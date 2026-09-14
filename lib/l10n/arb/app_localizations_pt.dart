@@ -10,7 +10,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_oauth_connect_browserFailed =>
-      'NÃ£o foi possÃ­vel abrir o navegador. Use Copiar link e cole o endereÃ§o no navegador.';
+      'Não foi possível abrir o navegador. Use Copiar link e cole o endereço no navegador.';
 
   @override
   String equipment_assemblyChip_label(Object count, Object name) {
@@ -21,7 +21,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_components_add => 'Adicionar componente';
 
   @override
-  String get equipment_components_containsSection => 'ContÃ©m';
+  String get equipment_components_containsSection => 'Contém';
 
   @override
   String equipment_components_count(num count) {
@@ -36,41 +36,41 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_components_cycleError =>
-      'Esse item jÃ¡ contÃ©m este, por isso nÃ£o pode ser adicionado como componente.';
+      'Esse item já contém este, por isso não pode ser adicionado como componente.';
 
   @override
-  String get equipment_components_editRole => 'Editar funÃ§Ã£o';
+  String get equipment_components_editRole => 'Editar função';
 
   @override
   String get equipment_components_empty =>
-      'Sem componentes. Adicione as peÃ§as que compÃµem este item.';
+      'Sem componentes. Adicione as peças que compõem este item.';
 
   @override
   String get equipment_components_emptyLeaf =>
-      'Sem peÃ§as prÃ³prias. Adicione-as se este item for composto por outros.';
+      'Sem peças próprias. Adicione-as se este item for composto por outros.';
 
   @override
   String equipment_components_historyAlsoPast(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Atualizar tambÃ©m $count mergulhos',
-      one: 'Atualizar tambÃ©m 1 mergulho',
+      other: 'Atualizar também $count mergulhos',
+      one: 'Atualizar também 1 mergulho',
     );
     return '$_temp0';
   }
 
   @override
   String get equipment_components_historyAskAdded =>
-      'Adicionar a nova peÃ§a tambÃ©m a esses mergulhos, ou sÃ³ a partir de agora?';
+      'Adicionar a nova peça também a esses mergulhos, ou só a partir de agora?';
 
   @override
   String get equipment_components_historyAskRemoved =>
-      'Remover a peÃ§a tambÃ©m desses mergulhos, ou sÃ³ a partir de agora?';
+      'Remover a peça também desses mergulhos, ou só a partir de agora?';
 
   @override
   String get equipment_components_historyAskReplaced =>
-      'Trocar a peÃ§a tambÃ©m nesses mergulhos, ou sÃ³ a partir de agora?';
+      'Trocar a peça também nesses mergulhos, ou só a partir de agora?';
 
   @override
   String get equipment_components_historyFutureOnly => 'A partir de agora';
@@ -80,8 +80,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Este conjunto estÃ¡ em $count mergulhos registados.',
-      one: 'Este conjunto estÃ¡ em 1 mergulho registado.',
+      other: 'Este conjunto está em $count mergulhos registados.',
+      one: 'Este conjunto está em 1 mergulho registado.',
     );
     return '$_temp0';
   }
@@ -128,7 +128,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_components_pickerEmpty =>
-      'NÃ£o hÃ¡ outro equipamento ativo que possa ser adicionado aqui.';
+      'Não há outro equipamento ativo que possa ser adicionado aqui.';
 
   @override
   String get equipment_components_pickerReplaceConfirm => 'Substituir';
@@ -149,13 +149,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_components_replace => 'Substituir componente';
 
   @override
-  String get equipment_components_role => 'FunÃ§Ã£o';
+  String get equipment_components_role => 'Função';
 
   @override
-  String get equipment_components_roleDialogTitle => 'FunÃ§Ã£o do componente';
+  String get equipment_components_roleDialogTitle => 'Função do componente';
 
   @override
-  String get equipment_components_roleHint => 'ex.: Segundo estÃ¡gio principal';
+  String get equipment_components_roleHint => 'ex.: Segundo estágio principal';
 
   @override
   String equipment_components_rollupClock(Object component, Object kind) {
@@ -167,12 +167,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String equipment_documents_removeError(String error) {
-    return 'NÃ£o foi possÃ­vel remover o documento: $error';
+    return 'Não foi possível remover o documento: $error';
   }
 
   @override
   String get settings_oauth_connect_copyFailed =>
-      'NÃ£o foi possÃ­vel copiar o link.';
+      'Não foi possível copiar o link.';
 
   @override
   String get settings_oauth_connect_copyLink => 'Copiar link';
@@ -187,7 +187,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_edit_flightWindowWarning(String time) {
-    return 'Este mergulho termina depois do Ãºltimo horÃ¡rio seguro para emergir antes do seu voo ($time)';
+    return 'Este mergulho termina depois do último horário seguro para emergir antes do seu voo ($time)';
   }
 
   @override
@@ -196,8 +196,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get diveLog_edit_geofenceSuggestion_title =>
-      'SugestÃ£o de equipamento';
+  String get diveLog_edit_geofenceSuggestion_title => 'Sugestão de equipamento';
 
   @override
   String diveLog_edit_geofenceSuggestion_body(String setName) {
@@ -211,11 +210,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get common_action_dismiss => 'Dispensar';
 
   @override
-  String get equipment_setEdit_defaultSwitch_title => 'Conjunto padrÃ£o';
+  String get equipment_setEdit_defaultSwitch_title => 'Conjunto padrão';
 
   @override
   String get equipment_setEdit_defaultSwitch_subtitle =>
-      'Aplicado automaticamente a novos mergulhos que ainda nÃ£o tÃªm equipamento';
+      'Aplicado automaticamente a novos mergulhos que ainda não têm equipamento';
 
   @override
   String get equipment_setEdit_geofencesTitle => 'Geocercas';
@@ -248,7 +247,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_geofenceEditor_dropPin => 'Colocar um alfinete';
 
   @override
-  String get equipment_geofenceEditor_labelLabel => 'RÃ³tulo';
+  String get equipment_geofenceEditor_labelLabel => 'Rótulo';
 
   @override
   String get equipment_geofenceEditor_noCenter => 'Escolha um ponto central';
@@ -257,14 +256,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_geofenceEditor_save => 'Salvar geocerca';
 
   @override
-  String get equipment_sets_defaultBadge => 'PadrÃ£o';
+  String get equipment_sets_defaultBadge => 'Padrão';
 
   @override
-  String get equipment_setDetail_setAsDefault => 'Definir como padrÃ£o';
+  String get equipment_setDetail_setAsDefault => 'Definir como padrão';
 
   @override
   String equipment_setDetail_setAsDefaultSnackbar(String name) {
-    return '\"$name\" agora Ã© o seu conjunto padrÃ£o';
+    return '\"$name\" agora é o seu conjunto padrão';
   }
 
   @override
@@ -406,7 +405,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get trips_story_surfaceDay => 'Dia de superfÃ­cie';
+  String get trips_story_surfaceDay => 'Dia de superfície';
 
   @override
   String get trips_story_today => 'Hoje';
@@ -421,26 +420,26 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: '$days dias atÃ© a partida',
-      one: '1 dia atÃ© a partida',
+      other: '$days dias até a partida',
+      one: '1 dia até a partida',
     );
     return '$_temp0';
   }
 
   @override
   String trips_story_checklistProgress(int done, int total) {
-    return '$done de $total concluÃ­do';
+    return '$done de $total concluído';
   }
 
   @override
-  String get trips_story_generateItinerary => 'Gerar itinerÃ¡rio';
+  String get trips_story_generateItinerary => 'Gerar itinerário';
 
   @override
   String get trips_story_openGallery => 'Abrir fotos da viagem';
 
   @override
   String trips_story_generateItineraryError(String error) {
-    return 'NÃ£o foi possÃ­vel gerar o itinerÃ¡rio: $error';
+    return 'Não foi possível gerar o itinerário: $error';
   }
 
   @override
@@ -462,11 +461,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trips_story_planned => 'Planejado';
 
   @override
-  String get trips_story_empty_title => 'Ainda sem mergulhos ou itinerÃ¡rio';
+  String get trips_story_empty_title => 'Ainda sem mergulhos ou itinerário';
 
   @override
   String get trips_story_empty_subtitle =>
-      'Adicione mergulhos ou planeje os dias para ver a histÃ³ria.';
+      'Adicione mergulhos ou planeje os dias para ver a história.';
 
   @override
   String trips_story_history_dives(int count) {
@@ -481,20 +480,20 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String trips_story_history_avgTemp(String value) {
-    return 'mÃ©dia $value';
+    return 'média $value';
   }
 
   @override
   String trips_story_history_avgDepth(String value) {
-    return 'prof. mÃ©dia $value';
+    return 'prof. média $value';
   }
 
   @override
-  String get trips_story_rhythm_semantics => 'HorÃ¡rios de mergulho deste dia';
+  String get trips_story_rhythm_semantics => 'Horários de mergulho deste dia';
 
   @override
   String get trips_story_map_semantics =>
-      'Mapa da viagem. Os pontos do dia visÃ­vel estÃ£o destacados.';
+      'Mapa da viagem. Os pontos do dia visível estão destacados.';
 
   @override
   String get diveLog_bulkEdit_groupRebreather =>
@@ -513,11 +512,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_bulkEdit_fieldScrubberType => 'Tipo de cal sodada';
 
   @override
-  String get diveLog_bulkEdit_fieldScrubberDuration => 'DuraÃ§Ã£o da cal';
+  String get diveLog_bulkEdit_fieldScrubberDuration => 'Duração da cal';
 
   @override
   String get diveLog_bulkEdit_contradiction =>
-      'O modo OC nÃ£o suporta ajustes de rebreather. Desative esses campos ou mude o modo.';
+      'O modo OC não suporta ajustes de rebreather. Desative esses campos ou mude o modo.';
 
   @override
   String diveLog_bulkEdit_appBarTitle(int count) {
@@ -525,7 +524,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get diveLog_bulkEdit_groupLogistics => 'LogÃ­stica';
+  String get diveLog_bulkEdit_groupLogistics => 'Logística';
 
   @override
   String get diveLog_bulkEdit_groupWeather => 'Clima';
@@ -537,7 +536,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_bulkEdit_fieldFavorite => 'Favorito';
 
   @override
-  String get diveLog_bulkEdit_fieldMyRole => 'Minha funÃ§Ã£o';
+  String get diveLog_bulkEdit_fieldMyRole => 'Minha função';
 
   @override
   String get diveLog_bulkEdit_buddyRoleMixed => 'Variado';
@@ -572,30 +571,29 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_bulkEdit_tankSpecsHint =>
-      'Escolhe quais atributos sobrescrever nos cilindros que estes mergulhos jÃ¡ tÃªm. As pressÃµes inicial e final nunca sÃ£o alteradas.';
+      'Escolhe quais atributos sobrescrever nos cilindros que estes mergulhos já têm. As pressões inicial e final nunca são alteradas.';
 
   @override
   String get diveLog_bulkEdit_tankSpecsNoFields =>
       'Escolhe pelo menos um atributo de cilindro para atualizar.';
 
   @override
-  String get diveLog_bulkEdit_tankFieldPreset => 'PredefiniÃ§Ã£o';
+  String get diveLog_bulkEdit_tankFieldPreset => 'Predefinição';
 
   @override
-  String get diveLog_bulkEdit_tankFieldRole => 'FunÃ§Ã£o';
+  String get diveLog_bulkEdit_tankFieldRole => 'Função';
 
   @override
   String get diveLog_bulkEdit_tankFieldVolume => 'Volume';
 
   @override
-  String get diveLog_bulkEdit_tankFieldWorkingPressure =>
-      'PressÃ£o de trabalho';
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'Pressão de trabalho';
 
   @override
   String get diveLog_bulkEdit_tankFieldMaterial => 'Material';
 
   @override
-  String get diveLog_bulkEdit_tankFieldGasMix => 'Mistura de gÃ¡s';
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Mistura de gás';
 
   @override
   String get diveLog_bulkEdit_tankFieldName => 'Nome';
@@ -606,14 +604,14 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '$count mergulhos selecionados nÃ£o tÃªm cilindros e serÃ£o ignorados.',
-      one: '1 mergulho selecionado nÃ£o tem cilindros e serÃ¡ ignorado.',
+          '$count mergulhos selecionados não têm cilindros e serão ignorados.',
+      one: '1 mergulho selecionado não tem cilindros e será ignorado.',
     );
     return '$_temp0';
   }
 
   @override
-  String get diveLog_bulkEdit_confirmTitle => 'Aplicar alteraÃ§Ãµes?';
+  String get diveLog_bulkEdit_confirmTitle => 'Aplicar alterações?';
 
   @override
   String get diveLog_bulkEdit_confirmApply => 'Aplicar';
@@ -642,7 +640,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_bulkEdit_nothingSelected =>
-      'Ative pelo menos um campo para aplicar alteraÃ§Ãµes.';
+      'Ative pelo menos um campo para aplicar alterações.';
 
   @override
   String diveLog_bulkEdit_applied(int count) {
@@ -651,19 +649,19 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_error_icloudSignedOut =>
-      'O iCloud nÃ£o estÃ¡ disponÃ­vel. Inicie sessÃ£o no iCloud nas definiÃ§Ãµes do seu dispositivo.';
+      'O iCloud não está disponível. Inicie sessão no iCloud nas definições do seu dispositivo.';
 
   @override
   String get settings_cloudSync_error_icloudUnknown =>
-      'NÃ£o foi possÃ­vel aceder ao iCloud. Tente novamente.';
+      'Não foi possível aceder ao iCloud. Tente novamente.';
 
   @override
   String get settings_cloudSync_error_icloudUnsupported =>
-      'A sincronizaÃ§Ã£o do iCloud nÃ£o estÃ¡ disponÃ­vel nesta versÃ£o do Submersion. Use a sincronizaÃ§Ã£o S3 ou a versÃ£o da App Store.';
+      'A sincronização do iCloud não está disponível nesta versão do Submersion. Use a sincronização S3 ou a versão da App Store.';
 
   @override
   String get settings_cloudSync_provider_icloud_unsupportedSubtitle =>
-      'IndisponÃ­vel nesta versÃ£o â€” use o S3 ou a versÃ£o da App Store';
+      'Indisponível nesta versão — use o S3 ou a versão da App Store';
 
   @override
   String get settings_cloudSync_encryption_title =>
@@ -671,7 +669,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_encryption_subtitleOff =>
-      'Criptografar todos os dados de sincronizaÃ§Ã£o e backups na nuvem antes do envio';
+      'Criptografar todos os dados de sincronização e backups na nuvem antes do envio';
 
   @override
   String get settings_cloudSync_encryption_subtitleNeedsProvider =>
@@ -679,19 +677,19 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_encryption_statusOff =>
-      'A criptografia estÃ¡ desativada';
+      'A criptografia está desativada';
 
   @override
   String get settings_cloudSync_encryption_statusOn =>
-      'A criptografia estÃ¡ ativada';
+      'A criptografia está ativada';
 
   @override
   String get settings_cloudSync_encryption_statusOnSubtitle =>
-      'Dados de sincronizaÃ§Ã£o e backups na nuvem sÃ£o criptografados antes do envio';
+      'Dados de sincronização e backups na nuvem são criptografados antes do envio';
 
   @override
   String get settings_cloudSync_encryption_statusLocked =>
-      'Criptografado â€” senha necessÃ¡ria';
+      'Criptografado — senha necessária';
 
   @override
   String get settings_cloudSync_encryption_statusLockedSubtitle =>
@@ -713,7 +711,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_encryption_passphraseMismatch =>
-      'As frases-senha nÃ£o coincidem';
+      'As frases-senha não coincidem';
 
   @override
   String get settings_cloudSync_encryption_passphraseTooShort =>
@@ -721,31 +719,31 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_encryption_wrongPassphrase =>
-      'Frase-senha ou cÃ³digo de recuperaÃ§Ã£o incorretos';
+      'Frase-senha ou código de recuperação incorretos';
 
   @override
   String get settings_cloudSync_encryption_warnUpdateDevices =>
-      'Todos os outros dispositivos precisam ser atualizados para a versÃ£o mais recente do app e baixarÃ£o a biblioteca novamente.';
+      'Todos os outros dispositivos precisam ser atualizados para a versão mais recente do app e baixarão a biblioteca novamente.';
 
   @override
   String get settings_cloudSync_encryption_warnLoss =>
-      'Se vocÃª perder a frase-senha e o cÃ³digo de recuperaÃ§Ã£o, os dados na nuvem nÃ£o poderÃ£o ser recuperados. Os dados nos seus dispositivos nunca correm risco.';
+      'Se você perder a frase-senha e o código de recuperação, os dados na nuvem não poderão ser recuperados. Os dados nos seus dispositivos nunca correm risco.';
 
   @override
   String get settings_cloudSync_encryption_deletePlaintextBackups =>
-      'Excluir backups na nuvem nÃ£o criptografados existentes';
+      'Excluir backups na nuvem não criptografados existentes';
 
   @override
   String get settings_cloudSync_encryption_recoveryTitle =>
-      'CÃ³digo de recuperaÃ§Ã£o';
+      'Código de recuperação';
 
   @override
   String get settings_cloudSync_encryption_recoveryExplain =>
-      'Anote este cÃ³digo e guarde-o em local seguro. Ã‰ a Ãºnica forma de voltar a acessar se vocÃª esquecer a frase-senha.';
+      'Anote este código e guarde-o em local seguro. É a única forma de voltar a acessar se você esquecer a frase-senha.';
 
   @override
   String get settings_cloudSync_encryption_recoverySavedConfirm =>
-      'Salvei meu cÃ³digo de recuperaÃ§Ã£o';
+      'Salvei meu código de recuperação';
 
   @override
   String get settings_cloudSync_encryption_changePassphrase =>
@@ -760,18 +758,18 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_encryption_regenerateRecovery =>
-      'Gerar novo cÃ³digo de recuperaÃ§Ã£o';
+      'Gerar novo código de recuperação';
 
   @override
   String get settings_cloudSync_encryption_regenerateRecoveryWarn =>
-      'O cÃ³digo de recuperaÃ§Ã£o antigo deixa de funcionar imediatamente.';
+      'O código de recuperação antigo deixa de funcionar imediatamente.';
 
   @override
   String get settings_cloudSync_encryption_disable => 'Desativar criptografia';
 
   @override
   String get settings_cloudSync_encryption_disableWarn =>
-      'A biblioteca serÃ¡ reenviada sem criptografia e os outros dispositivos a baixarÃ£o novamente. Os backups criptografados existentes continuam restaurÃ¡veis com a frase-senha.';
+      'A biblioteca será reenviada sem criptografia e os outros dispositivos a baixarão novamente. Os backups criptografados existentes continuam restauráveis com a frase-senha.';
 
   @override
   String get settings_cloudSync_encryption_unlockTitle =>
@@ -779,7 +777,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_encryption_unlockHint =>
-      'Frase-senha ou cÃ³digo de recuperaÃ§Ã£o';
+      'Frase-senha ou código de recuperação';
 
   @override
   String get settings_cloudSync_encryption_unlock => 'Desbloquear';
@@ -788,7 +786,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_cloudSync_encryption_continue => 'Continuar';
 
   @override
-  String get settings_cloudSync_encryption_done => 'ConcluÃ­do';
+  String get settings_cloudSync_encryption_done => 'Concluído';
 
   @override
   String get settings_cloudSync_encryption_cancel => 'Cancelar';
@@ -802,7 +800,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_backupEncryption_subtitleOn =>
-      'Os backups sÃ£o criptografados com sua senha';
+      'Os backups são criptografados com sua senha';
 
   @override
   String get settings_backupEncryption_enable => 'Criptografar backups';
@@ -816,14 +814,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_backupEncryption_turnOffBody =>
-      'Os novos backups deixarÃ£o de ser criptografados. Os backups criptografados existentes ainda precisam da sua senha para serem restaurados.';
+      'Os novos backups deixarão de ser criptografados. Os backups criptografados existentes ainda precisam da sua senha para serem restaurados.';
 
   @override
   String get settings_backupEncryption_changePassword => 'Alterar senha';
 
   @override
   String get settings_backupEncryption_regenerateRecovery =>
-      'Gerar novo cÃ³digo de recuperaÃ§Ã£o';
+      'Gerar novo código de recuperação';
 
   @override
   String get settings_backupEncryption_password => 'Senha';
@@ -837,7 +835,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_backupEncryption_passwordMismatch =>
-      'As senhas nÃ£o coincidem';
+      'As senhas não coincidem';
 
   @override
   String get settings_backupEncryption_currentPassword => 'Senha atual';
@@ -847,23 +845,23 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_backupEncryption_changePasswordWarn =>
-      'Em outro dispositivo, cada backup Ã© aberto com a senha ou o cÃ³digo de recuperaÃ§Ã£o que estava ativo quando foi criado.';
+      'Em outro dispositivo, cada backup é aberto com a senha ou o código de recuperação que estava ativo quando foi criado.';
 
   @override
   String get settings_backupEncryption_warnLoss =>
-      'Se vocÃª esquecer a senha e perder o cÃ³digo de recuperaÃ§Ã£o, os backups criptografados nÃ£o poderÃ£o ser recuperados.';
+      'Se você esquecer a senha e perder o código de recuperação, os backups criptografados não poderão ser recuperados.';
 
   @override
   String get settings_backupEncryption_recoveryTitle =>
-      'Seu cÃ³digo de recuperaÃ§Ã£o';
+      'Seu código de recuperação';
 
   @override
   String get settings_backupEncryption_recoveryExplain =>
-      'Guarde este cÃ³digo em local seguro. Ele pode desbloquear seus backups se vocÃª esquecer a senha.';
+      'Guarde este código em local seguro. Ele pode desbloquear seus backups se você esquecer a senha.';
 
   @override
   String get settings_backupEncryption_recoverySavedConfirm =>
-      'Salvei meu cÃ³digo de recuperaÃ§Ã£o';
+      'Salvei meu código de recuperação';
 
   @override
   String get settings_backupEncryption_unlockTitle =>
@@ -871,7 +869,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_backupEncryption_unlockHint =>
-      'Digite a senha do backup ou o cÃ³digo de recuperaÃ§Ã£o';
+      'Digite a senha do backup ou o código de recuperação';
 
   @override
   String get settings_backupEncryption_restoreUnlockTitle =>
@@ -879,7 +877,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_backupEncryption_restoreUnlockHint =>
-      'Insira a senha ou o cÃ³digo de recuperaÃ§Ã£o deste backup';
+      'Insira a senha ou o código de recuperação deste backup';
 
   @override
   String get settings_backupEncryption_continue => 'Continuar';
@@ -888,7 +886,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_backupEncryption_cancel => 'Cancelar';
 
   @override
-  String get settings_backupEncryption_done => 'ConcluÃ­do';
+  String get settings_backupEncryption_done => 'Concluído';
 
   @override
   String get settings_backupEncryption_reencryptTitle =>
@@ -896,17 +894,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_backupEncryption_reencryptBody =>
-      'Seus backups existentes ainda nÃ£o estÃ£o criptografados. RecriptografÃ¡-los agora com sua nova senha?';
+      'Seus backups existentes ainda não estão criptografados. Recriptografá-los agora com sua nova senha?';
 
   @override
   String get settings_backupEncryption_reencryptNow => 'Recriptografar agora';
 
   @override
-  String get settings_backupEncryption_reencryptNotNow => 'Agora nÃ£o';
+  String get settings_backupEncryption_reencryptNotNow => 'Agora não';
 
   @override
   String settings_backupEncryption_reencryptPartial(int done, int failed) {
-    return '$done backups recriptografados; $failed nÃ£o puderam ser criptografados e continuam desprotegidos';
+    return '$done backups recriptografados; $failed não puderam ser criptografados e continuam desprotegidos';
   }
 
   @override
@@ -916,16 +914,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_backupEncryption_wrongPassword =>
-      'Senha ou cÃ³digo de recuperaÃ§Ã£o incorretos';
+      'Senha ou código de recuperação incorretos';
 
   @override
   String settings_cloudSync_replace_globalBanner(String deviceName) {
-    return 'SincronizaÃ§Ã£o em pausa â€” a biblioteca foi substituÃ­da a partir de uma cÃ³pia de seguranÃ§a em \"$deviceName\".';
+    return 'Sincronização em pausa — a biblioteca foi substituída a partir de uma cópia de segurança em \"$deviceName\".';
   }
 
   @override
   String get settings_cloudSync_postRestore_syncing =>
-      'A sincronizar a sua biblioteca restaurada com a nuvemâ€¦';
+      'A sincronizar a sua biblioteca restaurada com a nuvem…';
 
   @override
   String get settings_cloudSync_postRestore_synced =>
@@ -1088,7 +1086,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get backup_appBar_title => 'Backup e RestauraÃ§Ã£o';
+  String get backup_appBar_title => 'Backup e Restauração';
 
   @override
   String get backup_backingUp => 'Fazendo backup...';
@@ -1108,7 +1106,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get backup_delete_dialog_content =>
-      'Este backup serÃ¡ excluÃ­do permanentemente. Esta aÃ§Ã£o nÃ£o pode ser desfeita.';
+      'Este backup será excluído permanentemente. Esta ação não pode ser desfeita.';
 
   @override
   String get backup_delete_dialog_delete => 'Excluir';
@@ -1144,7 +1142,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get backup_export_title => 'Exportar Backup';
 
   @override
-  String get backup_frequency_daily => 'DiÃ¡rio';
+  String get backup_frequency_daily => 'Diário';
 
   @override
   String get backup_frequency_monthly => 'Mensal';
@@ -1163,7 +1161,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String backup_history_error(Object error) {
-    return 'Erro ao carregar histÃ³rico: $error';
+    return 'Erro ao carregar histórico: $error';
   }
 
   @override
@@ -1208,7 +1206,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get backup_replaceConfirm_content =>
-      'A biblioteca em todos os dispositivos sincronizados serÃ¡ substituÃ­da por este backup. Cada dispositivo cria primeiro um backup de seguranÃ§a dos seus dados atuais. Isso nÃ£o pode ser desfeito.';
+      'A biblioteca em todos os dispositivos sincronizados será substituída por este backup. Cada dispositivo cria primeiro um backup de segurança dos seus dados atuais. Isso não pode ser desfeito.';
 
   @override
   String get backup_replaceConfirm_title =>
@@ -1219,11 +1217,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get backup_restore_dialog_modeMerge_subtitle =>
-      'Restaurar neste dispositivo. A prÃ³xima sincronizaÃ§Ã£o combinarÃ¡ os dados restaurados com a biblioteca na nuvem.';
+      'Restaurar neste dispositivo. A próxima sincronização combinará os dados restaurados com a biblioteca na nuvem.';
 
   @override
   String get backup_restore_dialog_modeMerge_title =>
-      'Mesclar na prÃ³xima sincronizaÃ§Ã£o';
+      'Mesclar na próxima sincronização';
 
   @override
   String get backup_restore_dialog_modeReplace_subtitle =>
@@ -1242,14 +1240,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get backup_restore_dialog_safetyNote =>
-      'Um backup de seguranÃ§a dos seus dados atuais serÃ¡ criado automaticamente antes da restauraÃ§Ã£o.';
+      'Um backup de segurança dos seus dados atuais será criado automaticamente antes da restauração.';
 
   @override
   String get backup_restore_dialog_title => 'Restaurar Backup';
 
   @override
   String get backup_restore_dialog_warning =>
-      'Isso substituirÃ¡ TODOS os dados atuais pelos dados do backup. Esta aÃ§Ã£o nÃ£o pode ser desfeita.';
+      'Isso substituirá TODOS os dados atuais pelos dados do backup. Esta ação não pode ser desfeita.';
 
   @override
   String backup_restore_safetyReview_progress(int done, int total) {
@@ -1261,7 +1259,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get backup_restore_safetyReview_title =>
-      'Executando a revisÃ£o de seguranÃ§a';
+      'Executando a revisão de segurança';
 
   @override
   String get backup_restoreComplete_continue => 'Continuar';
@@ -1274,21 +1272,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get backup_restoreComplete_title => 'Restauracao Concluida';
 
   @override
-  String get backup_schedule_enabled => 'Backups automÃ¡ticos';
+  String get backup_schedule_enabled => 'Backups automáticos';
 
   @override
   String get backup_schedule_enabled_subtitle =>
       'Fazer backup dos dados em um agendamento';
 
   @override
-  String get backup_schedule_frequency => 'FrequÃªncia';
+  String get backup_schedule_frequency => 'Frequência';
 
   @override
   String get backup_schedule_retention => 'Manter backups';
 
   @override
   String get backup_schedule_retention_subtitle =>
-      'Backups mais antigos sÃ£o removidos automaticamente';
+      'Backups mais antigos são removidos automaticamente';
 
   @override
   String get backup_section_auto => 'Backups Automaticos';
@@ -1297,17 +1295,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get backup_section_cloud => 'Nuvem';
 
   @override
-  String get backup_section_history => 'HistÃ³rico';
+  String get backup_section_history => 'Histórico';
 
   @override
   String get backup_section_schedule => 'Agendamento';
 
   @override
-  String get backup_status_disabled => 'Backups AutomÃ¡ticos Desativados';
+  String get backup_status_disabled => 'Backups Automáticos Desativados';
 
   @override
   String backup_status_lastBackup(String time) {
-    return 'Ãšltimo backup: $time';
+    return 'Último backup: $time';
   }
 
   @override
@@ -1325,12 +1323,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String backup_time_daysAgo(int count) {
-    return '${count}d atrÃ¡s';
+    return '${count}d atrás';
   }
 
   @override
   String backup_time_hoursAgo(int count) {
-    return '${count}h atrÃ¡s';
+    return '${count}h atrás';
   }
 
   @override
@@ -1338,14 +1336,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String backup_time_minutesAgo(int count) {
-    return '${count}m atrÃ¡s';
+    return '${count}m atrás';
   }
 
   @override
   String get buddies_action_add => 'Adicionar Companheiro';
 
   @override
-  String get buddies_action_addCertification => 'Adicionar certificaÃ§Ã£o';
+  String get buddies_action_addCertification => 'Adicionar certificação';
 
   @override
   String get buddies_action_addFirst => 'Adicione seu primeiro companheiro';
@@ -1364,7 +1362,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get buddies_action_importFromContacts => 'Importar dos Contatos';
 
   @override
-  String get buddies_action_moreOptions => 'Mais opÃ§Ãµes';
+  String get buddies_action_moreOptions => 'Mais opções';
 
   @override
   String get buddies_action_retry => 'Tentar novamente';
@@ -1398,11 +1396,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get buddies_detail_noDivesTogether => 'Nenhum mergulho juntos ainda';
 
   @override
-  String get buddies_detail_notFound => 'Companheiro nÃ£o encontrado';
+  String get buddies_detail_notFound => 'Companheiro não encontrado';
 
   @override
   String buddies_dialog_deleteMessage(Object name) {
-    return 'Tem certeza de que deseja excluir $name? Esta aÃ§Ã£o nÃ£o pode ser desfeita.';
+    return 'Tem certeza de que deseja excluir $name? Esta ação não pode ser desfeita.';
   }
 
   @override
@@ -1413,17 +1411,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get buddies_dialog_discardMessage =>
-      'VocÃª tem alteraÃ§Ãµes nÃ£o salvas. Tem certeza de que deseja descartÃ¡-las?';
+      'Você tem alterações não salvas. Tem certeza de que deseja descartá-las?';
 
   @override
-  String get buddies_dialog_discardTitle => 'Descartar AlteraÃ§Ãµes?';
+  String get buddies_dialog_discardTitle => 'Descartar Alterações?';
 
   @override
   String get buddies_dialog_keepEditing => 'Continuar Editando';
 
   @override
   String get buddies_empty_subtitle =>
-      'Adicione seu primeiro companheiro de mergulho para comeÃ§ar';
+      'Adicione seu primeiro companheiro de mergulho para começar';
 
   @override
   String get buddies_empty_title => 'Nenhum companheiro de mergulho ainda';
@@ -1435,17 +1433,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get buddies_error_unableToLoadDives =>
-      'NÃ£o foi possÃ­vel carregar os mergulhos';
+      'Não foi possível carregar os mergulhos';
 
   @override
   String get buddies_error_unableToLoadStats =>
-      'NÃ£o foi possÃ­vel carregar as estatÃ­sticas';
+      'Não foi possível carregar as estatísticas';
 
   @override
-  String get buddies_field_certificationAgency => 'AgÃªncia Certificadora';
+  String get buddies_field_certificationAgency => 'Agência Certificadora';
 
   @override
-  String get buddies_field_certificationLevel => 'NÃ­vel de CertificaÃ§Ã£o';
+  String get buddies_field_certificationLevel => 'Nível de Certificação';
 
   @override
   String get buddies_field_email => 'E-mail';
@@ -1473,7 +1471,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get buddies_field_phoneHint => '+55 (11) 98765-4321';
 
   @override
-  String get buddies_label_agency => 'AgÃªncia';
+  String get buddies_label_agency => 'Agência';
 
   @override
   String buddies_label_diveCount(int count) {
@@ -1487,10 +1485,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get buddies_label_level => 'NÃ­vel';
+  String get buddies_label_level => 'Nível';
 
   @override
-  String get buddies_label_notSpecified => 'NÃ£o especificado';
+  String get buddies_label_notSpecified => 'Não especificado';
 
   @override
   String get buddies_linkText_action => 'Vincular a registros de companheiros';
@@ -1500,7 +1498,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String buddies_linkText_chipWithRole(String name, String role) {
-    return '$name Â· $role';
+    return '$name · $role';
   }
 
   @override
@@ -1512,7 +1510,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String buddies_linkText_error(String error) {
-    return 'NÃ£o foi possÃ­vel vincular os companheiros: $error';
+    return 'Não foi possível vincular os companheiros: $error';
   }
 
   @override
@@ -1554,11 +1552,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get buddies_linkText_page_empty =>
-      'Todos os nomes de companheiros estÃ£o vinculados a um registro';
+      'Todos os nomes de companheiros estão vinculados a um registro';
 
   @override
   String buddies_linkText_page_errorLoading(String error) {
-    return 'NÃ£o foi possÃ­vel carregar os mergulhos: $error';
+    return 'Não foi possível carregar os mergulhos: $error';
   }
 
   @override
@@ -1632,12 +1630,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String buddies_linkText_sourceBuddy(String text) {
-    return 'De â€œ$textâ€';
+    return 'De “$text”';
   }
 
   @override
   String buddies_linkText_sourceDiveMaster(String text) {
-    return 'Divemaster â€œ$textâ€';
+    return 'Divemaster “$text”';
   }
 
   @override
@@ -1648,7 +1646,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String buddies_linkText_suggestion(String name) {
-    return 'VocÃª quis dizer $name?';
+    return 'Você quis dizer $name?';
   }
 
   @override
@@ -1663,7 +1661,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get buddies_linkText_undone => 'VÃ­nculos de companheiros removidos';
+  String get buddies_linkText_undone => 'Vínculos de companheiros removidos';
 
   @override
   String get buddies_linkText_useSuggestion => 'Usar';
@@ -1673,17 +1671,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get buddies_message_contactImportUnavailable =>
-      'ImportaÃ§Ã£o de contatos nÃ£o estÃ¡ disponÃ­vel nesta plataforma';
+      'Importação de contatos não está disponível nesta plataforma';
 
   @override
   String get buddies_message_contactLoadFailed => 'Falha ao carregar contatos';
 
   @override
   String get buddies_message_contactPermissionRequired =>
-      'PermissÃ£o de contatos Ã© necessÃ¡ria para importar companheiros';
+      'Permissão de contatos é necessária para importar companheiros';
 
   @override
-  String get buddies_message_deleted => 'Companheiro excluÃ­do';
+  String get buddies_message_deleted => 'Companheiro excluído';
 
   @override
   String buddies_message_errorImportingContact(Object error) {
@@ -1702,7 +1700,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String buddies_message_exportFailed(Object error) {
-    return 'Falha na exportaÃ§Ã£o: $error';
+    return 'Falha na exportação: $error';
   }
 
   @override
@@ -1714,7 +1712,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Nenhum mergulho para compartilhar com este companheiro';
 
   @override
-  String get buddies_message_preparingExport => 'Preparando exportaÃ§Ã£o...';
+  String get buddies_message_preparingExport => 'Preparando exportação...';
 
   @override
   String get buddies_message_updated => 'Companheiro atualizado com sucesso';
@@ -1724,7 +1722,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get buddies_picker_addCustomRole =>
-      'Adicionar funÃ§Ã£o personalizada...';
+      'Adicionar função personalizada...';
 
   @override
   String get buddies_picker_addNew => 'Adicionar Novo Companheiro';
@@ -1742,7 +1740,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get buddies_picker_noBuddiesYet => 'Nenhum companheiro ainda';
 
   @override
-  String get buddies_picker_noRole => 'Sem funÃ§Ã£o';
+  String get buddies_picker_noRole => 'Sem função';
 
   @override
   String get buddies_picker_noneSelected => 'Nenhum companheiro selecionado';
@@ -1754,15 +1752,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get buddies_picker_selectBuddies => 'Selecionar Companheiros';
 
   @override
-  String get buddies_picker_selectMyRole => 'Selecionar minha funÃ§Ã£o';
+  String get buddies_picker_selectMyRole => 'Selecionar minha função';
 
   @override
   String buddies_picker_selectRole(Object name) {
-    return 'Selecionar FunÃ§Ã£o para $name';
+    return 'Selecionar Função para $name';
   }
 
   @override
-  String get buddies_picker_setMyRole => 'Definir minha funÃ§Ã£o';
+  String get buddies_picker_setMyRole => 'Definir minha função';
 
   @override
   String get buddies_picker_tapToAdd =>
@@ -1777,19 +1775,19 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get buddies_section_certification => 'CertificaÃ§Ã£o';
+  String get buddies_section_certification => 'Certificação';
 
   @override
-  String get buddies_section_certifications => 'CertificaÃ§Ãµes';
+  String get buddies_section_certifications => 'Certificações';
 
   @override
-  String get buddies_certifications_empty => 'Sem certificaÃ§Ãµes';
+  String get buddies_certifications_empty => 'Sem certificações';
 
   @override
   String get buddies_section_contact => 'Contato';
 
   @override
-  String get buddies_section_diveStatistics => 'EstatÃ­sticas de Mergulho';
+  String get buddies_section_diveStatistics => 'Estatísticas de Mergulho';
 
   @override
   String get buddies_section_notes => 'Notas';
@@ -1807,13 +1805,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get buddies_stat_firstDive => 'Primeiro Mergulho';
 
   @override
-  String get buddies_stat_lastDive => 'Ãšltimo Mergulho';
+  String get buddies_stat_lastDive => 'Último Mergulho';
 
   @override
-  String get buddies_summary_overview => 'VisÃ£o Geral';
+  String get buddies_summary_overview => 'Visão Geral';
 
   @override
-  String get buddies_summary_quickActions => 'AÃ§Ãµes RÃ¡pidas';
+  String get buddies_summary_quickActions => 'Ações Rápidas';
 
   @override
   String get buddies_summary_recentBuddies => 'Companheiros Recentes';
@@ -1829,7 +1827,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get buddies_summary_totalBuddies => 'Total de Companheiros';
 
   @override
-  String get buddies_summary_withCertification => 'Com CertificaÃ§Ã£o';
+  String get buddies_summary_withCertification => 'Com Certificação';
 
   @override
   String get buddies_title => 'Companheiros';
@@ -1844,13 +1842,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get buddies_title_singular => 'Companheiro';
 
   @override
-  String get buddies_validation_emailInvalid => 'Digite um e-mail vÃ¡lido';
+  String get buddies_validation_emailInvalid => 'Digite um e-mail válido';
 
   @override
   String get buddies_validation_nameRequired => 'Digite um nome';
 
   @override
-  String get buddies_list_selection_closeTooltip => 'Fechar seleÃ§Ã£o';
+  String get buddies_list_selection_closeTooltip => 'Fechar seleção';
 
   @override
   String buddies_list_selection_count(int count) {
@@ -1897,7 +1895,7 @@ class AppLocalizationsPt extends AppLocalizations {
       other: 'companheiros',
       one: 'companheiro',
     );
-    return 'Tem certeza de que deseja excluir $count $_temp0? Esta aÃ§Ã£o nÃ£o pode ser desfeita.';
+    return 'Tem certeza de que deseja excluir $count $_temp0? Esta ação não pode ser desfeita.';
   }
 
   @override
@@ -1914,7 +1912,7 @@ class AppLocalizationsPt extends AppLocalizations {
       other: 'companheiros',
       one: 'companheiro',
     );
-    return '$count $_temp0 excluÃ­do(s)';
+    return '$count $_temp0 excluído(s)';
   }
 
   @override
@@ -1922,7 +1920,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get buddies_edit_merge_fieldSourceCycleTooltip =>
-      'Usar valor do prÃ³ximo companheiro selecionado';
+      'Usar valor do próximo companheiro selecionado';
 
   @override
   String buddies_edit_merge_fieldSourceLabel(
@@ -1938,7 +1936,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String buddies_edit_merge_confirmBody(int count) {
-    return 'Isso mesclarÃ¡ $count companheiros em um. As associaÃ§Ãµes de mergulho serÃ£o combinadas sob o companheiro resultante. Os outros companheiros serÃ£o excluÃ­dos.';
+    return 'Isso mesclará $count companheiros em um. As associações de mergulho serão combinadas sob o companheiro resultante. Os outros companheiros serão excluídos.';
   }
 
   @override
@@ -2013,7 +2011,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get certifications_detail_label_cardNumber => 'Numero do Cartao';
 
   @override
-  String get certifications_detail_label_certification => 'CertificaÃ§Ã£o';
+  String get certifications_detail_label_certification => 'Certificação';
 
   @override
   String get certifications_detail_label_expiryDate => 'Data de Validade';
@@ -2130,7 +2128,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get certifications_ecard_label_cardNumber => 'N.Âº DO CARTÃƒO';
+  String get certifications_ecard_label_cardNumber => 'N.º DO CARTÃO';
 
   @override
   String certifications_ecard_label_certifiedBy(Object agency) {
@@ -2147,7 +2145,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get certifications_ecard_label_issued => 'EMITIDO';
 
   @override
-  String get certifications_ecard_label_validUntil => 'VÃLIDA ATÃ‰';
+  String get certifications_ecard_label_validUntil => 'VÁLIDA ATÉ';
 
   @override
   String get certifications_ecard_statusBadge_expired => 'EXPIRADO';
@@ -2175,7 +2173,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get certifications_edit_certification_notSpecified =>
-      'NÃ£o especificado';
+      'Não especificado';
 
   @override
   String certifications_edit_datePicker_clearTooltip(Object label) {
@@ -2200,7 +2198,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get certifications_edit_dialog_keepEditing => 'Continuar Editando';
 
   @override
-  String get certifications_edit_group_progression => 'ProgressÃ£o';
+  String get certifications_edit_group_progression => 'Progressão';
 
   @override
   String get certifications_edit_group_specialties => 'Especialidades';
@@ -2241,7 +2239,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get certifications_edit_label_cardNumber => 'Numero do Cartao';
 
   @override
-  String get certifications_edit_label_certification => 'CertificaÃ§Ã£o';
+  String get certifications_edit_label_certification => 'Certificação';
 
   @override
   String get certifications_edit_label_expiryDate => 'Data de Validade';
@@ -2257,7 +2255,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get certifications_edit_label_issueDate => 'Data de Emissao';
 
   @override
-  String get certifications_edit_label_nameOnCard => 'Nome no cartÃ£o';
+  String get certifications_edit_label_nameOnCard => 'Nome no cartão';
 
   @override
   String get certifications_edit_label_notes => 'Observacoes';
@@ -2322,7 +2320,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get certifications_edit_validation_certificationOrNameRequired =>
-      'Escolha uma certificaÃ§Ã£o ou insira um nome';
+      'Escolha uma certificação ou insira um nome';
 
   @override
   String get certifications_list_button_retry => 'Tentar novamente';
@@ -2553,11 +2551,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get certifications_wallet_tooltip_share => 'Compartilhar certificacao';
 
   @override
-  String get checklists_section_title => 'Lista de VerificaÃ§Ã£o';
+  String get checklists_section_title => 'Lista de Verificação';
 
   @override
   String checklists_progress(int done, int total) {
-    return '$done de $total tarefas concluÃ­das';
+    return '$done de $total tarefas concluídas';
   }
 
   @override
@@ -2565,16 +2563,16 @@ class AppLocalizationsPt extends AppLocalizations {
       'Planeje sua viagem - adicione tarefas ou aplique um modelo';
 
   @override
-  String get checklists_empty_past => 'Nenhum item na lista de verificaÃ§Ã£o';
+  String get checklists_empty_past => 'Nenhum item na lista de verificação';
 
   @override
   String get checklists_addItem => 'Adicionar item';
 
   @override
-  String get checklists_item_titleLabel => 'TÃ­tulo';
+  String get checklists_item_titleLabel => 'Título';
 
   @override
-  String get checklists_item_titleRequired => 'O tÃ­tulo Ã© obrigatÃ³rio';
+  String get checklists_item_titleRequired => 'O título é obrigatório';
 
   @override
   String get checklists_item_categoryLabel => 'Categoria';
@@ -2586,8 +2584,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get checklists_item_dueDateLabel => 'Data de vencimento';
 
   @override
-  String get checklists_item_dueOffsetLabel =>
-      'Dias antes do inÃ­cio da viagem';
+  String get checklists_item_dueOffsetLabel => 'Dias antes do início da viagem';
 
   @override
   String get checklists_item_dueOffsetInvalid => 'Insira 0 ou mais dias';
@@ -2619,8 +2616,8 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          'Eliminar os $count itens desta lista? Os modelos nÃ£o sÃ£o afetados.',
-      one: 'Eliminar o Ãºnico item desta lista? Os modelos nÃ£o sÃ£o afetados.',
+          'Eliminar os $count itens desta lista? Os modelos não são afetados.',
+      one: 'Eliminar o único item desta lista? Os modelos não são afetados.',
     );
     return '$_temp0';
   }
@@ -2644,7 +2641,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get checklists_applySheet_empty =>
-      'Ainda nÃ£o hÃ¡ modelos. Crie-os em ConfiguraÃ§Ãµes.';
+      'Ainda não há modelos. Crie-os em Configurações.';
 
   @override
   String checklists_applySheet_itemCount(int count) {
@@ -2662,8 +2659,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       added,
       locale: localeName,
-      other: '$added itens serÃ£o adicionados',
-      one: '1 item serÃ¡ adicionado',
+      other: '$added itens serão adicionados',
+      one: '1 item será adicionado',
     );
     String _temp1 = intl.Intl.pluralLogic(
       skipped,
@@ -2688,7 +2685,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get checklists_apply_templateGone => 'O modelo nÃ£o existe mais';
+  String get checklists_apply_templateGone => 'O modelo não existe mais';
 
   @override
   String get checklists_saveTemplate_title => 'Salvar como modelo';
@@ -2701,7 +2698,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get checklists_templates_pageTitle =>
-      'Modelos de Lista de VerificaÃ§Ã£o de Viagem';
+      'Modelos de Lista de Verificação de Viagem';
 
   @override
   String get checklists_templates_addTemplate => 'Adicionar Modelo';
@@ -2710,24 +2707,24 @@ class AppLocalizationsPt extends AppLocalizations {
   String get checklists_templates_editTemplate => 'Editar Modelo';
 
   @override
-  String get checklists_templates_empty => 'Ainda nÃ£o hÃ¡ modelos';
+  String get checklists_templates_empty => 'Ainda não há modelos';
 
   @override
   String get checklists_templates_deleteTitle => 'Excluir Modelo';
 
   @override
   String checklists_templates_deleteContent(Object name) {
-    return 'Excluir \"$name\"? As viagens que jÃ¡ o aplicaram manterÃ£o seus itens.';
+    return 'Excluir \"$name\"? As viagens que já o aplicaram manterão seus itens.';
   }
 
   @override
   String get checklists_template_nameLabel => 'Nome';
 
   @override
-  String get checklists_template_nameRequired => 'O nome Ã© obrigatÃ³rio';
+  String get checklists_template_nameRequired => 'O nome é obrigatório';
 
   @override
-  String get checklists_template_descriptionLabel => 'DescriÃ§Ã£o';
+  String get checklists_template_descriptionLabel => 'Descrição';
 
   @override
   String get checklists_template_itemsHeader => 'Itens';
@@ -2736,11 +2733,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get checklists_template_addItem => 'Adicionar item';
 
   @override
-  String get preDive_templates_title => 'Listas de VerificaÃ§Ã£o PrÃ©-Mergulho';
+  String get preDive_templates_title => 'Listas de Verificação Pré-Mergulho';
 
   @override
   String get preDive_templates_empty =>
-      'Ainda nÃ£o hÃ¡ listas de verificaÃ§Ã£o prÃ©-mergulho';
+      'Ainda não há listas de verificação pré-mergulho';
 
   @override
   String get preDive_templates_builtInBadge => 'Integrada';
@@ -2749,31 +2746,30 @@ class AppLocalizationsPt extends AppLocalizations {
   String get preDive_templates_clone => 'Duplicar';
 
   @override
-  String get preDive_templates_cloneSuffix => ' (cÃ³pia)';
+  String get preDive_templates_cloneSuffix => ' (cópia)';
 
   @override
   String get preDive_templates_delete => 'Excluir';
 
   @override
   String get preDive_templates_deleteConfirm =>
-      'Excluir este modelo de lista de verificaÃ§Ã£o?';
+      'Excluir este modelo de lista de verificação?';
 
   @override
   String get preDive_templates_strictOrderBadge => 'Ordem estrita';
 
   @override
-  String get preDive_edit_titleNew =>
-      'Nova Lista de VerificaÃ§Ã£o PrÃ©-Mergulho';
+  String get preDive_edit_titleNew => 'Nova Lista de Verificação Pré-Mergulho';
 
   @override
   String get preDive_edit_titleEdit =>
-      'Editar Lista de VerificaÃ§Ã£o PrÃ©-Mergulho';
+      'Editar Lista de Verificação Pré-Mergulho';
 
   @override
   String get preDive_edit_name => 'Nome';
 
   @override
-  String get preDive_edit_description => 'DescriÃ§Ã£o';
+  String get preDive_edit_description => 'Descrição';
 
   @override
   String get preDive_edit_category => 'Categoria';
@@ -2783,7 +2779,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get preDive_edit_strictOrderHelp =>
-      'Os itens devem ser concluÃ­dos de cima para baixo';
+      'Os itens devem ser concluídos de cima para baixo';
 
   @override
   String get preDive_edit_addItem => 'Adicionar item';
@@ -2792,19 +2788,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get preDive_edit_nameRequired => 'Insira um nome';
 
   @override
-  String get preDive_item_title => 'TÃ­tulo';
+  String get preDive_item_title => 'Título';
 
   @override
-  String get preDive_item_section => 'SeÃ§Ã£o';
+  String get preDive_item_section => 'Seção';
 
   @override
   String get preDive_item_notes => 'Notas';
 
   @override
-  String get preDive_item_required => 'ObrigatÃ³rio';
+  String get preDive_item_required => 'Obrigatório';
 
   @override
-  String get preDive_item_type_check => 'Caixa de seleÃ§Ã£o';
+  String get preDive_item_type_check => 'Caixa de seleção';
 
   @override
   String get preDive_item_type_value => 'Valor registrado';
@@ -2817,19 +2813,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get preDive_item_type_equipment => 'Item de equipamento';
 
   @override
-  String get preDive_item_valueLabel => 'RÃ³tulo do valor';
+  String get preDive_item_valueLabel => 'Rótulo do valor';
 
   @override
   String get preDive_item_valueUnit => 'Unidade';
 
   @override
-  String get preDive_item_valueMin => 'MÃ­n (aviso)';
+  String get preDive_item_valueMin => 'Mín (aviso)';
 
   @override
-  String get preDive_item_valueMax => 'MÃ¡x (aviso)';
+  String get preDive_item_valueMax => 'Máx (aviso)';
 
   @override
-  String get preDive_item_type_cellLinearity => 'Linearidade da cÃ©lula';
+  String get preDive_item_type_cellLinearity => 'Linearidade da célula';
 
   @override
   String get preDive_item_sourceItem => 'Leitura no ar de';
@@ -2839,19 +2835,19 @@ class AppLocalizationsPt extends AppLocalizations {
       'Escolhe o item com a leitura no ar';
 
   @override
-  String get preDive_item_linearityMin => 'Linearidade mÃ­n. % (aviso)';
+  String get preDive_item_linearityMin => 'Linearidade mín. % (aviso)';
 
   @override
-  String get preDive_item_linearityMax => 'Linearidade mÃ¡x. % (aviso)';
+  String get preDive_item_linearityMax => 'Linearidade máx. % (aviso)';
 
   @override
   String preDive_item_sourceCleared(String title) {
-    return '$title jÃ¡ nÃ£o tem uma leitura no ar com que comparar';
+    return '$title já não tem uma leitura no ar com que comparar';
   }
 
   @override
   String get preDive_item_sourceBelow =>
-      'Usa um valor registado mais Ã  frente nesta lista';
+      'Usa um valor registado mais à frente nesta lista';
 
   @override
   String preDive_runner_progress(int done, int total) {
@@ -2867,11 +2863,11 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get preDive_runner_abort => 'Interromper lista de verificaÃ§Ã£o';
+  String get preDive_runner_abort => 'Interromper lista de verificação';
 
   @override
   String get preDive_runner_abortConfirm =>
-      'Interromper esta lista de verificaÃ§Ã£o? Ela serÃ¡ mantida no histÃ³rico como interrompida.';
+      'Interromper esta lista de verificação? Ela será mantida no histórico como interrompida.';
 
   @override
   String get preDive_runner_skip => 'Pular';
@@ -2883,10 +2879,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get preDive_runner_undo => 'Redefinir como pendente';
 
   @override
-  String get preDive_runner_serviceOverdue => 'ManutenÃ§Ã£o vencida';
+  String get preDive_runner_serviceOverdue => 'Manutenção vencida';
 
   @override
-  String get preDive_runner_conditionFindings => 'ConstataÃ§Ãµes de estado';
+  String get preDive_runner_conditionFindings => 'Constatações de estado';
 
   @override
   String get preDive_runner_addNote => 'Adicionar nota';
@@ -2898,7 +2894,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get preDive_runner_cellInAir => 'No ar';
 
   @override
-  String get preDive_runner_cellInAirMissing => 'Ainda nÃ£o registado';
+  String get preDive_runner_cellInAirMissing => 'Ainda não registado';
 
   @override
   String get preDive_runner_enterO2Value => 'Introduz o valor em O2';
@@ -2927,23 +2923,23 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get preDive_runner_locked =>
-      'Esta lista de verificaÃ§Ã£o estÃ¡ bloqueada';
+      'Esta lista de verificação está bloqueada';
 
   @override
-  String get preDive_sessions_title => 'Listas de VerificaÃ§Ã£o PrÃ©-Mergulho';
+  String get preDive_sessions_title => 'Listas de Verificação Pré-Mergulho';
 
   @override
   String get preDive_sessions_empty =>
-      'Ainda nÃ£o hÃ¡ execuÃ§Ãµes de lista de verificaÃ§Ã£o';
+      'Ainda não há execuções de lista de verificação';
 
   @override
   String get preDive_sessions_resume => 'Retomar';
 
   @override
-  String get preDive_sessions_start => 'Iniciar lista de verificaÃ§Ã£o';
+  String get preDive_sessions_start => 'Iniciar lista de verificação';
 
   @override
-  String get preDive_sessions_statusCompleted => 'ConcluÃ­da';
+  String get preDive_sessions_statusCompleted => 'Concluída';
 
   @override
   String get preDive_sessions_statusAborted => 'Interrompida';
@@ -2961,17 +2957,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get preDive_link_unlinkDive => 'Desvincular mergulho';
 
   @override
-  String get preDive_link_linkChecklist => 'Vincular lista de verificaÃ§Ã£o';
+  String get preDive_link_linkChecklist => 'Vincular lista de verificação';
 
   @override
-  String get preDive_link_unlinkChecklist =>
-      'Desvincular lista de verificaÃ§Ã£o';
+  String get preDive_link_unlinkChecklist => 'Desvincular lista de verificação';
 
   @override
   String get preDive_link_searchDives => 'Procurar mergulhos';
 
   @override
-  String get preDive_link_noDives => 'NÃ£o hÃ¡ mergulhos para vincular';
+  String get preDive_link_noDives => 'Não há mergulhos para vincular';
 
   @override
   String preDive_link_noDivesMatch(String query) {
@@ -2980,22 +2975,22 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get preDive_link_noUnlinkedSessions =>
-      'NÃ£o hÃ¡ listas de verificaÃ§Ã£o sem vÃ­nculo';
+      'Não há listas de verificação sem vínculo';
 
   @override
   String get preDive_link_linked =>
-      'Lista de verificaÃ§Ã£o vinculada a este mergulho';
+      'Lista de verificação vinculada a este mergulho';
 
   @override
   String get preDive_link_unlinked =>
-      'Lista de verificaÃ§Ã£o desvinculada deste mergulho';
+      'Lista de verificação desvinculada deste mergulho';
 
   @override
   String get preDive_sessions_delete => 'Excluir';
 
   @override
   String get preDive_sessions_deleteConfirm =>
-      'Excluir este registro de lista de verificaÃ§Ã£o?';
+      'Excluir este registro de lista de verificação?';
 
   @override
   String get preDive_sessions_filter => 'Filtrar';
@@ -3004,13 +2999,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get preDive_sessions_filterTitle => 'Filtrar listas realizadas';
 
   @override
-  String get preDive_sessions_filterChecklist => 'Lista de verificaÃ§Ã£o';
+  String get preDive_sessions_filterChecklist => 'Lista de verificação';
 
   @override
   String get preDive_sessions_filterStatus => 'Estado';
 
   @override
-  String get preDive_sessions_filterFlaggedOnly => 'Apenas com ocorrÃªncias';
+  String get preDive_sessions_filterFlaggedOnly => 'Apenas com ocorrências';
 
   @override
   String get preDive_sessions_filterDateRange => 'Intervalo de datas';
@@ -3025,7 +3020,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get preDive_sessions_filterApply => 'Aplicar';
 
   @override
-  String get preDive_sessions_filterFlaggedChip => 'Apenas ocorrÃªncias';
+  String get preDive_sessions_filterFlaggedChip => 'Apenas ocorrências';
 
   @override
   String get preDive_sessions_emptyFiltered =>
@@ -3039,15 +3034,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String preDive_sessions_exportFailed(String error) {
-    return 'Falha na exportaÃ§Ã£o: $error';
+    return 'Falha na exportação: $error';
   }
 
   @override
-  String get preDive_start_title =>
-      'Iniciar lista de verificaÃ§Ã£o prÃ©-mergulho';
+  String get preDive_start_title => 'Iniciar lista de verificação pré-mergulho';
 
   @override
-  String get preDive_start_template => 'Lista de verificaÃ§Ã£o';
+  String get preDive_start_template => 'Lista de verificação';
 
   @override
   String get preDive_start_equipmentSet => 'Conjunto de equipamentos';
@@ -3059,20 +3053,20 @@ class AppLocalizationsPt extends AppLocalizations {
   String get preDive_start_noEquipment => 'Nenhum';
 
   @override
-  String get preDive_start_begin => 'ComeÃ§ar';
+  String get preDive_start_begin => 'Começar';
 
   @override
-  String get diveLog_gear_collapse => 'Ocultar peÃ§as';
+  String get diveLog_gear_collapse => 'Ocultar peças';
 
   @override
-  String get diveLog_gear_expand => 'Mostrar peÃ§as';
+  String get diveLog_gear_expand => 'Mostrar peças';
 
   @override
   String get diveLog_gear_removeAssembly =>
-      'Remover o conjunto e as suas peÃ§as';
+      'Remover o conjunto e as suas peças';
 
   @override
-  String get diveLog_gear_removePart => 'Remover peÃ§a';
+  String get diveLog_gear_removePart => 'Remover peça';
 
   @override
   String get diveLog_gear_removeSet => 'Remover o conjunto deste mergulho';
@@ -3082,10 +3076,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>
-      'Iniciar lista de verificaÃ§Ã£o prÃ©-mergulho';
+      'Iniciar lista de verificação pré-mergulho';
 
   @override
-  String get preDive_dashboard_title => 'VerificaÃ§Ã£o PrÃ©-Mergulho';
+  String get preDive_dashboard_title => 'Verificação Pré-Mergulho';
 
   @override
   String preDive_dashboard_resume(int done, int total) {
@@ -3093,24 +3087,23 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get preDive_dashboard_start => 'Iniciar verificaÃ§Ã£o prÃ©-mergulho';
+  String get preDive_dashboard_start => 'Iniciar verificação pré-mergulho';
 
   @override
   String get preDive_templates_view => 'Ver';
 
   @override
-  String get preDive_edit_titleView =>
-      'Ver Lista de VerificaÃ§Ã£o PrÃ©-Mergulho';
+  String get preDive_edit_titleView => 'Ver Lista de Verificação Pré-Mergulho';
 
   @override
   String get preDive_edit_builtInNotice =>
-      'Lista integrada. Duplique-a para obter uma cÃ³pia editÃ¡vel.';
+      'Lista integrada. Duplique-a para obter uma cópia editável.';
 
   @override
-  String get dashboard_checklists_title => 'Listas de verificaÃ§Ã£o';
+  String get dashboard_checklists_title => 'Listas de verificação';
 
   @override
-  String get dashboard_checklists_preDiveLabel => 'PrÃ©-mergulho';
+  String get dashboard_checklists_preDiveLabel => 'Pré-mergulho';
 
   @override
   String dashboard_checklists_tripLabel(String name) {
@@ -3124,7 +3117,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String preDive_sessions_completedAt(String when) {
-    return 'ConcluÃ­da $when';
+    return 'Concluída $when';
   }
 
   @override
@@ -3133,16 +3126,15 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get trips_detail_preDive_action =>
-      'Lista de verificaÃ§Ã£o prÃ©-mergulho';
+  String get trips_detail_preDive_action => 'Lista de verificação pré-mergulho';
 
   @override
   String get settings_manage_preDiveChecklists =>
-      'Listas de VerificaÃ§Ã£o PrÃ©-Mergulho';
+      'Listas de Verificação Pré-Mergulho';
 
   @override
   String get settings_manage_preDiveChecklists_subtitle =>
-      'VerificaÃ§Ãµes de dupla, listas de montagem de CCR, preparaÃ§Ã£o de equipamento';
+      'Verificações de dupla, listas de montagem de CCR, preparação de equipamento';
 
   @override
   String get common_action_back => 'Voltar';
@@ -3151,16 +3143,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get common_action_cancel => 'Cancelar';
 
   @override
-  String get common_action_clearRating => 'Limpar avaliaÃ§Ã£o';
+  String get common_action_clearRating => 'Limpar avaliação';
 
   @override
   String get common_action_close => 'Fechar';
 
   @override
-  String get common_action_copyLink => 'Copiar ligaÃ§Ã£o';
+  String get common_action_copyLink => 'Copiar ligação';
 
   @override
-  String get common_link_couldNotOpen => 'NÃ£o foi possÃ­vel abrir a ligaÃ§Ã£o';
+  String get common_link_couldNotOpen => 'Não foi possível abrir a ligação';
 
   @override
   String get common_action_continue => 'Continuar';
@@ -3224,19 +3216,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get courses_action_linkDive => 'Vincular';
 
   @override
-  String get courses_action_markCompleted => 'Marcar como ConcluÃ­do';
+  String get courses_action_markCompleted => 'Marcar como Concluído';
 
   @override
   String get courses_action_unlinkDive => 'Desvincular mergulho';
 
   @override
-  String get courses_action_moreOptions => 'Mais opÃ§Ãµes';
+  String get courses_action_moreOptions => 'Mais opções';
 
   @override
   String get courses_action_retry => 'Tentar novamente';
 
   @override
-  String get courses_action_saveChanges => 'Salvar AlteraÃ§Ãµes';
+  String get courses_action_saveChanges => 'Salvar Alterações';
 
   @override
   String get courses_action_saveSemantic => 'Salvar curso';
@@ -3259,21 +3251,21 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get courses_detail_certificationNotFound =>
-      'CertificaÃ§Ã£o nÃ£o encontrada';
+      'Certificação não encontrada';
 
   @override
   String get courses_detail_noTrainingDives =>
       'Nenhum mergulho de treinamento vinculado ainda';
 
   @override
-  String get courses_detail_notFound => 'Curso nÃ£o encontrado';
+  String get courses_detail_notFound => 'Curso não encontrado';
 
   @override
   String get courses_dialog_complete => 'Concluir';
 
   @override
   String courses_dialog_deleteMessage(Object name) {
-    return 'Tem certeza de que deseja excluir $name? Esta aÃ§Ã£o nÃ£o pode ser desfeita.';
+    return 'Tem certeza de que deseja excluir $name? Esta ação não pode ser desfeita.';
   }
 
   @override
@@ -3281,24 +3273,24 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get courses_dialog_markCompletedMessage =>
-      'Isso marcarÃ¡ o curso como concluÃ­do com a data de hoje. Continuar?';
+      'Isso marcará o curso como concluído com a data de hoje. Continuar?';
 
   @override
-  String get courses_dialog_markCompletedTitle => 'Marcar como ConcluÃ­do?';
+  String get courses_dialog_markCompletedTitle => 'Marcar como Concluído?';
 
   @override
   String get courses_empty_button =>
       'Adicione seu primeiro curso de treinamento';
 
   @override
-  String get courses_empty_noCompleted => 'Nenhum curso concluÃ­do';
+  String get courses_empty_noCompleted => 'Nenhum curso concluído';
 
   @override
   String get courses_empty_noInProgress => 'Nenhum curso em andamento';
 
   @override
   String get courses_empty_subtitle =>
-      'Adicione seu primeiro curso para comeÃ§ar';
+      'Adicione seu primeiro curso para começar';
 
   @override
   String get courses_empty_title => 'Nenhum curso de treinamento ainda';
@@ -3310,7 +3302,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get courses_error_loadingCertification =>
-      'Erro ao carregar certificaÃ§Ã£o';
+      'Erro ao carregar certificação';
 
   @override
   String get courses_error_loadingDives => 'Erro ao carregar mergulhos';
@@ -3325,11 +3317,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get courses_field_instructorName => 'Nome do Instrutor';
 
   @override
-  String get courses_field_instructorNumber => 'NÃºmero do Instrutor';
+  String get courses_field_instructorNumber => 'Número do Instrutor';
 
   @override
   String get courses_field_linkCertificationHint =>
-      'Vincular uma certificaÃ§Ã£o obtida neste curso';
+      'Vincular uma certificação obtida neste curso';
 
   @override
   String get courses_field_location => 'Local';
@@ -3341,19 +3333,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get courses_filter_all => 'Todos';
 
   @override
-  String get courses_label_agency => 'AgÃªncia';
+  String get courses_label_agency => 'Agência';
 
   @override
-  String get courses_label_completed => 'ConcluÃ­do';
+  String get courses_label_completed => 'Concluído';
 
   @override
-  String get courses_label_completionDate => 'Data de ConclusÃ£o';
+  String get courses_label_completionDate => 'Data de Conclusão';
 
   @override
   String get courses_label_courseInProgress => 'Curso em andamento';
 
   @override
-  String get courses_label_instructorNumber => 'Instrutor nÂº';
+  String get courses_label_instructorNumber => 'Instrutor nº';
 
   @override
   String get courses_label_location => 'Local';
@@ -3362,7 +3354,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get courses_label_name => 'Nome';
 
   @override
-  String get courses_label_startDate => 'Data de InÃ­cio';
+  String get courses_label_startDate => 'Data de Início';
 
   @override
   String courses_message_errorSaving(Object error) {
@@ -3378,7 +3370,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get courses_picker_active => 'Ativo';
 
   @override
-  String get courses_picker_clearSelection => 'Limpar seleÃ§Ã£o';
+  String get courses_picker_clearSelection => 'Limpar seleção';
 
   @override
   String get courses_picker_createCourse => 'Criar Curso';
@@ -3416,10 +3408,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get courses_requirement_field_name => 'Nome';
 
   @override
-  String get courses_requirement_field_targetCount => 'Mergulhos necessÃ¡rios';
+  String get courses_requirement_field_targetCount => 'Mergulhos necessários';
 
   @override
-  String get courses_requirement_kind_checklist => 'Item de verificaÃ§Ã£o';
+  String get courses_requirement_kind_checklist => 'Item de verificação';
 
   @override
   String get courses_requirement_kind_dive => 'Requisito de mergulho';
@@ -3429,18 +3421,18 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get courses_requirements_empty =>
-      'Acompanhe mergulhos de aventura, prÃ©-requisitos e itens de verificaÃ§Ã£o deste curso.';
+      'Acompanhe mergulhos de aventura, pré-requisitos e itens de verificação deste curso.';
 
   @override
   String courses_requirements_progress(int satisfied, int total) {
-    return '$satisfied de $total concluÃ­dos';
+    return '$satisfied de $total concluídos';
   }
 
   @override
   String get courses_section_details => 'Detalhes do Curso';
 
   @override
-  String get courses_section_earnedCertification => 'CertificaÃ§Ã£o Obtida';
+  String get courses_section_earnedCertification => 'Certificação Obtida';
 
   @override
   String get courses_section_instructor => 'Instrutor';
@@ -3455,11 +3447,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get courses_section_trainingDives => 'Mergulhos de Treinamento';
 
   @override
-  String get courses_status_completed => 'ConcluÃ­do';
+  String get courses_status_completed => 'Concluído';
 
   @override
   String courses_status_daysSinceStart(Object days) {
-    return '$days dias desde o inÃ­cio';
+    return '$days dias desde o início';
   }
 
   @override
@@ -3481,10 +3473,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get courses_summary_overview => 'VisÃ£o Geral';
+  String get courses_summary_overview => 'Visão Geral';
 
   @override
-  String get courses_summary_quickActions => 'AÃ§Ãµes RÃ¡pidas';
+  String get courses_summary_quickActions => 'Ações Rápidas';
 
   @override
   String get courses_summary_recentCourses => 'Cursos Recentes';
@@ -3685,13 +3677,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dashboard_hero_divesLoggedLabel => 'mergulhos registrados';
 
   @override
-  String get dashboard_hero_hoursUnderwaterLabel => 'horas subaquÃ¡ticas';
+  String get dashboard_hero_hoursUnderwaterLabel => 'horas subaquáticas';
 
   @override
-  String get dashboard_hero_daysSinceLabel => 'dias desde o Ãºltimo mergulho';
+  String get dashboard_hero_daysSinceLabel => 'dias desde o último mergulho';
 
   @override
-  String get dashboard_hero_thisMonthLabel => 'este mÃªs';
+  String get dashboard_hero_thisMonthLabel => 'este mês';
 
   @override
   String get dashboard_hero_thisYearLabel => 'mergulhos este ano';
@@ -3715,7 +3707,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dashboard_hero_statSites => 'locais';
 
   @override
-  String get dashboard_hero_statCountries => 'paÃ­ses';
+  String get dashboard_hero_statCountries => 'países';
 
   @override
   String dashboard_activityStats_divesInYear(String year) {
@@ -3724,7 +3716,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dashboard_semantics_statsBar =>
-      'Resumo das estatÃ­sticas de mergulho';
+      'Resumo das estatísticas de mergulho';
 
   @override
   String get dashboard_gauges_addGear => 'Adicionar equipamento';
@@ -3764,7 +3756,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dashboard_gauges_noInsurance => 'Sem seguro registado';
 
   @override
-  String get dashboard_gauges_noFlyClear => 'NÃ£o voar 0:00';
+  String get dashboard_gauges_noFlyClear => 'Não voar 0:00';
 
   @override
   String dashboard_gauges_flightWindow(String hours, String minutes) {
@@ -3773,16 +3765,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dashboard_gauges_flightWindowClosed =>
-      'NÃ£o mergulhe mais antes do voo';
+      'Não mergulhe mais antes do voo';
 
   @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
-    return 'NÃ£o voar $hours:$minutes';
+    return 'Não voar $hours:$minutes';
   }
 
   @override
   String dashboard_gauges_lastDiveDays(int days) {
-    return 'Ãšltimo mergulho hÃ¡ ${days}d';
+    return 'Último mergulho há ${days}d';
   }
 
   @override
@@ -3792,36 +3784,36 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'Ainda sem mergulhos';
 
   @override
-  String get settings_homeChips_pageTitle => 'EcrÃ£ inicial';
+  String get settings_homeChips_pageTitle => 'Ecrã inicial';
 
   @override
   String get settings_homeChips_description =>
-      'Escolha que chips de estado aparecem no topo do separador InÃ­cio.';
+      'Escolha que chips de estado aparecem no topo do separador Início.';
 
   @override
   String get settings_homeChips_sectionTitle => 'Chips de estado';
 
   @override
-  String get settings_homeCards_sectionTitle => 'CartÃµes do InÃ­cio';
+  String get settings_homeCards_sectionTitle => 'Cartões do Início';
 
   @override
   String get settings_homeCards_description =>
-      'Escolha que cartÃµes aparecem no separador InÃ­cio e arraste-os para reordenar.';
+      'Escolha que cartões aparecem no separador Início e arraste-os para reordenar.';
 
   @override
   String get settings_homeCards_autoHides =>
       'Oculta-se automaticamente quando vazio';
 
   @override
-  String get settings_homeCards_resetToDefault => 'Repor predefiniÃ§Ãµes';
+  String get settings_homeCards_resetToDefault => 'Repor predefinições';
 
   @override
   String get settings_homeCards_resetDialog_title =>
-      'Repor o esquema do InÃ­cio?';
+      'Repor o esquema do Início?';
 
   @override
   String get settings_homeCards_resetDialog_message =>
-      'RepÃµe a ordem predefinida dos cartÃµes e volta a mostrÃ¡-los todos.';
+      'Repõe a ordem predefinida dos cartões e volta a mostrá-los todos.';
 
   @override
   String get settings_homeCards_resetDialog_cancel => 'Cancelar';
@@ -3830,25 +3822,25 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_homeCards_resetDialog_confirm => 'Repor';
 
   @override
-  String get settings_homeCards_card_hero => 'CabeÃ§alho de boas-vindas';
+  String get settings_homeCards_card_hero => 'Cabeçalho de boas-vindas';
 
   @override
   String get settings_homeCards_card_gaugeStrip => 'Chips de estado';
 
   @override
-  String get settings_homeCards_card_preDive => 'Listas de verificaÃ§Ã£o';
+  String get settings_homeCards_card_preDive => 'Listas de verificação';
 
   @override
   String get settings_homeCards_card_recentDives => 'Mergulhos recentes';
 
   @override
-  String get settings_homeCards_card_quickActions => 'AÃ§Ãµes rÃ¡pidas';
+  String get settings_homeCards_card_quickActions => 'Ações rápidas';
 
   @override
   String get settings_homeCards_card_milestones => 'Marcos';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'MÃ­dia recente';
+  String get settings_homeCards_card_photoRibbon => 'Mídia recente';
 
   @override
   String get settings_homeCards_card_onThisDay => 'Neste dia';
@@ -3865,55 +3857,54 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dashboard_allHidden_message =>
-      'Todos os cartÃµes do InÃ­cio estÃ£o ocultos.';
+      'Todos os cartões do Início estão ocultos.';
 
   @override
-  String get dashboard_allHidden_customize => 'Personalizar InÃ­cio';
+  String get dashboard_allHidden_customize => 'Personalizar Início';
 
   @override
   String get settings_homeChips_flightWindow =>
       'Janela de mergulho antes do voo';
 
   @override
-  String get settings_homeChips_gear => 'ManutenÃ§Ã£o do equipamento';
+  String get settings_homeChips_gear => 'Manutenção do equipamento';
 
   @override
   String get settings_homeChips_insurance => 'Seguro';
 
   @override
-  String get settings_homeChips_noFly => 'Temporizador de nÃ£o voar';
+  String get settings_homeChips_noFly => 'Temporizador de não voar';
 
   @override
   String get settings_homeChips_lastDive => 'Atualidade de mergulho';
 
   @override
-  String get settings_homeChips_certifications =>
-      'ExpiraÃ§Ã£o de certificaÃ§Ãµes';
+  String get settings_homeChips_certifications => 'Expiração de certificações';
 
   @override
-  String get settings_homeChips_trip => 'PrÃ³xima viagem';
+  String get settings_homeChips_trip => 'Próxima viagem';
 
   @override
-  String get settings_homeChips_checklist => 'Lista de verificaÃ§Ã£o ativa';
+  String get settings_homeChips_checklist => 'Lista de verificação ativa';
 
   @override
   String get settings_homeChips_course => 'Progresso do curso';
 
   @override
-  String get settings_homeChips_uploads => 'Envios de mÃ©dia';
+  String get settings_homeChips_uploads => 'Envios de média';
 
   @override
-  String get settings_homeChips_backup => 'Idade da cÃ³pia';
+  String get settings_homeChips_backup => 'Idade da cópia';
 
   @override
-  String get settings_homeChips_sync => 'Estado de sincronizaÃ§Ã£o';
+  String get settings_homeChips_sync => 'Estado de sincronização';
 
   @override
   String get settings_homeChips_dataQuality => 'Qualidade dos dados';
 
   @override
   String dashboard_gauges_certsExpiring(int count) {
-    return '$count certificaÃ§Ãµes a expirar';
+    return '$count certificações a expirar';
   }
 
   @override
@@ -3923,7 +3914,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dashboard_gauges_checklistActive =>
-      'Lista de verificaÃ§Ã£o em curso';
+      'Lista de verificação em curso';
 
   @override
   String dashboard_gauges_courseProgress(String name, int done, int total) {
@@ -3936,14 +3927,14 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get dashboard_gauges_backupNone => 'Sem cÃ³pia de seguranÃ§a';
+  String get dashboard_gauges_backupNone => 'Sem cópia de segurança';
 
   @override
-  String get dashboard_gauges_backupToday => 'CÃ³pia feita hoje';
+  String get dashboard_gauges_backupToday => 'Cópia feita hoje';
 
   @override
   String dashboard_gauges_backupDays(int days) {
-    return 'CÃ³pia hÃ¡ ${days}d';
+    return 'Cópia há ${days}d';
   }
 
   @override
@@ -3967,10 +3958,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dashboard_gauges_retry =>
-      'Estado indisponÃ­vel - toque para tentar novamente';
+      'Estado indisponível - toque para tentar novamente';
 
   @override
-  String get dashboard_media_title => 'MÃ­dia recente';
+  String get dashboard_media_title => 'Mídia recente';
 
   @override
   String get dashboard_recentSites_title => 'Locais recentes';
@@ -3985,12 +3976,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String dashboard_yearInReview_hours(String hours) {
-    return '$hours horas debaixo de Ã¡gua';
+    return '$hours horas debaixo de água';
   }
 
   @override
   String dashboard_yearInReview_maxDepth(String depth) {
-    return 'MÃ¡xima: $depth';
+    return 'Máxima: $depth';
   }
 
   @override
@@ -4006,7 +3997,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String dashboard_milestones_nextDive(int remaining, int milestone) {
-    return '$remaining mergulhos para o n.Âº $milestone';
+    return '$remaining mergulhos para o n.º $milestone';
   }
 
   @override
@@ -4092,7 +4083,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dashboard_recentDives_latestProfileTitle =>
-      'Perfil do Ãºltimo mergulho';
+      'Perfil do último mergulho';
 
   @override
   String get dashboard_recentDives_noProfileData =>
@@ -4100,7 +4091,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dashboard_recentDives_profileLoadError =>
-      'NÃ£o foi possÃ­vel carregar o perfil do mergulho';
+      'Não foi possível carregar o perfil do mergulho';
 
   @override
   String dashboard_recentDives_profileMinutes(int minutes) {
@@ -4162,7 +4153,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get decoCalculator_createPlanTooltip =>
-      'Criar um plano de mergulho a partir dos parÃ¢metros atuais';
+      'Criar um plano de mergulho a partir dos parâmetros atuais';
 
   @override
   String decoCalculator_createdPlanSnackbar(
@@ -4183,7 +4174,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get decoCalculator_diveParameters => 'ParÃ¢metros do Mergulho';
+  String get decoCalculator_diveParameters => 'Parâmetros do Mergulho';
 
   @override
   String get decoCalculator_endCaution => 'Cuidado';
@@ -4201,17 +4192,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get decoCalculator_field_depth => 'Profundidade';
 
   @override
-  String get decoCalculator_field_gasMix => 'Mistura de GÃ¡s';
+  String get decoCalculator_field_gasMix => 'Mistura de Gás';
 
   @override
-  String get decoCalculator_gasSafety => 'SeguranÃ§a do GÃ¡s';
+  String get decoCalculator_gasSafety => 'Segurança do Gás';
 
   @override
   String get decoCalculator_hideCustomMix => 'Ocultar Mistura Personalizada';
 
   @override
   String get decoCalculator_hideCustomMixSemantics =>
-      'Ocultar seletor de mistura de gÃ¡s personalizada';
+      'Ocultar seletor de mistura de gás personalizada';
 
   @override
   String get decoCalculator_modExceeded => 'MOD Excedida';
@@ -4226,17 +4217,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get decoCalculator_ppO2Danger => 'ppO2 Perigo';
 
   @override
-  String get decoCalculator_ppO2Hypoxic => 'ppO2 HipÃ³xico';
+  String get decoCalculator_ppO2Hypoxic => 'ppO2 Hipóxico';
 
   @override
   String get decoCalculator_ppO2Safe => 'ppO2 Seguro';
 
   @override
-  String get decoCalculator_resetToDefaults => 'Restaurar padrÃµes';
+  String get decoCalculator_resetToDefaults => 'Restaurar padrões';
 
   @override
   String get decoCalculator_showCustomMixSemantics =>
-      'Mostrar seletor de mistura de gÃ¡s personalizada';
+      'Mostrar seletor de mistura de gás personalizada';
 
   @override
   String decoCalculator_timeValueMin(Object time) {
@@ -4244,16 +4235,16 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get decoCalculator_title => 'Calculadora de DescompressÃ£o';
+  String get decoCalculator_title => 'Calculadora de Descompressão';
 
   @override
-  String get decoCalculator_waterType => 'Tipo de Ã¡gua';
+  String get decoCalculator_waterType => 'Tipo de água';
 
   @override
   String get decoCalculator_waterType_custom => 'Personalizado';
 
   @override
-  String get decoCalculator_waterType_standard => 'PadrÃ£o';
+  String get decoCalculator_waterType_standard => 'Padrão';
 
   @override
   String diveCenters_accessibility_markerLabel(Object name) {
@@ -4305,7 +4296,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveCenters_action_lookupFromAddress =>
-      'Consultar a partir do EndereÃ§o';
+      'Consultar a partir do Endereço';
 
   @override
   String get diveCenters_action_pickFromMap => 'Escolher no Mapa';
@@ -4314,10 +4305,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveCenters_action_retry => 'Tentar novamente';
 
   @override
-  String get diveCenters_action_settings => 'ConfiguraÃ§Ãµes';
+  String get diveCenters_action_settings => 'Configurações';
 
   @override
-  String get diveCenters_action_useMyLocation => 'Usar Minha LocalizaÃ§Ã£o';
+  String get diveCenters_action_useMyLocation => 'Usar Minha Localização';
 
   @override
   String get diveCenters_action_view => 'Ver';
@@ -4353,10 +4344,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveCenters_dialog_discardMessage =>
-      'VocÃª tem alteraÃ§Ãµes nÃ£o salvas. Tem certeza de que deseja descartÃ¡-las?';
+      'Você tem alterações não salvas. Tem certeza de que deseja descartá-las?';
 
   @override
-  String get diveCenters_dialog_discardTitle => 'Descartar AlteraÃ§Ãµes?';
+  String get diveCenters_dialog_discardTitle => 'Descartar Alterações?';
 
   @override
   String get diveCenters_dialog_keepEditing => 'Continuar Editando';
@@ -4379,7 +4370,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveCenters_error_geocodeFailed =>
-      'NÃ£o foi possÃ­vel encontrar as coordenadas para este endereÃ§o';
+      'Não foi possível encontrar as coordenadas para este endereço';
 
   @override
   String get diveCenters_error_importFailed =>
@@ -4392,18 +4383,18 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveCenters_error_locationPermission =>
-      'NÃ£o foi possÃ­vel obter a localizaÃ§Ã£o. Verifique as permissÃµes.';
+      'Não foi possível obter a localização. Verifique as permissões.';
 
   @override
   String get diveCenters_error_locationUnavailable =>
-      'NÃ£o foi possÃ­vel obter a localizaÃ§Ã£o. Os serviÃ§os de localizaÃ§Ã£o podem nÃ£o estar disponÃ­veis.';
+      'Não foi possível obter a localização. Os serviços de localização podem não estar disponíveis.';
 
   @override
   String get diveCenters_error_noAddressForLookup =>
-      'Digite um endereÃ§o para consultar as coordenadas';
+      'Digite um endereço para consultar as coordenadas';
 
   @override
-  String get diveCenters_error_notFound => 'Centro de mergulho nÃ£o encontrado';
+  String get diveCenters_error_notFound => 'Centro de mergulho não encontrado';
 
   @override
   String diveCenters_error_saving(Object error) {
@@ -4417,7 +4408,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveCenters_field_city => 'Cidade';
 
   @override
-  String get diveCenters_field_country => 'PaÃ­s';
+  String get diveCenters_field_country => 'País';
 
   @override
   String get diveCenters_field_latitude => 'Latitude';
@@ -4429,41 +4420,41 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveCenters_field_nameRequired => 'Nome *';
 
   @override
-  String get diveCenters_field_postalCode => 'CÃ³digo Postal';
+  String get diveCenters_field_postalCode => 'Código Postal';
 
   @override
-  String get diveCenters_field_rating => 'AvaliaÃ§Ã£o';
+  String get diveCenters_field_rating => 'Avaliação';
 
   @override
-  String get diveCenters_field_stateProvince => 'Estado/ProvÃ­ncia';
+  String get diveCenters_field_stateProvince => 'Estado/Província';
 
   @override
-  String get diveCenters_field_street => 'EndereÃ§o';
+  String get diveCenters_field_street => 'Endereço';
 
   @override
   String get diveCenters_hint_addressDescription =>
-      'EndereÃ§o opcional para navegaÃ§Ã£o';
+      'Endereço opcional para navegação';
 
   @override
   String get diveCenters_hint_affiliationsDescription =>
-      'Selecione as agÃªncias de treinamento com as quais este centro Ã© afiliado';
+      'Selecione as agências de treinamento com as quais este centro é afiliado';
 
   @override
   String get diveCenters_hint_city => 'ex: Phuket';
 
   @override
-  String get diveCenters_hint_country => 'ex: TailÃ¢ndia';
+  String get diveCenters_hint_country => 'ex: Tailândia';
 
   @override
   String get diveCenters_hint_email => 'info@centrodemergulho.com';
 
   @override
   String get diveCenters_hint_gpsDescription =>
-      'Escolha um mÃ©todo de localizaÃ§Ã£o ou digite as coordenadas manualmente';
+      'Escolha um método de localização ou digite as coordenadas manualmente';
 
   @override
   String get diveCenters_hint_importSearch =>
-      'Buscar centros de mergulho (ex: \"PADI\", \"TailÃ¢ndia\")';
+      'Buscar centros de mergulho (ex: \"PADI\", \"Tailândia\")';
 
   @override
   String get diveCenters_hint_latitude => 'ex: 10.4613';
@@ -4475,7 +4466,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveCenters_hint_name => 'Digite o nome do centro de mergulho';
 
   @override
-  String get diveCenters_hint_notes => 'Qualquer informaÃ§Ã£o adicional...';
+  String get diveCenters_hint_notes => 'Qualquer informação adicional...';
 
   @override
   String get diveCenters_hint_phone => '+55 11 98765-4321';
@@ -4519,13 +4510,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveCenters_import_searchHint =>
-      'Tente buscar por nome, paÃ­s ou agÃªncia certificadora.';
+      'Tente buscar por nome, país ou agência certificadora.';
 
   @override
   String get diveCenters_import_searchTitle => 'Buscar Centros de Mergulho';
 
   @override
-  String get diveCenters_label_alreadyImported => 'JÃ¡ Importado';
+  String get diveCenters_label_alreadyImported => 'Já Importado';
 
   @override
   String diveCenters_label_diveCount(int count) {
@@ -4545,10 +4536,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveCenters_label_imported => 'Importado';
 
   @override
-  String get diveCenters_label_locationNotSet => 'LocalizaÃ§Ã£o nÃ£o definida';
+  String get diveCenters_label_locationNotSet => 'Localização não definida';
 
   @override
-  String get diveCenters_label_locationUnknown => 'LocalizaÃ§Ã£o desconhecida';
+  String get diveCenters_label_locationUnknown => 'Localização desconhecida';
 
   @override
   String get diveCenters_label_phone => 'Telefone';
@@ -4566,7 +4557,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveCenters_map_addCoordinatesHint =>
-      'Adicione coordenadas aos seus centros de mergulho para vÃª-los no mapa';
+      'Adicione coordenadas aos seus centros de mergulho para vê-los no mapa';
 
   @override
   String get diveCenters_map_noCoordinates =>
@@ -4587,19 +4578,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveCenters_search_prompt => 'Buscar centros de mergulho';
 
   @override
-  String get diveCenters_section_address => 'EndereÃ§o';
+  String get diveCenters_section_address => 'Endereço';
 
   @override
-  String get diveCenters_section_affiliations => 'AfiliaÃ§Ãµes';
+  String get diveCenters_section_affiliations => 'Afiliações';
 
   @override
-  String get diveCenters_section_basicInfo => 'InformaÃ§Ãµes BÃ¡sicas';
+  String get diveCenters_section_basicInfo => 'Informações Básicas';
 
   @override
   String get diveCenters_section_contact => 'Contato';
 
   @override
-  String get diveCenters_section_contactInfo => 'InformaÃ§Ãµes de Contato';
+  String get diveCenters_section_contactInfo => 'Informações de Contato';
 
   @override
   String get diveCenters_section_gpsCoordinates => 'Coordenadas GPS';
@@ -4609,11 +4600,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveCenters_snackbar_coordinatesFound =>
-      'Coordenadas encontradas a partir do endereÃ§o';
+      'Coordenadas encontradas a partir do endereço';
 
   @override
   String get diveCenters_snackbar_copiedToClipboard =>
-      'Copiado para a Ã¡rea de transferÃªncia';
+      'Copiado para a área de transferência';
 
   @override
   String diveCenters_snackbar_imported(Object name) {
@@ -4621,31 +4612,31 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get diveCenters_snackbar_locationCaptured => 'LocalizaÃ§Ã£o capturada';
+  String get diveCenters_snackbar_locationCaptured => 'Localização capturada';
 
   @override
   String diveCenters_snackbar_locationCapturedWithAccuracy(Object accuracy) {
-    return 'LocalizaÃ§Ã£o capturada (Â±${accuracy}m)';
+    return 'Localização capturada (±${accuracy}m)';
   }
 
   @override
   String get diveCenters_snackbar_locationSelectedFromMap =>
-      'LocalizaÃ§Ã£o selecionada no mapa';
+      'Localização selecionada no mapa';
 
   @override
   String get diveCenters_sort_title => 'Ordenar Centros de Mergulho';
 
   @override
-  String get diveCenters_summary_countries => 'PaÃ­ses';
+  String get diveCenters_summary_countries => 'Países';
 
   @override
-  String get diveCenters_summary_highestRating => 'Maior AvaliaÃ§Ã£o';
+  String get diveCenters_summary_highestRating => 'Maior Avaliação';
 
   @override
-  String get diveCenters_summary_overview => 'VisÃ£o Geral';
+  String get diveCenters_summary_overview => 'Visão Geral';
 
   @override
-  String get diveCenters_summary_quickActions => 'AÃ§Ãµes RÃ¡pidas';
+  String get diveCenters_summary_quickActions => 'Ações Rápidas';
 
   @override
   String get diveCenters_summary_recentCenters =>
@@ -4687,13 +4678,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveCenters_tooltip_fitAllCenters => 'Ajustar Todos os Centros';
 
   @override
-  String get diveCenters_tooltip_listView => 'VisualizaÃ§Ã£o em Lista';
+  String get diveCenters_tooltip_listView => 'Visualização em Lista';
 
   @override
-  String get diveCenters_tooltip_mapView => 'VisualizaÃ§Ã£o em Mapa';
+  String get diveCenters_tooltip_mapView => 'Visualização em Mapa';
 
   @override
-  String get diveCenters_tooltip_moreOptions => 'Mais opÃ§Ãµes';
+  String get diveCenters_tooltip_moreOptions => 'Mais opções';
 
   @override
   String get diveCenters_tooltip_search => 'Buscar centros de mergulho';
@@ -4702,16 +4693,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveCenters_tooltip_sort => 'Ordenar';
 
   @override
-  String get diveCenters_validation_invalidEmail => 'Digite um e-mail vÃ¡lido';
+  String get diveCenters_validation_invalidEmail => 'Digite um e-mail válido';
 
   @override
-  String get diveCenters_validation_invalidLatitude => 'Latitude invÃ¡lida';
+  String get diveCenters_validation_invalidLatitude => 'Latitude inválida';
 
   @override
-  String get diveCenters_validation_invalidLongitude => 'Longitude invÃ¡lida';
+  String get diveCenters_validation_invalidLongitude => 'Longitude inválida';
 
   @override
-  String get diveCenters_validation_nameRequired => 'Nome Ã© obrigatÃ³rio';
+  String get diveCenters_validation_nameRequired => 'Nome é obrigatório';
 
   @override
   String get diveComputer_action_setFavorite => 'Definir como favorito';
@@ -4722,7 +4713,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get diveComputer_error_notFound => 'Dispositivo nÃ£o encontrado';
+  String get diveComputer_error_notFound => 'Dispositivo não encontrado';
 
   @override
   String get diveComputer_status_favorite => 'Computador favorito';
@@ -4933,10 +4924,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_ccr_label_lowDescAsc => 'Baixo (Desc/Sub)';
 
   @override
-  String get diveLog_ccr_label_n2 => 'Nâ‚‚';
+  String get diveLog_ccr_label_n2 => 'N₂';
 
   @override
-  String get diveLog_ccr_label_o2 => 'Oâ‚‚';
+  String get diveLog_ccr_label_o2 => 'O₂';
 
   @override
   String get diveLog_ccr_label_rated => 'Capacidade';
@@ -4974,31 +4965,31 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_combine_dataNote =>
-      'Os detalhes vÃªm do mergulho mais antigo, com os espaÃ§os em branco preenchidos pelos mergulhos posteriores. As notas sÃ£o combinadas. Cilindros, equipamentos, parceiros, tags e avistamentos sÃ£o todos mantidos.';
+      'Os detalhes vêm do mergulho mais antigo, com os espaços em branco preenchidos pelos mergulhos posteriores. As notas são combinadas. Cilindros, equipamentos, parceiros, tags e avistamentos são todos mantidos.';
 
   @override
   String get diveLog_combine_error =>
-      'NÃ£o foi possÃ­vel combinar os mergulhos. Nada foi alterado.';
+      'Não foi possível combinar os mergulhos. Nada foi alterado.';
 
   @override
   String diveLog_combine_gapLabel(String duration) {
-    return 'Intervalo de superfÃ­cie: $duration';
+    return 'Intervalo de superfície: $duration';
   }
 
   @override
   String get diveLog_combine_longSurfaceWarning =>
-      'Um ou mais intervalos de superfÃ­cie sÃ£o maiores que 30 minutos. Podem ser mergulhos separados em vez de um Ãºnico mergulho contÃ­nuo.';
+      'Um ou mais intervalos de superfície são maiores que 30 minutos. Podem ser mergulhos separados em vez de um único mergulho contínuo.';
 
   @override
   String get diveLog_combine_mixedDivers =>
-      'Os mergulhos selecionados pertencem a mergulhadores diferentes e nÃ£o podem ser combinados.';
+      'Os mergulhos selecionados pertencem a mergulhadores diferentes e não podem ser combinados.';
 
   @override
   String get diveLog_combine_profilePreview => 'Perfil combinado';
 
   @override
   String diveLog_combine_previewIntro(int count) {
-    return 'Estes $count mergulhos serÃ£o combinados em um Ãºnico mergulho contÃ­nuo. Os intervalos entre eles se tornam tempo de superfÃ­cie.';
+    return 'Estes $count mergulhos serão combinados em um único mergulho contínuo. Os intervalos entre eles se tornam tempo de superfície.';
   }
 
   @override
@@ -5007,7 +4998,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String maxDepth,
     String bottomTime,
   ) {
-    return 'Resultado: $runtime no total, profundidade mÃ¡xima $maxDepth, tempo de fundo $bottomTime';
+    return 'Resultado: $runtime no total, profundidade máxima $maxDepth, tempo de fundo $bottomTime';
   }
 
   @override
@@ -5026,29 +5017,29 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_combine_undoError =>
-      'NÃ£o foi possÃ­vel desfazer a combinaÃ§Ã£o.';
+      'Não foi possível desfazer a combinação.';
 
   @override
-  String get diveLog_combine_undone => 'CombinaÃ§Ã£o desfeita';
+  String get diveLog_combine_undone => 'Combinação desfeita';
 
   @override
   String get diveLog_computerSource_badge_primary => 'Principal';
 
   @override
   String get diveLog_consolidate_confirm =>
-      'Manter como um Ãºnico mergulho com os dois computadores';
+      'Manter como um único mergulho com os dois computadores';
 
   @override
   String get diveLog_consolidate_error_generic =>
-      'NÃ£o foi possÃ­vel mesclar os mergulhos. Nada foi alterado.';
+      'Não foi possível mesclar os mergulhos. Nada foi alterado.';
 
   @override
   String get diveLog_consolidate_error_notOverlapping =>
-      'Esses mergulhos nÃ£o se sobrepÃµem no tempo, portanto nÃ£o podem ser mesclados como o mesmo mergulho.';
+      'Esses mergulhos não se sobrepõem no tempo, portanto não podem ser mesclados como o mesmo mergulho.';
 
   @override
   String get diveLog_consolidate_error_sameComputer =>
-      'Esses mergulhos sÃ£o do mesmo computador de mergulho e nÃ£o podem ser mesclados dessa forma.';
+      'Esses mergulhos são do mesmo computador de mergulho e não podem ser mesclados dessa forma.';
 
   @override
   String get diveLog_consolidate_selectPrimary =>
@@ -5060,7 +5051,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_consolidate_undoError =>
-      'NÃ£o foi possÃ­vel desfazer a mesclagem.';
+      'Não foi possível desfazer a mesclagem.';
 
   @override
   String get diveLog_consolidate_undone => 'Mesclagem desfeita';
@@ -5128,7 +5119,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_deco_gf_chipFromSettings(Object low, Object high) {
-    return 'GF: $low/$high Â· as suas definiÃ§Ãµes';
+    return 'GF: $low/$high · as suas definições';
   }
 
   @override
@@ -5137,7 +5128,7 @@ class AppLocalizationsPt extends AppLocalizations {
     Object low,
     Object high,
   ) {
-    return '$algorithm Â· analisado com GF $low/$high';
+    return '$algorithm · analisado com GF $low/$high';
   }
 
   @override
@@ -5147,11 +5138,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_deco_gf_tooltipFromSettings =>
-      'Este computador de mergulho nÃ£o registou os seus fatores de gradiente, por isso este mergulho Ã© analisado com os das suas definiÃ§Ãµes.';
+      'Este computador de mergulho não registou os seus fatores de gradiente, por isso este mergulho é analisado com os das suas definições.';
 
   @override
   String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm) {
-    return 'Este mergulho foi calculado com $algorithm, que nÃ£o usa fatores de gradiente. O Submersion analisa-o com os das suas definiÃ§Ãµes.';
+    return 'Este mergulho foi calculado com $algorithm, que não usa fatores de gradiente. O Submersion analisa-o com os das suas definições.';
   }
 
   @override
@@ -5235,7 +5226,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_detail_collapsed_atTime(Object timestamp) {
-    return 'Ã€s $timestamp';
+    return 'Às $timestamp';
   }
 
   @override
@@ -5243,7 +5234,7 @@ class AppLocalizationsPt extends AppLocalizations {
     Object timestamp,
     Object baseInfo,
   ) {
-    return 'Ã€s $timestamp â€¢ $baseInfo';
+    return 'Às $timestamp • $baseInfo';
   }
 
   @override
@@ -5253,7 +5244,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_detail_collapsed_cnsMaxPpO2(Object cns, Object maxPpO2) {
-    return 'CNS: $cns â€¢ MÃ¡x ppOâ‚‚: $maxPpO2';
+    return 'CNS: $cns • Máx ppO₂: $maxPpO2';
   }
 
   @override
@@ -5263,7 +5254,7 @@ class AppLocalizationsPt extends AppLocalizations {
     Object timestamp,
     Object ppO2,
   ) {
-    return 'CNS: $cns â€¢ MÃ¡x ppOâ‚‚: $maxPpO2 â€¢ Ã€s $timestamp: $ppO2 bar';
+    return 'CNS: $cns • Máx ppO₂: $maxPpO2 • Às $timestamp: $ppO2 bar';
   }
 
   @override
@@ -5354,7 +5345,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_detail_label_lowTide => 'Mare Baixa';
 
   @override
-  String get diveLog_detail_label_ppO2AtPoint => 'ppOâ‚‚ no ponto selecionado:';
+  String get diveLog_detail_label_ppO2AtPoint => 'ppO₂ no ponto selecionado:';
 
   @override
   String get diveLog_detail_label_rateOfChange => 'Taxa de Variacao';
@@ -5431,7 +5422,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_detail_section_equipment => 'Equipamentos';
 
   @override
-  String get diveLog_detail_section_marineLife => 'EspÃ©cies';
+  String get diveLog_detail_section_marineLife => 'Espécies';
 
   @override
   String diveLog_detail_sightingPhotos(int count) {
@@ -5452,7 +5443,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_detail_section_sacRateBySegment =>
-      'Consumo de gÃ¡s por segmento';
+      'Consumo de gás por segmento';
 
   @override
   String get diveLog_detail_section_tags => 'Tags';
@@ -5541,11 +5532,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_diveMode_ccrDescription =>
-      'Rebreather de circuito fechado com ppOâ‚‚ constante';
+      'Rebreather de circuito fechado com ppO₂ constante';
 
   @override
   String get diveLog_diveMode_gaugeDescription =>
-      'Apenas profundidade e tempo; sem rastreamento de gÃ¡s ou descompressÃ£o';
+      'Apenas profundidade e tempo; sem rastreamento de gás ou descompressão';
 
   @override
   String get diveLog_diveMode_ocDescription =>
@@ -5553,7 +5544,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_diveMode_scrDescription =>
-      'Rebreather semi-fechado com ppOâ‚‚ variavel';
+      'Rebreather semi-fechado com ppO₂ variavel';
 
   @override
   String get diveLog_diveMode_title => 'Modo de Mergulho';
@@ -5649,13 +5640,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_edit_group_buddies => 'Parceiros';
 
   @override
-  String get diveLog_edit_group_conditions => 'CondiÃ§Ãµes';
+  String get diveLog_edit_group_conditions => 'Condições';
 
   @override
-  String get diveLog_edit_group_experience => 'ExperiÃªncia';
+  String get diveLog_edit_group_experience => 'Experiência';
 
   @override
-  String get diveLog_edit_group_gasGear => 'GÃ¡s e equipamento';
+  String get diveLog_edit_group_gasGear => 'Gás e equipamento';
 
   @override
   String get diveLog_edit_group_theDive => 'O mergulho';
@@ -5671,15 +5662,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_edit_invite_conditions =>
-      'Adicionar condiÃ§Ãµes: Ã¡gua, visibilidade, clima';
+      'Adicionar condições: água, visibilidade, clima';
 
   @override
   String get diveLog_edit_invite_experience =>
-      'Adicionar avaliaÃ§Ã£o, avistamentos, notas ou tags';
+      'Adicionar avaliação, avistamentos, notas ou tags';
 
   @override
   String get diveLog_edit_invite_gasGear =>
-      'Adicionar gÃ¡s e equipamento: modo, cilindros, equipamento, lastro';
+      'Adicionar gás e equipamento: modo, cilindros, equipamento, lastro';
 
   @override
   String get diveLog_edit_invite_trip =>
@@ -5765,7 +5756,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Nenhum equipamento selecionado';
 
   @override
-  String get diveLog_edit_noMarineLife => 'Nenhuma espÃ©cie registrada';
+  String get diveLog_edit_noMarineLife => 'Nenhuma espécie registrada';
 
   @override
   String get diveLog_edit_notSpecified => 'Nao especificado';
@@ -5818,16 +5809,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_edit_row_entry => 'Entrada';
 
   @override
-  String get diveLog_edit_row_exit => 'SaÃ­da';
+  String get diveLog_edit_row_exit => 'Saída';
 
   @override
-  String get diveLog_edit_row_notSet => 'NÃ£o definido';
+  String get diveLog_edit_row_notSet => 'Não definido';
 
   @override
   String get diveLog_edit_row_site => 'Ponto de mergulho';
 
   @override
-  String get diveLog_edit_row_surfaceInterval => 'Intervalo de superfÃ­cie';
+  String get diveLog_edit_row_surfaceInterval => 'Intervalo de superfície';
 
   @override
   String get diveLog_edit_row_trip => 'Viagem';
@@ -5906,7 +5897,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_edit_section_exitTime => 'Horario de Saida';
 
   @override
-  String get diveLog_edit_section_marineLife => 'EspÃ©cies';
+  String get diveLog_edit_section_marineLife => 'Espécies';
 
   @override
   String get diveLog_edit_section_notes => 'Anotacoes';
@@ -6008,8 +5999,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count espÃ©cies',
-      one: '1 espÃ©cie',
+      other: '$count espécies',
+      one: '1 espécie',
     );
     return '$_temp0';
   }
@@ -6038,7 +6029,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Padrao: 1013 mbar ao nivel do mar';
 
   @override
-  String get diveLog_edit_tankCard_done => 'ConcluÃ­do';
+  String get diveLog_edit_tankCard_done => 'Concluído';
 
   @override
   String get diveLog_edit_tankCard_edit => 'Editar';
@@ -6047,7 +6038,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_edit_tankCard_mix => 'Mistura';
 
   @override
-  String get diveLog_edit_tankCard_pressure => 'PressÃ£o';
+  String get diveLog_edit_tankCard_pressure => 'Pressão';
 
   @override
   String diveLog_edit_tankCard_title(int number) {
@@ -6096,44 +6087,44 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_edit_useSet => 'Usar Conjunto';
 
   @override
-  String get diveLog_edit_weightPreset_use => 'Usar predefiniÃ§Ã£o';
+  String get diveLog_edit_weightPreset_use => 'Usar predefinição';
 
   @override
-  String get diveLog_edit_weightPreset_save => 'Guardar como predefiniÃ§Ã£o';
+  String get diveLog_edit_weightPreset_save => 'Guardar como predefinição';
 
   @override
   String get diveLog_edit_weightPreset_pickerTitle =>
-      'Aplicar uma predefiniÃ§Ã£o de lastro';
+      'Aplicar uma predefinição de lastro';
 
   @override
   String get diveLog_edit_weightPreset_empty =>
-      'Ainda nÃ£o guardou nenhuma predefiniÃ§Ã£o de lastro.';
+      'Ainda não guardou nenhuma predefinição de lastro.';
 
   @override
   String diveLog_edit_weightPreset_summary(int count, Object total) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count pesos Â· $total',
-      one: '1 peso Â· $total',
+      other: '$count pesos · $total',
+      one: '1 peso · $total',
     );
     return '$_temp0';
   }
 
   @override
   String get diveLog_edit_weightPreset_applied =>
-      'PredefiniÃ§Ã£o de lastro aplicada. Ajuste as entradas conforme necessÃ¡rio.';
+      'Predefinição de lastro aplicada. Ajuste as entradas conforme necessário.';
 
   @override
   String get diveLog_edit_weightPreset_saveTitle =>
-      'Guardar o lastro como predefiniÃ§Ã£o';
+      'Guardar o lastro como predefinição';
 
   @override
-  String get diveLog_edit_weightPreset_nameLabel => 'Nome da predefiniÃ§Ã£o';
+  String get diveLog_edit_weightPreset_nameLabel => 'Nome da predefinição';
 
   @override
   String diveLog_edit_weightPreset_saved(Object name) {
-    return 'PredefiniÃ§Ã£o de lastro â€œ$nameâ€ guardada';
+    return 'Predefinição de lastro “$name” guardada';
   }
 
   @override
@@ -6414,10 +6405,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_filter_noTagsYet => 'Nenhuma tag criada ainda';
 
   @override
-  String get diveLog_filter_presetAllTime => 'Todo o perÃ­odo';
+  String get diveLog_filter_presetAllTime => 'Todo o período';
 
   @override
-  String get diveLog_filter_presetLast12Months => 'Ãšltimos 12 meses';
+  String get diveLog_filter_presetLast12Months => 'Últimos 12 meses';
 
   @override
   String get diveLog_filter_presetLastYear => 'Ano passado';
@@ -6465,7 +6456,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_filter_sectionDuration => 'Duracao (minutos)';
 
   @override
-  String get diveLog_filter_sectionGasMix => 'Mistura de Gas (Oâ‚‚%)';
+  String get diveLog_filter_sectionGasMix => 'Mistura de Gas (O₂%)';
 
   @override
   String get diveLog_filter_sectionMinRating => 'Avaliacao Minima';
@@ -6614,7 +6605,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_chartSection_gasAnalysis => 'Analise de gases';
 
   @override
-  String get diveLog_chartSection_display => 'ExibiÃ§Ã£o';
+  String get diveLog_chartSection_display => 'Exibição';
 
   @override
   String get diveLog_chartSection_other => 'Outros';
@@ -6624,7 +6615,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_chartOption_metricsFollowViewport =>
-      'Manter as sobreposiÃ§Ãµes visÃ­veis';
+      'Manter as sobreposições visíveis';
 
   @override
   String get diveLog_pressure_estimatedSuffix => '(est.)';
@@ -6649,7 +6640,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Digitalizar registro em papel';
 
   @override
-  String get ocrImport_scanPage_processing => 'Lendo a pÃ¡gina...';
+  String get ocrImport_scanPage_processing => 'Lendo a página...';
 
   @override
   String get ocrImport_scanPage_pickPhoto => 'Escolher foto';
@@ -6659,15 +6650,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get ocrImport_scanPage_nothingRead =>
-      'NÃ£o foi possÃ­vel ler muito desta pÃ¡gina - campos deixados em branco';
+      'Não foi possível ler muito desta página - campos deixados em branco';
 
   @override
   String get ocrImport_scanPage_engineMissing =>
-      'O reconhecimento de texto nÃ£o estÃ¡ disponÃ­vel. Instale o Tesseract para digitalizar registros em papel (por exemplo: sudo apt install tesseract-ocr).';
+      'O reconhecimento de texto não está disponível. Instale o Tesseract para digitalizar registros em papel (por exemplo: sudo apt install tesseract-ocr).';
 
   @override
   String get ocrImport_editPage_photoAttachFailed =>
-      'O mergulho foi salvo, mas nÃ£o foi possÃ­vel anexar a pÃ¡gina digitalizada';
+      'O mergulho foi salvo, mas não foi possível anexar a página digitalizada';
 
   @override
   String get diveLog_listPage_bottomSheet_logManually =>
@@ -6690,20 +6681,20 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_listPage_menuFetchConditions =>
-      'Obter condiÃ§Ãµes de todos os mergulhos';
+      'Obter condições de todos os mergulhos';
 
   @override
-  String get diveLog_fetchConditions_confirmTitle => 'Obter condiÃ§Ãµes?';
+  String get diveLog_fetchConditions_confirmTitle => 'Obter condições?';
 
   @override
   String diveLog_fetchConditions_confirmBody(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count mergulhos estÃ£o sem condiÃ§Ãµes.',
-      one: '1 mergulho estÃ¡ sem condiÃ§Ãµes.',
+      other: '$count mergulhos estão sem condições.',
+      one: '1 mergulho está sem condições.',
     );
-    return '$_temp0 Apenas os campos vazios sÃ£o preenchidos, por isso nada do que jÃ¡ introduziu serÃ¡ alterado.';
+    return '$_temp0 Apenas os campos vazios são preenchidos, por isso nada do que já introduziu será alterado.';
   }
 
   @override
@@ -6711,10 +6702,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_fetchConditions_noneNeeded =>
-      'NÃ£o hÃ¡ mergulhos sem condiÃ§Ãµes.';
+      'Não há mergulhos sem condições.';
 
   @override
-  String get diveLog_fetchConditions_progressTitle => 'A obter condiÃ§Ãµes';
+  String get diveLog_fetchConditions_progressTitle => 'A obter condições';
 
   @override
   String diveLog_fetchConditions_progressCount(int completed, int total) {
@@ -6722,7 +6713,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get diveLog_fetchConditions_summaryTitle => 'CondiÃ§Ãµes obtidas';
+  String get diveLog_fetchConditions_summaryTitle => 'Condições obtidas';
 
   @override
   String diveLog_fetchConditions_summaryFilled(int count) {
@@ -6740,8 +6731,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count mergulhos sem dados disponÃ­veis',
-      one: '1 mergulho sem dados disponÃ­veis',
+      other: '$count mergulhos sem dados disponíveis',
+      one: '1 mergulho sem dados disponíveis',
     );
     return '$_temp0';
   }
@@ -6776,7 +6767,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_speciesPicker_errorLoading(String error) {
-    return 'Erro ao carregar espÃ©cies: $error';
+    return 'Erro ao carregar espécies: $error';
   }
 
   @override
@@ -6795,7 +6786,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveRole_builtin_rearGuard => 'Retaguarda';
 
   @override
-  String get diveRole_builtin_safetyDiver => 'Mergulhador de SeguranÃ§a';
+  String get diveRole_builtin_safetyDiver => 'Mergulhador de Segurança';
 
   @override
   String get diveRole_builtin_solo => 'Solo';
@@ -6810,29 +6801,29 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveRoles_addDialog_addButton => 'Adicionar';
 
   @override
-  String get diveRoles_addDialog_nameHint => 'ex: FotÃ³grafo';
+  String get diveRoles_addDialog_nameHint => 'ex: Fotógrafo';
 
   @override
-  String get diveRoles_addDialog_nameLabel => 'Nome da FunÃ§Ã£o de Mergulho';
+  String get diveRoles_addDialog_nameLabel => 'Nome da Função de Mergulho';
 
   @override
   String get diveRoles_addDialog_nameValidation => 'Digite um nome';
 
   @override
   String get diveRoles_addDialog_title =>
-      'Adicionar FunÃ§Ã£o de Mergulho Personalizada';
+      'Adicionar Função de Mergulho Personalizada';
 
   @override
-  String get diveRoles_addTooltip => 'Adicionar funÃ§Ã£o de mergulho';
+  String get diveRoles_addTooltip => 'Adicionar função de mergulho';
 
   @override
-  String get diveRoles_appBar_title => 'FunÃ§Ãµes de Mergulho';
+  String get diveRoles_appBar_title => 'Funções de Mergulho';
 
   @override
-  String get diveRoles_builtInHeader => 'FunÃ§Ãµes de Mergulho Integradas';
+  String get diveRoles_builtInHeader => 'Funções de Mergulho Integradas';
 
   @override
-  String get diveRoles_customHeader => 'FunÃ§Ãµes de Mergulho Personalizadas';
+  String get diveRoles_customHeader => 'Funções de Mergulho Personalizadas';
 
   @override
   String diveRoles_deleteDialog_content(Object name) {
@@ -6840,45 +6831,45 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get diveRoles_deleteDialog_title => 'Excluir FunÃ§Ã£o de Mergulho?';
+  String get diveRoles_deleteDialog_title => 'Excluir Função de Mergulho?';
 
   @override
-  String get diveRoles_deleteTooltip => 'Excluir funÃ§Ã£o de mergulho';
+  String get diveRoles_deleteTooltip => 'Excluir função de mergulho';
 
   @override
-  String get diveRoles_renameDialog_title => 'Renomear FunÃ§Ã£o de Mergulho';
+  String get diveRoles_renameDialog_title => 'Renomear Função de Mergulho';
 
   @override
-  String get diveRoles_renameTooltip => 'Renomear funÃ§Ã£o de mergulho';
+  String get diveRoles_renameTooltip => 'Renomear função de mergulho';
 
   @override
   String diveRoles_snackbar_added(Object name) {
-    return 'FunÃ§Ã£o de mergulho adicionada: $name';
+    return 'Função de mergulho adicionada: $name';
   }
 
   @override
   String diveRoles_snackbar_cannotDelete(Object name) {
-    return 'NÃ£o Ã© possÃ­vel excluir \"$name\" - estÃ¡ sendo usada por mergulhos existentes';
+    return 'Não é possível excluir \"$name\" - está sendo usada por mergulhos existentes';
   }
 
   @override
   String diveRoles_snackbar_deleted(Object name) {
-    return 'FunÃ§Ã£o de mergulho excluÃ­da: $name';
+    return 'Função de mergulho excluída: $name';
   }
 
   @override
   String diveRoles_snackbar_errorAdding(Object error) {
-    return 'Erro ao adicionar funÃ§Ã£o de mergulho: $error';
+    return 'Erro ao adicionar função de mergulho: $error';
   }
 
   @override
-  String get diveSites_edit_depth_heroMax => 'Prof. mÃ¡x.';
+  String get diveSites_edit_depth_heroMax => 'Prof. máx.';
 
   @override
-  String get diveSites_edit_depth_heroMin => 'Prof. mÃ­n.';
+  String get diveSites_edit_depth_heroMin => 'Prof. mín.';
 
   @override
-  String get diveSites_edit_group_accessSafety => 'Acesso e seguranÃ§a';
+  String get diveSites_edit_group_accessSafety => 'Acesso e segurança';
 
   @override
   String get diveSites_edit_group_diveInfo => 'Dados de mergulho';
@@ -6890,7 +6881,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveSites_edit_group_lifeNotes => 'Vida marinha e notas';
 
   @override
-  String get diveSites_edit_group_location => 'LocalizaÃ§Ã£o';
+  String get diveSites_edit_group_location => 'Localização';
 
   @override
   String get diveSites_edit_group_typeTags => 'Tipo e etiquetas';
@@ -6910,15 +6901,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_edit_invite_diveInfo =>
-      'Adicionar faixa de profundidade, dificuldade ou avaliaÃ§Ã£o';
+      'Adicionar faixa de profundidade, dificuldade ou avaliação';
 
   @override
   String get diveSites_edit_invite_lifeNotes =>
-      'Adicionar espÃ©cies, notas ou compartilhamento';
+      'Adicionar espécies, notas ou compartilhamento';
 
   @override
   String get diveSites_edit_invite_location =>
-      'Adicionar posiÃ§Ã£o GPS ou altitude';
+      'Adicionar posição GPS ou altitude';
 
   @override
   String get diveSites_edit_summary_shared => 'compartilhado';
@@ -6931,7 +6922,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get forms_discard_body =>
-      'VocÃª tem alteraÃ§Ãµes nÃ£o salvas. Se sair agora, elas serÃ£o perdidas.';
+      'Você tem alterações não salvas. Se sair agora, elas serão perdidas.';
 
   @override
   String get forms_discard_discard => 'Descartar';
@@ -6940,7 +6931,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get forms_discard_keepEditing => 'Continuar editando';
 
   @override
-  String get forms_discard_title => 'Descartar as alteraÃ§Ãµes?';
+  String get forms_discard_title => 'Descartar as alterações?';
 
   @override
   String get forms_save => 'Salvar';
@@ -6957,20 +6948,20 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get settings_manage_setupAssistant => 'Assistente de configuraÃ§Ã£o';
+  String get settings_manage_setupAssistant => 'Assistente de configuração';
 
   @override
   String get settings_manage_setupAssistant_subtitle =>
-      'Reveja unidades, aparÃªncia e opÃ§Ãµes de backup';
+      'Reveja unidades, aparência e opções de backup';
 
   @override
   String get setup_backup_cloudCopy => 'Armazenar backups na nuvem';
 
   @override
-  String get setup_backup_frequency => 'FrequÃªncia';
+  String get setup_backup_frequency => 'Frequência';
 
   @override
-  String get setup_backup_frequency_daily => 'DiÃ¡ria';
+  String get setup_backup_frequency_daily => 'Diária';
 
   @override
   String get setup_backup_frequency_monthly => 'Mensal';
@@ -6980,30 +6971,30 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get setup_backup_scheduleSubtitle =>
-      'FaÃ§a backup dos seus dados periodicamente';
+      'Faça backup dos seus dados periodicamente';
 
   @override
-  String get setup_backup_scheduleToggle => 'Backups automÃ¡ticos';
+  String get setup_backup_scheduleToggle => 'Backups automáticos';
 
   @override
   String get setup_backup_subtitle =>
       'Proteja seus dados desde o primeiro dia.';
 
   @override
-  String get setup_backup_title => 'Backups e sincronizaÃ§Ã£o';
+  String get setup_backup_title => 'Backups e sincronização';
 
   @override
   String get setup_common_back => 'Voltar';
 
   @override
-  String get setup_common_next => 'AvanÃ§ar';
+  String get setup_common_next => 'Avançar';
 
   @override
   String get setup_common_skip => 'Ignorar';
 
   @override
   String get setup_existing_folder_subtitle =>
-      'Aponte o Submersion para uma pasta que jÃ¡ contÃ©m uma biblioteca';
+      'Aponte o Submersion para uma pasta que já contém uma biblioteca';
 
   @override
   String get setup_existing_folder_title => 'Abrir uma pasta existente';
@@ -7024,7 +7015,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Baixe sua biblioteca do iCloud, Dropbox ou S3';
 
   @override
-  String get setup_existing_sync_title => 'Conectar sincronizaÃ§Ã£o na nuvem';
+  String get setup_existing_sync_title => 'Conectar sincronização na nuvem';
 
   @override
   String get setup_existing_title => 'Traga seus dados';
@@ -7034,7 +7025,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String setup_finish_error(Object error) {
-    return 'NÃ£o foi possÃ­vel concluir a configuraÃ§Ã£o: $error';
+    return 'Não foi possível concluir a configuração: $error';
   }
 
   @override
@@ -7043,7 +7034,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get setup_finish_feature_gear =>
-      'Acompanhe equipamentos e intervalos de manutenÃ§Ã£o';
+      'Acompanhe equipamentos e intervalos de manutenção';
 
   @override
   String get setup_finish_feature_import =>
@@ -7055,20 +7046,20 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get setup_finish_feature_statistics =>
-      'Explore estatÃ­sticas sobre seus mergulhos';
+      'Explore estatísticas sobre seus mergulhos';
 
   @override
-  String get setup_finish_start => 'ComeÃ§ar';
+  String get setup_finish_start => 'Começar';
 
   @override
-  String get setup_finish_subtitle => 'O Submersion tambÃ©m pode...';
+  String get setup_finish_subtitle => 'O Submersion também pode...';
 
   @override
   String get setup_finish_title => 'Tudo pronto';
 
   @override
   String get setup_folder_notFound_message =>
-      'A pasta selecionada nÃ£o contÃ©m um banco de dados do Submersion.';
+      'A pasta selecionada não contém um banco de dados do Submersion.';
 
   @override
   String get setup_folder_notFound_title => 'Nenhuma biblioteca nessa pasta';
@@ -7093,7 +7084,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get setup_profile_subtitle =>
-      'Digite seu nome para comeÃ§ar. VocÃª pode adicionar mais detalhes depois.';
+      'Digite seu nome para começar. Você pode adicionar mais detalhes depois.';
 
   @override
   String get setup_profile_title => 'Crie Seu Perfil';
@@ -7111,7 +7102,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get setup_step_backup => 'Backup';
 
   @override
-  String get setup_step_finish => 'ConcluÃ­do';
+  String get setup_step_finish => 'Concluído';
 
   @override
   String get setup_step_profile => 'Perfil';
@@ -7124,7 +7115,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get setup_syncPull_incomplete_message =>
-      'Esta conta contÃ©m uma biblioteca do Submersion cujo envio nunca foi concluÃ­do. Deixe o seu outro dispositivo terminar a sincronizaÃ§Ã£o e tente novamente.';
+      'Esta conta contém uma biblioteca do Submersion cujo envio nunca foi concluído. Deixe o seu outro dispositivo terminar a sincronização e tente novamente.';
 
   @override
   String get setup_syncPull_incomplete_retry => 'Verificar novamente';
@@ -7135,15 +7126,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get setup_syncPull_locked_message =>
-      'Digite a frase-senha de criptografia para desbloquear esta biblioteca e baixÃ¡-la neste dispositivo.';
+      'Digite a frase-senha de criptografia para desbloquear esta biblioteca e baixá-la neste dispositivo.';
 
   @override
   String get setup_syncPull_locked_title =>
-      'Esta biblioteca estÃ¡ criptografada';
+      'Esta biblioteca está criptografada';
 
   @override
   String get setup_syncPull_noLibrary_message =>
-      'Nenhuma biblioteca do Submersion foi encontrada nesta conta. ComeÃ§ar do zero? Sua conexÃ£o serÃ¡ mantida.';
+      'Nenhuma biblioteca do Submersion foi encontrada nesta conta. Começar do zero? Sua conexão será mantida.';
 
   @override
   String get setup_syncPull_noLibrary_title => 'Nenhuma biblioteca encontrada';
@@ -7167,30 +7158,30 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String setup_sync_error(Object error) {
-    return 'NÃ£o foi possÃ­vel conectar: $error';
+    return 'Não foi possível conectar: $error';
   }
 
   @override
-  String get setup_sync_header => 'SincronizaÃ§Ã£o na nuvem';
+  String get setup_sync_header => 'Sincronização na nuvem';
 
   @override
   String get setup_sync_libraryFound_adopt => 'Adotar biblioteca existente';
 
   @override
-  String get setup_sync_libraryFound_keepFresh => 'ComeÃ§ar do zero';
+  String get setup_sync_libraryFound_keepFresh => 'Começar do zero';
 
   @override
   String get setup_sync_libraryFound_message =>
-      'Esta conta jÃ¡ contÃ©m uma biblioteca do Submersion. AdotÃ¡-la em vez de comeÃ§ar do zero?';
+      'Esta conta já contém uma biblioteca do Submersion. Adotá-la em vez de começar do zero?';
 
   @override
   String get setup_sync_libraryFound_title => 'Biblioteca existente encontrada';
 
   @override
-  String get setup_sync_manageInSettings => 'Gerenciar nas ConfiguraÃ§Ãµes';
+  String get setup_sync_manageInSettings => 'Gerenciar nas Configurações';
 
   @override
-  String get setup_sync_notConnected => 'NÃ£o conectado';
+  String get setup_sync_notConnected => 'Não conectado';
 
   @override
   String get setup_sync_subtitle => 'Sincronize seus dados entre dispositivos';
@@ -7211,17 +7202,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get setup_units_imperial => 'Imperial';
 
   @override
-  String get setup_units_metric => 'MÃ©trico';
+  String get setup_units_metric => 'Métrico';
 
   @override
-  String get setup_units_pressure => 'PressÃ£o';
+  String get setup_units_pressure => 'Pressão';
 
   @override
-  String get setup_units_gasConsumption => 'Consumo de gÃ¡s';
+  String get setup_units_gasConsumption => 'Consumo de gás';
 
   @override
   String get setup_units_subtitle =>
-      'Escolha como as medidas sÃ£o exibidas. VocÃª pode ajustar cada unidade.';
+      'Escolha como as medidas são exibidas. Você pode ajustar cada unidade.';
 
   @override
   String get setup_units_temperature => 'Temperatura';
@@ -7240,14 +7231,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get setup_welcome_existingData_subtitle =>
-      'Restaure um backup, conecte a sincronizaÃ§Ã£o ou abra uma pasta existente';
+      'Restaure um backup, conecte a sincronização ou abra uma pasta existente';
 
   @override
-  String get setup_welcome_existingData_title =>
-      'JÃ¡ tenho dados do Submersion';
+  String get setup_welcome_existingData_title => 'Já tenho dados do Submersion';
 
   @override
-  String get setup_welcome_skipSetup => 'Ignorar configuraÃ§Ã£o';
+  String get setup_welcome_skipSetup => 'Ignorar configuração';
 
   @override
   String get setup_welcome_startFresh_subtitle =>
@@ -7257,8 +7247,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get setup_welcome_startFresh_title => 'Configurar um novo perfil';
 
   @override
-  String get setup_welcome_subtitle =>
-      'Mergulhe com seguranÃ§a. Registre tudo.';
+  String get setup_welcome_subtitle => 'Mergulhe com segurança. Registre tudo.';
 
   @override
   String get setup_welcome_title => 'Bem-vindo ao Submersion';
@@ -7275,11 +7264,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get siteMatchReview_empty => 'Nada para associar.';
 
   @override
-  String get siteSuggestion_titlePhoto => 'LocalizaÃ§Ã£o encontrada nas fotos';
+  String get siteSuggestion_titlePhoto => 'Localização encontrada nas fotos';
 
   @override
   String get siteSuggestion_titleDiveComputer =>
-      'LocalizaÃ§Ã£o do computador de mergulho';
+      'Localização do computador de mergulho';
 
   @override
   String siteSuggestion_assignButton(Object name) {
@@ -7288,17 +7277,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String siteSuggestion_chooseNearbyButton(int count) {
-    return 'Escolher ponto prÃ³ximo ($count)';
+    return 'Escolher ponto próximo ($count)';
   }
 
   @override
   String siteSuggestion_addLocationButton(Object name) {
-    return 'Adicionar localizaÃ§Ã£o a $name';
+    return 'Adicionar localização a $name';
   }
 
   @override
   String siteSuggestion_assignedSnack(Object name) {
-    return '$name atribuÃ­do';
+    return '$name atribuído';
   }
 
   @override
@@ -7321,8 +7310,8 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '\"$name\" Ã© usado por $count pontos. EliminÃ¡-lo remove-o desses pontos.',
-      one: '\"$name\" Ã© usado por 1 ponto. EliminÃ¡-lo remove-o desse ponto.',
+          '\"$name\" é usado por $count pontos. Eliminá-lo remove-o desses pontos.',
+      one: '\"$name\" é usado por 1 ponto. Eliminá-lo remove-o desse ponto.',
     );
     return '$_temp0';
   }
@@ -7362,7 +7351,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String siteTypes_snackbar_error(String error) {
-    return 'NÃ£o foi possÃ­vel guardar o tipo de ponto: $error';
+    return 'Não foi possível guardar o tipo de ponto: $error';
   }
 
   @override
@@ -7393,7 +7382,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get siteType_builtin_muck => 'Muck';
 
   @override
-  String get siteType_builtin_pier => 'Cais / pontÃ£o';
+  String get siteType_builtin_pier => 'Cais / pontão';
 
   @override
   String get siteType_builtin_pool => 'Piscina';
@@ -7414,7 +7403,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get siteType_builtin_wall => 'Parede';
 
   @override
-  String get siteType_builtin_wreck => 'NaufrÃ¡gio';
+  String get siteType_builtin_wreck => 'Naufrágio';
 
   @override
   String get siteMatchReview_sourcePhoto => 'da foto';
@@ -7424,19 +7413,19 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get siteMatchReview_currentSiteCard =>
-      'Adicionar localizaÃ§Ã£o a este ponto';
+      'Adicionar localização a este ponto';
 
   @override
   String get siteMatchReview_createHereButton => 'Criar ponto aqui';
 
   @override
   String siteMatchReview_summary(int selected, int review, int none) {
-    return '$selected selecionados Â· $review para revisar Â· $none sem correspondÃªncia';
+    return '$selected selecionados · $review para revisar · $none sem correspondência';
   }
 
   @override
   String siteMatchReview_confirm(int count) {
-    return 'Confirmar $count associaÃ§Ãµes';
+    return 'Confirmar $count associações';
   }
 
   @override
@@ -7452,29 +7441,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String siteMatchReview_depthTo(int meters) {
-    return 'atÃ© $meters m';
+    return 'até $meters m';
   }
 
   @override
   String siteMatchReview_depthRange(int min, int max) {
-    return '$minâ€“$max m';
+    return '$min–$max m';
   }
 
   @override
   String siteMatchReview_appliedSnack(int dives, int sites, int located) {
-    return '$dives mergulhos associados Â· $sites pontos adicionados Â· $located pontos localizados';
+    return '$dives mergulhos associados · $sites pontos adicionados · $located pontos localizados';
   }
 
   @override
   String get siteMatchReview_applyError =>
-      'NÃ£o foi possÃ­vel aplicar as associaÃ§Ãµes';
+      'Não foi possível aplicar as associações';
 
   @override
-  String get siteMatchReview_discardTitle => 'Descartar associaÃ§Ãµes?';
+  String get siteMatchReview_discardTitle => 'Descartar associações?';
 
   @override
-  String get siteMatchReview_discardMessage =>
-      'Sua seleÃ§Ã£o nÃ£o serÃ¡ salva.';
+  String get siteMatchReview_discardMessage => 'Sua seleção não será salva.';
 
   @override
   String get siteMatchReview_discardConfirm => 'Descartar';
@@ -7489,7 +7477,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get siteMatchReview_sourceBundled => 'importado';
 
   @override
-  String get siteMatchReview_noNearbySite => 'Nenhum ponto prÃ³ximo';
+  String get siteMatchReview_noNearbySite => 'Nenhum ponto próximo';
 
   @override
   String importSummary_matchSitesButton(int count) {
@@ -7501,7 +7489,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_listPage_groupingPausedBySort(String sortName) {
-    return 'O agrupamento por viagem estÃ¡ desativado ao ordenar por $sortName';
+    return 'O agrupamento por viagem está desativado ao ordenar por $sortName';
   }
 
   @override
@@ -7553,7 +7541,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_listPage_searchLimitNotice(int limit) {
-    return 'Mostrando as primeiras $limit correspondÃªncias. Refine a busca para restringir os resultados.';
+    return 'Mostrando as primeiras $limit correspondências. Refine a busca para restringir os resultados.';
   }
 
   @override
@@ -7676,7 +7664,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_numbering_summary(Object total, Object numbered) {
-    return '$total mergulhos no total â€¢ $numbered numerados';
+    return '$total mergulhos no total • $numbered numerados';
   }
 
   @override
@@ -7735,7 +7723,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_o2tox_semantics_cnsBadge(Object value) {
-    return 'Toxicidade do oxigÃªnio CNS $value';
+    return 'Toxicidade do oxigênio CNS $value';
   }
 
   @override
@@ -7744,7 +7732,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_o2tox_semantics_otu(Object value, Object percent) {
-    return 'Unidades de TolerÃ¢ncia ao OxigÃªnio: $value, $percent porcento do limite diÃ¡rio';
+    return 'Unidades de Tolerância ao Oxigênio: $value, $percent porcento do limite diário';
   }
 
   @override
@@ -7775,7 +7763,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_playbackStats_ndl => 'NDL';
 
   @override
-  String get diveLog_playbackStats_ppO2 => 'ppOâ‚‚';
+  String get diveLog_playbackStats_ppO2 => 'ppO₂';
 
   @override
   String get diveLog_playbackStats_pressure => 'Pressao';
@@ -7857,7 +7845,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_profile_zoomHint(Object level) {
-    return 'Zoom: ${level}x â€¢ Pince ou role para ampliar, arraste para mover';
+    return 'Zoom: ${level}x • Pince ou role para ampliar, arraste para mover';
   }
 
   @override
@@ -7917,7 +7905,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_scr_calculatedLoopFo2(Object value) {
-    return 'FOâ‚‚ calculado do loop: $value%';
+    return 'FO₂ calculado do loop: $value%';
   }
 
   @override
@@ -7927,7 +7915,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_scr_label_additionRatio => 'Razao de Adicao';
 
   @override
-  String get diveLog_scr_label_assumedVo2 => 'VOâ‚‚ Assumido';
+  String get diveLog_scr_label_assumedVo2 => 'VO₂ Assumido';
 
   @override
   String get diveLog_scr_label_avg => 'Media';
@@ -7952,7 +7940,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_scr_sectionMeasuredLoopO2 =>
-      'Oâ‚‚ Medido no Loop (opcional)';
+      'O₂ Medido no Loop (opcional)';
 
   @override
   String get diveLog_scr_sectionPascr => 'Parametros PASCR';
@@ -8009,10 +7997,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_search_filter_any => 'Qualquer';
 
   @override
-  String get diveLog_search_gasTrimix => 'Trimix (<21% Oâ‚‚)';
+  String get diveLog_search_gasTrimix => 'Trimix (<21% O₂)';
 
   @override
-  String get diveLog_search_label_deco => 'DescompressÃ£o';
+  String get diveLog_search_label_deco => 'Descompressão';
 
   @override
   String get diveLog_search_label_depthRange => 'Faixa de Profundidade (m)';
@@ -8112,12 +8100,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_sitePicker_distanceAway(String distance) {
-    return '$distance de distÃ¢ncia';
+    return '$distance de distância';
   }
 
   @override
   String get diveLog_sitePicker_sortedByDiveDistance =>
-      'Ordenado por distÃ¢ncia deste mergulho';
+      'Ordenado por distância deste mergulho';
 
   @override
   String diveLog_sitePicker_distanceMeters(Object distance) {
@@ -8159,7 +8147,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_speciesPicker_searchHint => 'Buscar especies...';
 
   @override
-  String get diveLog_speciesPicker_title => 'Adicionar EspÃ©cies';
+  String get diveLog_speciesPicker_title => 'Adicionar Espécies';
 
   @override
   String get diveLog_speciesPicker_tooltip_clearSearch => 'Limpar busca';
@@ -8274,12 +8262,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_tank_modInfo(Object depth, String ppO2) {
-    return 'MOD: $depth (ppOâ‚‚ $ppO2)';
+    return 'MOD: $depth (ppO₂ $ppO2)';
   }
 
   @override
   String diveLog_tank_modMndInfo(Object mod, String ppO2, Object mnd) {
-    return 'MOD: $mod (ppOâ‚‚ $ppO2) | MND: $mnd';
+    return 'MOD: $mod (ppO₂ $ppO2) | MND: $mnd';
   }
 
   @override
@@ -8293,7 +8281,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_tank_saveAsPreset_needSpecs =>
-      'Introduza primeiro um volume e uma pressÃ£o de trabalho';
+      'Introduza primeiro um volume e uma pressão de trabalho';
 
   @override
   String get diveLog_tank_saveAsPreset_nameTitle =>
@@ -8340,13 +8328,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_tissue_legend_mValue => '100% M-value';
 
   @override
-  String get diveLog_tissue_legend_n2 => 'Nâ‚‚';
+  String get diveLog_tissue_legend_n2 => 'N₂';
 
   @override
   String get diveLog_tissue_title => 'Carga Tissular';
 
   @override
-  String get diveLog_tooltip_avgCalculated => '(mÃ©d., calculado)';
+  String get diveLog_tooltip_avgCalculated => '(méd., calculado)';
 
   @override
   String get diveLog_tooltip_ceiling => 'Teto';
@@ -8409,7 +8397,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_tooltip_sensor => 'Sensor';
 
   @override
-  String get diveLog_legend_label_o2Cells => 'CÃ©lulas O2';
+  String get diveLog_legend_label_o2Cells => 'Células O2';
 
   @override
   String get diveLog_tooltip_o2CellsTight => 'estreita';
@@ -8439,16 +8427,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_sources_row_metric => 'Medida';
 
   @override
-  String get diveLog_sources_row_maxDepth => 'Prof. MÃ¡xima';
+  String get diveLog_sources_row_maxDepth => 'Prof. Máxima';
 
   @override
-  String get diveLog_sources_row_avgDepth => 'Prof. MÃ©dia';
+  String get diveLog_sources_row_avgDepth => 'Prof. Média';
 
   @override
-  String get diveLog_sources_row_duration => 'DuraÃ§Ã£o';
+  String get diveLog_sources_row_duration => 'Duração';
 
   @override
-  String get diveLog_sources_row_waterTemp => 'Temp. Ãgua';
+  String get diveLog_sources_row_waterTemp => 'Temp. Água';
 
   @override
   String get diveLog_sources_row_cns => 'CNS';
@@ -8495,7 +8483,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_sources_menu_split => 'Dividir em mergulho separado';
 
   @override
-  String get diveLog_sources_overlayTooltip => 'Sobrepor no grÃ¡fico';
+  String get diveLog_sources_overlayTooltip => 'Sobrepor no gráfico';
 
   @override
   String get diveLog_sources_splitDialog_title =>
@@ -8503,7 +8491,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_sources_splitDialog_body =>
-      'O perfil, os eventos e os cilindros desta fonte serÃ£o movidos para um novo mergulho. O registro do diÃ¡rio permanece neste mergulho.';
+      'O perfil, os eventos e os cilindros desta fonte serão movidos para um novo mergulho. O registro do diário permanece neste mergulho.';
 
   @override
   String get diveLog_sources_splitDialog_confirm => 'Dividir';
@@ -8523,7 +8511,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_sources_separateDialog_body(int count) {
-    return 'Este mergulho foi combinado a partir de $count mergulhos. O perfil, os eventos, os cilindros e as trocas de gÃ¡s de cada um voltam para o seu prÃ³prio mergulho. O restante do registro, incluindo parceiros, tags, equipamentos, mÃ­dia, notas e o nÃºmero do mergulho, permanece neste mergulho.';
+    return 'Este mergulho foi combinado a partir de $count mergulhos. O perfil, os eventos, os cilindros e as trocas de gás de cada um voltam para o seu próprio mergulho. O restante do registro, incluindo parceiros, tags, equipamentos, mídia, notas e o número do mergulho, permanece neste mergulho.';
   }
 
   @override
@@ -8542,7 +8530,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_sources_separateFailed =>
-      'NÃ£o foi possÃ­vel separar este mergulho';
+      'Não foi possível separar este mergulho';
 
   @override
   String get divePlanner_action_addTank => 'Adicionar Cilindro';
@@ -8557,10 +8545,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get divePlanner_action_editTank => 'Editar Cilindro';
 
   @override
-  String get divePlanner_action_moreOptions => 'Mais opÃ§Ãµes';
+  String get divePlanner_action_moreOptions => 'Mais opções';
 
   @override
-  String get divePlanner_action_quickPlan => 'Plano RÃ¡pido';
+  String get divePlanner_action_quickPlan => 'Plano Rápido';
 
   @override
   String get divePlanner_action_renamePlan => 'Renomear Plano';
@@ -8576,18 +8564,18 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get divePlanner_error_cannotConvert =>
-      'NÃ£o Ã© possÃ­vel converter: o plano tem avisos crÃ­ticos';
+      'Não é possível converter: o plano tem avisos críticos';
 
   @override
   String get divePlanner_error_reserveExceedsTank =>
-      'Excede a pressÃ£o do cilindro';
+      'Excede a pressão do cilindro';
 
   @override
   String get divePlanner_error_reserveMustBePositive => 'Deve ser maior que 0';
 
   @override
   String divePlanner_info_reserveDefault(Object unit, Object value) {
-    return 'NÃ£o inserido â€” assumindo $value $unit';
+    return 'Não inserido — assumindo $value $unit';
   }
 
   @override
@@ -8604,7 +8592,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get divePlanner_field_name => 'Nome';
 
   @override
-  String get divePlanner_field_o2Percent => 'Oâ‚‚ %';
+  String get divePlanner_field_o2Percent => 'O₂ %';
 
   @override
   String get divePlanner_field_planName => 'Nome do Plano';
@@ -8615,7 +8603,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get divePlanner_field_travelGas => 'TambÃ©m usado como gÃ¡s de viagem';
+  String get divePlanner_field_travelGas => 'Também usado como gás de viagem';
 
   @override
   String divePlanner_field_volume(Object volumeSymbol) {
@@ -8638,7 +8626,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get divePlanner_label_altitude => 'Altitude:';
 
   @override
-  String get divePlanner_label_belowMinReserve => 'Abaixo da Reserva MÃ­nima';
+  String get divePlanner_label_belowMinReserve => 'Abaixo da Reserva Mínima';
 
   @override
   String get divePlanner_label_ceiling => 'Teto';
@@ -8650,11 +8638,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get divePlanner_label_deco => 'DECO';
 
   @override
-  String get divePlanner_label_decoSchedule =>
-      'ProgramaÃ§Ã£o de DescompressÃ£o';
+  String get divePlanner_label_decoSchedule => 'Programação de Descompressão';
 
   @override
-  String get divePlanner_label_decompression => 'DescompressÃ£o';
+  String get divePlanner_label_decompression => 'Descompressão';
 
   @override
   String divePlanner_label_depthAxis(Object depthSymbol) {
@@ -8668,7 +8655,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get divePlanner_label_empty => 'VAZIO';
 
   @override
-  String get divePlanner_label_gasConsumption => 'Consumo de GÃ¡s';
+  String get divePlanner_label_gasConsumption => 'Consumo de Gás';
 
   @override
   String get divePlanner_label_gfHigh => 'GF Alto';
@@ -8677,7 +8664,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get divePlanner_label_gfLow => 'GF Baixo';
 
   @override
-  String get divePlanner_label_max => 'MÃ¡x';
+  String get divePlanner_label_max => 'Máx';
 
   @override
   String get divePlanner_label_minutesUnit => 'min';
@@ -8686,7 +8673,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get divePlanner_label_ndl => 'NDL';
 
   @override
-  String get divePlanner_label_planSettings => 'ConfiguraÃ§Ãµes do Plano';
+  String get divePlanner_label_planSettings => 'Configurações do Plano';
 
   @override
   String get divePlanner_label_remaining => 'Restante';
@@ -8720,17 +8707,17 @@ class AppLocalizationsPt extends AppLocalizations {
       'Problem solving time';
 
   @override
-  String get divePlanner_gasOptions_ppO2Bottom => 'Bottom ppOâ‚‚';
+  String get divePlanner_gasOptions_ppO2Bottom => 'Bottom ppO₂';
 
   @override
-  String get divePlanner_gasOptions_ppO2Deco => 'Deco ppOâ‚‚';
+  String get divePlanner_gasOptions_ppO2Deco => 'Deco ppO₂';
 
   @override
   String get divePlanner_gasOptions_bestMixEnd => 'Best mix END';
 
   @override
   String get divePlanner_gasOptions_o2Narcotic =>
-      'Treat Oâ‚‚ as narcotic for this plan';
+      'Treat O₂ as narcotic for this plan';
 
   @override
   String get divePlanner_label_status => 'Status';
@@ -8758,7 +8745,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get divePlanner_savedTanks_empty =>
-      'Ainda nÃ£o hÃ¡ cilindros guardados. Guarde um cilindro deste plano para o reutilizar em outros planos.';
+      'Ainda não há cilindros guardados. Guarde um cilindro deste plano para o reutilizar em outros planos.';
 
   @override
   String get divePlanner_label_time => 'Tempo';
@@ -8788,11 +8775,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get divePlanner_legend_descent => 'Descida';
 
   @override
-  String get divePlanner_legend_safety => 'SeguranÃ§a';
+  String get divePlanner_legend_safety => 'Segurança';
 
   @override
   String get divePlanner_message_addSegmentsForGas =>
-      'Adicione segmentos para ver as projeÃ§Ãµes de gÃ¡s';
+      'Adicione segmentos para ver as projeções de gás';
 
   @override
   String get divePlanner_message_addSegmentsForProfile =>
@@ -8811,7 +8798,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get divePlanner_message_planDeleted => 'Plano excluÃ­do';
+  String get divePlanner_message_planDeleted => 'Plano excluído';
 
   @override
   String get divePlanner_message_planSaved => 'Plano salvo';
@@ -8822,7 +8809,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String divePlanner_semantics_criticalWarning(Object message) {
-    return 'Aviso crÃ­tico: $message';
+    return 'Aviso crítico: $message';
   }
 
   @override
@@ -8850,7 +8837,7 @@ class AppLocalizationsPt extends AppLocalizations {
     Object maxDepth,
     Object totalMinutes,
   ) {
-    return 'Plano de mergulho, profundidade mÃ¡xima $maxDepth, tempo total $totalMinutes minutos';
+    return 'Plano de mergulho, profundidade máxima $maxDepth, tempo total $totalMinutes minutos';
   }
 
   @override
@@ -8878,7 +8865,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String divePlanner_warning_belowMinReserve(Object reserve) {
-    return 'Abaixo da reserva mÃ­nima ($reserve)';
+    return 'Abaixo da reserva mínima ($reserve)';
   }
 
   @override
@@ -8891,7 +8878,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get divePlanner_warning_endHigh =>
-      'Profundidade NarcÃ³tica Equivalente muito alta';
+      'Profundidade Narcótica Equivalente muito alta';
 
   @override
   String divePlanner_warning_endHighWithDepth(Object depth) {
@@ -8904,31 +8891,31 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get divePlanner_warning_gasOut => 'Cilindro ficarÃ¡ vazio';
+  String get divePlanner_warning_gasOut => 'Cilindro ficará vazio';
 
   @override
   String get divePlanner_warning_minGasViolation =>
-      'Reserva mÃ­nima de gÃ¡s nÃ£o mantida';
+      'Reserva mínima de gás não mantida';
 
   @override
   String get divePlanner_warning_modViolation =>
-      'Tentativa de troca de gÃ¡s acima da MOD';
+      'Tentativa de troca de gás acima da MOD';
 
   @override
   String get divePlanner_warning_ndlExceeded =>
-      'Mergulho entra em obrigaÃ§Ã£o de descompressÃ£o';
+      'Mergulho entra em obrigação de descompressão';
 
   @override
-  String get divePlanner_warning_otuWarning => 'AcumulaÃ§Ã£o de OTU alta';
+  String get divePlanner_warning_otuWarning => 'Acumulação de OTU alta';
 
   @override
   String divePlanner_warning_ppO2Critical(Object value) {
-    return 'ppOâ‚‚ de $value bar excede o limite crÃ­tico';
+    return 'ppO₂ de $value bar excede o limite crítico';
   }
 
   @override
   String divePlanner_warning_ppO2High(Object value) {
-    return 'ppOâ‚‚ de $value bar excede o limite de trabalho';
+    return 'ppO₂ de $value bar excede o limite de trabalho';
   }
 
   @override
@@ -9022,7 +9009,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveSites_detail_location_island => 'Ilha';
 
   @override
-  String get diveSites_detail_location_bodyOfWater => 'Corpo de Ã¡gua';
+  String get diveSites_detail_location_bodyOfWater => 'Corpo de água';
 
   @override
   String get diveSites_detail_location_gpsCoordinates => 'Coordenadas GPS';
@@ -9176,10 +9163,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Informacoes de Estacionamento';
 
   @override
-  String get diveSites_edit_access_entryMethod_label => 'MÃ©todo de entrada';
+  String get diveSites_edit_access_entryMethod_label => 'Método de entrada';
 
   @override
-  String get diveSites_edit_access_exitMethod_label => 'MÃ©todo de saÃ­da';
+  String get diveSites_edit_access_exitMethod_label => 'Método de saída';
 
   @override
   String diveSites_edit_access_entrySuggestionPair(
@@ -9190,8 +9177,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Os teus $count mergulhos aqui: entrada $entry, saÃ­da $exit',
-      one: 'O teu mergulho aqui: entrada $entry, saÃ­da $exit',
+      other: 'Os teus $count mergulhos aqui: entrada $entry, saída $exit',
+      one: 'O teu mergulho aqui: entrada $entry, saída $exit',
     );
     return '$_temp0';
   }
@@ -9214,7 +9201,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveSites_detail_access_entryMethod => 'Entrada';
 
   @override
-  String get diveSites_detail_access_exitMethod => 'SaÃ­da';
+  String get diveSites_detail_access_exitMethod => 'Saída';
 
   @override
   String get diveSites_edit_altitude_helperText =>
@@ -9307,7 +9294,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveSites_edit_field_island_label => 'Ilha';
 
   @override
-  String get diveSites_edit_field_bodyOfWater_label => 'Corpo de Ã¡gua';
+  String get diveSites_edit_field_bodyOfWater_label => 'Corpo de água';
 
   @override
   String get diveSites_edit_field_description_hint =>
@@ -9343,7 +9330,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveSites_similarSite_warning(Object siteName) {
-    return 'JÃ¡ existe um local semelhante: \"$siteName\"';
+    return 'Já existe um local semelhante: \"$siteName\"';
   }
 
   @override
@@ -9351,7 +9338,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_helperText =>
-      'Escolha um mÃ©todo de localizaÃ§Ã£o ou consulte as coordenadas para preencher paÃ­s, regiÃ£o, cidade e corpo de Ã¡gua';
+      'Escolha um método de localização ou consulte as coordenadas para preencher país, região, cidade e corpo de água';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'ex., 21.4225';
@@ -9380,15 +9367,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_edit_snackbar_lookupNothingFound =>
-      'Nenhum detalhe de localizaÃ§Ã£o encontrado para estas coordenadas';
+      'Nenhum detalhe de localização encontrado para estas coordenadas';
 
   @override
   String get diveSites_edit_snackbar_lookupFailed =>
-      'A consulta de localizaÃ§Ã£o falhou. Verifique a sua ligaÃ§Ã£o e tente novamente.';
+      'A consulta de localização falhou. Verifique a sua ligação e tente novamente.';
 
   @override
   String get diveSites_edit_lookupReplace_title =>
-      'Substituir os detalhes de localizaÃ§Ã£o?';
+      'Substituir os detalhes de localização?';
 
   @override
   String get diveSites_edit_lookupReplace_body =>
@@ -9427,7 +9414,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveSites_edit_merge_confirmBody(int count) {
-    return 'Isso mesclarÃ¡ $count locais em um sÃ³. Mergulhos, mÃ­dias e espÃ©cies esperadas serÃ£o combinados no local remanescente. Os outros locais serÃ£o excluÃ­dos.';
+    return 'Isso mesclará $count locais em um só. Mergulhos, mídias e espécies esperadas serão combinados no local remanescente. Os outros locais serão excluídos.';
   }
 
   @override
@@ -9435,7 +9422,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_edit_merge_fieldSourceCycleTooltip =>
-      'Usar valor do prÃ³ximo local selecionado';
+      'Usar valor do próximo local selecionado';
 
   @override
   String diveSites_edit_merge_fieldSourceLabel(
@@ -9465,7 +9452,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_edit_merge_notEnoughBody =>
-      'NÃ£o hÃ¡ locais de mergulho suficientes para mesclar.';
+      'Não há locais de mergulho suficientes para mesclar.';
 
   @override
   String get diveSites_edit_merge_notEnoughTitle =>
@@ -9498,7 +9485,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveSites_edit_section_difficultyLevel => 'Nivel de Dificuldade';
 
   @override
-  String get diveSites_edit_section_expectedMarineLife => 'EspÃ©cies Esperadas';
+  String get diveSites_edit_section_expectedMarineLife => 'Espécies Esperadas';
 
   @override
   String get diveSites_edit_section_gpsCoordinates => 'Coordenadas GPS';
@@ -9510,7 +9497,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveSites_edit_section_rating => 'Avaliacao';
 
   @override
-  String get diveSites_edit_section_waterType => 'Tipo de Ã¡gua';
+  String get diveSites_edit_section_waterType => 'Tipo de água';
 
   @override
   String diveSites_edit_snackbar_errorDeleting(Object error) {
@@ -9779,7 +9766,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return 'AtÃ© $max';
+    return 'Até $max';
   }
 
   @override
@@ -9896,11 +9883,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_list_menu_fillLocationDetails =>
-      'Preencher detalhes de localizaÃ§Ã£o em falta';
+      'Preencher detalhes de localização em falta';
 
   @override
   String get diveSites_backfill_confirm_title =>
-      'Preencher os detalhes de localizaÃ§Ã£o em falta?';
+      'Preencher os detalhes de localização em falta?';
 
   @override
   String diveSites_backfill_confirm_body(int count, int minutes) {
@@ -9908,9 +9895,9 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '$count locais com coordenadas nÃ£o tÃªm paÃ­s, regiÃ£o, cidade ou corpo de Ã¡gua.',
+          '$count locais com coordenadas não têm país, região, cidade ou corpo de água.',
       one:
-          '1 local com coordenadas nÃ£o tem paÃ­s, regiÃ£o, cidade ou corpo de Ã¡gua.',
+          '1 local com coordenadas não tem país, região, cidade ou corpo de água.',
     );
     String _temp1 = intl.Intl.pluralLogic(
       minutes,
@@ -9918,7 +9905,7 @@ class AppLocalizationsPt extends AppLocalizations {
       other: '$minutes minutos',
       one: '1 minuto',
     );
-    return '$_temp0 O Submersion consultarÃ¡ cada um no OpenStreetMap e preencherÃ¡ apenas os campos vazios. Demora cerca de $_temp1.';
+    return '$_temp0 O Submersion consultará cada um no OpenStreetMap e preencherá apenas os campos vazios. Demora cerca de $_temp1.';
   }
 
   @override
@@ -9926,11 +9913,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_backfill_nothingToFill =>
-      'Todos os locais com coordenadas jÃ¡ tÃªm os seus detalhes de localizaÃ§Ã£o.';
+      'Todos os locais com coordenadas já têm os seus detalhes de localização.';
 
   @override
   String get diveSites_backfill_progress_title =>
-      'A preencher detalhes de localizaÃ§Ã£o';
+      'A preencher detalhes de localização';
 
   @override
   String diveSites_backfill_progress_count(int done, int total) {
@@ -9947,7 +9934,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_backfill_offline =>
-      'A consulta de localizaÃ§Ã£o nÃ£o estÃ¡ disponÃ­vel. Verifique a sua ligaÃ§Ã£o e tente novamente.';
+      'A consulta de localização não está disponível. Verifique a sua ligação e tente novamente.';
 
   @override
   String get diveSites_list_menu_refreshPlaceNames =>
@@ -9966,8 +9953,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count locais com coordenadas serÃ£o consultados de novo.',
-      one: '1 local com coordenadas serÃ¡ consultado de novo.',
+      other: '$count locais com coordenadas serão consultados de novo.',
+      one: '1 local com coordenadas será consultado de novo.',
     );
     String _temp1 = intl.Intl.pluralLogic(
       minutes,
@@ -9975,7 +9962,7 @@ class AppLocalizationsPt extends AppLocalizations {
       other: '$minutes minutos',
       one: '1 minuto',
     );
-    return '$_temp0 O paÃ­s, a regiÃ£o, a localidade e a massa de Ã¡gua serÃ£o substituÃ­dos sempre que diferirem do idioma dos nomes de lugares ($language), incluindo os valores que escreveu. Demora cerca de $_temp1.';
+    return '$_temp0 O país, a região, a localidade e a massa de água serão substituídos sempre que diferirem do idioma dos nomes de lugares ($language), incluindo os valores que escreveu. Demora cerca de $_temp1.';
   }
 
   @override
@@ -10120,7 +10107,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_map_builtInSites_addError =>
-      'NÃ£o foi possÃ­vel adicionar o ponto. Tente novamente.';
+      'Não foi possível adicionar o ponto. Tente novamente.';
 
   @override
   String get diveSites_map_builtInSites_added => 'Adicionado aos seus pontos';
@@ -10132,7 +10119,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveSites_map_builtInSites_off => 'Pontos integrados ocultos';
 
   @override
-  String get diveSites_map_builtInSites_on => 'Pontos integrados visÃ­veis';
+  String get diveSites_map_builtInSites_on => 'Pontos integrados visíveis';
 
   @override
   String get diveSites_map_builtInSites_show => 'Mostrar pontos integrados';
@@ -10228,7 +10215,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveSites_summary_stat_withGps => 'Com GPS';
 
   @override
-  String get diveSites_summary_stat_countries => 'PaÃ­ses';
+  String get diveSites_summary_stat_countries => 'Países';
 
   @override
   String get diveSites_summary_stat_notDived => 'Sem mergulhos';
@@ -10315,7 +10302,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveType_builtin_shore_short => 'Costa';
 
   @override
-  String get diveType_builtin_technical => 'TÃ©cnico';
+  String get diveType_builtin_technical => 'Técnico';
 
   @override
   String get diveType_builtin_technical_short => 'Tec';
@@ -10327,16 +10314,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveType_builtin_training_short => 'Treinamento';
 
   @override
-  String get diveType_builtin_wreck => 'NaufrÃ¡gio';
+  String get diveType_builtin_wreck => 'Naufrágio';
 
   @override
-  String get diveType_builtin_wreck_short => 'NaufrÃ¡gio';
+  String get diveType_builtin_wreck_short => 'Naufrágio';
 
   @override
   String get diveTypes_addDialog_addButton => 'Adicionar';
 
   @override
-  String get diveTypes_addDialog_nameHint => 'ex: Busca e RecuperaÃ§Ã£o';
+  String get diveTypes_addDialog_nameHint => 'ex: Busca e Recuperação';
 
   @override
   String get diveTypes_addDialog_nameLabel => 'Nome do Tipo de Mergulho';
@@ -10346,7 +10333,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveTypes_addDialog_shortNameHelper =>
-      'Exibido no cabeÃ§alho de detalhes do mergulho quando o espaÃ§o Ã© limitado';
+      'Exibido no cabeçalho de detalhes do mergulho quando o espaço é limitado';
 
   @override
   String get diveTypes_addDialog_shortNameHint => 'ex: ByR';
@@ -10389,7 +10376,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveTypes_editDialog_builtInNameHelper =>
-      'Os nomes internos nÃ£o podem ser alterados';
+      'Os nomes internos não podem ser alterados';
 
   @override
   String get diveTypes_editDialog_saveButton => 'Salvar';
@@ -10398,11 +10385,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveTypes_editDialog_title => 'Editar tipo de mergulho';
 
   @override
-  String get diveTypes_showInHeaderLabel => 'CabeÃ§alho';
+  String get diveTypes_showInHeaderLabel => 'Cabeçalho';
 
   @override
   String get diveTypes_showInHeaderTooltip =>
-      'Mostrar o selo deste tipo no cabeÃ§alho de detalhes do mergulho';
+      'Mostrar o selo deste tipo no cabeçalho de detalhes do mergulho';
 
   @override
   String get diveTypes_showInListLabel => 'Lista';
@@ -10418,12 +10405,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveTypes_snackbar_cannotDelete(Object name) {
-    return 'NÃ£o Ã© possÃ­vel excluir \"$name\" - estÃ¡ sendo usado por mergulhos existentes';
+    return 'Não é possível excluir \"$name\" - está sendo usado por mergulhos existentes';
   }
 
   @override
   String diveTypes_snackbar_deleted(Object name) {
-    return 'ExcluÃ­do \"$name\"';
+    return 'Excluído \"$name\"';
   }
 
   @override
@@ -10637,18 +10624,18 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get divers_edit_insuranceEmergencyPhoneHelper =>
-      'Aparece primeiro no seu cartÃ£o de emergÃªncia.';
+      'Aparece primeiro no seu cartão de emergência.';
 
   @override
   String get divers_edit_insuranceEmergencyPhoneHint => 'ex., +1 919 684 9111';
 
   @override
   String get divers_edit_insuranceEmergencyPhoneLabel =>
-      'NÃºmero de assistÃªncia de emergÃªncia 24 h';
+      'Número de assistência de emergência 24 h';
 
   @override
   String get divers_edit_insurancePhoneLabel =>
-      'Telefone do escritÃ³rio do seguro';
+      'Telefone do escritório do seguro';
 
   @override
   String get divers_edit_insuranceProviderHint => 'ex., DAN, DiveAssure';
@@ -10931,36 +10918,36 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_certificationLevel_extendedRange => 'Extended Range';
 
   @override
-  String get enum_certificationLevel_advancedTrimix => 'Trimix avanÃ§ado';
+  String get enum_certificationLevel_advancedTrimix => 'Trimix avançado';
 
   @override
-  String get enum_certificationLevel_cmas1StarDiver => 'Mergulhador 1â˜…';
+  String get enum_certificationLevel_cmas1StarDiver => 'Mergulhador 1★';
 
   @override
-  String get enum_certificationLevel_cmas2StarDiver => 'Mergulhador 2â˜…';
+  String get enum_certificationLevel_cmas2StarDiver => 'Mergulhador 2★';
 
   @override
-  String get enum_certificationLevel_cmas3StarDiver => 'Mergulhador 3â˜…';
+  String get enum_certificationLevel_cmas3StarDiver => 'Mergulhador 3★';
 
   @override
-  String get enum_certificationLevel_cmas4StarDiver => 'Mergulhador 4â˜…';
+  String get enum_certificationLevel_cmas4StarDiver => 'Mergulhador 4★';
 
   @override
   String get enum_certificationLevel_cmas3StarDiverAssistantInstructor =>
-      'Mergulhador 3â˜… - Instrutor assistente';
+      'Mergulhador 3★ - Instrutor assistente';
 
   @override
   String get enum_certificationLevel_cmas4StarDiverAssistantInstructor =>
-      'Mergulhador 4â˜… - Instrutor assistente';
+      'Mergulhador 4★ - Instrutor assistente';
 
   @override
-  String get enum_certificationLevel_cmas1StarInstructor => 'Instrutor 1â˜…';
+  String get enum_certificationLevel_cmas1StarInstructor => 'Instrutor 1★';
 
   @override
-  String get enum_certificationLevel_cmas2StarInstructor => 'Instrutor 2â˜…';
+  String get enum_certificationLevel_cmas2StarInstructor => 'Instrutor 2★';
 
   @override
-  String get enum_certificationLevel_cmas3StarInstructor => 'Instrutor 3â˜…';
+  String get enum_certificationLevel_cmas3StarInstructor => 'Instrutor 3★';
 
   @override
   String get enum_certificationLevel_bsacOceanDiver => 'Ocean Diver';
@@ -11179,7 +11166,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_equipmentType_dpv => 'DPV';
 
   @override
-  String get enum_equipmentType_o2Cell => 'CÃ©lula de O2';
+  String get enum_equipmentType_o2Cell => 'Célula de O2';
 
   @override
   String get enum_equipmentType_battery => 'Bateria';
@@ -11194,10 +11181,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_equipmentType_baselayer => 'Camada base';
 
   @override
-  String get enum_equipmentType_firstStage => 'Primeiro estÃ¡gio';
+  String get enum_equipmentType_firstStage => 'Primeiro estágio';
 
   @override
-  String get enum_equipmentType_harness => 'ArnÃªs';
+  String get enum_equipmentType_harness => 'Arnês';
 
   @override
   String get enum_equipmentType_tankBand => 'Cinta de cilindro';
@@ -11215,7 +11202,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_equipmentType_housing => 'Caixa estanque';
 
   @override
-  String get enum_equipmentType_secondStage => 'Segundo estÃ¡gio';
+  String get enum_equipmentType_secondStage => 'Segundo estágio';
 
   @override
   String get enum_equipmentType_strobe => 'Flash';
@@ -11269,10 +11256,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_equipmentType_transmitter => 'Transmissor';
 
   @override
-  String get enum_equipmentType_instrument => 'Instrumento / ManÃ³metro';
+  String get enum_equipmentType_instrument => 'Instrumento / Manómetro';
 
   @override
-  String get enum_equipmentType_compass => 'BÃºssola';
+  String get enum_equipmentType_compass => 'Bússola';
 
   @override
   String get enum_equipmentType_rebreather => 'Rebreather';
@@ -11467,7 +11454,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_profileMetric_pressure_short => 'Press';
 
   @override
-  String get enum_profileMetric_sacRate => 'Consumo de gÃ¡s';
+  String get enum_profileMetric_sacRate => 'Consumo de gás';
 
   @override
   String get enum_profileMetric_sacRate_short => 'Consumo';
@@ -11584,7 +11571,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_sortField_fileSize => 'Tamanho do arquivo';
 
   @override
-  String get enum_sortField_lastDive => 'Ãšltimo mergulho';
+  String get enum_sortField_lastDive => 'Último mergulho';
 
   @override
   String get enum_sortField_lastServiceDate => 'Ultima Manutencao';
@@ -11662,7 +11649,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_tankRole_diluent => 'Diluente';
 
   @override
-  String get enum_tankRole_oxygenSupply => 'Suprimento de Oâ‚‚';
+  String get enum_tankRole_oxygenSupply => 'Suprimento de O₂';
 
   @override
   String get enum_tankRole_pony => 'Cilindro Pony';
@@ -11710,13 +11697,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_matchConfidence_manual => 'Manual';
 
   @override
-  String get enum_logCategory_app => 'AplicaÃ§Ã£o';
+  String get enum_logCategory_app => 'Aplicação';
 
   @override
   String get enum_logCategory_bluetooth => 'Bluetooth';
 
   @override
-  String get enum_logCategory_serial => 'SÃ©rie';
+  String get enum_logCategory_serial => 'Série';
 
   @override
   String get enum_logCategory_libdc => 'libdc';
@@ -11930,13 +11917,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_detail_serviceInfoTitle => 'Informacoes de Manutencao';
 
   @override
-  String get equipment_serviceClocks_title => 'Prazos de manutenÃ§Ã£o';
+  String get equipment_serviceClocks_title => 'Prazos de manutenção';
 
   @override
   String get equipment_serviceClocks_addClock => 'Adicionar prazo';
 
   @override
-  String get equipment_serviceClocks_logService => 'Registrar manutenÃ§Ã£o';
+  String get equipment_serviceClocks_logService => 'Registrar manutenção';
 
   @override
   String get equipment_serviceClocks_edit => 'Editar intervalos';
@@ -11954,7 +11941,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_serviceClocks_paused => 'Pausado';
 
   @override
-  String get equipment_serviceClocks_empty => 'Nenhum prazo de manutenÃ§Ã£o';
+  String get equipment_serviceClocks_empty => 'Nenhum prazo de manutenção';
 
   @override
   String get equipment_serviceClocks_unconfigured =>
@@ -11984,17 +11971,17 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get cylinderConfigs_title => 'ConfiguraÃ§Ãµes de garrafas';
+  String get cylinderConfigs_title => 'Configurações de garrafas';
 
   @override
-  String get cylinderConfigs_empty => 'Ainda sem configuraÃ§Ãµes';
+  String get cylinderConfigs_empty => 'Ainda sem configurações';
 
   @override
   String get cylinderConfigs_emptyBody =>
       'Guarde uma montagem de diluente e bailout uma vez e aplique-a a qualquer mergulho.';
 
   @override
-  String get cylinderConfigs_new => 'Nova configuraÃ§Ã£o';
+  String get cylinderConfigs_new => 'Nova configuração';
 
   @override
   String get cylinderConfigs_name => 'Nome';
@@ -12006,35 +11993,35 @@ class AppLocalizationsPt extends AppLocalizations {
   String get cylinderConfigs_forUnit => 'Para a unidade';
 
   @override
-  String get cylinderConfigs_noUnit => 'Plano de gÃ¡s genÃ©rico';
+  String get cylinderConfigs_noUnit => 'Plano de gás genérico';
 
   @override
-  String get cylinderConfigs_gasPlans => 'Planos de gÃ¡s';
+  String get cylinderConfigs_gasPlans => 'Planos de gás';
 
   @override
   String get cylinderConfigs_addCylinder => 'Adicionar garrafa';
 
   @override
-  String get cylinderConfigs_role => 'FunÃ§Ã£o';
+  String get cylinderConfigs_role => 'Função';
 
   @override
-  String get cylinderConfigs_startPressure => 'PressÃ£o inicial';
+  String get cylinderConfigs_startPressure => 'Pressão inicial';
 
   @override
   String get cylinderConfigs_label => 'Etiqueta';
 
   @override
-  String get cylinderConfigs_fromPreset => 'A partir de predefiniÃ§Ã£o';
+  String get cylinderConfigs_fromPreset => 'A partir de predefinição';
 
   @override
-  String get cylinderConfigs_deleteTitle => 'Eliminar a configuraÃ§Ã£o?';
+  String get cylinderConfigs_deleteTitle => 'Eliminar a configuração?';
 
   @override
   String get cylinderConfigs_deleteBody =>
-      'Os mergulhos onde jÃ¡ foi aplicada nÃ£o sÃ£o alterados.';
+      'Os mergulhos onde já foi aplicada não são alterados.';
 
   @override
-  String get cylinderConfigs_applyAction => 'Aplicar configuraÃ§Ã£o';
+  String get cylinderConfigs_applyAction => 'Aplicar configuração';
 
   @override
   String cylinderConfigs_applyAdded(int count) {
@@ -12060,10 +12047,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get cylinderConfigs_applyNothingToDo =>
-      'Este mergulho jÃ¡ corresponde Ã  configuraÃ§Ã£o';
+      'Este mergulho já corresponde à configuração';
 
   @override
-  String get cylinderConfigs_sectionTitle => 'ConfiguraÃ§Ãµes';
+  String get cylinderConfigs_sectionTitle => 'Configurações';
 
   @override
   String get equipment_serviceClocks_hoursSource =>
@@ -12076,12 +12063,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String equipment_serviceClocks_saltHoursLeft(String remaining, String total) {
-    return 'Restam $remaining de $total horas em Ã¡gua salgada';
+    return 'Restam $remaining de $total horas em água salgada';
   }
 
   @override
   String equipment_serviceClocks_coldDivesLeft(String remaining, String total) {
-    return 'Restam $remaining de $total mergulhos em Ã¡gua fria';
+    return 'Restam $remaining de $total mergulhos em água fria';
   }
 
   @override
@@ -12104,14 +12091,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_serviceClocks_manageKinds =>
-      'Gerenciar tipos de manutenÃ§Ã£o';
+      'Gerenciar tipos de manutenção';
 
   @override
   String get equipment_serviceClocks_appliesToClock => 'Aplica-se ao prazo';
 
   @override
   String get equipment_serviceClocks_noClockOption =>
-      'NÃ£o vinculado a um prazo';
+      'Não vinculado a um prazo';
 
   @override
   String get equipment_scheduleDialog_title => 'Editar prazo';
@@ -12127,11 +12114,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_scheduleDialog_intervalSaltHours =>
-      'Intervalo (horas em Ã¡gua salgada)';
+      'Intervalo (horas em água salgada)';
 
   @override
   String get equipment_scheduleDialog_intervalColdDives =>
-      'Intervalo (mergulhos em Ã¡gua fria)';
+      'Intervalo (mergulhos em água fria)';
 
   @override
   String get equipment_scheduleDialog_intervalO2Hours =>
@@ -12147,19 +12134,19 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String equipment_scheduleDialog_inheritHint(String value) {
-    return 'PadrÃ£o: $value';
+    return 'Padrão: $value';
   }
 
   @override
-  String get equipment_scheduleDialog_anchorDate => 'Data de referÃªncia';
+  String get equipment_scheduleDialog_anchorDate => 'Data de referência';
 
   @override
   String get equipment_scheduleDialog_anchorHint =>
-      'O relÃ³gio conta a partir desta data atÃ© registrar uma manutenÃ§Ã£o mais recente.';
+      'O relógio conta a partir desta data até registrar uma manutenção mais recente.';
 
   @override
   String get equipment_scheduleDialog_clearAnchor =>
-      'Limpar data de referÃªncia';
+      'Limpar data de referência';
 
   @override
   String get equipment_scheduleDialog_save => 'Salvar';
@@ -12168,7 +12155,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_scheduleDialog_cancel => 'Cancelar';
 
   @override
-  String get equipment_serviceKinds_title => 'Tipos de manutenÃ§Ã£o';
+  String get equipment_serviceKinds_title => 'Tipos de manutenção';
 
   @override
   String get equipment_serviceKinds_builtIn => 'Integrados';
@@ -12177,16 +12164,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_serviceKinds_custom => 'Personalizados';
 
   @override
-  String get equipment_serviceKinds_add => 'Adicionar tipo de manutenÃ§Ã£o';
+  String get equipment_serviceKinds_add => 'Adicionar tipo de manutenção';
 
   @override
-  String get equipment_serviceKinds_editTitle => 'Editar tipo de manutenÃ§Ã£o';
+  String get equipment_serviceKinds_editTitle => 'Editar tipo de manutenção';
 
   @override
   String get equipment_serviceKinds_nameLabel => 'Nome';
 
   @override
-  String get equipment_serviceKinds_nameRequired => 'O nome Ã© obrigatÃ³rio';
+  String get equipment_serviceKinds_nameRequired => 'O nome é obrigatório';
 
   @override
   String get equipment_serviceKinds_appliesTo => 'Aplica-se a';
@@ -12197,11 +12184,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_serviceKinds_deleteConfirmTitle =>
-      'Excluir tipo de manutenÃ§Ã£o?';
+      'Excluir tipo de manutenção?';
 
   @override
   String get equipment_serviceKinds_deleteConfirmBody =>
-      'Os prazos que usam este tipo de manutenÃ§Ã£o serÃ£o removidos.';
+      'Os prazos que usam este tipo de manutenção serão removidos.';
 
   @override
   String get equipment_serviceKinds_delete => 'Excluir';
@@ -12214,7 +12201,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_serviceKinds_emptyCustom =>
-      'Ainda nÃ£o hÃ¡ tipos de manutenÃ§Ã£o personalizados';
+      'Ainda não há tipos de manutenção personalizados';
 
   @override
   String equipment_serviceKinds_everyDays(int days) {
@@ -12232,7 +12219,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get dashboard_serviceDue_title => 'ManutenÃ§Ã£o pendente';
+  String get dashboard_serviceDue_title => 'Manutenção pendente';
 
   @override
   String dashboard_serviceDue_more(int count) {
@@ -12259,8 +12246,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count equipamentos precisam de manutenÃ§Ã£o antes desta viagem',
-      one: '1 equipamento precisa de manutenÃ§Ã£o antes desta viagem',
+      other: '$count equipamentos precisam de manutenção antes desta viagem',
+      one: '1 equipamento precisa de manutenção antes desta viagem',
     );
     return '$_temp0';
   }
@@ -12277,7 +12264,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_notifications_tripLeadTitle =>
-      'AntecedÃªncia do aviso de manutenÃ§Ã£o para viagens';
+      'Antecedência do aviso de manutenção para viagens';
 
   @override
   String settings_notifications_tripLeadDays(int days) {
@@ -12509,7 +12496,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_edit_parentLabel => 'Instalado em';
 
   @override
-  String get equipment_edit_parentNone => 'NÃ£o instalado';
+  String get equipment_edit_parentNone => 'Não instalado';
 
   @override
   String get equipment_edit_thicknessDesignationHint => 'ex: 5, 5/4, 7/5/3';
@@ -12707,7 +12694,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String equipment_retypeOther_errorLoading(String error) {
-    return 'NÃ£o foi possÃ­vel carregar o equipamento: $error';
+    return 'Não foi possível carregar o equipamento: $error';
   }
 
   @override
@@ -12715,15 +12702,15 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'NÃ£o foi possÃ­vel alterar o tipo de $count itens',
-      one: 'NÃ£o foi possÃ­vel alterar o tipo de 1 item',
+      other: 'Não foi possível alterar o tipo de $count itens',
+      one: 'Não foi possível alterar o tipo de 1 item',
     );
     return '$_temp0';
   }
 
   @override
   String get equipment_retypeOther_intro =>
-      'Estes itens estÃ£o marcados como Outro, mas o nome indica o que sÃ£o. Desmarque os que estiverem errados.';
+      'Estes itens estão marcados como Outro, mas o nome indica o que são. Desmarque os que estiverem errados.';
 
   @override
   String equipment_retypeOther_retypedSnackbar(int count) {
@@ -12741,7 +12728,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_retypeOther_subtitle =>
-      'DÃª ao equipamento importado o tipo indicado pelo nome';
+      'Dê ao equipamento importado o tipo indicado pelo nome';
 
   @override
   String get equipment_retypeOther_title =>
@@ -12752,8 +12739,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'NÃ£o foi possÃ­vel restaurar $count itens',
-      one: 'NÃ£o foi possÃ­vel restaurar 1 item',
+      other: 'Não foi possível restaurar $count itens',
+      one: 'Não foi possível restaurar 1 item',
     );
     return '$_temp0';
   }
@@ -12763,14 +12750,14 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count itens mudaram desde entÃ£o e foram mantidos como estÃ£o',
-      one: '1 item mudou desde entÃ£o e foi mantido como estÃ¡',
+      other: '$count itens mudaram desde então e foram mantidos como estão',
+      one: '1 item mudou desde então e foi mantido como está',
     );
     return '$_temp0';
   }
 
   @override
-  String get equipment_retypeOther_undone => 'AlteraÃ§Ã£o de tipo desfeita';
+  String get equipment_retypeOther_undone => 'Alteração de tipo desfeita';
 
   @override
   String get equipment_search_backTooltip => 'Voltar';
@@ -12849,18 +12836,18 @@ class AppLocalizationsPt extends AppLocalizations {
       'Selecionar data da manutencao';
 
   @override
-  String get equipment_serviceDialog_serviceTypeLabel => 'Tipo de manutenÃ§Ã£o';
+  String get equipment_serviceDialog_serviceTypeLabel => 'Tipo de manutenção';
 
   @override
   String get equipment_serviceDialog_serviceTypeHelper =>
-      'RegistÃ¡-la reinicia o contador deste tipo de manutenÃ§Ã£o';
+      'Registá-la reinicia o contador deste tipo de manutenção';
 
   @override
   String get equipment_serviceDialog_serviceTypeRequired =>
-      'Escolha um tipo de manutenÃ§Ã£o';
+      'Escolha um tipo de manutenção';
 
   @override
-  String get equipment_serviceDialog_serviceTypeNotSet => 'NÃ£o definido';
+  String get equipment_serviceDialog_serviceTypeNotSet => 'Não definido';
 
   @override
   String get equipment_serviceDialog_categoryHelper =>
@@ -12868,7 +12855,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_serviceDialog_manageServiceTypes =>
-      'Gerir tipos de manutenÃ§Ã£o';
+      'Gerir tipos de manutenção';
 
   @override
   String get equipment_serviceDialog_categoryLabel => 'Categoria';
@@ -12890,32 +12877,31 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Atualizar';
 
   @override
-  String get equipment_serviceCategory_annual => 'ManutenÃ§Ã£o anual';
+  String get equipment_serviceCategory_annual => 'Manutenção anual';
 
   @override
-  String get equipment_serviceCategory_repair => 'ReparaÃ§Ã£o';
+  String get equipment_serviceCategory_repair => 'Reparação';
 
   @override
-  String get equipment_serviceCategory_inspection => 'InspeÃ§Ã£o';
+  String get equipment_serviceCategory_inspection => 'Inspeção';
 
   @override
-  String get equipment_serviceCategory_overhaul => 'RevisÃ£o geral';
+  String get equipment_serviceCategory_overhaul => 'Revisão geral';
 
   @override
-  String get equipment_serviceCategory_replacement =>
-      'SubstituiÃ§Ã£o de peÃ§as';
+  String get equipment_serviceCategory_replacement => 'Substituição de peças';
 
   @override
   String get equipment_serviceCategory_cleaning => 'Limpeza';
 
   @override
-  String get equipment_serviceCategory_calibration => 'CalibraÃ§Ã£o';
+  String get equipment_serviceCategory_calibration => 'Calibração';
 
   @override
-  String get equipment_serviceCategory_warranty => 'ServiÃ§o em garantia';
+  String get equipment_serviceCategory_warranty => 'Serviço em garantia';
 
   @override
-  String get equipment_serviceCategory_recall => 'Recolha/SeguranÃ§a';
+  String get equipment_serviceCategory_recall => 'Recolha/Segurança';
 
   @override
   String get equipment_serviceCategory_other => 'Outro';
@@ -12953,7 +12939,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String equipment_service_nextDueLabel(String date) {
-    return 'PrÃ³ximo vencimento $date';
+    return 'Próximo vencimento $date';
   }
 
   @override
@@ -12973,7 +12959,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_service_filterNoMatches =>
-      'Nenhuma manutenÃ§Ã£o corresponde a este filtro';
+      'Nenhuma manutenção corresponde a este filtro';
 
   @override
   String equipment_service_filterMatchCount(int count, int total) {
@@ -12981,51 +12967,51 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get equipment_serviceKinds_defaultCategoryLabel => 'Categoria padrÃ£o';
+  String get equipment_serviceKinds_defaultCategoryLabel => 'Categoria padrão';
 
   @override
-  String get equipment_serviceKinds_defaultCategoryNone => 'Sem padrÃ£o';
+  String get equipment_serviceKinds_defaultCategoryNone => 'Sem padrão';
 
   @override
-  String get equipment_serviceKinds_defaultCostLabel => 'PreÃ§o padrÃ£o';
+  String get equipment_serviceKinds_defaultCostLabel => 'Preço padrão';
 
   @override
   String get equipment_serviceKinds_defaultCostHint =>
-      'Deixe em branco para nenhum valor padrÃ£o';
+      'Deixe em branco para nenhum valor padrão';
 
   @override
   String get equipment_scheduleDialog_defaultCostLabel =>
-      'PreÃ§o padrÃ£o para este equipamento';
+      'Preço padrão para este equipamento';
 
   @override
   String get equipment_serviceKinds_defaultCurrencyLabel => 'Moeda';
 
   @override
   String get equipment_service_exportMenuItem =>
-      'Exportar registo de manutenÃ§Ã£o';
+      'Exportar registo de manutenção';
 
   @override
-  String get transfer_export_maintenanceTitle => 'Registo de manutenÃ§Ã£o';
+  String get transfer_export_maintenanceTitle => 'Registo de manutenção';
 
   @override
   String get transfer_export_maintenanceSubtitle =>
-      'HistÃ³rico de manutenÃ§Ã£o de todo o equipamento numa folha de cÃ¡lculo';
+      'Histórico de manutenção de todo o equipamento numa folha de cálculo';
 
   @override
   String get settings_export_progress_maintenance =>
-      'A exportar o registo de manutenÃ§Ã£o...';
+      'A exportar o registo de manutenção...';
 
   @override
   String get settings_export_success_maintenance =>
-      'Registo de manutenÃ§Ã£o exportado';
+      'Registo de manutenção exportado';
 
   @override
   String get settings_export_saved_maintenance =>
-      'Registo de manutenÃ§Ã£o guardado';
+      'Registo de manutenção guardado';
 
   @override
   String get equipment_serviceKinds_defaultCurrencyInherit =>
-      'Usar a moeda padrÃ£o';
+      'Usar a moeda padrão';
 
   @override
   String get equipment_scheduleDialog_defaultCurrencyLabel =>
@@ -13404,15 +13390,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gasCalculators_bestMix_bestOxygenMix =>
-      'Melhor Mistura de OxigÃªnio';
+      'Melhor Mistura de Oxigênio';
 
   @override
   String get gasCalculators_bestMix_commonMixesRef =>
-      'ReferÃªncia de Misturas Comuns';
+      'Referência de Misturas Comuns';
 
   @override
   String gasCalculators_bestMix_exceedsAirMod(Object ppO2) {
-    return 'MOD do ar excedida em ppOâ‚‚ $ppO2';
+    return 'MOD do ar excedida em ppO₂ $ppO2';
   }
 
   @override
@@ -13426,14 +13412,14 @@ class AppLocalizationsPt extends AppLocalizations {
     Object depth,
     Object depthSymbol,
   ) {
-    return 'PressÃ£o ambiente em $depth$depthSymbol';
+    return 'Pressão ambiente em $depth$depthSymbol';
   }
 
   @override
-  String get gasCalculators_consumption_avgDepth => 'Profundidade MÃ©dia';
+  String get gasCalculators_consumption_avgDepth => 'Profundidade Média';
 
   @override
-  String get gasCalculators_consumption_breakdown => 'Detalhamento do CÃ¡lculo';
+  String get gasCalculators_consumption_breakdown => 'Detalhamento do Cálculo';
 
   @override
   String get gasCalculators_consumption_diveTime => 'Tempo de Mergulho';
@@ -13448,13 +13434,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gasCalculators_consumption_gasAtDepth =>
-      'Consumo de gÃ¡s em profundidade';
+      'Consumo de gás em profundidade';
 
   @override
-  String get gasCalculators_consumption_pressure => 'PressÃ£o';
+  String get gasCalculators_consumption_pressure => 'Pressão';
 
   @override
-  String get gasCalculators_consumption_remainingGas => 'GÃ¡s restante';
+  String get gasCalculators_consumption_remainingGas => 'Gás restante';
 
   @override
   String gasCalculators_consumption_tankCapacity(
@@ -13467,11 +13453,11 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get gasCalculators_consumption_title => 'Consumo de GÃ¡s';
+  String get gasCalculators_consumption_title => 'Consumo de Gás';
 
   @override
   String gasCalculators_consumption_totalGas(Object time) {
-    return 'GÃ¡s total para $time minutos';
+    return 'Gás total para $time minutos';
   }
 
   @override
@@ -13482,17 +13468,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gasCalculators_mod_aboutModBody =>
-      'Menos Oâ‚‚ = MOD mais profunda = NDL mais curto';
+      'Menos O₂ = MOD mais profunda = NDL mais curto';
 
   @override
-  String get gasCalculators_mod_inputParameters => 'ParÃ¢metros de Entrada';
+  String get gasCalculators_mod_inputParameters => 'Parâmetros de Entrada';
 
   @override
   String get gasCalculators_mod_maximumOperatingDepth =>
-      'Profundidade MÃ¡xima de OperaÃ§Ã£o';
+      'Profundidade Máxima de Operação';
 
   @override
-  String get gasCalculators_mod_oxygenO2 => 'OxigÃªnio (Oâ‚‚)';
+  String get gasCalculators_mod_oxygenO2 => 'Oxigênio (O₂)';
 
   @override
   String get gasCalculators_mod_ppO2Conservative =>
@@ -13500,11 +13486,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gasCalculators_mod_ppO2Maximum =>
-      'Limite mÃ¡ximo apenas para paradas de descompressÃ£o';
+      'Limite máximo apenas para paradas de descompressão';
 
   @override
   String get gasCalculators_mod_ppO2Standard =>
-      'Limite de trabalho padrÃ£o para mergulho recreativo';
+      'Limite de trabalho padrão para mergulho recreativo';
 
   @override
   String get gasCalculators_mnd_depthInput => 'Profundidade';
@@ -13542,7 +13528,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gasCalculators_mnd_resultTitle => 'Profundidade Narcotica Maxima';
 
   @override
-  String get gasCalculators_ppO2Limit => 'Limite ppOâ‚‚';
+  String get gasCalculators_ppO2Limit => 'Limite ppO₂';
 
   @override
   String get gasCalculators_resetAll => 'Restaurar todas as calculadoras';
@@ -13575,10 +13561,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gasCalculators_blender_fillGases => 'Gases de enchimento';
 
   @override
-  String get gasCalculators_blender_pressure => 'PressÃ£o';
+  String get gasCalculators_blender_pressure => 'Pressão';
 
   @override
-  String get gasCalculators_blender_o2 => 'Oâ‚‚';
+  String get gasCalculators_blender_o2 => 'O₂';
 
   @override
   String get gasCalculators_blender_he => 'He';
@@ -13587,7 +13573,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gasCalculators_blender_air => 'Ar';
 
   @override
-  String get gasCalculators_blender_helium => 'HÃ©lio';
+  String get gasCalculators_blender_helium => 'Hélio';
 
   @override
   String get gasCalculators_blender_topup => 'Complemento';
@@ -13609,11 +13595,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gasCalculators_blender_procedure => 'Procedimento de enchimento';
 
   @override
-  String get gasCalculators_blender_amounts => 'GÃ¡s a adicionar';
+  String get gasCalculators_blender_amounts => 'Gás a adicionar';
 
   @override
   String gasCalculators_blender_stepStart(String pressure, String gas) {
-    return 'ComeÃ§a com $pressure $gas';
+    return 'Começa com $pressure $gas';
   }
 
   @override
@@ -13622,96 +13608,96 @@ class AppLocalizationsPt extends AppLocalizations {
     String pressure,
     String mix,
   ) {
-    return 'Enche $gas atÃ© $pressure â†’ $mix';
+    return 'Enche $gas até $pressure → $mix';
   }
 
   @override
   String get gasCalculators_blender_error_targetPressure =>
-      'A pressÃ£o alvo deve ser maior que a inicial.';
+      'A pressão alvo deve ser maior que a inicial.';
 
   @override
   String get gasCalculators_blender_error_invalidMix =>
-      'Oâ‚‚ + He de uma mistura nÃ£o pode exceder 100%.';
+      'O₂ + He de uma mistura não pode exceder 100%.';
 
   @override
   String get gasCalculators_blender_error_identicalGases =>
-      'Os dois gases de enchimento sÃ£o idÃªnticos â€” nada para misturar.';
+      'Os dois gases de enchimento são idênticos — nada para misturar.';
 
   @override
   String get gasCalculators_blender_error_linearlyDependent =>
-      'Estes gases nÃ£o conseguem produzir a mistura alvo â€” um alvo trimix precisa de uma fonte de hÃ©lio.';
+      'Estes gases não conseguem produzir a mistura alvo — um alvo trimix precisa de uma fonte de hélio.';
 
   @override
   String get gasCalculators_blender_error_negativeAmount =>
-      'Esta mistura nÃ£o Ã© possÃ­vel com estes gases â€” seria necessÃ¡rio remover gÃ¡s.';
+      'Esta mistura não é possível com estes gases — seria necessário remover gás.';
 
   @override
   String gasCalculators_blender_error_drainTo(String pressure) {
-    return 'GÃ¡s a mais no cilindro para esta mistura. Esvazie atÃ© $pressure e depois encha.';
+    return 'Gás a mais no cilindro para esta mistura. Esvazie até $pressure e depois encha.';
   }
 
   @override
   String get gasCalculators_blender_error_drainEmpty =>
-      'O gÃ¡s que estÃ¡ no cilindro nÃ£o serve para esta mistura. Esvazie-o por completo e depois encha.';
+      'O gás que está no cilindro não serve para esta mistura. Esvazie-o por completo e depois encha.';
 
   @override
   String get gasCalculators_blender_error_cannotRemoveHelium =>
-      'O cilindro contÃ©m hÃ©lio e a mistura alvo nÃ£o. Atestar dilui o hÃ©lio mas nÃ£o o remove: o cilindro tem de ser esvaziado primeiro.';
+      'O cilindro contém hélio e a mistura alvo não. Atestar dilui o hélio mas não o remove: o cilindro tem de ser esvaziado primeiro.';
 
   @override
   String get gasCalculators_blender_error_insufficientGases =>
-      'Um alvo sem hÃ©lio precisa de dois gases de enchimento sem hÃ©lio com teores de Oâ‚‚ diferentes.';
+      'Um alvo sem hélio precisa de dois gases de enchimento sem hélio com teores de O₂ diferentes.';
 
   @override
   String get gasCalculators_blender_error_targetNotReached =>
-      'Estes gases de enchimento nÃ£o atingem exatamente a mistura alvo. Verifique os gases e a sua ordem.';
+      'Estes gases de enchimento não atingem exatamente a mistura alvo. Verifique os gases e a sua ordem.';
 
   @override
   String get gasCalculators_blender_error_implausibleStartMix =>
-      'O cilindro tem pressÃ£o mas nem oxigÃ©nio nem hÃ©lio, o que seria azoto puro. Verifica a mistura que jÃ¡ estÃ¡ no cilindro.';
+      'O cilindro tem pressão mas nem oxigénio nem hélio, o que seria azoto puro. Verifica a mistura que já está no cilindro.';
 
   @override
   String get gasCalculators_blender_about => 'Sobre a mistura';
 
   @override
   String get gasCalculators_blender_aboutBody =>
-      'Mistura por pressÃµes parciais para a mistura alvo. Adiciona cada gÃ¡s de enchimento pela ordem, atÃ© Ã  pressÃ£o indicada, e deixa o cilindro estabilizar. Os gases de enchimento e a sua ordem sÃ£o configurÃ¡veis: se definires o Ãºltimo gÃ¡s como 32/0, o remate Ã© feito com EAN32 em vez de ar. Analisa sempre a mistura final antes de a mergulhares.';
+      'Mistura por pressões parciais para a mistura alvo. Adiciona cada gás de enchimento pela ordem, até à pressão indicada, e deixa o cilindro estabilizar. Os gases de enchimento e a sua ordem são configuráveis: se definires o último gás como 32/0, o remate é feito com EAN32 em vez de ar. Analisa sempre a mistura final antes de a mergulhares.';
 
   @override
-  String get gasCalculators_blender_conditions => 'CondiÃ§Ãµes de mistura';
+  String get gasCalculators_blender_conditions => 'Condições de mistura';
 
   @override
   String get gasCalculators_blender_fillTemp => 'Temperatura de enchimento';
 
   @override
   String get gasCalculators_blender_fillTempHelp =>
-      'A temperatura do cilindro enquanto o enches. Cada pressÃ£o do procedimento Ã© a leitura do manÃ³metro a esta temperatura.';
+      'A temperatura do cilindro enquanto o enches. Cada pressão do procedimento é a leitura do manómetro a esta temperatura.';
 
   @override
   String get gasCalculators_blender_settledTemp => 'Temperatura estabilizada';
 
   @override
   String get gasCalculators_blender_settledTempHelp =>
-      'A temperatura a que o cilindro fica no fim. A pressÃ£o alvo Ã© o que ele marca depois de estabilizar.';
+      'A temperatura a que o cilindro fica no fim. A pressão alvo é o que ele marca depois de estabilizar.';
 
   @override
-  String get gasCalculators_blender_gasModel => 'Modelo de gÃ¡s';
+  String get gasCalculators_blender_gasModel => 'Modelo de gás';
 
   @override
-  String get gasCalculators_blender_modelIdeal => 'GÃ¡s ideal';
+  String get gasCalculators_blender_modelIdeal => 'Gás ideal';
 
   @override
   String get gasCalculators_blender_modelVanDerWaals => 'Van der Waals';
 
   @override
-  String get gasCalculators_blender_modelZFactor => 'GÃ¡s real (fator Z)';
+  String get gasCalculators_blender_modelZFactor => 'Gás real (fator Z)';
 
   @override
   String get gasCalculators_blender_modelRecommended => 'Recomendado';
 
   @override
   String get gasCalculators_blender_modelHelp =>
-      'O gÃ¡s real (fator Z) Ã© o mais rigoroso Ã s pressÃµes de cilindro. O gÃ¡s ideal corresponde Ã  maioria das tabelas de mistura publicadas. Van der Waals Ã© oferecido para comparaÃ§Ã£o com outro software de mistura e desvia-se vÃ¡rios por cento Ã  pressÃ£o de enchimento.';
+      'O gás real (fator Z) é o mais rigoroso às pressões de cilindro. O gás ideal corresponde à maioria das tabelas de mistura publicadas. Van der Waals é oferecido para comparação com outro software de mistura e desvia-se vários por cento à pressão de enchimento.';
 
   @override
   String gasCalculators_blender_stepAdd(String gas) {
@@ -13719,7 +13705,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get gasCalculators_blender_stepStartLabel => 'InÃ­cio';
+  String get gasCalculators_blender_stepStartLabel => 'Início';
 
   @override
   String gasCalculators_blender_settlesTo(String pressure, String temperature) {
@@ -13745,19 +13731,19 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_templateExists =>
-      'Essa mistura jÃ¡ estÃ¡ guardada.';
+      'Essa mistura já está guardada.';
 
   @override
   String get gasCalculators_blender_templateInvalid =>
-      'Oâ‚‚ + He nÃ£o pode exceder 100%.';
+      'O₂ + He não pode exceder 100%.';
 
   @override
   String get gasCalculators_blender_templateNeedsNumbers =>
-      'Introduz Oâ‚‚ e He como nÃºmeros.';
+      'Introduz O₂ e He como números.';
 
   @override
   String gasCalculators_blender_templateLimit(int count) {
-    return 'Podes guardar atÃ© $count modelos.';
+    return 'Podes guardar até $count modelos.';
   }
 
   @override
@@ -13780,14 +13766,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_cylinderVolume =>
-      'Volume de Ã¡gua do cilindro';
+      'Volume de água do cilindro';
 
   @override
-  String get gasCalculators_blender_cylinderPresets => 'PredefiniÃ§Ãµes';
+  String get gasCalculators_blender_cylinderPresets => 'Predefinições';
 
   @override
   String gasCalculators_blender_unitPrice(String unit) {
-    return 'PreÃ§o por 100 $unit';
+    return 'Preço por 100 $unit';
   }
 
   @override
@@ -13795,7 +13781,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_currencyFollowsUnits =>
-      'Segue Configuracoes > Unidades > Moeda padrÃ£o';
+      'Segue Configuracoes > Unidades > Moeda padrão';
 
   @override
   String get gasCalculators_blender_manageCylinderSizes =>
@@ -13806,11 +13792,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_costBasis =>
-      'Faturado sobre a pressÃ£o fornecida (volume de Ã¡gua do cilindro Ã— bar adicionados), tal como uma estaÃ§Ã£o de enchimento mede.';
+      'Faturado sobre a pressão fornecida (volume de água do cilindro × bar adicionados), tal como uma estação de enchimento mede.';
 
   @override
   String get gasCalculators_blender_costMissingPrice =>
-      'Introduz um preÃ§o para cada gÃ¡s para veres o total.';
+      'Introduz um preço para cada gás para veres o total.';
 
   @override
   String get gasCalculators_blender_saveFill => 'Guardar este enchimento';
@@ -13860,14 +13846,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gasCalculators_blender_addManualLine => 'Adicionar uma linha';
 
   @override
-  String get gasCalculators_blender_lineDescription => 'DescriÃ§Ã£o';
+  String get gasCalculators_blender_lineDescription => 'Descrição';
 
   @override
   String get gasCalculators_blender_lineAmount => 'Valor';
 
   @override
   String get gasCalculators_blender_lineNeedsDescription =>
-      'Introduza uma descriÃ§Ã£o, ou um cilindro e uma mistura.';
+      'Introduza uma descrição, ou um cilindro e uma mistura.';
 
   @override
   String get gasCalculators_blender_export => 'Exportar';
@@ -13883,7 +13869,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String gasCalculators_blender_exportError(String error) {
-    return 'Falha na exportaÃ§Ã£o: $error';
+    return 'Falha na exportação: $error';
   }
 
   @override
@@ -13909,12 +13895,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String gasCalculators_blender_fillAdded(String mix) {
-    return '$mix adicionado Ã  fatura';
+    return '$mix adicionado à fatura';
   }
 
   @override
   String get gasCalculators_blender_billedIncomplete =>
-      'Uma ou mais linhas nÃ£o tÃªm preÃ§o, por isso este total estÃ¡ incompleto.';
+      'Uma ou mais linhas não têm preço, por isso este total está incompleto.';
 
   @override
   String get gasCalculators_blender_billedTotal => 'Total';
@@ -13933,11 +13919,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_invoiceArchiveEmpty =>
-      'Ainda nÃ£o hÃ¡ faturas pagas.';
+      'Ainda não há faturas pagas.';
 
   @override
   String get gasCalculators_blender_invoiceArchiveEmptyFiltered =>
-      'Nenhuma fatura neste perÃ­odo.';
+      'Nenhuma fatura neste período.';
 
   @override
   String gasCalculators_blender_invoiceArchiveFillCount(int count) {
@@ -13948,15 +13934,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gasCalculators_blender_invoiceArchiveIncomplete => 'Incompleto';
 
   @override
-  String get gasCalculators_blender_invoiceArchiveUntitled => 'Sem tÃ­tulo';
+  String get gasCalculators_blender_invoiceArchiveUntitled => 'Sem título';
 
   @override
   String get gasCalculators_blender_invoiceArchiveNotFound =>
-      'Fatura nÃ£o encontrada.';
+      'Fatura não encontrada.';
 
   @override
   String get gasCalculators_blender_defaults =>
-      'DefiniÃ§Ãµes por defeito e faturaÃ§Ã£o';
+      'Definições por defeito e faturação';
 
   @override
   String get gasCalculators_tab_mod => 'MOD';
@@ -13968,11 +13954,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gasCalculators_tankSize => 'Tamanho do Cilindro';
 
   @override
-  String get gasCalculators_title => 'Calculadoras de GÃ¡s';
+  String get gasCalculators_title => 'Calculadoras de Gás';
 
   @override
   String get gasCalculators_desc_mod =>
-      'Profundidade mÃ¡xima segura para uma mistura';
+      'Profundidade máxima segura para uma mistura';
 
   @override
   String get gasCalculators_desc_bestMix =>
@@ -13980,7 +13966,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gasCalculators_desc_consumption =>
-      'GÃ¡s que um mergulho planejado vai consumir';
+      'Gás que um mergulho planejado vai consumir';
 
   @override
   String get gasCalculators_desc_rockBottom =>
@@ -13988,7 +13974,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gasCalculators_desc_mnd =>
-      'Profundidade narcÃ³tica limite de uma mistura';
+      'Profundidade narcótica limite de uma mistura';
 
   @override
   String get gasCalculators_desc_blender =>
@@ -13996,7 +13982,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gasCalculators_summary_prompt =>
-      'Selecione uma calculadora para comeÃ§ar';
+      'Selecione uma calculadora para começar';
 
   @override
   String get marineLife_siteSection_editExpectedTooltip =>
@@ -14019,7 +14005,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get marineLife_siteSection_noSpotted =>
-      'Nenhuma espÃ©cie avistada ainda';
+      'Nenhuma espécie avistada ainda';
 
   @override
   String marineLife_siteSection_spottedCountSemantics(
@@ -14033,7 +14019,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get marineLife_siteSection_spottedHere => 'Avistados Aqui';
 
   @override
-  String get marineLife_siteSection_title => 'EspÃ©cies';
+  String get marineLife_siteSection_title => 'Espécies';
 
   @override
   String get marineLife_speciesDetail_backTooltip => 'Voltar';
@@ -14144,7 +14130,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get marineLife_speciesEdit_notFoundMessage =>
-      'Esta espÃ©cie jÃ¡ nÃ£o existe.';
+      'Esta espécie já não existe.';
 
   @override
   String get marineLife_speciesEdit_saveButton => 'Salvar';
@@ -14259,10 +14245,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get marineLife_lookup_button => 'Pesquisar online';
 
   @override
-  String get marineLife_lookup_title => 'Pesquisar uma espÃ©cie';
+  String get marineLife_lookup_title => 'Pesquisar uma espécie';
 
   @override
-  String get marineLife_lookup_searchHint => 'Nome comum ou cientÃ­fico';
+  String get marineLife_lookup_searchHint => 'Nome comum ou científico';
 
   @override
   String get marineLife_lookup_search => 'Pesquisar';
@@ -14272,18 +14258,18 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get marineLife_lookup_attribution =>
-      'Dados e fotos de espÃ©cies do iNaturalist';
+      'Dados e fotos de espécies do iNaturalist';
 
   @override
   String get marineLife_lookup_idle => 'Digite um nome e toque em Pesquisar.';
 
   @override
   String marineLife_lookup_empty(String query) {
-    return 'Nenhuma espÃ©cie encontrada para \"$query\"';
+    return 'Nenhuma espécie encontrada para \"$query\"';
   }
 
   @override
-  String get marineLife_lookup_errorOffline => 'VocÃª parece estar offline.';
+  String get marineLife_lookup_errorOffline => 'Você parece estar offline.';
 
   @override
   String get marineLife_lookup_errorTimeout => 'A pesquisa expirou.';
@@ -14304,24 +14290,24 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count observaÃ§Ãµes',
-      one: '1 observaÃ§Ã£o',
+      other: '$count observações',
+      one: '1 observação',
     );
     return '$_temp0';
   }
 
   @override
   String marineLife_lookup_unresolvableRank(String rank) {
-    return '$rank: escolha uma espÃ©cie';
+    return '$rank: escolha uma espécie';
   }
 
   @override
   String get marineLife_speciesDetail_suggestForCatalog =>
-      'Sugerir para o catÃ¡logo';
+      'Sugerir para o catálogo';
 
   @override
   String get marineLife_suggest_couldNotOpen =>
-      'NÃ£o foi possÃ­vel abrir o navegador';
+      'Não foi possível abrir o navegador';
 
   @override
   String get marineLife_suggest_copyLink => 'Copiar link';
@@ -14333,7 +14319,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get marineLife_speciesPhotos_empty =>
-      'As fotos marcadas com esta espÃ©cie aparecem aqui.';
+      'As fotos marcadas com esta espécie aparecem aqui.';
 
   @override
   String get marineLife_speciesPhotos_tagPhotos => 'Marcar fotos';
@@ -14342,7 +14328,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get marineLife_speciesPhotos_addPhotos => 'Adicionar fotos';
 
   @override
-  String get marineLife_speciesPhotos_thumbnailLabel => 'Foto da espÃ©cie';
+  String get marineLife_speciesPhotos_thumbnailLabel => 'Foto da espécie';
 
   @override
   String marineLife_speciesPhotos_importAdded(int count) {
@@ -14382,11 +14368,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get marineLife_tagPicker_empty =>
-      'Nenhuma foto sem marcaÃ§Ã£o nos mergulhos em que vocÃª registrou esta espÃ©cie.';
+      'Nenhuma foto sem marcação nos mergulhos em que você registrou esta espécie.';
 
   @override
   String get marineLife_tagPicker_emptyHint =>
-      'Use Adicionar fotos para importar imagens do seu rolo da cÃ¢mera.';
+      'Use Adicionar fotos para importar imagens do seu rolo da câmera.';
 
   @override
   String get marineLife_tagPicker_selectAll => 'Selecionar tudo';
@@ -14419,18 +14405,18 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get marineLife_speciesPage_title => 'EspÃ©cies';
+  String get marineLife_speciesPage_title => 'Espécies';
 
   @override
   String get marineLife_speciesPage_searchHint =>
-      'Pesquisar espÃ©cies que vocÃª viu';
+      'Pesquisar espécies que você viu';
 
   @override
   String get marineLife_speciesPage_clearSearchTooltip => 'Limpar pesquisa';
 
   @override
   String get marineLife_speciesPage_manageCatalogTooltip =>
-      'Gerenciar catÃ¡logo';
+      'Gerenciar catálogo';
 
   @override
   String get marineLife_speciesPage_sortTooltip => 'Ordenar';
@@ -14452,8 +14438,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count espÃ©cies',
-      one: '1 espÃ©cie',
+      other: '$count espécies',
+      one: '1 espécie',
     );
     return '$_temp0';
   }
@@ -14482,23 +14468,23 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String marineLife_speciesPage_lastSeen(String date) {
-    return 'Visto pela Ãºltima vez em $date';
+    return 'Visto pela última vez em $date';
   }
 
   @override
-  String get marineLife_speciesPage_emptyTitle => 'Ainda nÃ£o hÃ¡ espÃ©cies';
+  String get marineLife_speciesPage_emptyTitle => 'Ainda não há espécies';
 
   @override
   String get marineLife_speciesPage_emptyHint =>
-      'Os avistamentos de espÃ©cies adicionados a um mergulho aparecerÃ£o aqui.';
+      'Os avistamentos de espécies adicionados a um mergulho aparecerão aqui.';
 
   @override
   String get marineLife_speciesPage_noMatch =>
-      'Nenhuma espÃ©cie corresponde Ã  sua pesquisa';
+      'Nenhuma espécie corresponde à sua pesquisa';
 
   @override
   String marineLife_speciesPage_error(String error) {
-    return 'NÃ£o foi possÃ­vel carregar suas espÃ©cies: $error';
+    return 'Não foi possível carregar suas espécies: $error';
   }
 
   @override
@@ -14511,7 +14497,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String marineLife_speciesDetail_sightingsError(String error) {
-    return 'NÃ£o foi possÃ­vel carregar os avistamentos: $error';
+    return 'Não foi possível carregar os avistamentos: $error';
   }
 
   @override
@@ -14527,7 +14513,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String marineLife_speciesDetail_countTimes(Object count) {
-    return 'Ã— $count';
+    return '× $count';
   }
 
   @override
@@ -14601,11 +14587,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_replaceEditedContent =>
-      'O conteÃºdo deste arquivo difere do original. Revincular farÃ¡ um novo envio para seu armazenamento de mÃ­dia.';
+      'O conteúdo deste arquivo difere do original. Revincular fará um novo envio para seu armazenamento de mídia.';
 
   @override
   String get media_diveMediaSection_replaceEditedTitle =>
-      'O conteÃºdo do arquivo difere';
+      'O conteúdo do arquivo difere';
 
   @override
   String get media_diveMediaSection_unlinkButton => 'Desvincular';
@@ -14647,7 +14633,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_library_unlinkConfirmBody =>
-      'Saem da sua biblioteca, juntamente com as cÃ³pias na nuvem e as miniaturas. Os seus ficheiros originais nÃ£o sÃ£o afetados. NÃ£o pode ser desfeito.';
+      'Saem da sua biblioteca, juntamente com as cópias na nuvem e as miniaturas. Os seus ficheiros originais não são afetados. Não pode ser desfeito.';
 
   @override
   String media_library_unlinkMetadataNote(int count) {
@@ -14655,7 +14641,7 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '$count deles tÃªm legenda ou favorito guardados no Submersion, e esses detalhes perdem-se.',
+          '$count deles têm legenda ou favorito guardados no Submersion, e esses detalhes perdem-se.',
       one:
           'Um deles tem uma legenda ou favorito guardados no Submersion, e esses detalhes perdem-se.',
     );
@@ -14663,10 +14649,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_title => 'MÃ­dia do ponto de mergulho';
+  String get media_siteMediaSection_title => 'Mídia do ponto de mergulho';
 
   @override
-  String get media_siteMediaSection_addPhotos => 'Adicionar fotos ou vÃ­deos';
+  String get media_siteMediaSection_addPhotos => 'Adicionar fotos ou vídeos';
 
   @override
   String get media_siteMediaSection_addDocument => 'Adicionar documento';
@@ -14690,7 +14676,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedContent(int count) {
-    return 'Remove $count itens da sua biblioteca, junto com as cÃ³pias na nuvem e miniaturas. MÃ­dias que um mergulho ainda usa sÃ£o mantidas. Seus arquivos originais nÃ£o sÃ£o afetados.';
+    return 'Remove $count itens da sua biblioteca, junto com as cópias na nuvem e miniaturas. Mídias que um mergulho ainda usa são mantidas. Seus arquivos originais não são afetados.';
   }
 
   @override
@@ -14703,11 +14689,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_documentViewer_unavailable =>
-      'Este documento nÃ£o estÃ¡ disponÃ­vel neste dispositivo';
+      'Este documento não está disponível neste dispositivo';
 
   @override
   String get media_documentViewer_availableOnOriginDevice =>
-      'Ele estÃ¡ disponÃ­vel no dispositivo em que foi adicionado, ou por meio de um armazenamento de mÃ­dia configurado.';
+      'Ele está disponível no dispositivo em que foi adicionado, ou por meio de um armazenamento de mídia configurado.';
 
   @override
   String media_documentViewer_attached(int count) {
@@ -14858,7 +14844,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_lightroom_suggestion_dismiss => 'Dispensar';
 
   @override
-  String get media_lightroom_suggestions_title => 'SugestÃµes do Lightroom';
+  String get media_lightroom_suggestions_title => 'Sugestões do Lightroom';
 
   @override
   String get media_miniProfile_headerLabel => 'Perfil do Mergulho';
@@ -14945,19 +14931,18 @@ class AppLocalizationsPt extends AppLocalizations {
       'Alternar selecao da foto, selecionada';
 
   @override
-  String get media_photoPicker_files_pickFilesButton => 'Escolher arquivosâ€¦';
+  String get media_photoPicker_files_pickFilesButton => 'Escolher arquivos…';
 
   @override
-  String get media_photoPicker_files_pickFolderButton =>
-      'Escolher uma pastaâ€¦';
+  String get media_photoPicker_files_pickFolderButton => 'Escolher uma pasta…';
 
   @override
   String get media_photoPicker_files_autoMatchLabel =>
-      'Associar automaticamente fotos e vÃ­deos aos mergulhos por data';
+      'Associar automaticamente fotos e vídeos aos mergulhos por data';
 
   @override
   String get media_photoPicker_files_emptyHint =>
-      'Escolha arquivos ou uma pasta para comeÃ§ar.';
+      'Escolha arquivos ou uma pasta para começar.';
 
   @override
   String media_photoPicker_files_linkButton(int count) {
@@ -14999,7 +14984,7 @@ class AppLocalizationsPt extends AppLocalizations {
       other: '$diveCount mergulhos',
       one: '1 mergulho',
     );
-    return '$_temp0, $_temp1, $unmatchedCount sem associaÃ§Ã£o';
+    return '$_temp0, $_temp1, $unmatchedCount sem associação';
   }
 
   @override
@@ -15030,7 +15015,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get media_photoPicker_files_unmatchedGroupTitle => 'Sem associaÃ§Ã£o';
+  String get media_photoPicker_files_unmatchedGroupTitle => 'Sem associação';
 
   @override
   String media_photoPicker_files_addAllToDive(int count) {
@@ -15052,7 +15037,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Escolher um mergulho';
 
   @override
-  String get media_photoPicker_files_removeTooltip => 'Remover da seleÃ§Ã£o';
+  String get media_photoPicker_files_removeTooltip => 'Remover da seleção';
 
   @override
   String get media_photoPicker_files_sourceExif => 'do EXIF';
@@ -15074,16 +15059,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_photoPicker_files_reasonNoTimestamp =>
-      'NÃ£o foi possÃ­vel ler a hora de captura';
+      'Não foi possível ler a hora de captura';
 
   @override
   String media_photoPicker_files_reasonBeforeDive(String gap) {
-    return '$gap antes do mergulho mais prÃ³ximo';
+    return '$gap antes do mergulho mais próximo';
   }
 
   @override
   String media_photoPicker_files_reasonAfterDive(String gap) {
-    return '$gap depois do mergulho mais prÃ³ximo';
+    return '$gap depois do mergulho mais próximo';
   }
 
   @override
@@ -15172,7 +15157,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_perdixOverlay_toggleTooltip =>
-      'SobreposiÃ§Ã£o de computador de mergulho';
+      'Sobreposição de computador de mergulho';
 
   @override
   String get media_photoViewer_cannotShare =>
@@ -15215,7 +15200,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get media_photoViewer_nextTooltip => 'PrÃ³xima mÃ­dia';
+  String get media_photoViewer_nextTooltip => 'Próxima mídia';
 
   @override
   String get media_photoViewer_noPhotosAvailable => 'Nenhuma foto disponivel';
@@ -15230,7 +15215,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Reproduzir ou pausar video';
 
   @override
-  String get media_photoViewer_previousTooltip => 'MÃ­dia anterior';
+  String get media_photoViewer_previousTooltip => 'Mídia anterior';
 
   @override
   String get media_photoViewer_seekVideoLabel => 'Buscar posicao do video';
@@ -15344,7 +15329,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_unavailablePlaceholder_notOnDevice =>
-      'IndisponÃ­vel neste dispositivo';
+      'Indisponível neste dispositivo';
 
   @override
   String get media_unavailablePlaceholder_signInRequired => 'Sign in to view';
@@ -15367,7 +15352,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_writeMetadata_livePhotoUnsupported =>
-      'As Live Photos ainda nÃ£o sÃ£o suportadas. Duplique esta como fotografia estÃ¡tica e escreva os dados do mergulho na cÃ³pia.';
+      'As Live Photos ainda não são suportadas. Duplique esta como fotografia estática e escreva os dados do mergulho na cópia.';
 
   @override
   String get media_writeMetadata_noDataAvailable =>
@@ -15385,7 +15370,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_writeMetadata_videoUnsupported =>
-      'Os dados do mergulho sÃ³ podem ser escritos em fotografias, nÃ£o em vÃ­deos.';
+      'Os dados do mergulho só podem ser escritos em fotografias, não em vídeos.';
 
   @override
   String get media_writeMetadata_warningPhotoText =>
@@ -15422,16 +15407,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_console_library => 'Biblioteca';
 
   @override
-  String get media_console_transfers => 'TransferÃªncias';
+  String get media_console_transfers => 'Transferências';
 
   @override
   String get media_console_import => 'Importar';
 
   @override
-  String get media_import_launch => 'Importar mÃ­dia...';
+  String get media_import_launch => 'Importar mídia...';
 
   @override
-  String get media_import_review_title => 'Revisar importaÃ§Ã£o';
+  String get media_import_review_title => 'Revisar importação';
 
   @override
   String media_import_review_confirm(int count) {
@@ -15447,13 +15432,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_import_review_chooseSite => 'Escolher local';
 
   @override
-  String get media_import_review_ambiguous => 'VÃ¡rios mergulhos correspondem';
+  String get media_import_review_ambiguous => 'Vários mergulhos correspondem';
 
   @override
   String get media_import_review_noMatch => 'Nenhum mergulho correspondente';
 
   @override
-  String get media_import_review_skipped => 'NÃ£o importado';
+  String get media_import_review_skipped => 'Não importado';
 
   @override
   String media_import_review_linkChip(int number) {
@@ -15471,7 +15456,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_import_intro =>
-      'As fotos sÃ£o vinculadas a um mergulho ou ponto de mergulho ao importar.';
+      'As fotos são vinculadas a um mergulho ou ponto de mergulho ao importar.';
 
   @override
   String get media_console_sources => 'Origens';
@@ -15486,14 +15471,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_sources_addWatched => 'Adicionar pasta...';
 
   @override
-  String get media_sources_scanFailed => 'Falha na verificaÃ§Ã£o';
+  String get media_sources_scanFailed => 'Falha na verificação';
 
   @override
   String get media_sources_scanNow => 'Verificar agora';
 
   @override
   String get media_sources_autoApply =>
-      'Revincular automaticamente correspondÃªncias exatas';
+      'Revincular automaticamente correspondências exatas';
 
   @override
   String get media_sources_neverScanned => 'Nunca verificada';
@@ -15511,16 +15496,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_source_manifest => 'Assinaturas';
 
   @override
-  String get media_source_connector => 'ServiÃ§os conectados';
+  String get media_source_connector => 'Serviços conectados';
 
   @override
-  String get media_source_mediaStore => 'Armazenamento de mÃ­dia na nuvem';
+  String get media_source_mediaStore => 'Armazenamento de mídia na nuvem';
 
   @override
   String get media_source_signature => 'Assinaturas';
 
   @override
-  String get media_repairHistory_title => 'HistÃ³rico de reparos';
+  String get media_repairHistory_title => 'Histórico de reparos';
 
   @override
   String get media_repairHistory_empty => 'Nenhum reparo ainda';
@@ -15536,27 +15521,27 @@ class AppLocalizationsPt extends AppLocalizations {
       'Revinculado automaticamente';
 
   @override
-  String get media_smartAlbum_save => 'Salvar como Ã¡lbum';
+  String get media_smartAlbum_save => 'Salvar como álbum';
 
   @override
-  String get media_smartAlbum_saveTitle => 'Nomeie este Ã¡lbum';
+  String get media_smartAlbum_saveTitle => 'Nomeie este álbum';
 
   @override
-  String get media_smartAlbum_albums => 'Ãlbuns';
+  String get media_smartAlbum_albums => 'Álbuns';
 
   @override
-  String get media_smartAlbum_delete => 'Excluir Ã¡lbum';
+  String get media_smartAlbum_delete => 'Excluir álbum';
 
   @override
   String get media_smartAlbum_deleteFailed =>
-      'NÃ£o foi possÃ­vel excluir o Ã¡lbum';
+      'Não foi possível excluir o álbum';
 
   @override
-  String get media_smartAlbum_saved => 'Ãlbum salvo';
+  String get media_smartAlbum_saved => 'Álbum salvo';
 
   @override
   String media_sources_lastScanned(String date) {
-    return 'Ãšltima verificaÃ§Ã£o $date';
+    return 'Última verificação $date';
   }
 
   @override
@@ -15565,20 +15550,20 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get media_repairHistory_sourceFolder => 'verificaÃ§Ã£o de pastas';
+  String get media_repairHistory_sourceFolder => 'verificação de pastas';
 
   @override
   String get media_repairHistory_sourcePhotoLibrary => 'biblioteca de fotos';
 
   @override
   String get media_repairHistory_sourceStore =>
-      'armazenamento de mÃ­dia na nuvem';
+      'armazenamento de mídia na nuvem';
 
   @override
   String get media_repairHistory_sourceWatcher => 'pastas monitoradas';
 
   @override
-  String get media_repairHistory_sourceManual => 'revinculaÃ§Ã£o manual';
+  String get media_repairHistory_sourceManual => 'revinculação manual';
 
   @override
   String media_repairHistory_source(String source) {
@@ -15606,14 +15591,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_repair_usePhotoLibrary => 'Pesquisar na fototeca';
 
   @override
-  String get media_repair_useStore => 'Usar o armazenamento de mÃ­dia na nuvem';
+  String get media_repair_useStore => 'Usar o armazenamento de mídia na nuvem';
 
   @override
   String get media_repair_scan => 'Verificar';
 
   @override
   String media_repair_prefixMove(String from, String to, int count) {
-    return 'MovimentaÃ§Ã£o de pasta detectada: $from para $to cobre $count arquivos';
+    return 'Movimentação de pasta detectada: $from para $to cobre $count arquivos';
   }
 
   @override
@@ -15629,7 +15614,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_repair_confidence_unmatched => 'Nenhum candidato';
 
   @override
-  String get media_repair_unverified => 'NÃ£o verificado no armazenamento';
+  String get media_repair_unverified => 'Não verificado no armazenamento';
 
   @override
   String media_repair_apply(int count) {
@@ -15648,7 +15633,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get media_library_empty => 'Nenhuma mÃ­dia ainda';
+  String get media_library_empty => 'Nenhuma mídia ainda';
 
   @override
   String get media_library_filter_all => 'Tudo';
@@ -15657,13 +15642,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_library_filter_photos => 'Fotos';
 
   @override
-  String get media_library_filter_videos => 'VÃ­deos';
+  String get media_library_filter_videos => 'Vídeos';
 
   @override
   String get media_library_filter_site => 'Ponto';
 
   @override
-  String get media_library_filter_species => 'EspÃ©cie';
+  String get media_library_filter_species => 'Espécie';
 
   @override
   String get media_library_filter_trip => 'Viagem';
@@ -15686,16 +15671,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_library_filter_any => 'Qualquer';
 
   @override
-  String get media_library_filter_title => 'Filtrar mÃ­dia';
+  String get media_library_filter_title => 'Filtrar mídia';
 
   @override
   String get media_library_filter_apply => 'Aplicar';
 
   @override
-  String get media_library_sort_title => 'Ordenar mÃ­dia';
+  String get media_library_sort_title => 'Ordenar mídia';
 
   @override
-  String get media_smartAlbum_load => 'Carregar Ã¡lbum';
+  String get media_smartAlbum_load => 'Carregar álbum';
 
   @override
   String get media_divePicker_title => 'Mover para um mergulho';
@@ -15715,13 +15700,13 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get media_library_unlinkedHeader => 'Sem vÃ­nculo';
+  String get media_library_unlinkedHeader => 'Sem vínculo';
 
   @override
   String get media_library_diveHeaderHint => 'Abrir este mergulho';
 
   @override
-  String get media_library_untitledDiveHeader => 'Mergulho sem tÃ­tulo';
+  String get media_library_untitledDiveHeader => 'Mergulho sem título';
 
   @override
   String get media_library_viewMode_byDive => 'Por mergulho';
@@ -15739,7 +15724,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get nav_home => 'Inicio';
 
   @override
-  String get nav_media => 'MÃ­dia';
+  String get nav_media => 'Mídia';
 
   @override
   String get nav_more => 'Mais';
@@ -15757,7 +15742,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get nav_sites => 'Pontos de Mergulho';
 
   @override
-  String get nav_species => 'EspÃ©cies';
+  String get nav_species => 'Espécies';
 
   @override
   String get nav_statistics => 'Estatisticas';
@@ -15779,16 +15764,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String plannerCanvas_bailout_available(String liters) {
-    return 'DisponÃ­vel $liters';
+    return 'Disponível $liters';
   }
 
   @override
   String get plannerCanvas_bailout_insufficient =>
-      'GÃ¡s de bailout insuficiente para o pior caso';
+      'Gás de bailout insuficiente para o pior caso';
 
   @override
   String plannerCanvas_bailout_required(String liters) {
-    return 'NecessÃ¡rio $liters';
+    return 'Necessário $liters';
   }
 
   @override
@@ -15796,12 +15781,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String plannerCanvas_bailout_tts(String minutes) {
-    return 'TTS de bailout $minutesâ€²';
+    return 'TTS de bailout $minutes′';
   }
 
   @override
   String plannerCanvas_bailout_worstCase(String minutes, String depth) {
-    return 'Pior caso aos $minutesâ€² Â· $depth';
+    return 'Pior caso aos $minutes′ · $depth';
   }
 
   @override
@@ -15815,11 +15800,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'Profundidade de troca do setpoint';
 
   @override
-  String get plannerCanvas_pscr_ratio => 'RazÃ£o pSCR';
+  String get plannerCanvas_pscr_ratio => 'Razão pSCR';
 
   @override
   String get plannerCanvas_pscr_ratio_hint =>
-      'Maior = mais gÃ¡s fresco, menor queda de Oâ‚‚';
+      'Maior = mais gás fresco, menor queda de O₂';
 
   @override
   String plannerCanvas_chip_cns(String value) {
@@ -15860,7 +15845,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String plannerCanvas_contingency_previewing(String label) {
-    return 'PrÃ©-visualizaÃ§Ã£o: $label';
+    return 'Pré-visualização: $label';
   }
 
   @override
@@ -15868,18 +15853,18 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String plannerCanvas_chart_meanDepth(String depth) {
-    return 'mÃ©dia $depth';
+    return 'média $depth';
   }
 
   @override
-  String get plannerCanvas_contingency_title => 'ContingÃªncias';
+  String get plannerCanvas_contingency_title => 'Contingências';
 
   @override
-  String get plannerCanvas_contingency_turnFraction => 'FraÃ§Ã£o de retorno';
+  String get plannerCanvas_contingency_turnFraction => 'Fração de retorno';
 
   @override
   String get plannerCanvas_contingency_turnRule =>
-      'Regra de pressÃ£o de retorno';
+      'Regra de pressão de retorno';
 
   @override
   String get plannerCanvas_convert_success =>
@@ -15894,19 +15879,18 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get plannerCanvas_follow_empty =>
-      'Ainda nÃ£o hÃ¡ mergulhos registrados';
+  String get plannerCanvas_follow_empty => 'Ainda não há mergulhos registrados';
 
   @override
   String get plannerCanvas_follow_noTissues =>
-      'Sem dados de perfil nesse mergulho â€” intervalo de superfÃ­cie definido sem saturaÃ§Ã£o dos tecidos';
+      'Sem dados de perfil nesse mergulho — intervalo de superfície definido sem saturação dos tecidos';
 
   @override
   String get plannerCanvas_follow_title => 'Seguir um mergulho';
 
   @override
   String plannerCanvas_gas_minGas(String pressure) {
-    return 'gÃ¡s mÃ­nimo $pressure';
+    return 'gás mínimo $pressure';
   }
 
   @override
@@ -15926,38 +15910,38 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String plannerCanvas_issue_gasDensityCritical(String value) {
-    return 'Densidade do gÃ¡s $value g/L acima do limite mÃ¡ximo';
+    return 'Densidade do gás $value g/L acima do limite máximo';
   }
 
   @override
   String plannerCanvas_issue_gasDensityHigh(String value) {
-    return 'Densidade do gÃ¡s $value g/L acima do limite recomendado';
+    return 'Densidade do gás $value g/L acima do limite recomendado';
   }
 
   @override
   String plannerCanvas_issue_hypoxic(String depth, String value) {
-    return 'GÃ¡s hipÃ³xico a $depth (ppOâ‚‚ $value bar)';
+    return 'Gás hipóxico a $depth (ppO₂ $value bar)';
   }
 
   @override
   String plannerCanvas_issue_minGas(String pressure) {
-    return 'O cilindro termina abaixo do mÃ­nimo rock bottom de $pressure';
+    return 'O cilindro termina abaixo do mínimo rock bottom de $pressure';
   }
 
   @override
   String get plannerCanvas_issue_noBailout =>
-      'O plano de descompressÃ£o CCR nÃ£o leva gÃ¡s de bailout';
+      'O plano de descompressão CCR não leva gás de bailout';
 
   @override
   String get plannerCanvas_issue_noDecoGas =>
-      'DescompressÃ£o necessÃ¡ria mas sem gÃ¡s de deco a bordo';
+      'Descompressão necessária mas sem gás de deco a bordo';
 
   @override
   String get plannerCanvas_range_base => 'Base';
 
   @override
   String get plannerCanvas_range_legend =>
-      'As cÃ©lulas mostram o tempo atÃ© a superfÃ­cie; vermelho = nÃ£o mergulhÃ¡vel como planejado';
+      'As células mostram o tempo até a superfície; vermelho = não mergulhável como planejado';
 
   @override
   String get plannerCanvas_pane_collapse => 'Recolher painel';
@@ -15966,20 +15950,20 @@ class AppLocalizationsPt extends AppLocalizations {
   String get plannerCanvas_pane_expand => 'Expandir painel';
 
   @override
-  String get plannerCanvas_tab_setup => 'ConfiguraÃ§Ã£o';
+  String get plannerCanvas_tab_setup => 'Configuração';
 
   @override
-  String get plannerCanvas_o2Narcotic => 'Tratar o Oâ‚‚ como narcÃ³tico';
+  String get plannerCanvas_o2Narcotic => 'Tratar o O₂ como narcótico';
 
   @override
   String get plannerCanvas_rates_ascent => 'Taxa de subida';
 
   @override
   String get plannerCanvas_rates_intermediateAscent =>
-      'Velocidade de subida entre paradas intermÃ©dias';
+      'Velocidade de subida entre paradas intermédias';
 
   @override
-  String get plannerCanvas_rates_lastStop => 'Ãšltima parada';
+  String get plannerCanvas_rates_lastStop => 'Última parada';
 
   @override
   String get plannerCanvas_rates_shallowAscent =>
@@ -15987,7 +15971,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String plannerCanvas_rates_finalAscent(String depth) {
-    return 'Velocidade de subida final (Ãºltimos $depth)';
+    return 'Velocidade de subida final (últimos $depth)';
   }
 
   @override
@@ -15997,15 +15981,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get plannerCanvas_rates_title => 'Taxas';
 
   @override
-  String get plannerCanvas_range_title => 'Tabela de variaÃ§Ãµes';
+  String get plannerCanvas_range_title => 'Tabela de variações';
 
   @override
-  String get plannerCanvas_results_noDeco =>
-      'Nenhuma descompressÃ£o necessÃ¡ria';
+  String get plannerCanvas_results_noDeco => 'Nenhuma descompressão necessária';
 
   @override
   String plannerCanvas_sac_useLogged(String sac) {
-    return 'Usar mÃ©dia registrada ($sac)';
+    return 'Usar média registrada ($sac)';
   }
 
   @override
@@ -16020,25 +16003,25 @@ class AppLocalizationsPt extends AppLocalizations {
   String get plannerCanvas_saved_duplicate => 'Duplicar';
 
   @override
-  String get plannerCanvas_saved_empty => 'Ainda nÃ£o hÃ¡ planos salvos';
+  String get plannerCanvas_saved_empty => 'Ainda não há planos salvos';
 
   @override
   String get plannerCanvas_saved_title => 'Planos salvos';
 
   @override
-  String get plannerCanvas_name_dialogTitle => 'DÃª um nome ao seu plano';
+  String get plannerCanvas_name_dialogTitle => 'Dê um nome ao seu plano';
 
   @override
   String get plannerCanvas_name_defaultFallback => 'Plano de mergulho';
 
   @override
   String plannerCanvas_scrub_bailout(String minutes) {
-    return 'BO $minutesâ€²';
+    return 'BO $minutes′';
   }
 
   @override
   String plannerCanvas_scrub_readout(String minutes, String depth) {
-    return 'RT $minutesâ€² Â· $depth';
+    return 'RT $minutes′ · $depth';
   }
 
   @override
@@ -16046,7 +16029,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String plannerCanvas_share_importFailed(String reason) {
-    return 'NÃ£o foi possÃ­vel importar o plano: $reason';
+    return 'Não foi possível importar o plano: $reason';
   }
 
   @override
@@ -16056,7 +16039,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get plannerCanvas_slate_menu => 'Exportar prancheta (PDF)';
 
   @override
-  String get plannerCanvas_slate_minGas => 'GÃ¡s mÃ­nimo';
+  String get plannerCanvas_slate_minGas => 'Gás mínimo';
 
   @override
   String get plannerCanvas_slate_turn => 'Retorno';
@@ -16065,16 +16048,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get plannerCanvas_table_depth => 'Profundidade';
 
   @override
-  String get plannerCanvas_table_gas => 'GÃ¡s';
+  String get plannerCanvas_table_gas => 'Gás';
 
   @override
   String get plannerCanvas_table_runtime => 'RT';
 
   @override
-  String get plannerCanvas_table_duration => 'DuraÃ§Ã£o';
+  String get plannerCanvas_table_duration => 'Duração';
 
   @override
-  String get plannerCanvas_turnRule_allUsable => 'Tudo utilizÃ¡vel';
+  String get plannerCanvas_turnRule_allUsable => 'Tudo utilizável';
 
   @override
   String get plannerCanvas_turnRule_custom => 'Personalizada';
@@ -16086,7 +16069,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get plannerCanvas_turnRule_none => 'Nenhuma';
 
   @override
-  String get plannerCanvas_turnRule_thirds => 'TerÃ§os';
+  String get plannerCanvas_turnRule_thirds => 'Terços';
 
   @override
   String get planning_appBar_title => 'Planejamento';
@@ -16115,7 +16098,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get planning_card_gasCalculators_description =>
-      'Quatro calculadoras de gas especializadas:\nâ€¢ MOD - Profundidade maxima operacional para uma mistura de gas\nâ€¢ Best Mix - Oâ‚‚% ideal para uma profundidade alvo\nâ€¢ Consumo - Estimativa de consumo de gas\nâ€¢ Rock Bottom - Calculo de reserva de emergencia';
+      'Quatro calculadoras de gas especializadas:\n• MOD - Profundidade maxima operacional para uma mistura de gas\n• Best Mix - O₂% ideal para uma profundidade alvo\n• Consumo - Estimativa de consumo de gas\n• Rock Bottom - Calculo de reserva de emergencia';
 
   @override
   String get planning_card_gasCalculators_subtitle =>
@@ -16157,14 +16140,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get planning_section_tools => 'Ferramentas';
 
   @override
-  String get planning_summary_prompt =>
-      'Selecione uma ferramenta para comeÃ§ar';
+  String get planning_summary_prompt => 'Selecione uma ferramenta para começar';
 
   @override
   String get planning_summary_savedPlans => 'Planos salvos';
 
   @override
-  String get planning_summary_noPlans => 'Ainda nÃ£o hÃ¡ planos salvos';
+  String get planning_summary_noPlans => 'Ainda não há planos salvos';
 
   @override
   String get planning_sidebar_appBar_title => 'Planejamento';
@@ -16240,7 +16222,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_about_description =>
-      'Mergulhe com seguranÃ§a. Registre tudo.';
+      'Mergulhe com segurança. Registre tudo.';
 
   @override
   String get settings_about_header => 'Sobre';
@@ -16270,7 +16252,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_appearance_appLanguage => 'Idioma do Aplicativo';
 
   @override
-  String get settings_appearance_displaySize => 'Tamanho de exibiÃ§Ã£o';
+  String get settings_appearance_displaySize => 'Tamanho de exibição';
 
   @override
   String settings_appearance_displaySize_value(int percent) {
@@ -16348,11 +16330,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'Mostrar marcadores para trocas de gas';
 
   @override
-  String get settings_appearance_gasTimeline => 'Linha do tempo do gÃ¡s';
+  String get settings_appearance_gasTimeline => 'Linha do tempo do gás';
 
   @override
   String get settings_appearance_gasTimeline_subtitle =>
-      'Exibir a faixa de consumo de gÃ¡s abaixo do perfil de mergulho por padrÃ£o';
+      'Exibir a faixa de consumo de gás abaixo do perfil de mergulho por padrão';
 
   @override
   String get settings_appearance_header_diveDetails => 'Detalhes do Mergulho';
@@ -16394,7 +16376,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveDetailSection_profile_description =>
-      'GrÃ¡fico de profundidade/tempo, reproduÃ§Ã£o, seleÃ§Ã£o de intervalo';
+      'Gráfico de profundidade/tempo, reprodução, seleção de intervalo';
 
   @override
   String get diveDetailSection_decoStatus_name => 'Estado de deco';
@@ -16408,23 +16390,23 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveDetailSection_tissueLoading_description =>
-      'SaturaÃ§Ã£o por compartimento e mapa de calor';
+      'Saturação por compartimento e mapa de calor';
 
   @override
-  String get diveLog_detail_displayOptions_tooltip => 'OpÃ§Ãµes de exibiÃ§Ã£o';
+  String get diveLog_detail_displayOptions_tooltip => 'Opções de exibição';
 
   @override
-  String get diveLog_detail_displayOptions_layout => 'DisposiÃ§Ã£o';
+  String get diveLog_detail_displayOptions_layout => 'Disposição';
 
   @override
-  String get diveLog_detail_displayOptions_sections => 'SecÃ§Ãµes';
+  String get diveLog_detail_displayOptions_sections => 'Secções';
 
   @override
   String get diveLog_detail_displayOptions_showAll =>
-      'Mostrar todas as secÃ§Ãµes';
+      'Mostrar todas as secções';
 
   @override
-  String get diveLog_detail_displayOptions_reorder => 'Reordenar secÃ§Ãµesâ€¦';
+  String get diveLog_detail_displayOptions_reorder => 'Reordenar secções…';
 
   @override
   String get diveDetailLayout_detailed => 'Detalhado';
@@ -16433,22 +16415,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveDetailLayout_list => 'Lista';
 
   @override
-  String get diveDetailSection_safetyReview_name => 'RevisÃ£o de seguranÃ§a';
+  String get diveDetailSection_safetyReview_name => 'Revisão de segurança';
 
   @override
   String get diveDetailSection_safetyReview_description =>
-      'ObservaÃ§Ãµes automÃ¡ticas do perfil apÃ³s o mergulho';
+      'Observações automáticas do perfil após o mergulho';
 
   @override
-  String get safetyReview_sectionTitle => 'RevisÃ£o de seguranÃ§a';
+  String get safetyReview_sectionTitle => 'Revisão de segurança';
 
   @override
   String safetyReview_findingCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count observaÃ§Ãµes',
-      one: '1 observaÃ§Ã£o',
+      other: '$count observações',
+      one: '1 observação',
     );
     return '$_temp0';
   }
@@ -16465,22 +16447,22 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String safetyReview_omittedSafetyStop_title(String remaining) {
-    return 'A parada de seguranÃ§a recomendada foi encurtada em $remaining';
+    return 'A parada de segurança recomendada foi encurtada em $remaining';
   }
 
   @override
   String safetyReview_sawtoothProfile_title(int count) {
-    return '$count variaÃ§Ãµes repetidas de profundidade para cima e para baixo durante o mergulho';
+    return '$count variações repetidas de profundidade para cima e para baixo durante o mergulho';
   }
 
   @override
   String safetyReview_highSurfaceGf_title(String gf, String gfHigh) {
-    return 'Chegou Ã  superfÃ­cie com fator de gradiente $gf, acima do $gfHigh configurado';
+    return 'Chegou à superfície com fator de gradiente $gf, acima do $gfHigh configurado';
   }
 
   @override
   String safetyReview_timeRange(String start, String end) {
-    return 'Em $startâ€“$end';
+    return 'Em $start–$end';
   }
 
   @override
@@ -16496,19 +16478,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get safetyReview_restoreAll => 'Restaurar tudo';
 
   @override
-  String get safetySettings_dismissAll => 'Dispensar todas as observaÃ§Ãµes';
+  String get safetySettings_dismissAll => 'Dispensar todas as observações';
 
   @override
   String get safetySettings_dismissAll_subtitle =>
-      'Marcar como revistas todas as observaÃ§Ãµes deste diÃ¡rio';
+      'Marcar como revistas todas as observações deste diário';
 
   @override
   String get safetySettings_dismissAll_confirmTitle =>
-      'Dispensar todas as observaÃ§Ãµes?';
+      'Dispensar todas as observações?';
 
   @override
   String get safetySettings_dismissAll_confirmBody =>
-      'Todas as observaÃ§Ãµes de todos os mergulhos analisados serÃ£o marcadas como revistas. Pode restaurÃ¡-las mergulho a mergulho na respetiva secÃ§Ã£o de revisÃ£o de seguranÃ§a.';
+      'Todas as observações de todos os mergulhos analisados serão marcadas como revistas. Pode restaurá-las mergulho a mergulho na respetiva secção de revisão de segurança.';
 
   @override
   String get safetySettings_dismissAll_confirm => 'Dispensar tudo';
@@ -16526,9 +16508,9 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count observaÃ§Ãµes dispensadas',
-      one: '1 observaÃ§Ã£o dispensada',
-      zero: 'Nenhuma observaÃ§Ã£o para dispensar',
+      other: '$count observações dispensadas',
+      one: '1 observação dispensada',
+      zero: 'Nenhuma observação para dispensar',
     );
     return '$_temp0';
   }
@@ -16538,26 +16520,26 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count observaÃ§Ãµes dispensadas',
-      one: '1 observaÃ§Ã£o dispensada',
-      zero: 'Nenhuma observaÃ§Ã£o dispensada',
+      other: '$count observações dispensadas',
+      one: '1 observação dispensada',
+      zero: 'Nenhuma observação dispensada',
     );
     String _temp1 = intl.Intl.pluralLogic(
       failed,
       locale: localeName,
-      other: '$failed mergulhos nÃ£o puderam ser atualizados',
-      one: '1 mergulho nÃ£o pÃ´de ser atualizado',
+      other: '$failed mergulhos não puderam ser atualizados',
+      one: '1 mergulho não pôde ser atualizado',
     );
     return '$_temp0, $_temp1';
   }
 
   @override
   String get safetySettings_dismissAll_failed =>
-      'NÃ£o foi possÃ­vel ler a lista de mergulhos. Nada foi alterado.';
+      'Não foi possível ler a lista de mergulhos. Nada foi alterado.';
 
   @override
   String get safetySettings_analyzeAll_failed =>
-      'NÃ£o foi possÃ­vel analisar os mergulhos.';
+      'Não foi possível analisar os mergulhos.';
 
   @override
   String get safetyReview_details => 'Detalhes';
@@ -16570,32 +16552,31 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count observaÃ§Ãµes de seguranÃ§a',
-      one: '1 observaÃ§Ã£o de seguranÃ§a',
+      other: '$count observações de segurança',
+      one: '1 observação de segurança',
     );
     return '$_temp0';
   }
 
   @override
-  String get safetySettings_title => 'RevisÃ£o de seguranÃ§a';
+  String get safetySettings_title => 'Revisão de segurança';
 
   @override
   String get safetySettings_entry_subtitle =>
-      'ObservaÃ§Ãµes e regras pÃ³s-mergulho';
+      'Observações e regras pós-mergulho';
 
   @override
-  String get safetySettings_masterToggle =>
-      'RevisÃ£o de seguranÃ§a pÃ³s-mergulho';
+  String get safetySettings_masterToggle => 'Revisão de segurança pós-mergulho';
 
   @override
   String get safetySettings_masterToggle_subtitle =>
-      'Anotar automaticamente observaÃ§Ãµes de subida, paradas e perfil nos mergulhos analisados';
+      'Anotar automaticamente observações de subida, paradas e perfil nos mergulhos analisados';
 
   @override
   String get safetySettings_rulesHeader => 'Regras';
 
   @override
-  String get safetySettings_rule_rapidAscent => 'Subidas rÃ¡pidas';
+  String get safetySettings_rule_rapidAscent => 'Subidas rápidas';
 
   @override
   String get safetySettings_rule_missedDecoStop =>
@@ -16603,7 +16584,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get safetySettings_rule_omittedSafetyStop =>
-      'Paradas de seguranÃ§a omitidas';
+      'Paradas de segurança omitidas';
 
   @override
   String get safetySettings_rule_sawtoothProfile => 'Perfis em dente de serra';
@@ -16617,7 +16598,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get safetySettings_analyzeAll_subtitle =>
-      'Executar a revisÃ£o de seguranÃ§a em todos os mergulhos com perfil ainda nÃ£o analisados';
+      'Executar a revisão de segurança em todos os mergulhos com perfil ainda não analisados';
 
   @override
   String safetySettings_analyzeAll_progress(int done, int total) {
@@ -16625,17 +16606,17 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get safetySettings_analyzeAll_done => 'AnÃ¡lise concluÃ­da';
+  String get safetySettings_analyzeAll_done => 'Análise concluída';
 
   @override
   String safetySettings_analyzeAll_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'NÃ£o foi possÃ­vel analisar $count mergulhos',
-      one: 'NÃ£o foi possÃ­vel analisar 1 mergulho',
+      other: 'Não foi possível analisar $count mergulhos',
+      one: 'Não foi possível analisar 1 mergulho',
     );
-    return 'AnÃ¡lise concluÃ­da â€” $_temp0';
+    return 'Análise concluída — $_temp0';
   }
 
   @override
@@ -16651,7 +16632,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveDetailSection_sacSegments_name =>
-      'Consumo de gÃ¡s por segmento';
+      'Consumo de gás por segmento';
 
   @override
   String get diveDetailSection_sacSegments_description =>
@@ -16686,27 +16667,27 @@ class AppLocalizationsPt extends AppLocalizations {
       'Grafico do ciclo de mare e horarios';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'CondiÃ§Ãµes da Ã¡gua';
+  String get diveDetailSection_reefHealth_name => 'Condições da água';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'CondiÃ§Ãµes da Ã¡gua por satÃ©lite na data do mergulho';
+      'Condições da água por satélite na data do mergulho';
 
   @override
-  String get diveDetailSection_surfaceGps_name => 'GPS de superfÃ­cie';
+  String get diveDetailSection_surfaceGps_name => 'GPS de superfície';
 
   @override
   String get diveDetailSection_surfaceGps_description =>
-      'Pontos de entrada/saÃ­da por GPS e deriva na superfÃ­cie';
+      'Pontos de entrada/saída por GPS e deriva na superfície';
 
   @override
-  String get diveLog_detail_section_surfaceGps => 'GPS de superfÃ­cie';
+  String get diveLog_detail_section_surfaceGps => 'GPS de superfície';
 
   @override
   String get diveLog_detail_surfaceGps_entry => 'Entrada';
 
   @override
-  String get diveLog_detail_surfaceGps_exit => 'SaÃ­da';
+  String get diveLog_detail_surfaceGps_exit => 'Saída';
 
   @override
   String get diveLog_detail_label_drift => 'Deriva';
@@ -16716,13 +16697,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'Ponto de entrada registrado';
 
   @override
-  String get diveLog_detail_surfaceGps_exitOnly => 'Ponto de saÃ­da registrado';
+  String get diveLog_detail_surfaceGps_exitOnly => 'Ponto de saída registrado';
 
   @override
   String get diveLog_detail_surfaceGps_site => 'Ponto de mergulho';
 
   @override
-  String get diveLog_detail_surfaceGps_track => 'Trilha de superfÃ­cie';
+  String get diveLog_detail_surfaceGps_track => 'Trilha de superfície';
 
   @override
   String get diveLog_detail_surfaceGps_showFullTrack => 'Trilha completa';
@@ -16743,7 +16724,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_detail_coordinatesCopied =>
-      'Coordenadas copiadas para a Ã¡rea de transferÃªncia';
+      'Coordenadas copiadas para a área de transferência';
 
   @override
   String get diveLog_detail_openInMaps => 'Abrir no Mapas';
@@ -16760,29 +16741,29 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveDetailSection_buoyancy_description =>
-      'Flutuabilidade durante o mergulho, variaÃ§Ã£o, lastro descartÃ¡vel';
+      'Flutuabilidade durante o mergulho, variação, lastro descartável';
 
   @override
   String get buoyancy_tooltip =>
-      'Flutuabilidade lÃ­quida modelada durante o mergulho a partir do perfil, consumo de gÃ¡s e equipamento.';
+      'Flutuabilidade líquida modelada durante o mergulho a partir do perfil, consumo de gás e equipamento.';
 
   @override
   String buoyancy_verdictBuoyant(String depth, String amount) {
-    return 'Na sua Ãºltima parada (~$depth) vocÃª tinha cerca de $amount de flutuabilidade';
+    return 'Na sua última parada (~$depth) você tinha cerca de $amount de flutuabilidade';
   }
 
   @override
   String buoyancy_verdictHeavy(String depth, String amount) {
-    return 'Na sua Ãºltima parada (~$depth) vocÃª estava cerca de $amount pesado demais';
+    return 'Na sua última parada (~$depth) você estava cerca de $amount pesado demais';
   }
 
   @override
   String get buoyancy_verdictNeutral =>
-      'Sua configuraÃ§Ã£o estava quase neutra na Ãºltima parada';
+      'Sua configuração estava quase neutra na última parada';
 
   @override
   String get buoyancy_verdictConvention =>
-      'Estimado pela convenÃ§Ã£o de parada de seguranÃ§a a 5 m';
+      'Estimado pela convenção de parada de segurança a 5 m';
 
   @override
   String get buoyancy_breakdownTitle => 'Detalhe dos termos';
@@ -16794,47 +16775,46 @@ class AppLocalizationsPt extends AppLocalizations {
   String get buoyancy_leadTerm => 'Lastro';
 
   @override
-  String get buoyancy_beginNet => 'InÃ­cio do mergulho';
+  String get buoyancy_beginNet => 'Início do mergulho';
 
   @override
   String get buoyancy_endNet => 'Fim do mergulho';
 
   @override
-  String get buoyancy_swing => 'VariaÃ§Ã£o de flutuabilidade';
+  String get buoyancy_swing => 'Variação de flutuabilidade';
 
   @override
-  String get buoyancy_peakLift => 'SustentaÃ§Ã£o mÃ¡xima necessÃ¡ria';
+  String get buoyancy_peakLift => 'Sustentação máxima necessária';
 
   @override
-  String get buoyancy_wingWarning =>
-      'Excede a sustentaÃ§Ã£o nominal do seu wing';
+  String get buoyancy_wingWarning => 'Excede a sustentação nominal do seu wing';
 
   @override
-  String get buoyancy_minDitchable => 'Lastro descartÃ¡vel mÃ­nimo';
+  String get buoyancy_minDitchable => 'Lastro descartável mínimo';
 
   @override
-  String get buoyancy_droppable => 'VocÃª pode soltar';
+  String get buoyancy_droppable => 'Você pode soltar';
 
   @override
-  String get buoyancy_ditchWarning => 'Mais do que vocÃª pode soltar';
+  String get buoyancy_ditchWarning => 'Mais do que você pode soltar';
 
   @override
-  String get buoyancy_drysuitGas => 'GÃ¡s de roupa seca adicionado';
+  String get buoyancy_drysuitGas => 'Gás de roupa seca adicionado';
 
   @override
   String get buoyancy_estimatedPressures =>
-      'As pressÃµes dos cilindros sÃ£o estimadas';
+      'As pressões dos cilindros são estimadas';
 
   @override
   String get buoyancy_linkSuitHint =>
-      'Associe uma roupa de exposiÃ§Ã£o a este mergulho para um quadro mais completo';
+      'Associe uma roupa de exposição a este mergulho para um quadro mais completo';
 
   @override
   String get buoyancy_noLeadHint =>
       'Nenhum lastro registado: adicione lastro a este mergulho ou um peso seco ao seu equipamento de lastro';
 
   @override
-  String get buoyancy_chartNet => 'LÃ­quido';
+  String get buoyancy_chartNet => 'Líquido';
 
   @override
   String get buoyancy_chartRig => 'Equipamento + lastro';
@@ -16843,7 +16823,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get buoyancy_chartMinutes => 'Tempo (min)';
 
   @override
-  String get buoyancy_historyTitle => 'HistÃ³rico de lastro';
+  String get buoyancy_historyTitle => 'Histórico de lastro';
 
   @override
   String get buoyancy_historyCarried => 'Levado';
@@ -16853,12 +16833,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String buoyancy_historyMore(String delta) {
-    return 'VocÃª costuma levar $delta a mais do que o modelo sugere';
+    return 'Você costuma levar $delta a mais do que o modelo sugere';
   }
 
   @override
   String buoyancy_historyLess(String delta) {
-    return 'VocÃª costuma levar $delta a menos do que o modelo sugere';
+    return 'Você costuma levar $delta a menos do que o modelo sugere';
   }
 
   @override
@@ -16913,7 +16893,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Equipamento utilizado no mergulho';
 
   @override
-  String get diveDetailSection_sightings_name => 'Avistamentos de EspÃ©cies';
+  String get diveDetailSection_sightings_name => 'Avistamentos de Espécies';
 
   @override
   String get diveDetailSection_sightings_description =>
@@ -16957,23 +16937,22 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get siteDetailSection_map_description =>
-      'PrÃ©-visualizaÃ§Ã£o do mapa da localizaÃ§Ã£o do ponto';
+      'Pré-visualização do mapa da localização do ponto';
 
   @override
   String get siteDetailSection_diveStatistics_description =>
-      'NÃºmero de mergulhos, profundidades alcanÃ§adas, mergulhos mais longos e mais recentes';
+      'Número de mergulhos, profundidades alcançadas, mergulhos mais longos e mais recentes';
 
   @override
-  String get siteDetailSection_description_description =>
-      'DescriÃ§Ã£o do ponto';
+  String get siteDetailSection_description_description => 'Descrição do ponto';
 
   @override
   String get siteDetailSection_location_description =>
-      'PaÃ­s, regiÃ£o, corpo de Ã¡gua, coordenadas GPS';
+      'País, região, corpo de água, coordenadas GPS';
 
   @override
   String get siteDetailSection_depth_description =>
-      'Faixa de profundidade indicada e profundidades alcanÃ§adas nos mergulhos';
+      'Faixa de profundidade indicada e profundidades alcançadas nos mergulhos';
 
   @override
   String get siteDetailSection_altitude_description =>
@@ -16985,45 +16964,44 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get siteDetailSection_tide_description =>
-      'GrÃ¡fico do ciclo de marÃ© e horÃ¡rios';
+      'Gráfico do ciclo de maré e horários';
 
   @override
   String get siteDetailSection_reefHealth_description =>
-      'CondiÃ§Ãµes da Ã¡gua por satÃ©lite no ponto';
+      'Condições da água por satélite no ponto';
 
   @override
   String get siteDetailSection_marineLife_description =>
-      'EspÃ©cies vistas neste ponto';
+      'Espécies vistas neste ponto';
 
   @override
   String get siteDetailSection_media_description =>
-      'Fotos, vÃ­deos e documentos do ponto';
+      'Fotos, vídeos e documentos do ponto';
 
   @override
   String get siteDetailSection_tags_description => 'Tags deste ponto';
 
   @override
   String get siteDetailSection_difficulty_description =>
-      'NÃ­vel de dificuldade do ponto';
+      'Nível de dificuldade do ponto';
 
   @override
-  String get siteDetailSection_rating_description => 'Sua avaliaÃ§Ã£o do ponto';
+  String get siteDetailSection_rating_description => 'Sua avaliação do ponto';
 
   @override
   String get siteDetailSection_hazards_description =>
-      'Perigos e notas de seguranÃ§a';
+      'Perigos e notas de segurança';
 
   @override
   String get siteDetailSection_access_description =>
-      'Entrada e saÃ­da, estacionamento, amarraÃ§Ã£o, notas de acesso';
+      'Entrada e saída, estacionamento, amarração, notas de acesso';
 
   @override
   String get siteDetailSection_notes_description =>
-      'Suas observaÃ§Ãµes sobre o ponto';
+      'Suas observações sobre o ponto';
 
   @override
-  String get settings_siteDetailSections_title =>
-      'SeÃ§Ãµes de detalhes do ponto';
+  String get settings_siteDetailSections_title => 'Seções de detalhes do ponto';
 
   @override
   String get settings_appearance_header_siteDetails => 'Detalhes do Ponto';
@@ -17106,7 +17084,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_estimatedTankPressure =>
-      'PressÃ£o estimada do cilindro';
+      'Pressão estimada do cilindro';
 
   @override
   String get settings_appearance_metric_gasDensity => 'Densidade do Gas';
@@ -17136,7 +17114,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_appearance_metric_pressure => 'Pressao';
 
   @override
-  String get settings_appearance_metric_sacRate => 'Consumo de gÃ¡s';
+  String get settings_appearance_metric_sacRate => 'Consumo de gás';
 
   @override
   String get settings_appearance_metric_surfaceGf => 'GF de Superficie';
@@ -17148,7 +17126,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_appearance_metric_tts => 'TTS (Tempo ate a Superficie)';
 
   @override
-  String get settings_appearance_metric_gtr => 'GTR (Tempo de gÃ¡s restante)';
+  String get settings_appearance_metric_gtr => 'GTR (Tempo de gás restante)';
 
   @override
   String get settings_appearance_metric_cns => 'CNS% (Toxicidade de O2)';
@@ -17179,11 +17157,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_appearance_metricsFollowViewport =>
-      'Manter as sobreposiÃ§Ãµes visÃ­veis ao ampliar';
+      'Manter as sobreposições visíveis ao ampliar';
 
   @override
   String get settings_appearance_metricsFollowViewport_subtitle =>
-      'Ajustar as sobreposiÃ§Ãµes como NDL e ppO2 Ã  Ã¡rea visÃ­vel em vez de ampliÃ¡-las com o eixo de profundidade';
+      'Ajustar as sobreposições como NDL e ppO2 à área visível em vez de ampliá-las com o eixo de profundidade';
 
   @override
   String get settings_appearance_rightYAxisMetric =>
@@ -17223,7 +17201,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_appearance_theme_system => 'Padrao do sistema';
 
   @override
-  String get settings_navCustomization_title => 'Layout de navegaÃ§Ã£o';
+  String get settings_navCustomization_title => 'Layout de navegação';
 
   @override
   String get settings_navCustomization_description =>
@@ -17231,7 +17209,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_navCustomization_descriptionDesktop =>
-      'Arraste os itens para reordenar a barra lateral. O InÃ­cio fica sempre no topo.';
+      'Arraste os itens para reordenar a barra lateral. O Início fica sempre no topo.';
 
   @override
   String get settings_navCustomization_scopePhone => 'Telefone';
@@ -17265,7 +17243,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String second,
     String third,
   ) {
-    return '$first Â· $second Â· $third';
+    return '$first · $second · $third';
   }
 
   @override
@@ -17307,7 +17285,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_entry_subtitle =>
-      'SincronizaÃ§Ã£o via armazenamento na nuvem';
+      'Sincronização via armazenamento na nuvem';
 
   @override
   String get settings_cloudSync_adopt_confirm =>
@@ -17318,7 +17296,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String deviceName,
     String date,
   ) {
-    return 'A biblioteca foi substituÃ­da a partir de um backup em \"$deviceName\" ($date). Ao adotÃ¡-la, os dados deste dispositivo serÃ£o substituÃ­dos pela biblioteca restaurada. Primeiro serÃ¡ criado um backup de seguranÃ§a dos dados atuais deste dispositivo.';
+    return 'A biblioteca foi substituída a partir de um backup em \"$deviceName\" ($date). Ao adotá-la, os dados deste dispositivo serão substituídos pela biblioteca restaurada. Primeiro será criado um backup de segurança dos dados atuais deste dispositivo.';
   }
 
   @override
@@ -17326,7 +17304,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Adotar a biblioteca restaurada?';
 
   @override
-  String get settings_cloudSync_adopt_notNow => 'Agora nÃ£o';
+  String get settings_cloudSync_adopt_notNow => 'Agora não';
 
   @override
   String get settings_cloudSync_dangerZone => 'Zona de perigo';
@@ -17353,9 +17331,9 @@ class AppLocalizationsPt extends AppLocalizations {
       diveCount,
       locale: localeName,
       other:
-          'A biblioteca na nuvem Ã© apagada e substituÃ­da pelos $diveCount mergulhos deste dispositivo.',
+          'A biblioteca na nuvem é apagada e substituída pelos $diveCount mergulhos deste dispositivo.',
       one:
-          'A biblioteca na nuvem Ã© apagada e substituÃ­da pelo 1 mergulho deste dispositivo.',
+          'A biblioteca na nuvem é apagada e substituída pelo 1 mergulho deste dispositivo.',
     );
     return '$_temp0';
   }
@@ -17366,22 +17344,22 @@ class AppLocalizationsPt extends AppLocalizations {
       peerCount,
       locale: localeName,
       other:
-          'SerÃ¡ pedido a $peerCount outros dispositivos que a adotem; atÃ© lÃ¡, as suas alteraÃ§Ãµes nÃ£o sÃ£o combinadas.',
+          'Será pedido a $peerCount outros dispositivos que a adotem; até lá, as suas alterações não são combinadas.',
       one:
-          'SerÃ¡ pedido a 1 outro dispositivo que a adote; atÃ© lÃ¡, as suas alteraÃ§Ãµes nÃ£o sÃ£o combinadas.',
+          'Será pedido a 1 outro dispositivo que a adote; até lá, as suas alterações não são combinadas.',
       zero:
-          'Nenhum outro dispositivo sincroniza ainda, portanto nÃ£o hÃ¡ nada para adotar.',
+          'Nenhum outro dispositivo sincroniza ainda, portanto não há nada para adotar.',
     );
     return '$_temp0';
   }
 
   @override
   String get settings_cloudSync_replaceLibrary_peersUnknown =>
-      'SerÃ¡ pedido a todos os outros dispositivos que a adotem; atÃ© lÃ¡, as suas alteraÃ§Ãµes nÃ£o sÃ£o combinadas.';
+      'Será pedido a todos os outros dispositivos que a adotem; até lá, as suas alterações não são combinadas.';
 
   @override
   String get settings_cloudSync_replaceLibrary_backupNote =>
-      'Primeiro Ã© criada uma cÃ³pia de seguranÃ§a deste dispositivo. Esta aÃ§Ã£o nÃ£o pode ser anulada.';
+      'Primeiro é criada uma cópia de segurança deste dispositivo. Esta ação não pode ser anulada.';
 
   @override
   String get settings_cloudSync_replaceLibrary_confirmWord => 'Substituir';
@@ -17395,7 +17373,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_firstSync_banner =>
-      'A primeira sincronizaÃ§Ã£o estÃ¡ aguardando confirmaÃ§Ã£o. Toque em \'Sincronizar Agora\' para revisar o que serÃ¡ combinado.';
+      'A primeira sincronização está aguardando confirmação. Toque em \'Sincronizar Agora\' para revisar o que será combinado.';
 
   @override
   String get settings_cloudSync_firstSync_dialogConfirm =>
@@ -17403,14 +17381,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_firstSync_replaceHint =>
-      'Se, em vez disso, a biblioteca deste dispositivo deve substituir a que estÃ¡ na nuvem, cancele e use DefiniÃ§Ãµes > SincronizaÃ§Ã£o na nuvem > Substituir biblioteca na nuvem.';
+      'Se, em vez disso, a biblioteca deste dispositivo deve substituir a que está na nuvem, cancele e use Definições > Sincronização na nuvem > Substituir biblioteca na nuvem.';
 
   @override
   String settings_cloudSync_firstSync_dialogContent(
     int deviceCount,
     int diveCount,
   ) {
-    return 'Foram encontrados dados de sincronizaÃ§Ã£o existentes na nuvem ($deviceCount arquivo(s) de sincronizaÃ§Ã£o). Sua primeira sincronizaÃ§Ã£o combinarÃ¡ esses dados com os $diveCount mergulho(s) neste dispositivo, em todos os dispositivos sincronizados.\n\nSe os mesmos mergulhos foram adicionados separadamente em cada dispositivo, eles aparecerÃ£o duas vezes.';
+    return 'Foram encontrados dados de sincronização existentes na nuvem ($deviceCount arquivo(s) de sincronização). Sua primeira sincronização combinará esses dados com os $diveCount mergulho(s) neste dispositivo, em todos os dispositivos sincronizados.\n\nSe os mesmos mergulhos foram adicionados separadamente em cada dispositivo, eles aparecerão duas vezes.';
   }
 
   @override
@@ -17419,19 +17397,19 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String settings_cloudSync_replace_banner(String deviceName) {
-    return 'SincronizaÃ§Ã£o pausada: a biblioteca foi substituÃ­da a partir de um backup em \"$deviceName\". Toque em Sincronizar agora para revisar.';
+    return 'Sincronização pausada: a biblioteca foi substituída a partir de um backup em \"$deviceName\". Toque em Sincronizar agora para revisar.';
   }
 
   @override
   String get settings_cloudSync_switch_dialogTitle =>
-      'Trocar de provedor de sincronizaÃ§Ã£o?';
+      'Trocar de provedor de sincronização?';
 
   @override
   String settings_cloudSync_switch_dialogContent(
     String fromName,
     String toName,
   ) {
-    return 'Seus dados nÃ£o serÃ£o removidos de $fromName â€” eles permanecem lÃ¡ atÃ© que vocÃª os exclua. ApÃ³s a troca, a prÃ³xima sincronizaÃ§Ã£o deste dispositivo combinarÃ¡ seus dados com o que jÃ¡ existir em $toName. Seus outros dispositivos continuarÃ£o usando $fromName atÃ© que vocÃª troque cada um deles tambÃ©m.';
+    return 'Seus dados não serão removidos de $fromName — eles permanecem lá até que você os exclua. Após a troca, a próxima sincronização deste dispositivo combinará seus dados com o que já existir em $toName. Seus outros dispositivos continuarão usando $fromName até que você troque cada um deles também.';
   }
 
   @override
@@ -17442,7 +17420,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String deviceName,
     String destination,
   ) {
-    return '$deviceName moveu esta biblioteca para $destination. Este provedor nÃ£o estÃ¡ mais sendo atualizado por ele. Selecione $destination abaixo para acompanhar a mudanÃ§a.';
+    return '$deviceName moveu esta biblioteca para $destination. Este provedor não está mais sendo atualizado por ele. Selecione $destination abaixo para acompanhar a mudança.';
   }
 
   @override
@@ -17450,7 +17428,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String settings_cloudSync_cleanup_banner(String backend) {
-    return 'Dados de sincronizaÃ§Ã£o antigos ainda estÃ£o armazenados em $backend de antes de vocÃª trocar de provedor. Eles nÃ£o sÃ£o mais usados.';
+    return 'Dados de sincronização antigos ainda estão armazenados em $backend de antes de você trocar de provedor. Eles não são mais usados.';
   }
 
   @override
@@ -17464,7 +17442,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_signOut_backupWarning =>
-      'O backup na nuvem serÃ¡ desativado e os backups serÃ£o salvos no local padrÃ£o.';
+      'O backup na nuvem será desativado e os backups serão salvos no local padrão.';
 
   @override
   String get settings_cloudSync_header_cloudProvider => 'Provedor de Nuvem';
@@ -17496,12 +17474,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList) {
-    return '$deviceList ainda tem uma versÃ£o de biblioteca antiga ou desconhecida, portanto as suas alteraÃ§Ãµes nÃ£o foram combinadas. Abra o Submersion nele para adotar a biblioteca atual.';
+    return '$deviceList ainda tem uma versão de biblioteca antiga ou desconhecida, portanto as suas alterações não foram combinadas. Abra o Submersion nele para adotar a biblioteca atual.';
   }
 
   @override
   String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList) {
-    return '$deviceList ainda tÃªm uma versÃ£o de biblioteca antiga ou desconhecida, portanto as suas alteraÃ§Ãµes nÃ£o foram combinadas. Abra o Submersion neles para adotar a biblioteca atual.';
+    return '$deviceList ainda têm uma versão de biblioteca antiga ou desconhecida, portanto as suas alterações não foram combinadas. Abra o Submersion neles para adotar a biblioteca atual.';
   }
 
   @override
@@ -17517,24 +17495,24 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
-    return 'As alteraÃ§Ãµes de $deviceList nÃ£o puderam ser lidas durante a Ãºltima sincronizaÃ§Ã£o, por isso nÃ£o foram mescladas. A prÃ³xima sincronizaÃ§Ã£o tentarÃ¡ novamente automaticamente.';
+    return 'As alterações de $deviceList não puderam ser lidas durante a última sincronização, por isso não foram mescladas. A próxima sincronização tentará novamente automaticamente.';
   }
 
   @override
   String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
-    return 'As alteraÃ§Ãµes de $deviceList nÃ£o puderam ser lidas durante a Ãºltima sincronizaÃ§Ã£o, por isso nÃ£o foram mescladas. A prÃ³xima sincronizaÃ§Ã£o tentarÃ¡ novamente automaticamente.';
+    return 'As alterações de $deviceList não puderam ser lidas durante a última sincronização, por isso não foram mescladas. A próxima sincronização tentará novamente automaticamente.';
   }
 
   @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
-    return '$deviceList sincroniza a partir de uma versÃ£o mais recente do Submersion, por isso as suas alteraÃ§Ãµes mais recentes ficam retidas por agora.';
+    return '$deviceList sincroniza a partir de uma versão mais recente do Submersion, por isso as suas alterações mais recentes ficam retidas por agora.';
   }
 
   @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
     Object deviceList,
   ) {
-    return '$deviceList sincronizam a partir de uma versÃ£o mais recente do Submersion, por isso as suas alteraÃ§Ãµes mais recentes ficam retidas por agora.';
+    return '$deviceList sincronizam a partir de uma versão mais recente do Submersion, por isso as suas alterações mais recentes ficam retidas por agora.';
   }
 
   @override
@@ -17543,7 +17521,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_peerRequiresUpdate_storeAction =>
-      'SerÃ£o aplicadas automaticamente quando a atualizaÃ§Ã£o da loja de aplicaÃ§Ãµes deste dispositivo chegar; a atualizaÃ§Ã£o pode ainda estar em revisÃ£o.';
+      'Serão aplicadas automaticamente quando a atualização da loja de aplicações deste dispositivo chegar; a atualização pode ainda estar em revisão.';
 
   @override
   String get settings_cloudSync_provider_connected => 'Conectado';
@@ -17566,20 +17544,20 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_dropbox_connect_codeLabel =>
-      'CÃ³digo de autorizaÃ§Ã£o';
+      'Código de autorização';
 
   @override
   String get settings_cloudSync_dropbox_connect_emptyCode =>
-      'Insira o cÃ³digo de autorizaÃ§Ã£o exibido no seu navegador';
+      'Insira o código de autorização exibido no seu navegador';
 
   @override
   String settings_cloudSync_dropbox_connect_failed(Object error) {
-    return 'NÃ£o foi possÃ­vel conectar ao Dropbox: $error';
+    return 'Não foi possível conectar ao Dropbox: $error';
   }
 
   @override
   String get settings_cloudSync_dropbox_connect_instructions =>
-      'Seu navegador abriu uma pÃ¡gina de autorizaÃ§Ã£o do Dropbox. Aprove o acesso e cole aqui o cÃ³digo exibido pelo Dropbox.';
+      'Seu navegador abriu uma página de autorização do Dropbox. Aprove o acesso e cole aqui o código exibido pelo Dropbox.';
 
   @override
   String get settings_cloudSync_dropbox_connect_reopenBrowser =>
@@ -17618,7 +17596,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_googleDrive_desktopNotConfigured =>
-      'IndisponÃ­vel nesta versÃ£o';
+      'Indisponível nesta versão';
 
   @override
   String get settings_cloudSync_googleDrive_browserWait_title =>
@@ -17626,7 +17604,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_googleDrive_browserWait_message =>
-      'Conclua a autenticaÃ§Ã£o com a sua conta Google no navegador e depois regresse ao Submersion.';
+      'Conclua a autenticação com a sua conta Google no navegador e depois regresse ao Submersion.';
 
   @override
   String get settings_cloudSync_provider_icloud => 'iCloud';
@@ -17641,16 +17619,15 @@ class AppLocalizationsPt extends AppLocalizations {
       'Nao disponivel nesta plataforma';
 
   @override
-  String get settings_cloudSync_provider_s3_edit =>
-      'Editar configuraÃ§Ã£o do S3';
+  String get settings_cloudSync_provider_s3_edit => 'Editar configuração do S3';
 
   @override
   String get settings_cloudSync_provider_s3_subtitle =>
-      'Funciona com qualquer serviÃ§o de armazenamento compatÃ­vel com S3';
+      'Funciona com qualquer serviço de armazenamento compatível com S3';
 
   @override
   String get settings_cloudSync_provider_s3_title =>
-      'Armazenamento compatÃ­vel com S3';
+      'Armazenamento compatível com S3';
 
   @override
   String get settings_cloudSync_resetDialog_cancel => 'Cancelar';
@@ -17693,7 +17670,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_signOutDialog_content =>
-      'Isso desconectara do provedor de nuvem. Seus dados locais permanecerÃ£o intactos.';
+      'Isso desconectara do provedor de nuvem. Seus dados locais permanecerão intactos.';
 
   @override
   String get settings_cloudSync_signOutDialog_signOut => 'Sair';
@@ -18132,14 +18109,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_decompression_header_oxygenToxicity =>
-      'Toxicidade do oxigÃªnio';
+      'Toxicidade do oxigênio';
 
   @override
   String get settings_decompression_ppO2LimitsTitle => 'Limites de ppO2';
 
   @override
   String settings_decompression_ppO2LimitsSubtitle(String working, String max) {
-    return 'Trabalho $working bar Â· MÃ¡x $max bar';
+    return 'Trabalho $working bar · Máx $max bar';
   }
 
   @override
@@ -18147,21 +18124,21 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_decompression_ppO2Dialog_info =>
-      'Os limites de ppO2 usados para a MOD, o planeamento de gÃ¡s e os avisos de toxicidade do oxigÃ©nio. Defina-os de acordo com os limites configurados no seu computador de mergulho.';
+      'Os limites de ppO2 usados para a MOD, o planeamento de gás e os avisos de toxicidade do oxigénio. Defina-os de acordo com os limites configurados no seu computador de mergulho.';
 
   @override
   String get settings_decompression_ppO2Dialog_working => 'ppO2 de trabalho';
 
   @override
   String get settings_decompression_ppO2Dialog_workingHint =>
-      'GÃ¡s de fundo, parte ativa do mergulho';
+      'Gás de fundo, parte ativa do mergulho';
 
   @override
-  String get settings_decompression_ppO2Dialog_max => 'ppO2 mÃ¡xima';
+  String get settings_decompression_ppO2Dialog_max => 'ppO2 máxima';
 
   @override
   String get settings_decompression_ppO2Dialog_maxHint =>
-      'DescompressÃ£o e contingÃªncia';
+      'Descompressão e contingência';
 
   @override
   String settings_decompression_preset_selectLabel(Object presetName) {
@@ -18189,23 +18166,23 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_decompression_endLimit_dialog_title => 'Limite END';
 
   @override
-  String get settings_decompression_cnsMethodTitle => 'CÃ¡lculo de CNS';
+  String get settings_decompression_cnsMethodTitle => 'Cálculo de CNS';
 
   @override
   String get settings_decompression_cnsMethodClassic =>
-      'Tabela NOAA, em degraus (clÃ¡ssico)';
+      'Tabela NOAA, em degraus (clássico)';
 
   @override
   String get settings_decompression_cnsMethodClassicDesc =>
-      'Calcula cada faixa de 0,1 bar em sua borda mais rigorosa. MÃ©todo original do Submersion.';
+      'Calcula cada faixa de 0,1 bar em sua borda mais rigorosa. Método original do Submersion.';
 
   @override
   String get settings_decompression_cnsMethodShearwater =>
-      'InterpolaÃ§Ã£o linear (estilo Shearwater)';
+      'Interpolação linear (estilo Shearwater)';
 
   @override
   String get settings_decompression_cnsMethodShearwaterDesc =>
-      'Interpola entre os limites da NOAA conforme documentado pela Shearwater. Corresponde Ã  maioria dos computadores de mergulho.';
+      'Interpola entre os limites da NOAA conforme documentado pela Shearwater. Corresponde à maioria dos computadores de mergulho.';
 
   @override
   String get settings_decompression_cnsMethodSubsurface =>
@@ -18213,25 +18190,25 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_decompression_cnsMethodSubsurfaceDesc =>
-      'Ajuste de curva suave Ã  tabela NOAA. Corresponde ao CNS calculado pelo Subsurface.';
+      'Ajuste de curva suave à tabela NOAA. Corresponde ao CNS calculado pelo Subsurface.';
 
   @override
   String get settings_decompression_cnsMethodAboutTitle =>
-      'Sobre esses mÃ©todos';
+      'Sobre esses métodos';
 
   @override
   String get settings_decompression_cnsMethodAboutBody =>
-      'Os trÃªs mÃ©todos se baseiam nos limites de exposiÃ§Ã£o ao oxigÃªnio do NOAA Diving Manual (300 minutos com ppO2 de 1,0 bar, 45 minutos a 1,6 bar). A tabela define limites apenas em passos de 0,1 bar: o mÃ©todo clÃ¡ssico calcula tudo o que estÃ¡ dentro de uma faixa na borda mais rigorosa da faixa, o que superestima sistematicamente a exposiÃ§Ã£o entre as entradas. Os computadores de mergulho da Shearwater documentam uma interpolaÃ§Ã£o linear entre os limites da NOAA, com um valor fixo de 15% por minuto acima de 1,65 bar. Em 2019, o Subsurface substituiu sua consulta em tabela por um ajuste exponencial suave de dois segmentos aos mesmos dados da NOAA (Robert C. Helling), que tambÃ©m se estende naturalmente alÃ©m de 1,6 bar. Entre as entradas da tabela, os dois mÃ©todos suaves concordam dentro de cerca de um ponto de CNS; o mÃ©todo clÃ¡ssico exibe valores mais altos.';
+      'Os três métodos se baseiam nos limites de exposição ao oxigênio do NOAA Diving Manual (300 minutos com ppO2 de 1,0 bar, 45 minutos a 1,6 bar). A tabela define limites apenas em passos de 0,1 bar: o método clássico calcula tudo o que está dentro de uma faixa na borda mais rigorosa da faixa, o que superestima sistematicamente a exposição entre as entradas. Os computadores de mergulho da Shearwater documentam uma interpolação linear entre os limites da NOAA, com um valor fixo de 15% por minuto acima de 1,65 bar. Em 2019, o Subsurface substituiu sua consulta em tabela por um ajuste exponencial suave de dois segmentos aos mesmos dados da NOAA (Robert C. Helling), que também se estende naturalmente além de 1,6 bar. Entre as entradas da tabela, os dois métodos suaves concordam dentro de cerca de um ponto de CNS; o método clássico exibe valores mais altos.';
 
   @override
   String get settings_decompression_cnsMethodDisclaimer =>
-      'Os nomes se referem aos mÃ©todos publicados dos respectivos projetos e fabricantes; nenhuma afiliaÃ§Ã£o ou endosso estÃ¡ implÃ­cito. Os valores calculados podem diferir das leituras reais do computador de mergulho.';
+      'Os nomes se referem aos métodos publicados dos respectivos projetos e fabricantes; nenhuma afiliação ou endosso está implícito. Os valores calculados podem diferir das leituras reais do computador de mergulho.';
 
   @override
   String get settings_decompression_cnsMethodSourcesTitle => 'Fontes';
 
   @override
-  String get settings_linkOpenFailed => 'NÃ£o foi possÃ­vel abrir o link.';
+  String get settings_linkOpenFailed => 'Não foi possível abrir o link.';
 
   @override
   String get settings_decompression_cnsMethodSourceNoaa =>
@@ -18239,15 +18216,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_decompression_cnsMethodSourceShearwater =>
-      'Shearwater: o relÃ³gio de oxigÃ©nio CNS';
+      'Shearwater: o relógio de oxigénio CNS';
 
   @override
   String get settings_decompression_cnsMethodSourceTheoreticalDiver =>
-      'The Theoretical Diver: cÃ¡lculo da toxicidade CNS do oxigÃ©nio';
+      'The Theoretical Diver: cálculo da toxicidade CNS do oxigénio';
 
   @override
   String get settings_decompression_cnsMethodSourceSubsurface =>
-      'Subsurface: implementaÃ§Ã£o (divelist.cpp)';
+      'Subsurface: implementação (divelist.cpp)';
 
   @override
   String get settings_existingDb_cancel => 'Cancelar';
@@ -18392,10 +18369,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_language_systemDefault => 'Padrao do Sistema';
 
   @override
-  String get settings_lightroom_albumFilter_all => 'CatÃ¡logo inteiro';
+  String get settings_lightroom_albumFilter_all => 'Catálogo inteiro';
 
   @override
-  String get settings_lightroom_albumFilter_title => 'Ãlbuns a analisar';
+  String get settings_lightroom_albumFilter_title => 'Álbuns a analisar';
 
   @override
   String get settings_lightroom_autoPoll_title =>
@@ -18403,7 +18380,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String settings_lightroom_clientId_help(String redirectUri) {
-    return 'Crie uma integraÃ§Ã£o na Adobe Developer Console com a API Lightroom Services e um tipo de credencial compatÃ­vel com PKCE. Insira abaixo a URI de redirecionamento da sua credencial â€” as credenciais de Native App usam um esquema personalizado â€” ou deixe em branco para usar $redirectUri.';
+    return 'Crie uma integração na Adobe Developer Console com a API Lightroom Services e um tipo de credencial compatível com PKCE. Insira abaixo a URI de redirecionamento da sua credencial — as credenciais de Native App usam um esquema personalizado — ou deixe em branco para usar $redirectUri.';
   }
 
   @override
@@ -18425,24 +18402,24 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_lightroom_advancedByo =>
-      'Usar suas prÃ³prias credenciais da Adobe';
+      'Usar suas próprias credenciais da Adobe';
 
   @override
   String get settings_lightroom_connect_codeLabel =>
-      'URL redirecionada ou cÃ³digo';
+      'URL redirecionada ou código';
 
   @override
   String get settings_lightroom_connect_emptyCode =>
-      'Cole a URL redirecionada ou o cÃ³digo de autorizaÃ§Ã£o';
+      'Cole a URL redirecionada ou o código de autorização';
 
   @override
   String settings_lightroom_connect_failed(String error) {
-    return 'NÃ£o foi possÃ­vel conectar ao Lightroom: $error';
+    return 'Não foi possível conectar ao Lightroom: $error';
   }
 
   @override
   String get settings_lightroom_connect_instructions =>
-      'Inicie sessÃ£o na Adobe na janela do navegador e cole o endereÃ§o completo da pÃ¡gina em que vocÃª chegar (ele contÃ©m o cÃ³digo de autorizaÃ§Ã£o).';
+      'Inicie sessão na Adobe na janela do navegador e cole o endereço completo da página em que você chegar (ele contém o código de autorização).';
 
   @override
   String get settings_lightroom_connect_reopenBrowser => 'Reabrir navegador';
@@ -18463,7 +18440,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_lightroom_disconnect_confirmBody =>
-      'As fotos vinculadas permanecem nos seus mergulhos e continuam sendo exibidas a partir do armazenamento de mÃ­dia. Novas fotos nÃ£o serÃ£o mais vinculadas.';
+      'As fotos vinculadas permanecem nos seus mergulhos e continuam sendo exibidas a partir do armazenamento de mídia. Novas fotos não serão mais vinculadas.';
 
   @override
   String get settings_lightroom_disconnect_confirmTitle =>
@@ -18471,11 +18448,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String settings_lightroom_lastPoll(String when) {
-    return 'Ãšltima verificaÃ§Ã£o: $when';
+    return 'Última verificação: $when';
   }
 
   @override
-  String get settings_lightroom_needsReauth => 'ReconexÃ£o necessÃ¡ria';
+  String get settings_lightroom_needsReauth => 'Reconexão necessária';
 
   @override
   String get settings_lightroom_scanNow => 'Analisar Lightroom';
@@ -18489,30 +18466,30 @@ class AppLocalizationsPt extends AppLocalizations {
     int suggested,
     int skipped,
   ) {
-    return '$attached vinculadas, $suggested sugeridas, $skipped jÃ¡ vinculadas';
+    return '$attached vinculadas, $suggested sugeridas, $skipped já vinculadas';
   }
 
   @override
   String get settings_lightroom_subtitle =>
-      'Vincular fotos e vÃ­deos aos mergulhos automaticamente';
+      'Vincular fotos e vídeos aos mergulhos automaticamente';
 
   @override
   String get settings_lightroom_title => 'Adobe Lightroom';
 
   @override
   String get settings_manage_checklistTemplates =>
-      'Modelos de Lista de VerificaÃ§Ã£o de Viagem';
+      'Modelos de Lista de Verificação de Viagem';
 
   @override
   String get settings_manage_checklistTemplates_subtitle =>
-      'Listas de tarefas reutilizÃ¡veis para planejamento de viagens';
+      'Listas de tarefas reutilizáveis para planejamento de viagens';
 
   @override
-  String get settings_manage_diveRoles => 'FunÃ§Ãµes de Mergulho';
+  String get settings_manage_diveRoles => 'Funções de Mergulho';
 
   @override
   String get settings_manage_diveRoles_subtitle =>
-      'Gerenciar funÃ§Ãµes de mergulho personalizadas';
+      'Gerenciar funções de mergulho personalizadas';
 
   @override
   String get settings_manage_diveTypes => 'Tipos de Mergulho';
@@ -18536,7 +18513,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_manage_species_subtitle =>
-      'Gerenciar o catÃ¡logo de espÃ©cies';
+      'Gerenciar o catálogo de espécies';
 
   @override
   String get settings_manage_tags => 'Etiquetas';
@@ -18553,18 +18530,18 @@ class AppLocalizationsPt extends AppLocalizations {
       'Gerenciar configuracoes personalizadas de cilindro';
 
   @override
-  String get settings_manage_weightPresets => 'PredefiniÃ§Ãµes de lastro';
+  String get settings_manage_weightPresets => 'Predefinições de lastro';
 
   @override
   String get settings_manage_weightPresets_subtitle =>
-      'Conjuntos de pesos reutilizÃ¡veis para um mergulho';
+      'Conjuntos de pesos reutilizáveis para um mergulho';
 
   @override
-  String get weightPresets_page_title => 'PredefiniÃ§Ãµes de lastro';
+  String get weightPresets_page_title => 'Predefinições de lastro';
 
   @override
   String get weightPresets_page_empty =>
-      'Guarde um lastro no editor de mergulho e ele aparecerÃ¡ aqui para reutilizar.';
+      'Guarde um lastro no editor de mergulho e ele aparecerá aqui para reutilizar.';
 
   @override
   String get weightPresets_action_rename => 'Renomear';
@@ -18595,22 +18572,22 @@ class AppLocalizationsPt extends AppLocalizations {
       'This weighting rig no longer exists.';
 
   @override
-  String get weightPresets_rename_title => 'Renomear predefiniÃ§Ã£o';
+  String get weightPresets_rename_title => 'Renomear predefinição';
 
   @override
-  String get weightPresets_delete_title => 'Eliminar esta predefiniÃ§Ã£o?';
+  String get weightPresets_delete_title => 'Eliminar esta predefinição?';
 
   @override
   String weightPresets_delete_body(Object name) {
-    return 'â€œ$nameâ€ serÃ¡ removida. Os mergulhos que a usaram mantÃªm os seus prÃ³prios pesos.';
+    return '“$name” será removida. Os mergulhos que a usaram mantêm os seus próprios pesos.';
   }
 
   @override
-  String get settings_manage_serviceTypes => 'Tipos de manutenÃ§Ã£o';
+  String get settings_manage_serviceTypes => 'Tipos de manutenção';
 
   @override
   String get settings_manage_serviceTypes_subtitle =>
-      'A manutenÃ§Ã£o de que o seu equipamento precisa, e com que frequÃªncia';
+      'A manutenção de que o seu equipamento precisa, e com que frequência';
 
   @override
   String get settings_migrationProgress_doNotClose =>
@@ -18813,21 +18790,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_profileHub_switchDiver => 'Trocar de Mergulhador';
 
   @override
-  String get settings_s3Config_action_remove => 'Remover configuraÃ§Ã£o';
+  String get settings_s3Config_action_remove => 'Remover configuração';
 
   @override
-  String get settings_s3Config_action_testConnection => 'Testar conexÃ£o';
+  String get settings_s3Config_action_testConnection => 'Testar conexão';
 
   @override
-  String get settings_s3Config_advanced_title => 'AvanÃ§ado';
+  String get settings_s3Config_advanced_title => 'Avançado';
 
   @override
   String get settings_s3Config_appBar_title =>
-      'Armazenamento compatÃ­vel com S3';
+      'Armazenamento compatível com S3';
 
   @override
   String get settings_s3Config_error_secureStorage =>
-      'NÃ£o foi possÃ­vel acessar o armazenamento seguro';
+      'Não foi possível acessar o armazenamento seguro';
 
   @override
   String get settings_s3Config_field_accessKeyId_label => 'Access Key ID';
@@ -18844,7 +18821,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_s3Config_field_pathStyle_label =>
-      'Usar endereÃ§amento path-style';
+      'Usar endereçamento path-style';
 
   @override
   String get settings_s3Config_field_pathStyle_subtitle =>
@@ -18859,7 +18836,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get settings_s3Config_field_region_label => 'RegiÃ£o';
+  String get settings_s3Config_field_region_label => 'Região';
 
   @override
   String get settings_s3Config_field_secretAccessKey_label =>
@@ -18870,40 +18847,40 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_s3Config_remove_confirm_body =>
-      'A sincronizaÃ§Ã£o via S3 serÃ¡ interrompida neste dispositivo. Seus dados no bucket nÃ£o sÃ£o excluÃ­dos.';
+      'A sincronização via S3 será interrompida neste dispositivo. Seus dados no bucket não são excluídos.';
 
   @override
   String get settings_s3Config_remove_confirm_title =>
-      'Remover a configuraÃ§Ã£o do S3?';
+      'Remover a configuração do S3?';
 
   @override
-  String get settings_s3Config_removed => 'ConfiguraÃ§Ã£o do S3 removida';
+  String get settings_s3Config_removed => 'Configuração do S3 removida';
 
   @override
-  String get settings_s3Config_saved => 'ConfiguraÃ§Ã£o do S3 salva';
+  String get settings_s3Config_saved => 'Configuração do S3 salva';
 
   @override
   String settings_s3Config_test_regionDetected(String region) {
-    return 'RegiÃ£o detectada: $region';
+    return 'Região detectada: $region';
   }
 
   @override
-  String get settings_s3Config_test_success => 'ConexÃ£o bem-sucedida';
+  String get settings_s3Config_test_success => 'Conexão bem-sucedida';
 
   @override
   String get settings_s3Config_validation_endpointInvalid =>
-      'Insira um URL http:// ou https:// vÃ¡lido';
+      'Insira um URL http:// ou https:// válido';
 
   @override
   String get settings_s3Config_validation_endpointPath =>
-      'O URL do endpoint nÃ£o deve incluir um caminho';
+      'O URL do endpoint não deve incluir um caminho';
 
   @override
-  String get settings_s3Config_validation_required => 'ObrigatÃ³rio';
+  String get settings_s3Config_validation_required => 'Obrigatório';
 
   @override
   String get settings_s3Config_warning_http =>
-      'Este endpoint usa HTTP sem criptografia. Credenciais e dados de mergulho trafegarÃ£o sem criptografia; use apenas em uma rede confiÃ¡vel.';
+      'Este endpoint usa HTTP sem criptografia. Credenciais e dados de mergulho trafegarão sem criptografia; use apenas em uma rede confiável.';
 
   @override
   String get settings_section_about_subtitle =>
@@ -18990,11 +18967,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_storage_customFolder_subtitleDeviceOnly =>
-      'Mova o banco de dados para o armazenamento interno ou o cartÃ£o SD';
+      'Mova o banco de dados para o armazenamento interno ou o cartão SD';
 
   @override
   String get settings_storage_customFolder_deviceOnly_noCloudSync =>
-      'A sincronizaÃ§Ã£o na nuvem gerenciada pelo app fica desativada enquanto o banco de dados estÃ¡ em um volume de armazenamento do dispositivo. Nenhum serviÃ§o de sincronizaÃ§Ã£o consegue acessar essa pasta no Android, entÃ£o use Backup e RestauraÃ§Ã£o para manter cÃ³pias em outro lugar.';
+      'A sincronização na nuvem gerenciada pelo app fica desativada enquanto o banco de dados está em um volume de armazenamento do dispositivo. Nenhum serviço de sincronização consegue acessar essa pasta no Android, então use Backup e Restauração para manter cópias em outro lugar.';
 
   @override
   String settings_storage_dbStats(
@@ -19002,7 +18979,7 @@ class AppLocalizationsPt extends AppLocalizations {
     Object diveCount,
     Object siteCount,
   ) {
-    return '$fileSize â€¢ $diveCount mergulhos â€¢ $siteCount pontos';
+    return '$fileSize • $diveCount mergulhos • $siteCount pontos';
   }
 
   @override
@@ -19067,14 +19044,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'Excluir todos os dados deste dispositivo e comeÃ§ar do zero';
+      'Excluir todos os dados deste dispositivo e começar do zero';
 
   @override
   String get settings_storage_resetDialog_title => 'Redefinir Banco de Dados?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'Isso exclui permanentemente todos os dados DESTE dispositivo, incluindo mergulhos, pontos, equipamentos e configuraÃ§Ãµes. Um backup Ã© criado automaticamente antes da redefiniÃ§Ã£o.\n\nA sua biblioteca na nuvem nÃ£o Ã© excluÃ­da e os outros dispositivos mantÃªm os seus dados. A sincronizaÃ§Ã£o na nuvem serÃ¡ desconectada para que a redefiniÃ§Ã£o nÃ£o seja desfeita; pode reconectÃ¡-la em DefiniÃ§Ãµes > SincronizaÃ§Ã£o na nuvem.';
+      'Isso exclui permanentemente todos os dados DESTE dispositivo, incluindo mergulhos, pontos, equipamentos e configurações. Um backup é criado automaticamente antes da redefinição.\n\nA sua biblioteca na nuvem não é excluída e os outros dispositivos mantêm os seus dados. A sincronização na nuvem será desconectada para que a redefinição não seja desfeita; pode reconectá-la em Definições > Sincronização na nuvem.';
 
   @override
   String get settings_storage_resetDialog_confirmWord => 'Excluir';
@@ -19101,7 +19078,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'Os dados deste dispositivo foram apagados e um backup foi salvo. A sincronizaÃ§Ã£o na nuvem estÃ¡ agora desconectada para que a redefiniÃ§Ã£o nÃ£o seja desfeita; pode reconectÃ¡-la em DefiniÃ§Ãµes > SincronizaÃ§Ã£o na nuvem. Toque em continuar para recarregar o app.';
+      'Os dados deste dispositivo foram apagados e um backup foi salvo. A sincronização na nuvem está agora desconectada para que a redefinição não seja desfeita; pode reconectá-la em Definições > Sincronização na nuvem. Toque em continuar para recarregar o app.';
 
   @override
   String get settings_summary_activeDiver => 'Mergulhador Ativo';
@@ -19190,34 +19167,34 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_units_dialog_pressureUnit => 'Unidade de Pressao';
 
   @override
-  String get settings_units_gasModel => 'CÃ¡lculos de gÃ¡s';
+  String get settings_units_gasModel => 'Cálculos de gás';
 
   @override
-  String get settings_units_waterType => 'Tipo de Ã¡gua';
+  String get settings_units_waterType => 'Tipo de água';
 
   @override
-  String get settings_units_gasModel_real => 'GÃ¡s real';
+  String get settings_units_gasModel_real => 'Gás real';
 
   @override
   String get settings_units_gasModel_real_subtitle =>
-      'Considera a compressibilidade. Um cilindro de 12 L a 200 bar contÃ©m cerca de 2317 L.';
+      'Considera a compressibilidade. Um cilindro de 12 L a 200 bar contém cerca de 2317 L.';
 
   @override
-  String get settings_units_gasModel_ideal => 'GÃ¡s ideal';
+  String get settings_units_gasModel_ideal => 'Gás ideal';
 
   @override
   String get settings_units_gasModel_ideal_subtitle =>
-      'Corresponde ao cÃ¡lculo manual e Ã s tabelas. Um cilindro de 12 L a 200 bar contÃ©m 2400 L.';
+      'Corresponde ao cálculo manual e às tabelas. Um cilindro de 12 L a 200 bar contém 2400 L.';
 
   @override
   String get settings_units_gasModel_explanation =>
-      'Como a pressÃ£o do cilindro Ã© convertida em volume de gÃ¡s. Afeta o RMV, as estatÃ­sticas de gÃ¡s, o planeador e as calculadoras. O gÃ¡s ideal corresponde ao cÃ¡lculo ensinado pelas agÃªncias; o gÃ¡s real Ã© fisicamente exato e apresenta um RMV cerca de 5% mais baixo.';
+      'Como a pressão do cilindro é convertida em volume de gás. Afeta o RMV, as estatísticas de gás, o planeador e as calculadoras. O gás ideal corresponde ao cálculo ensinado pelas agências; o gás real é fisicamente exato e apresenta um RMV cerca de 5% mais baixo.';
 
   @override
-  String get settings_units_dialog_gasModel => 'CÃ¡lculos de gÃ¡s';
+  String get settings_units_dialog_gasModel => 'Cálculos de gás';
 
   @override
-  String get settings_units_dialog_waterType => 'Tipo de Ã¡gua padrÃ£o';
+  String get settings_units_dialog_waterType => 'Tipo de água padrão';
 
   @override
   String get settings_units_dialog_temperatureUnit => 'Unidade de Temperatura';
@@ -19267,35 +19244,35 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String settings_units_gasConsumption_rmv_subtitle(String unit) {
-    return 'Volume de gÃ¡s respirado por minuto Ã  superfÃ­cie ($unit). Requer o volume do cilindro.';
+    return 'Volume de gás respirado por minuto à superfície ($unit). Requer o volume do cilindro.';
   }
 
   @override
   String settings_units_gasConsumption_sac_subtitle(String unit) {
-    return 'Queda de pressÃ£o do cilindro por minuto ($unit). Funciona com qualquer pressÃ£o registrada.';
+    return 'Queda de pressão do cilindro por minuto ($unit). Funciona com qualquer pressão registrada.';
   }
 
   @override
   String get settings_units_dialog_gasConsumption =>
-      'ExibiÃ§Ã£o do consumo de gÃ¡s';
+      'Exibição do consumo de gás';
 
   @override
-  String get settings_units_gasConsumption => 'Consumo de gÃ¡s';
+  String get settings_units_gasConsumption => 'Consumo de gás';
 
   @override
-  String get settings_units_defaultCurrency => 'Moeda padrÃ£o';
+  String get settings_units_defaultCurrency => 'Moeda padrão';
 
   @override
-  String get settings_units_dialog_defaultCurrency => 'Moeda padrÃ£o';
+  String get settings_units_dialog_defaultCurrency => 'Moeda padrão';
 
   @override
   String get settings_units_temperature => 'Temperatura';
 
   @override
-  String get settings_units_temperature_celsius => 'Celsius (Â°C)';
+  String get settings_units_temperature_celsius => 'Celsius (°C)';
 
   @override
-  String get settings_units_temperature_fahrenheit => 'Fahrenheit (Â°F)';
+  String get settings_units_temperature_fahrenheit => 'Fahrenheit (°F)';
 
   @override
   String get settings_units_timeFormat => 'Formato de Hora';
@@ -19319,24 +19296,24 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_units_weight_pounds => 'Libras (lbs)';
 
   @override
-  String get settings_updates_automaticUpdates => 'AtualizaÃ§Ãµes automÃ¡ticas';
+  String get settings_updates_automaticUpdates => 'Atualizações automáticas';
 
   @override
   String get settings_updates_automaticUpdatesSubtitle =>
-      'Verificar atualizaÃ§Ãµes periodicamente';
+      'Verificar atualizações periodicamente';
 
   @override
   String get settings_updates_betaDialogBody =>
-      'As versÃµes beta sÃ£o publicadas a cada alteraÃ§Ã£o e podem atualizar o banco de dados do seu registro de mergulhos antes da versÃ£o estÃ¡vel. Voltar depois para o canal estÃ¡vel nÃ£o farÃ¡ downgrade do app, e todos os dispositivos que sincronizam entre si devem usar o mesmo canal. Um backup Ã© feito automaticamente antes de qualquer atualizaÃ§Ã£o do banco de dados.';
+      'As versões beta são publicadas a cada alteração e podem atualizar o banco de dados do seu registro de mergulhos antes da versão estável. Voltar depois para o canal estável não fará downgrade do app, e todos os dispositivos que sincronizam entre si devem usar o mesmo canal. Um backup é feito automaticamente antes de qualquer atualização do banco de dados.';
 
   @override
   String get settings_updates_betaDialogConfirm => 'Mudar para Beta';
 
   @override
-  String get settings_updates_betaDialogTitle => 'Receber atualizaÃ§Ãµes beta?';
+  String get settings_updates_betaDialogTitle => 'Receber atualizações beta?';
 
   @override
-  String get settings_updates_channel => 'Canal de atualizaÃ§Ã£o';
+  String get settings_updates_channel => 'Canal de atualização';
 
   @override
   String settings_updates_channelBadgeBeta(String version) {
@@ -19348,17 +19325,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_updates_channelBetaSubtitle =>
-      'Novas versÃµes a cada alteraÃ§Ã£o, antes da estÃ¡vel';
+      'Novas versões a cada alteração, antes da estável';
 
   @override
-  String get settings_updates_channelStable => 'EstÃ¡vel';
+  String get settings_updates_channelStable => 'Estável';
 
   @override
   String get settings_updates_channelStableSubtitle =>
-      'Apenas versÃµes testadas';
+      'Apenas versões testadas';
 
   @override
-  String get settings_updates_checkForUpdates => 'Verificar atualizaÃ§Ãµes';
+  String get settings_updates_checkForUpdates => 'Verificar atualizações';
 
   @override
   String get settings_updates_checking => 'Verificando...';
@@ -19374,36 +19351,36 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get settings_updates_header => 'AtualizaÃ§Ãµes';
+  String get settings_updates_header => 'Atualizações';
 
   @override
   String get settings_updates_joinBeta => 'Participar do Beta';
 
   @override
   String get settings_updates_joinBetaSubtitle =>
-      'Receba novos recursos antes atravÃ©s do programa beta';
+      'Receba novos recursos antes através do programa beta';
 
   @override
-  String get settings_updates_lastChecked => 'Ãšltima verificaÃ§Ã£o';
+  String get settings_updates_lastChecked => 'Última verificação';
 
   @override
   String get settings_updates_never => 'Nunca';
 
   @override
   String settings_updates_readyToInstall(String version) {
-    return 'VersÃ£o $version pronta para instalar';
+    return 'Versão $version pronta para instalar';
   }
 
   @override
   String get settings_updates_stableSwitchNotice =>
-      'VocÃª permanecerÃ¡ nesta beta atÃ© que a prÃ³xima versÃ£o estÃ¡vel seja mais recente que ela.';
+      'Você permanecerá nesta beta até que a próxima versão estável seja mais recente que ela.';
 
   @override
   String get settings_updates_upToDate => 'Atualizado';
 
   @override
   String settings_updates_versionAvailable(String version) {
-    return 'VersÃ£o $version disponÃ­vel';
+    return 'Versão $version disponível';
   }
 
   @override
@@ -19411,7 +19388,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get signatures_action_closeSignatureView =>
-      'Fechar visualizaÃ§Ã£o de assinatura';
+      'Fechar visualização de assinatura';
 
   @override
   String get signatures_action_deleteSignature => 'Excluir assinatura';
@@ -19430,7 +19407,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String signatures_buddyCard_notSignedSemantics(Object name) {
-    return 'Assinatura de $name, nÃ£o assinado';
+    return 'Assinatura de $name, não assinado';
   }
 
   @override
@@ -19444,7 +19421,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String signatures_deleteDialog_message(Object name) {
-    return 'Tem certeza de que deseja excluir a assinatura de $name? Isso nÃ£o pode ser desfeito.';
+    return 'Tem certeza de que deseja excluir a assinatura de $name? Isso não pode ser desfeito.';
   }
 
   @override
@@ -19464,11 +19441,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get signatures_error_drawSignature => 'Desenhe uma assinatura';
 
   @override
-  String get signatures_error_enterSignerName => 'Digite o nome do signatÃ¡rio';
+  String get signatures_error_enterSignerName => 'Digite o nome do signatário';
 
   @override
   String get signatures_error_saveFailed =>
-      'NÃ£o foi possÃ­vel salvar a assinatura. Tente novamente.';
+      'Não foi possível salvar a assinatura. Tente novamente.';
 
   @override
   String get signatures_field_instructorName => 'Nome do Instrutor';
@@ -19538,7 +19515,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get statistics_category_equipment_title => 'Equipamento';
 
   @override
-  String get statistics_category_gas_subtitle => 'Consumo de gÃ¡s e misturas';
+  String get statistics_category_gas_subtitle => 'Consumo de gás e misturas';
 
   @override
   String get statistics_category_gas_title => 'Consumo de Ar';
@@ -19554,7 +19531,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Avistamentos de especies';
 
   @override
-  String get statistics_category_marineLife_title => 'EspÃ©cies';
+  String get statistics_category_marineLife_title => 'Espécies';
 
   @override
   String get statistics_category_overview_title => 'Overview';
@@ -19665,11 +19642,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_conditions_temperature_subtitle =>
-      'MÃ­n, mÃ©dia e mÃ¡x por mÃªs do calendÃ¡rio, em todos os anos';
+      'Mín, média e máx por mês do calendário, em todos os anos';
 
   @override
   String get statistics_conditions_temperature_title =>
-      'Temperatura da Ã¡gua por estaÃ§Ã£o';
+      'Temperatura da água por estação';
 
   @override
   String get statistics_conditions_visibility_error =>
@@ -19685,16 +19662,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_conditions_siteType_error =>
-      'NÃ£o foi possÃ­vel carregar os dados dos tipos de ponto';
+      'Não foi possível carregar os dados dos tipos de ponto';
 
   @override
   String statistics_conditions_siteType_semanticLabel(String description) {
-    return 'GrÃ¡fico de barras. Mergulhos por tipo de ponto. $description';
+    return 'Gráfico de barras. Mergulhos por tipo de ponto. $description';
   }
 
   @override
   String get statistics_conditions_siteType_subtitle =>
-      'Mergulhos por tipo de ponto. Um mergulho num ponto com vÃ¡rios tipos conta para cada um; os pontos sem tipo nÃ£o sÃ£o mostrados.';
+      'Mergulhos por tipo de ponto. Um mergulho num ponto com vários tipos conta para cada um; os pontos sem tipo não são mostrados.';
 
   @override
   String get statistics_conditions_siteType_title => 'Tipos de ponto';
@@ -19737,19 +19714,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get statistics_equipment_weightTrend_title => 'Tendencia de Peso';
 
   @override
-  String get statistics_equipment_exposure_title => 'ExposiÃ§Ã£o';
+  String get statistics_equipment_exposure_title => 'Exposição';
 
   @override
   String get statistics_equipment_exposure_error =>
-      'NÃ£o foi possÃ­vel carregar os dados de exposiÃ§Ã£o';
+      'Não foi possível carregar os dados de exposição';
 
   @override
   String get statistics_equipment_findings_error =>
-      'NÃ£o foi possÃ­vel carregar as constataÃ§Ãµes de estado';
+      'Não foi possível carregar as constatações de estado';
 
   @override
   String get statistics_equipment_issues_error =>
-      'NÃ£o foi possÃ­vel carregar os problemas registados';
+      'Não foi possível carregar os problemas registados';
 
   @override
   String get statistics_equipment_exposure_subtitle =>
@@ -19757,29 +19734,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_equipment_exposure_empty =>
-      'Ainda nÃ£o hÃ¡ mergulhos com equipamento';
+      'Ainda não há mergulhos com equipamento';
 
   @override
-  String get statistics_equipment_findings_title => 'ConstataÃ§Ãµes de estado';
+  String get statistics_equipment_findings_title => 'Constatações de estado';
 
   @override
   String get statistics_equipment_findings_subtitle =>
-      'ConstataÃ§Ãµes abertas por regra';
+      'Constatações abertas por regra';
 
   @override
   String get statistics_equipment_findings_subtitleAllDives =>
-      'ConstataÃ§Ãµes abertas por regra, em todos os mergulhos';
+      'Constatações abertas por regra, em todos os mergulhos';
 
   @override
-  String get statistics_equipment_findings_empty =>
-      'Sem constataÃ§Ãµes abertas';
+  String get statistics_equipment_findings_empty => 'Sem constatações abertas';
 
   @override
   String get statistics_equipment_issues_title => 'Problemas registados';
 
   @override
   String get statistics_equipment_issues_subtitle =>
-      'Etiquetas de verificaÃ§Ã£o mais frequentes';
+      'Etiquetas de verificação mais frequentes';
 
   @override
   String get statistics_equipment_issues_empty => 'Sem problemas registados';
@@ -19788,7 +19764,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get statistics_equipment_countLabel_items => 'itens';
 
   @override
-  String get statistics_equipment_countLabel_findings => 'constataÃ§Ãµes';
+  String get statistics_equipment_countLabel_findings => 'constatações';
 
   @override
   String get statistics_equipment_countLabel_reports => 'registos';
@@ -19810,7 +19786,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_equipment_countLabel_saltHours =>
-      'horas em Ã¡gua salgada';
+      'horas em água salgada';
 
   @override
   String get statistics_equipment_countLabel_coldDives => 'mergulhos frios';
@@ -19830,7 +19806,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_equipment_exposureUnit_saltHours =>
-      'Horas em Ã¡gua salgada';
+      'Horas em água salgada';
 
   @override
   String get statistics_equipment_exposureUnit_coldDives => 'Mergulhos frios';
@@ -19891,7 +19867,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_gas_sacByRole_title =>
-      'Consumo de gÃ¡s por funÃ§Ã£o do cilindro';
+      'Consumo de gás por função do cilindro';
 
   @override
   String get statistics_gas_sacRecords_empty => 'Nenhum dado de consumo ainda';
@@ -19917,17 +19893,17 @@ class AppLocalizationsPt extends AppLocalizations {
       'Melhor e pior consumo de ar';
 
   @override
-  String get statistics_gas_sacRecords_title => 'Registros de consumo de gÃ¡s';
+  String get statistics_gas_sacRecords_title => 'Registros de consumo de gás';
 
   @override
   String get statistics_gas_sacTrend_error =>
       'Falha ao carregar tendencia de consumo';
 
   @override
-  String get statistics_gas_sacTrend_subtitle => 'Cada mergulho no perÃ­odo';
+  String get statistics_gas_sacTrend_subtitle => 'Cada mergulho no período';
 
   @override
-  String get statistics_gas_sacTrend_title => 'TendÃªncia do consumo de gÃ¡s';
+  String get statistics_gas_sacTrend_title => 'Tendência do consumo de gás';
 
   @override
   String get statistics_gas_tankRole_backGas => 'Gas Principal';
@@ -19942,7 +19918,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get statistics_gas_tankRole_diluent => 'Diluente';
 
   @override
-  String get statistics_gas_tankRole_oxygenSupply => 'Suprimento de Oâ‚‚';
+  String get statistics_gas_tankRole_oxygenSupply => 'Suprimento de O₂';
 
   @override
   String get statistics_gas_tankRole_pony => 'Pony';
@@ -20029,7 +20005,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get statistics_listContent_selectedSuffix => ', selecionado';
 
   @override
-  String get statistics_marineLife_appBar_title => 'EspÃ©cies';
+  String get statistics_marineLife_appBar_title => 'Espécies';
 
   @override
   String get statistics_marineLife_bestSites_empty => 'Nenhum dado de ponto';
@@ -20084,11 +20060,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_marineLife_seeAllSpecies_title =>
-      'Ver todas as espÃ©cies';
+      'Ver todas as espécies';
 
   @override
   String get statistics_marineLife_seeAllSpecies_subtitle =>
-      'Todas as espÃ©cies que vocÃª registrou, com pesquisa';
+      'Todas as espécies que você registrou, com pesquisa';
 
   @override
   String get statistics_profile_appBar_title => 'Analise de Perfil';
@@ -20134,11 +20110,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get statistics_profile_deco_noDeco => 'Sem Deco';
 
   @override
-  String get statistics_profile_deco_notRecorded => 'NÃ£o registado';
+  String get statistics_profile_deco_notRecorded => 'Não registado';
 
   @override
   String statistics_profile_deco_notRecordedHint(int count) {
-    return '$count mergulhos nÃ£o tÃªm dados de descompressÃ£o registados ou calculÃ¡veis e sÃ£o excluÃ­dos da taxa';
+    return '$count mergulhos não têm dados de descompressão registados ou calculáveis e são excluídos da taxa';
   }
 
   @override
@@ -20183,7 +20159,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_progression_bottomTime_subtitle =>
-      'Cada mergulho no perÃ­odo';
+      'Cada mergulho no período';
 
   @override
   String get statistics_progression_bottomTime_title =>
@@ -20207,7 +20183,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_progression_depthProgression_subtitle =>
-      'Cada mergulho no perÃ­odo';
+      'Cada mergulho no período';
 
   @override
   String get statistics_progression_depthProgression_title =>
@@ -20649,7 +20625,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get statistics_tooltip_diveRecords => 'Recordes de Mergulho';
 
   @override
-  String get statistics_tooltip_filter => 'Filtrar estatÃ­sticas';
+  String get statistics_tooltip_filter => 'Filtrar estatísticas';
 
   @override
   String get statistics_tooltip_refreshRecords => 'Atualizar recordes';
@@ -20664,30 +20640,30 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get surfaceInterval_aboutTissueLoading_body =>
-      'Seu corpo possui 16 compartimentos de tecido que absorvem e liberam nitrogÃªnio em taxas diferentes. Tecidos rÃ¡pidos (como sangue) saturam rapidamente, mas tambÃ©m liberam gÃ¡s rapidamente. Tecidos lentos (como osso e gordura) levam mais tempo para carregar e descarregar. O \"compartimento lÃ­der\" Ã© aquele tecido que estÃ¡ mais saturado e normalmente controla seu limite de nÃ£o descompressÃ£o (NDL). Durante um intervalo de superfÃ­cie, todos os tecidos liberam gÃ¡s em direÃ§Ã£o aos nÃ­veis de saturaÃ§Ã£o de superfÃ­cie (~40% de carregamento).';
+      'Seu corpo possui 16 compartimentos de tecido que absorvem e liberam nitrogênio em taxas diferentes. Tecidos rápidos (como sangue) saturam rapidamente, mas também liberam gás rapidamente. Tecidos lentos (como osso e gordura) levam mais tempo para carregar e descarregar. O \"compartimento líder\" é aquele tecido que está mais saturado e normalmente controla seu limite de não descompressão (NDL). Durante um intervalo de superfície, todos os tecidos liberam gás em direção aos níveis de saturação de superfície (~40% de carregamento).';
 
   @override
   String get surfaceInterval_aboutTissueLoading_title =>
       'Sobre Carregamento de Tecidos';
 
   @override
-  String get surfaceInterval_action_resetDefaults => 'Restaurar padrÃµes';
+  String get surfaceInterval_action_resetDefaults => 'Restaurar padrões';
 
   @override
   String get surfaceInterval_disclaimer =>
-      'Esta ferramenta Ã© apenas para fins de planejamento. Sempre use um computador de mergulho e siga seu treinamento. Os resultados sÃ£o baseados no algoritmo Buhlmann ZH-L16C e podem diferir do seu computador.';
+      'Esta ferramenta é apenas para fins de planejamento. Sempre use um computador de mergulho e siga seu treinamento. Os resultados são baseados no algoritmo Buhlmann ZH-L16C e podem diferir do seu computador.';
 
   @override
   String get surfaceInterval_field_depth => 'Profundidade';
 
   @override
-  String get surfaceInterval_field_gasMix => 'Mistura de GÃ¡s: ';
+  String get surfaceInterval_field_gasMix => 'Mistura de Gás: ';
 
   @override
   String get surfaceInterval_field_he => 'He';
 
   @override
-  String get surfaceInterval_field_o2 => 'Oâ‚‚';
+  String get surfaceInterval_field_o2 => 'O₂';
 
   @override
   String get surfaceInterval_field_time => 'Tempo';
@@ -20735,12 +20711,12 @@ class AppLocalizationsPt extends AppLocalizations {
     Object limit,
     Object mod,
   ) {
-    return 'ppOâ‚‚ $ppO2 a $depth excede $limit. A MOD desta mistura Ã© $mod.';
+    return 'ppO₂ $ppO2 a $depth excede $limit. A MOD desta mistura é $mod.';
   }
 
   @override
   String surfaceInterval_heSemantics(Object percent) {
-    return 'HÃ©lio: $percent%';
+    return 'Hélio: $percent%';
   }
 
   @override
@@ -20750,7 +20726,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String surfaceInterval_result_beyondHorizon(Object hours) {
-    return 'A espera ultrapassa as $hours horas que este planeador procura. A desaturaÃ§Ã£o continua, por isso um intervalo de superfÃ­cie mais longo serÃ¡ suficiente.';
+    return 'A espera ultrapassa as $hours horas que este planeador procura. A desaturação continua, por isso um intervalo de superfície mais longo será suficiente.';
   }
 
   @override
@@ -20763,21 +20739,21 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get surfaceInterval_result_gasUnsafe =>
-      'GÃ¡s inseguro nesta profundidade';
+      'Gás inseguro nesta profundidade';
 
   @override
   String get surfaceInterval_result_inDeco => 'Em deco';
 
   @override
   String get surfaceInterval_result_increaseInterval =>
-      'Aumente o intervalo de superfÃ­cie ou reduza a profundidade/tempo do segundo mergulho';
+      'Aumente o intervalo de superfície ou reduza a profundidade/tempo do segundo mergulho';
 
   @override
   String get surfaceInterval_result_minimumInterval =>
-      'Intervalo de SuperfÃ­cie MÃ­nimo';
+      'Intervalo de Superfície Mínimo';
 
   @override
-  String get surfaceInterval_result_ndlForSecondDive => 'NDL para 2Âº Mergulho';
+  String get surfaceInterval_result_ndlForSecondDive => 'NDL para 2º Mergulho';
 
   @override
   String surfaceInterval_result_ndlMinutes(Object minutes) {
@@ -20786,16 +20762,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String surfaceInterval_result_noIntervalHelps(Object minutes) {
-    return 'Nenhum intervalo de superfÃ­cie Ã© suficiente. O mergulho sem descompressÃ£o mais longo a esta profundidade com esta mistura Ã© de $minutes min. Encurte o segundo mergulho ou reduza a sua profundidade.';
+    return 'Nenhum intervalo de superfície é suficiente. O mergulho sem descompressão mais longo a esta profundidade com esta mistura é de $minutes min. Encurte o segundo mergulho ou reduza a sua profundidade.';
   }
 
   @override
   String get surfaceInterval_result_notAchievable =>
-      'NÃ£o alcanÃ§Ã¡vel com nenhum intervalo de superfÃ­cie';
+      'Não alcançável com nenhum intervalo de superfície';
 
   @override
   String get surfaceInterval_result_notYetSafe =>
-      'Ainda nÃ£o Ã© seguro, aumente o intervalo de superfÃ­cie';
+      'Ainda não é seguro, aumente o intervalo de superfície';
 
   @override
   String get surfaceInterval_result_safeToDive => 'Seguro para mergulhar';
@@ -20807,7 +20783,7 @@ class AppLocalizationsPt extends AppLocalizations {
     Object ndl,
     Object status,
   ) {
-    return 'Intervalo de superfÃ­cie mÃ­nimo: $interval. Intervalo atual: $current. NDL para segundo mergulho: $ndl. $status';
+    return 'Intervalo de superfície mínimo: $interval. Intervalo atual: $current. NDL para segundo mergulho: $ndl. $status';
   }
 
   @override
@@ -20817,7 +20793,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String surfaceInterval_secondDive_heSemantics(Object percent) {
-    return 'HÃ©lio do segundo mergulho: $percent%';
+    return 'Hélio do segundo mergulho: $percent%';
   }
 
   @override
@@ -20835,7 +20811,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String surfaceInterval_tissueRecovery_chartSemantics(Object interval) {
-    return 'GrÃ¡fico de recuperaÃ§Ã£o de tecidos mostrando a liberaÃ§Ã£o de gÃ¡s de 16 compartimentos durante um intervalo de superfÃ­cie de $interval';
+    return 'Gráfico de recuperação de tecidos mostrando a liberação de gás de 16 compartimentos durante um intervalo de superfície de $interval';
   }
 
   @override
@@ -20844,24 +20820,24 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get surfaceInterval_tissueRecovery_description =>
-      'Mostrando como cada um dos 16 compartimentos de tecido liberam gÃ¡s durante o intervalo de superfÃ­cie';
+      'Mostrando como cada um dos 16 compartimentos de tecido liberam gás durante o intervalo de superfície';
 
   @override
-  String get surfaceInterval_tissueRecovery_fast => 'RÃ¡pido (C1-5)';
+  String get surfaceInterval_tissueRecovery_fast => 'Rápido (C1-5)';
 
   @override
   String surfaceInterval_tissueRecovery_leadingCompartment(Object number) {
-    return 'Compartimento lÃ­der: C$number';
+    return 'Compartimento líder: C$number';
   }
 
   @override
   String get surfaceInterval_tissueRecovery_loadingPercent => 'Carregamento %';
 
   @override
-  String get surfaceInterval_tissueRecovery_medium => 'MÃ©dio (C6-10)';
+  String get surfaceInterval_tissueRecovery_medium => 'Médio (C6-10)';
 
   @override
-  String get surfaceInterval_tissueRecovery_min => 'MÃ­n';
+  String get surfaceInterval_tissueRecovery_min => 'Mín';
 
   @override
   String get surfaceInterval_tissueRecovery_now => 'Agora';
@@ -20870,10 +20846,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get surfaceInterval_tissueRecovery_slow => 'Lento (C11-16)';
 
   @override
-  String get surfaceInterval_tissueRecovery_title => 'RecuperaÃ§Ã£o de Tecidos';
+  String get surfaceInterval_tissueRecovery_title => 'Recuperação de Tecidos';
 
   @override
-  String get surfaceInterval_title => 'Intervalo de SuperfÃ­cie';
+  String get surfaceInterval_title => 'Intervalo de Superfície';
 
   @override
   String tags_action_createNamed(Object tagName) {
@@ -20891,7 +20867,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tags_picker_empty =>
-      'Ainda nÃ£o hÃ¡ etiquetas. Escreva um nome para criar a primeira.';
+      'Ainda não há etiquetas. Escreva um nome para criar a primeira.';
 
   @override
   String tags_picker_errorLoading(String error) {
@@ -20899,12 +20875,11 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get tags_picker_allAdded =>
-      'Todas as etiquetas jÃ¡ foram adicionadas.';
+  String get tags_picker_allAdded => 'Todas as etiquetas já foram adicionadas.';
 
   @override
   String get tags_picker_noMatches =>
-      'Nenhuma etiqueta corresponde Ã  sua pesquisa.';
+      'Nenhuma etiqueta corresponde à sua pesquisa.';
 
   @override
   String tags_picker_addCount(int count) {
@@ -20928,7 +20903,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String tags_dialog_deleteMessage(Object tagName) {
-    return 'Tem certeza de que deseja excluir \"$tagName\"? Isso irÃ¡ removÃª-la de todos os mergulhos.';
+    return 'Tem certeza de que deseja excluir \"$tagName\"? Isso irá removê-la de todos os mergulhos.';
   }
 
   @override
@@ -20951,8 +20926,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count fotos referenciadas neste diÃ¡rio',
-      one: '1 foto referenciada neste diÃ¡rio',
+      other: '$count fotos referenciadas neste diário',
+      one: '1 foto referenciada neste diário',
     );
     return '$_temp0';
   }
@@ -20969,7 +20944,7 @@ class AppLocalizationsPt extends AppLocalizations {
     int byName,
     int missing,
   ) {
-    return '$matched correspondidas, $byName apenas pelo nome do ficheiro, $missing nÃ£o encontradas';
+    return '$matched correspondidas, $byName apenas pelo nome do ficheiro, $missing não encontradas';
   }
 
   @override
@@ -20977,15 +20952,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get importWizard_photos_mobileUnsupported =>
-      'Importar fotos requer uma pasta no disco deste dispositivo. Execute esta importaÃ§Ã£o num computador para as incluir. Os mergulhos e locais sÃ£o importados normalmente.';
+      'Importar fotos requer uma pasta no disco deste dispositivo. Execute esta importação num computador para as incluir. Os mergulhos e locais são importados normalmente.';
 
   @override
   String importWizard_photos_bundledCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count fotos incluÃ­das no arquivo',
-      one: '1 foto incluÃ­da no arquivo',
+      other: '$count fotos incluídas no arquivo',
+      one: '1 foto incluída no arquivo',
     );
     return '$_temp0';
   }
@@ -20996,11 +20971,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get importWizard_photos_destinationNote =>
-      'As fotos sÃ£o guardadas nesta pasta e ligadas a partir daÃ­. O Submersion nunca guarda uma cÃ³pia prÃ³pria.';
+      'As fotos são guardadas nesta pasta e ligadas a partir daí. O Submersion nunca guarda uma cópia própria.';
 
   @override
   String get importWizard_photos_destinationUnwritable =>
-      'NÃ£o Ã© possÃ­vel escrever nessa pasta. Escolha outra.';
+      'Não é possível escrever nessa pasta. Escolha outra.';
 
   @override
   String importWizard_review_olderDivesSkipped(int count) {
@@ -21008,8 +20983,8 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '$count mergulhos mais antigos ignorados â€” jÃ¡ estÃ£o no seu registo',
-      one: '1 mergulho mais antigo ignorado â€” jÃ¡ estÃ¡ no seu registo',
+          '$count mergulhos mais antigos ignorados — já estão no seu registo',
+      one: '1 mergulho mais antigo ignorado — já está no seu registo',
     );
     return '$_temp0';
   }
@@ -21021,15 +20996,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tags_manage_title => 'Etiquetas';
 
   @override
-  String get tags_manage_importsSection => 'ImportaÃ§Ãµes';
+  String get tags_manage_importsSection => 'Importações';
 
   @override
-  String get tags_manage_autoTagImports =>
-      'Marcar importaÃ§Ãµes automaticamente';
+  String get tags_manage_autoTagImports => 'Marcar importações automaticamente';
 
   @override
   String get tags_manage_autoTagImports_subtitle =>
-      'Cada nova importaÃ§Ã£o comeÃ§a com uma etiqueta que indica a origem e a data. Pode alterar isto para uma Ãºnica importaÃ§Ã£o nas opÃ§Ãµes dessa importaÃ§Ã£o.';
+      'Cada nova importação começa com uma etiqueta que indica a origem e a data. Pode alterar isto para uma única importação nas opções dessa importação.';
 
   @override
   String get tags_manage_searchHint => 'Buscar etiquetas...';
@@ -21076,9 +21050,9 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          'Esta etiqueta estÃ¡ em $count mergulhos. Desativar \"Usar em mergulhos\" remove-a desses mergulhos.',
+          'Esta etiqueta está em $count mergulhos. Desativar \"Usar em mergulhos\" remove-a desses mergulhos.',
       one:
-          'Esta etiqueta estÃ¡ em 1 mergulho. Desativar \"Usar em mergulhos\" remove-a desse mergulho.',
+          'Esta etiqueta está em 1 mergulho. Desativar \"Usar em mergulhos\" remove-a desse mergulho.',
     );
     return '$_temp0';
   }
@@ -21089,9 +21063,9 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          'Esta etiqueta estÃ¡ em $count pontos. Desativar \"Usar em pontos\" remove-a desses pontos.',
+          'Esta etiqueta está em $count pontos. Desativar \"Usar em pontos\" remove-a desses pontos.',
       one:
-          'Esta etiqueta estÃ¡ em 1 ponto. Desativar \"Usar em pontos\" remove-a desse ponto.',
+          'Esta etiqueta está em 1 ponto. Desativar \"Usar em pontos\" remove-a desse ponto.',
     );
     return '$_temp0';
   }
@@ -21153,7 +21127,7 @@ class AppLocalizationsPt extends AppLocalizations {
       other: '$count pontos',
       one: '1 ponto',
     );
-    return '\"$tagName\" serÃ¡ removida de $_temp0. Esta aÃ§Ã£o nÃ£o pode ser desfeita.';
+    return '\"$tagName\" será removida de $_temp0. Esta ação não pode ser desfeita.';
   }
 
   @override
@@ -21174,12 +21148,12 @@ class AppLocalizationsPt extends AppLocalizations {
       other: '$siteCount pontos',
       one: '1 ponto',
     );
-    return '\"$tagName\" serÃ¡ removida de $_temp0 e $_temp1. Esta aÃ§Ã£o nÃ£o pode ser desfeita.';
+    return '\"$tagName\" será removida de $_temp0 e $_temp1. Esta ação não pode ser desfeita.';
   }
 
   @override
   String tags_manage_deleteMessage_unused(String tagName) {
-    return '\"$tagName\" nÃ£o Ã© usada em nenhum mergulho nem em nenhum ponto. Esta aÃ§Ã£o nÃ£o pode ser desfeita.';
+    return '\"$tagName\" não é usada em nenhum mergulho nem em nenhum ponto. Esta ação não pode ser desfeita.';
   }
 
   @override
@@ -21207,7 +21181,7 @@ class AppLocalizationsPt extends AppLocalizations {
       other: '$siteCount pontos',
       one: '1 ponto',
     );
-    return 'Estas etiquetas serÃ£o removidas de $_temp0 no total. Esta aÃ§Ã£o nÃ£o pode ser desfeita.';
+    return 'Estas etiquetas serão removidas de $_temp0 no total. Esta ação não pode ser desfeita.';
   }
 
   @override
@@ -21227,12 +21201,12 @@ class AppLocalizationsPt extends AppLocalizations {
       other: '$siteCount pontos',
       one: '1 ponto',
     );
-    return 'Estas etiquetas serÃ£o removidas de $_temp0 e $_temp1 no total. Esta aÃ§Ã£o nÃ£o pode ser desfeita.';
+    return 'Estas etiquetas serão removidas de $_temp0 e $_temp1 no total. Esta ação não pode ser desfeita.';
   }
 
   @override
   String get tags_manage_bulkDeleteMessage_unused =>
-      'Estas etiquetas nÃ£o sÃ£o usadas em nenhum mergulho nem em nenhum ponto. Esta aÃ§Ã£o nÃ£o pode ser desfeita.';
+      'Estas etiquetas não são usadas em nenhum mergulho nem em nenhum ponto. Esta ação não pode ser desfeita.';
 
   @override
   String tags_manage_mergeTitle(int count) {
@@ -21265,7 +21239,7 @@ class AppLocalizationsPt extends AppLocalizations {
       other: '$count pontos',
       one: '1 ponto',
     );
-    return 'Isso afetarÃ¡ $_temp0 no total.';
+    return 'Isso afetará $_temp0 no total.';
   }
 
   @override
@@ -21282,12 +21256,12 @@ class AppLocalizationsPt extends AppLocalizations {
       other: '$siteCount pontos',
       one: '1 ponto',
     );
-    return 'Isso afetarÃ¡ $_temp0 e $_temp1 no total.';
+    return 'Isso afetará $_temp0 e $_temp1 no total.';
   }
 
   @override
   String get tags_manage_mergeAffected_unused =>
-      'Estas etiquetas nÃ£o sÃ£o usadas em nenhum mergulho nem em nenhum ponto.';
+      'Estas etiquetas não são usadas em nenhum mergulho nem em nenhum ponto.';
 
   @override
   String get tags_manage_mergeAction => 'Mesclar';
@@ -21376,10 +21350,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tank_steel15_displayName => 'Aco 15L';
 
   @override
-  String get tides_action_refresh => 'Atualizar dados de marÃ©';
+  String get tides_action_refresh => 'Atualizar dados de maré';
 
   @override
-  String get tides_chart_24hourForecast => 'PrevisÃ£o de 24 Horas';
+  String get tides_chart_24hourForecast => 'Previsão de 24 Horas';
 
   @override
   String tides_chart_heightAxis(Object depthSymbol) {
@@ -21396,15 +21370,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tides_error_unableToLoad =>
-      'NÃ£o foi possÃ­vel carregar os dados de marÃ©';
+      'Não foi possível carregar os dados de maré';
 
   @override
   String get tides_error_unableToLoadChart =>
-      'NÃ£o foi possÃ­vel carregar o grÃ¡fico';
+      'Não foi possível carregar o gráfico';
 
   @override
   String tides_label_ago(Object duration) {
-    return '$duration atrÃ¡s';
+    return '$duration atrás';
   }
 
   @override
@@ -21424,7 +21398,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tides_label_highIn => 'Alta em';
 
   @override
-  String get tides_label_highTide => 'MarÃ© Alta';
+  String get tides_label_highTide => 'Maré Alta';
 
   @override
   String get tides_label_low => 'Baixa';
@@ -21433,7 +21407,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tides_label_lowIn => 'Baixa em';
 
   @override
-  String get tides_label_lowTide => 'MarÃ© Baixa';
+  String get tides_label_lowTide => 'Maré Baixa';
 
   @override
   String tides_label_tideIn(Object duration) {
@@ -21441,42 +21415,41 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get tides_label_tideTimes => 'HorÃ¡rios das MarÃ©s';
+  String get tides_label_tideTimes => 'Horários das Marés';
 
   @override
   String get tides_label_today => 'Hoje';
 
   @override
-  String get tides_label_tomorrow => 'AmanhÃ£';
+  String get tides_label_tomorrow => 'Amanhã';
 
   @override
-  String get tides_label_upcomingTides => 'PrÃ³ximas MarÃ©s';
+  String get tides_label_upcomingTides => 'Próximas Marés';
 
   @override
-  String get tides_legend_highTide => 'MarÃ© Alta';
+  String get tides_legend_highTide => 'Maré Alta';
 
   @override
-  String get tides_legend_lowTide => 'MarÃ© Baixa';
+  String get tides_legend_lowTide => 'Maré Baixa';
 
   @override
   String get tides_legend_now => 'Agora';
 
   @override
-  String get tides_legend_tideLevel => 'NÃ­vel da MarÃ©';
+  String get tides_legend_tideLevel => 'Nível da Maré';
 
   @override
-  String get tides_noDataAvailable => 'Nenhum dado de marÃ© disponÃ­vel';
+  String get tides_noDataAvailable => 'Nenhum dado de maré disponível';
 
   @override
   String get tides_noDataForLocation =>
-      'Dados de marÃ© nÃ£o disponÃ­veis para este local';
+      'Dados de maré não disponíveis para este local';
 
   @override
   String get tides_noExtremesData => 'Sem dados de extremos';
 
   @override
-  String get tides_noTideTimesAvailable =>
-      'Nenhum horÃ¡rio de marÃ© disponÃ­vel';
+  String get tides_noTideTimesAvailable => 'Nenhum horário de maré disponível';
 
   @override
   String tides_semantic_currentTide(
@@ -21485,7 +21458,7 @@ class AppLocalizationsPt extends AppLocalizations {
     Object depthSymbol,
     Object nextExtreme,
   ) {
-    return 'MarÃ© $tideState, $height$depthSymbol$nextExtreme';
+    return 'Maré $tideState, $height$depthSymbol$nextExtreme';
   }
 
   @override
@@ -21495,44 +21468,43 @@ class AppLocalizationsPt extends AppLocalizations {
     Object height,
     Object depthSymbol,
   ) {
-    return 'MarÃ© $typeLabel Ã s $time, $height$depthSymbol';
+    return 'Maré $typeLabel às $time, $height$depthSymbol';
   }
 
   @override
   String tides_semantic_tideChart(Object extremesSummary) {
-    return 'GrÃ¡fico de marÃ©s. $extremesSummary';
+    return 'Gráfico de marés. $extremesSummary';
   }
 
   @override
   String tides_semantic_tideState(Object state) {
-    return 'Estado da marÃ©: $state';
+    return 'Estado da maré: $state';
   }
 
   @override
   String tides_source_noaaStation(String name, String distance) {
-    return 'EstaÃ§Ã£o NOAA: $name ($distance)';
+    return 'Estação NOAA: $name ($distance)';
   }
 
   @override
-  String get tides_source_modelEstimate => 'Estimativa de modelo oceÃ¢nico';
+  String get tides_source_modelEstimate => 'Estimativa de modelo oceânico';
 
   @override
   String get tides_source_modelCaveat =>
-      'Modelado a partir de dados de satÃ©lite. HorÃ¡rios e alturas podem diferir perto de costas complexas.';
+      'Modelado a partir de dados de satélite. Horários e alturas podem diferir perto de costas complexas.';
 
   @override
-  String get tides_source_sheetTitle => 'Fonte dos dados de marÃ©';
+  String get tides_source_sheetTitle => 'Fonte dos dados de maré';
 
   @override
   String get tides_source_datumMllw =>
-      'Alturas relativas ao MLLW (datum da estaÃ§Ã£o)';
+      'Alturas relativas ao MLLW (datum da estação)';
 
   @override
-  String get tides_source_datumMsl =>
-      'Alturas relativas ao nÃ­vel mÃ©dio do mar';
+  String get tides_source_datumMsl => 'Alturas relativas ao nível médio do mar';
 
   @override
-  String get tides_title => 'MarÃ©s';
+  String get tides_title => 'Marés';
 
   @override
   String get transfer_appBar_title => 'Transferencia';
@@ -21593,7 +21565,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String transfer_computers_lastDownloadDaysAgo(int days) {
-    return 'hÃ¡ $days dias';
+    return 'há $days dias';
   }
 
   @override
@@ -21601,15 +21573,15 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       hours,
       locale: localeName,
-      other: 'hÃ¡ $hours horas',
-      one: 'hÃ¡ 1 hora',
+      other: 'há $hours horas',
+      one: 'há 1 hora',
     );
     return '$_temp0';
   }
 
   @override
   String transfer_computers_lastDownloadMinutesAgo(int minutes) {
-    return 'hÃ¡ $minutes min';
+    return 'há $minutes min';
   }
 
   @override
@@ -21648,7 +21620,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get transfer_csvExport_descriptionObservations =>
-      'Cada verificaÃ§Ã£o OK e cada problema reportado, com mergulho, etiquetas e nota';
+      'Cada verificação OK e cada problema reportado, com mergulho, etiquetas e nota';
 
   @override
   String get transfer_csvExport_descriptionSites =>
@@ -21668,7 +21640,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get transfer_csvExport_optionObservationsTitle =>
-      'CSV de verificaÃ§Ãµes de equipamento';
+      'CSV de verificações de equipamento';
 
   @override
   String get transfer_csvExport_optionSitesTitle => 'CSV de Pontos';
@@ -21686,7 +21658,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get transfer_csvExport_typeObservations =>
-      'VerificaÃ§Ãµes de equipamento';
+      'Verificações de equipamento';
 
   @override
   String get transfer_csvExport_typeSites => 'Pontos';
@@ -21695,18 +21667,18 @@ class AppLocalizationsPt extends AppLocalizations {
   String get transfer_csvExport_unitsHeader => 'Unidades';
 
   @override
-  String get transfer_csvExport_unitsMetric => 'MÃ©trico';
+  String get transfer_csvExport_unitsMetric => 'Métrico';
 
   @override
   String get transfer_csvExport_unitsMetricDescription =>
-      'Valores mÃ©tricos e datas ISO, no mesmo formato das exportaÃ§Ãµes anteriores';
+      'Valores métricos e datas ISO, no mesmo formato das exportações anteriores';
 
   @override
   String get transfer_csvExport_unitsMine => 'Minhas unidades';
 
   @override
   String get transfer_csvExport_unitsMineDescription =>
-      'Valores nas suas configuraÃ§Ãµes de unidade, data e hora, indicadas no cabeÃ§alho de cada coluna';
+      'Valores nas suas configurações de unidade, data e hora, indicadas no cabeçalho de cada coluna';
 
   @override
   String get transfer_detail_backTooltip => 'Voltar para transferencia';
@@ -21716,7 +21688,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Exporte seus dados de mergulho em varios formatos. PDF cria um logbook imprimivel. UDDF e um formato universal compativel com a maioria dos softwares de registro de mergulho. Arquivos CSV podem ser abertos em aplicativos de planilha.';
 
   @override
-  String get transfer_export_backupLink => 'Ir para Backup e restauraÃ§Ã£o';
+  String get transfer_export_backupLink => 'Ir para Backup e restauração';
 
   @override
   String get transfer_export_aboutTitle => 'Sobre Exportacao';
@@ -21768,7 +21740,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get transfer_export_includeParticipantsSubtitle =>
-      'Adiciona companheiros, guias e as suas funÃ§Ãµes em cada mergulho, com nome e certificaÃ§Ã£o. Os dados de contacto ficam de fora.';
+      'Adiciona companheiros, guias e as suas funções em cada mergulho, com nome e certificação. Os dados de contacto ficam de fora.';
 
   @override
   String get transfer_export_includeRawData =>
@@ -21776,7 +21748,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get transfer_export_includeRawDataSubtitle =>
-      'MantÃ©m os bytes originais do seu computador de mergulho para que o ficheiro possa ser reprocessado mais tarde. Aumenta o tamanho do ficheiro.';
+      'Mantém os bytes originais do seu computador de mergulho para que o ficheiro possa ser reprocessado mais tarde. Aumenta o tamanho do ficheiro.';
 
   @override
   String get transfer_export_optionSaveTitle => 'Salvar em Arquivo';
@@ -22068,7 +22040,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trips_detail_stat_totalDives => 'Total de Mergulhos';
 
   @override
-  String get trips_detail_tab_checklist => 'Lista de VerificaÃ§Ã£o';
+  String get trips_detail_tab_checklist => 'Lista de Verificação';
 
   @override
   String get trips_detail_tooltip_edit => 'Editar viagem';
@@ -22216,7 +22188,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trips_edit_returnFlightClear => 'Limpar voo de volta';
 
   @override
-  String get trips_edit_returnFlightNotSet => 'NÃ£o definido';
+  String get trips_edit_returnFlightNotSet => 'Não definido';
 
   @override
   String get trips_edit_label_startDate => 'Data de Inicio';
@@ -22329,7 +22301,7 @@ class AppLocalizationsPt extends AppLocalizations {
       locale: localeName,
       other: 'Em $days dias',
       one: 'Em 1 dia',
-      zero: 'ComeÃ§a hoje',
+      zero: 'Começa hoje',
     );
     return '$_temp0';
   }
@@ -22387,7 +22359,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trips_list_tooltip_sort => 'Ordenar';
 
   @override
-  String get trips_list_upcomingSection => 'PrÃ³ximas';
+  String get trips_list_upcomingSection => 'Próximas';
 
   @override
   String get trips_photos_empty_scanButton => 'Escanear galeria do dispositivo';
@@ -22487,7 +22459,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String trips_summary_recentSubtitle(Object date, Object count) {
-    return '$date â€¢ $count mergulhos';
+    return '$date • $count mergulhos';
   }
 
   @override
@@ -22507,7 +22479,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String trips_summary_upcomingSubtitle(Object date, Object days) {
-    return '$date â€¢ Em $days dias';
+    return '$date • Em $days dias';
   }
 
   @override
@@ -22567,7 +22539,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get trips_edit_label_expectedRuntime =>
-      'DuraÃ§Ã£o prevista por mergulho (minutos)';
+      'Duração prevista por mergulho (minutos)';
 
   @override
   String get trips_edit_hint_expectedRuntime =>
@@ -22578,7 +22550,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String trips_scrubber_asOfStart(String date) {
-    return 'Ã  data de $date';
+    return 'à data de $date';
   }
 
   @override
@@ -22587,7 +22559,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String rated,
     String consumed,
   ) {
-    return '$minutes min restantes antes da viagem (nominal $rated min, $consumed min usados desde a Ãºltima troca)';
+    return '$minutes min restantes antes da viagem (nominal $rated min, $consumed min usados desde a última troca)';
   }
 
   @override
@@ -22615,8 +22587,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       n,
       locale: localeName,
-      other: '(das suas Ãºltimas $n viagens)',
-      one: '(da sua Ãºltima viagem)',
+      other: '(das suas últimas $n viagens)',
+      one: '(da sua última viagem)',
     );
     return '$_temp0';
   }
@@ -22634,8 +22606,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       n,
       locale: localeName,
-      other: '(dos seus Ãºltimos $n mergulhos com rebreather)',
-      one: '(do seu Ãºltimo mergulho com rebreather)',
+      other: '(dos seus últimos $n mergulhos com rebreather)',
+      one: '(do seu último mergulho com rebreather)',
     );
     return '$_temp0';
   }
@@ -22647,16 +22619,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String trips_scrubber_margin(String minutes) {
-    return '$minutes min de margem apÃ³s a viagem';
+    return '$minutes min de margem após a viagem';
   }
 
   @override
   String get trips_scrubber_caution =>
-      'Abaixo de 20 por cento da duraÃ§Ã£o nominal. Planeie uma troca ou leve absorvente de reserva.';
+      'Abaixo de 20 por cento da duração nominal. Planeie uma troca ou leve absorvente de reserva.';
 
   @override
   String get trips_scrubber_noRating =>
-      'Sem duraÃ§Ã£o nominal neste rebreather; adicione a duraÃ§Ã£o do absorvente aos atributos ou um plano de troca.';
+      'Sem duração nominal neste rebreather; adicione a duração do absorvente aos atributos ou um plano de troca.';
 
   @override
   String trips_scrubber_bannerMargin(String minutes) {
@@ -22665,7 +22637,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String trips_scrubber_bannerCount(int count, String minutes) {
-    return '$count rebreathers, a menor margem de absorvente Ã© de $minutes min';
+    return '$count rebreathers, a menor margem de absorvente é de $minutes min';
   }
 
   @override
@@ -22938,14 +22910,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'Importar individualmente (CSV)';
 
   @override
-  String get universalImport_triage_unsupported => 'Formato nÃ£o suportado';
+  String get universalImport_triage_unsupported => 'Formato não suportado';
 
   @override
-  String get universalImport_triage_parseFailed => 'NÃ£o foi possÃ­vel ler';
+  String get universalImport_triage_parseFailed => 'Não foi possível ler';
 
   @override
   String universalImport_triage_parsing(int current, int total) {
-    return 'Analisando arquivo $current de $totalâ€¦';
+    return 'Analisando arquivo $current de $total…';
   }
 
   @override
@@ -22961,7 +22933,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_review_inBatchDuplicate =>
-      'Duplicata de outro mergulho neste lote de importaÃ§Ã£o.';
+      'Duplicata de outro mergulho neste lote de importação.';
 
   @override
   String get universalImport_summary_filesTitle => 'Arquivos';
@@ -22972,7 +22944,7 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          'Este registro tem mergulhos de $count mergulhadores. Escolha para onde vÃ£o os mergulhos e as certificaÃ§Ãµes de cada mergulhador.',
+          'Este registro tem mergulhos de $count mergulhadores. Escolha para onde vão os mergulhos e as certificações de cada mergulhador.',
     );
     return '$_temp0';
   }
@@ -22993,8 +22965,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count certificaÃ§Ãµes',
-      one: '1 certificaÃ§Ã£o',
+      other: '$count certificações',
+      one: '1 certificação',
     );
     return '$_temp0';
   }
@@ -23011,7 +22983,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get universalImport_divers_targetSkip => 'NÃ£o importar';
+  String get universalImport_divers_targetSkip => 'Não importar';
 
   @override
   String universalImport_divers_newLabel(String name) {
@@ -23030,15 +23002,15 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get universalImport_summary_noticesTitle => 'Notas da importaÃ§Ã£o';
+  String get universalImport_summary_noticesTitle => 'Notas da importação';
 
   @override
   String get universalImport_summary_noticeNoTankPressureTitle =>
-      'PressÃ£o do cilindro nÃ£o registada';
+      'Pressão do cilindro não registada';
 
   @override
   String get universalImport_summary_noticeNoTankPressureBody =>
-      'NÃ£o Ã© possÃ­vel calcular o consumo de ar nem o SAC. Pode adicionar a pressÃ£o inicial e final ao editar o mergulho.';
+      'Não é possível calcular o consumo de ar nem o SAC. Pode adicionar a pressão inicial e final ao editar o mergulho.';
 
   @override
   String universalImport_summary_noticeAffectedDives(int count) {
@@ -23053,11 +23025,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_summary_noticeDivesSkippedTitle =>
-      'Alguns mergulhos nÃ£o puderam ser lidos';
+      'Alguns mergulhos não puderam ser lidos';
 
   @override
   String get universalImport_summary_noticeDivesSkippedBody =>
-      'Esses mergulhos foram ignorados porque os dados deles no arquivo nÃ£o puderam ser lidos.';
+      'Esses mergulhos foram ignorados porque os dados deles no arquivo não puderam ser lidos.';
 
   @override
   String universalImport_summary_noticeDivesSkippedCount(int count) {
@@ -23072,35 +23044,35 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_summary_noticeProfileUnreadableTitle =>
-      'Alguns perfis nÃ£o puderam ser lidos';
+      'Alguns perfis não puderam ser lidos';
 
   @override
   String get universalImport_summary_noticeProfileUnreadableBody =>
-      'Esses mergulhos foram importados sem perfil de profundidade porque os dados do perfil no arquivo estÃ£o ausentes ou nÃ£o puderam ser lidos.';
+      'Esses mergulhos foram importados sem perfil de profundidade porque os dados do perfil no arquivo estão ausentes ou não puderam ser lidos.';
 
   @override
   String get universalImport_summary_noticeMacdiveProfileUndecodableTitle =>
-      'Perfis do MacDive nÃ£o decodificados';
+      'Perfis do MacDive não decodificados';
 
   @override
   String get universalImport_summary_noticeMacdiveProfileUndecodableBody =>
-      'O MacDive salvou esses perfis em um formato que o Submersion nÃ£o consegue ler. Para importÃ¡-los, exporte do MacDive como XML (File > Export > MacDive XML) e importe esse arquivo no lugar.';
+      'O MacDive salvou esses perfis em um formato que o Submersion não consegue ler. Para importá-los, exporte do MacDive como XML (File > Export > MacDive XML) e importe esse arquivo no lugar.';
 
   @override
   String get universalImport_summary_noticeProfileUndecodableOnPlatformTitle =>
-      'Perfis nÃ£o decodificados neste dispositivo';
+      'Perfis não decodificados neste dispositivo';
 
   @override
   String get universalImport_summary_noticeProfileUndecodableOnPlatformBody =>
-      'Este dispositivo nÃ£o conseguiu decodificar os dados do computador de mergulho no arquivo, entÃ£o esses mergulhos foram importados sem perfil de profundidade.';
+      'Este dispositivo não conseguiu decodificar os dados do computador de mergulho no arquivo, então esses mergulhos foram importados sem perfil de profundidade.';
 
   @override
   String get universalImport_summary_noticeColumnsNotImportedTitle =>
-      'Algumas colunas nÃ£o foram importadas';
+      'Algumas colunas não foram importadas';
 
   @override
   String universalImport_summary_noticeColumnsNotImportedBody(String names) {
-    return 'Essas colunas correspondiam a um campo que outra coluna jÃ¡ preenche, entÃ£o foram deixadas de fora: $names. Para usar uma delas no lugar, importe o arquivo novamente e escolha-a na etapa â€œMap Fieldsâ€.';
+    return 'Essas colunas correspondiam a um campo que outra coluna já preenche, então foram deixadas de fora: $names. Para usar uma delas no lugar, importe o arquivo novamente e escolha-a na etapa “Map Fields”.';
   }
 
   @override
@@ -23113,9 +23085,9 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '$count valores nÃ£o puderam ser convertidos e ficaram em branco. Se um campo parecer errado, verifique o mapeamento de colunas e importe novamente.',
+          '$count valores não puderam ser convertidos e ficaram em branco. Se um campo parecer errado, verifique o mapeamento de colunas e importe novamente.',
       one:
-          '1 valor nÃ£o pÃ´de ser convertido e ficou em branco. Se um campo parecer errado, verifique o mapeamento de colunas e importe novamente.',
+          '1 valor não pôde ser convertido e ficou em branco. Se um campo parecer errado, verifique o mapeamento de colunas e importe novamente.',
     );
     return '$_temp0';
   }
@@ -23130,44 +23102,44 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '$count fotos nÃ£o tinham nome de arquivo e nÃ£o puderam ser vinculadas.',
-      one: '1 foto nÃ£o tinha nome de arquivo e nÃ£o pÃ´de ser vinculada.',
+          '$count fotos não tinham nome de arquivo e não puderam ser vinculadas.',
+      one: '1 foto não tinha nome de arquivo e não pôde ser vinculada.',
     );
     return '$_temp0';
   }
 
   @override
   String get universalImport_summary_noticeMacdiveXmlCertsTitle =>
-      'CertificaÃ§Ãµes e registros de manutenÃ§Ã£o nÃ£o estÃ£o no arquivo';
+      'Certificações e registros de manutenção não estão no arquivo';
 
   @override
   String get universalImport_summary_noticeMacdiveXmlCertsBody =>
-      'O MacDive deixa as certificaÃ§Ãµes e os registros de manutenÃ§Ã£o do equipamento fora da exportaÃ§Ã£o XML. Para trazÃª-los, importe seu banco de dados MacDive.sqlite.';
+      'O MacDive deixa as certificações e os registros de manutenção do equipamento fora da exportação XML. Para trazê-los, importe seu banco de dados MacDive.sqlite.';
 
   @override
   String get universalImport_summary_noticeMacdiveLogbooksTitle =>
-      'Logbooks do MacDive nÃ£o importados';
+      'Logbooks do MacDive não importados';
 
   @override
   String universalImport_summary_noticeMacdiveLogbooksBody(String names) {
-    return 'Os logbooks do MacDive ($names) sÃ£o buscas salvas, nÃ£o listas fixas de mergulhos, entÃ£o nÃ£o hÃ¡ nada para importar. VocÃª pode recriÃ¡-los como filtros de mergulhos.';
+    return 'Os logbooks do MacDive ($names) são buscas salvas, não listas fixas de mergulhos, então não há nada para importar. Você pode recriá-los como filtros de mergulhos.';
   }
 
   @override
   String get universalImport_summary_unreadableDatesTitle =>
-      'Algumas linhas nÃ£o foram importadas';
+      'Algumas linhas não foram importadas';
 
   @override
   String get universalImport_summary_unreadableDatesBody =>
-      'NÃ£o foi possÃ­vel ler a data destas linhas. Verifique a coluna de data no arquivo, corrija estas linhas e importe-o novamente.';
+      'Não foi possível ler a data destas linhas. Verifique a coluna de data no arquivo, corrija estas linhas e importe-o novamente.';
 
   @override
   String universalImport_summary_unreadableDatesCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count linhas nÃ£o importadas',
-      one: '1 linha nÃ£o importada',
+      other: '$count linhas não importadas',
+      one: '1 linha não importada',
     );
     return '$_temp0';
   }
@@ -23213,11 +23185,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_summary_fileNeedsIndividualImport =>
-      'Requer importaÃ§Ã£o individual';
+      'Requer importação individual';
 
   @override
-  String get universalImport_summary_fileUnsupported =>
-      'Formato nÃ£o suportado';
+  String get universalImport_summary_fileUnsupported => 'Formato não suportado';
 
   @override
   String get universalImport_summary_fileParseFailed => 'Falha na leitura';
@@ -23256,19 +23227,19 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_error_unsupportedFormat =>
-      'Este formato ainda nÃ£o Ã© suportado. Exporte como UDDF ou CSV.';
+      'Este formato ainda não é suportado. Exporte como UDDF ou CSV.';
 
   @override
   String get universalImport_error_duplicateCheckFailed =>
-      'A deteÃ§Ã£o de duplicados nÃ£o pÃ´de ser executada, por isso nada nesta lista estÃ¡ assinalado como jÃ¡ existente no seu registo. Verifique-a antes de importar.';
+      'A deteção de duplicados não pôde ser executada, por isso nada nesta lista está assinalado como já existente no seu registo. Verifique-a antes de importar.';
 
   @override
   String get universalImport_error_noColumnsToMap =>
-      'Este ficheiro nÃ£o tem colunas para mapear. Volte atrÃ¡s e selecione o ficheiro novamente, ou escolha outra origem.';
+      'Este ficheiro não tem colunas para mapear. Volte atrás e selecione o ficheiro novamente, ou escolha outra origem.';
 
   @override
   String universalImport_error_stepFailed(Object details) {
-    return 'NÃ£o foi possÃ­vel continuar a importaÃ§Ã£o: $details';
+    return 'Não foi possível continuar a importação: $details';
   }
 
   @override
@@ -23277,59 +23248,59 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          'Nada foi importado: nÃ£o foi possÃ­vel ler as datas de $count linhas.',
-      one: 'Nada foi importado: nÃ£o foi possÃ­vel ler a data de 1 linha.',
+          'Nada foi importado: não foi possível ler as datas de $count linhas.',
+      one: 'Nada foi importado: não foi possível ler a data de 1 linha.',
     );
     return '$_temp0';
   }
 
   @override
   String get universalImport_error_unreadableDatesHint =>
-      'Verifique se as colunas de data e hora estÃ£o mapeadas nesta etapa e se contÃªm datas.';
+      'Verifique se as colunas de data e hora estão mapeadas nesta etapa e se contêm datas.';
 
   @override
   String get universalImport_error_noDataInFile =>
-      'Nenhum dado importÃ¡vel foi encontrado neste arquivo.';
+      'Nenhum dado importável foi encontrado neste arquivo.';
 
   @override
   String universalImport_error_noDataInFileWithDetails(String details) {
-    return 'Nenhum dado importÃ¡vel foi encontrado neste arquivo: $details';
+    return 'Nenhum dado importável foi encontrado neste arquivo: $details';
   }
 
   @override
   String get universalImport_error_noDataInFiles =>
-      'Nenhum dado importÃ¡vel foi encontrado nos arquivos selecionados.';
+      'Nenhum dado importável foi encontrado nos arquivos selecionados.';
 
   @override
   String get universalImport_error_fileUnreadable =>
-      'NÃ£o foi possÃ­vel ler o arquivo selecionado. Selecione-o novamente.';
+      'Não foi possível ler o arquivo selecionado. Selecione-o novamente.';
 
   @override
   String universalImport_error_parseFailed(String details) {
-    return 'NÃ£o foi possÃ­vel ler o arquivo: $details';
+    return 'Não foi possível ler o arquivo: $details';
   }
 
   @override
   String get universalImport_error_noFilesInArchive =>
-      'Nenhum arquivo importÃ¡vel foi encontrado no arquivo compactado.';
+      'Nenhum arquivo importável foi encontrado no arquivo compactado.';
 
   @override
   String get universalImport_error_noFilesInFolder =>
-      'Nenhum arquivo importÃ¡vel foi encontrado na pasta selecionada.';
+      'Nenhum arquivo importável foi encontrado na pasta selecionada.';
 
   @override
   String universalImport_error_loadFailed(String details) {
-    return 'NÃ£o foi possÃ­vel carregar o arquivo: $details';
+    return 'Não foi possível carregar o arquivo: $details';
   }
 
   @override
   String universalImport_error_pickFailed(String details) {
-    return 'NÃ£o foi possÃ­vel abrir o arquivo: $details';
+    return 'Não foi possível abrir o arquivo: $details';
   }
 
   @override
   String universalImport_error_folderScanFailed(String details) {
-    return 'NÃ£o foi possÃ­vel verificar a pasta: $details';
+    return 'Não foi possível verificar a pasta: $details';
   }
 
   @override
@@ -23338,7 +23309,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String universalImport_error_garminReadFailed(String details) {
-    return 'NÃ£o foi possÃ­vel ler o dispositivo Garmin: $details';
+    return 'Não foi possível ler o dispositivo Garmin: $details';
   }
 
   @override
@@ -23347,7 +23318,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String universalImport_error_additionalFilePickFailed(String details) {
-    return 'NÃ£o foi possÃ­vel abrir o arquivo adicional: $details';
+    return 'Não foi possível abrir o arquivo adicional: $details';
   }
 
   @override
@@ -23366,7 +23337,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String universalImport_label_diveNumber(Object number) {
-    return 'Mergulho nÂº$number';
+    return 'Mergulho nº$number';
   }
 
   @override
@@ -23393,16 +23364,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String universalImport_label_percentMatch(Object percent) {
-    return '$percent% de correspondÃªncia';
+    return '$percent% de correspondência';
   }
 
   @override
-  String get universalImport_label_possibleMatch =>
-      'PossÃ­vel correspondÃªncia';
+  String get universalImport_label_possibleMatch => 'Possível correspondência';
 
   @override
   String get universalImport_label_selectCorrectSource =>
-      'NÃ£o estÃ¡ certo? Selecione a fonte correta:';
+      'Não está certo? Selecione a fonte correta:';
 
   @override
   String universalImport_label_selected(Object count) {
@@ -23460,7 +23430,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_entityAction_skipSubtitle =>
-      'Descartar esta importaÃ§Ã£o';
+      'Descartar esta importação';
 
   @override
   String get universalImport_entityAction_importAsNew => 'Importar como novo';
@@ -23498,17 +23468,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String universalImport_semantics_importError(Object error) {
-    return 'Erro de importaÃ§Ã£o: $error';
+    return 'Erro de importação: $error';
   }
 
   @override
   String universalImport_semantics_importProgress(Object percent) {
-    return 'Progresso da importaÃ§Ã£o: $percent porcento';
+    return 'Progresso da importação: $percent porcento';
   }
 
   @override
   String universalImport_semantics_itemsSelected(Object count) {
-    return '$count itens selecionados para importaÃ§Ã£o';
+    return '$count itens selecionados para importação';
   }
 
   @override
@@ -23517,11 +23487,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_semantics_possibleDuplicate =>
-      'PossÃ­vel duplicado';
+      'Possível duplicado';
 
   @override
   String get universalImport_semantics_probableDuplicate =>
-      'ProvÃ¡vel duplicado';
+      'Provável duplicado';
 
   @override
   String universalImport_semantics_sourceDetected(Object description) {
@@ -23564,7 +23534,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_tooltip_closeWizard =>
-      'Fechar assistente de importaÃ§Ã£o';
+      'Fechar assistente de importação';
 
   @override
   String weather_windFromDirection(Object wind, Object direction) {
@@ -23690,11 +23660,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String tides_semantic_tideCycle(Object state, Object height) {
-    return 'Ciclo de marÃ©, estado: $state, altura: $height';
+    return 'Ciclo de maré, estado: $state, altura: $height';
   }
 
   @override
-  String get tides_label_agoSuffix => 'atrÃ¡s';
+  String get tides_label_agoSuffix => 'atrás';
 
   @override
   String get tides_label_fromNowSuffix => 'a partir de agora';
@@ -23730,31 +23700,30 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveComputer_clockSync_appSettingOff =>
-      'DefiniÃ§Ã£o da app: desligada';
+      'Definição da app: desligada';
 
   @override
-  String get diveComputer_clockSync_appSettingOn =>
-      'DefiniÃ§Ã£o da app: ligada';
+  String get diveComputer_clockSync_appSettingOn => 'Definição da app: ligada';
 
   @override
-  String get diveComputer_clockSync_cardTitle => 'SincronizaÃ§Ã£o do relÃ³gio';
+  String get diveComputer_clockSync_cardTitle => 'Sincronização do relógio';
 
   @override
   String get diveComputer_clockSync_checkAgain => 'Verificar novamente';
 
   @override
   String get diveComputer_clockSync_globalSubtitle =>
-      'Acerta o relÃ³gio pela hora deste dispositivo apÃ³s cada download. Aplica-se apenas a este dispositivo.';
+      'Acerta o relógio pela hora deste dispositivo após cada download. Aplica-se apenas a este dispositivo.';
 
   @override
   String get diveComputer_clockSync_globalTitle =>
-      'Sincronizar relÃ³gios dos computadores de mergulho';
+      'Sincronizar relógios dos computadores de mergulho';
 
   @override
   String get diveComputer_clockSync_overrideAlways => 'Sempre';
 
   @override
-  String get diveComputer_clockSync_overrideInherit => 'DefiniÃ§Ã£o da app';
+  String get diveComputer_clockSync_overrideInherit => 'Definição da app';
 
   @override
   String get diveComputer_clockSync_overrideNever => 'Nunca';
@@ -23764,7 +23733,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveComputer_clockSync_unsupported =>
-      'Este modelo nÃ£o suporta a sincronizaÃ§Ã£o do relÃ³gio';
+      'Este modelo não suporta a sincronização do relógio';
 
   @override
   String get diveComputer_connectionType_ble => 'Bluetooth LE';
@@ -23834,7 +23803,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveComputer_detail_reimportDialogBody(String computerName) {
-    return 'Baixe todos os mergulhos de $computerName e compare-os com o seu log. Isso pode levar vÃ¡rios minutos.';
+    return 'Baixe todos os mergulhos de $computerName e compare-os com o seu log. Isso pode levar vários minutos.';
   }
 
   @override
@@ -23979,14 +23948,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveComputer_downloadStep_clockSyncFailed =>
-      'Falha na sincronizaÃ§Ã£o do relÃ³gio';
+      'Falha na sincronização do relógio';
 
   @override
   String get diveComputer_downloadStep_clockSyncUnsupported =>
-      'A sincronizaÃ§Ã£o do relÃ³gio nÃ£o Ã© suportada por este modelo';
+      'A sincronização do relógio não é suportada por este modelo';
 
   @override
-  String get diveComputer_downloadStep_clockSynced => 'RelÃ³gio sincronizado';
+  String get diveComputer_downloadStep_clockSynced => 'Relógio sincronizado';
 
   @override
   String diveComputer_downloadStep_depthMeters(Object depth) {
@@ -24021,7 +23990,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveComputer_downloadStep_firstSyncBody =>
-      'Seu diÃ¡rio jÃ¡ tem mergulhos. VocÃª pode pular o download de mergulhos que jÃ¡ possui.';
+      'Seu diário já tem mergulhos. Você pode pular o download de mergulhos que já possui.';
 
   @override
   String get diveComputer_downloadStep_firstSyncTitle =>
@@ -24029,7 +23998,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveComputer_downloadStep_onlyAfterDate(String date) {
-    return 'Baixar apenas mergulhos apÃ³s $date';
+    return 'Baixar apenas mergulhos após $date';
   }
 
   @override
@@ -24113,24 +24082,24 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveComputer_download_noSerialPortsFound =>
-      'Nenhuma porta serial USB encontrada. O computador de mergulho estÃ¡ conectado e ligado?';
+      'Nenhuma porta serial USB encontrada. O computador de mergulho está conectado e ligado?';
 
   @override
   String diveComputer_download_noUsbDeviceFound(Object model) {
-    return 'Nenhum $model encontrado por USB. EstÃ¡ conectado a este computador e ligado?';
+    return 'Nenhum $model encontrado por USB. Está conectado a este computador e ligado?';
   }
 
   @override
   String get diveComputer_download_stalePairing =>
-      'O emparelhamento Bluetooth deste computador de mergulho estÃ¡ desatualizado. EsqueÃ§a o computador de mergulho nas definiÃ§Ãµes de Bluetooth do seu dispositivo e emparelhe-o novamente a partir do menu Bluetooth do computador de mergulho.';
+      'O emparelhamento Bluetooth deste computador de mergulho está desatualizado. Esqueça o computador de mergulho nas definições de Bluetooth do seu dispositivo e emparelhe-o novamente a partir do menu Bluetooth do computador de mergulho.';
 
   @override
   String get diveComputer_download_discoveryStalled =>
-      'Ligou-se ao computador de mergulho, mas ele deixou de responder antes de a transferÃªncia comeÃ§ar. Normalmente isto significa que o emparelhamento Bluetooth estÃ¡ desatualizado: esqueÃ§a o computador de mergulho nas definiÃ§Ãµes de Bluetooth do seu dispositivo e tente novamente.';
+      'Ligou-se ao computador de mergulho, mas ele deixou de responder antes de a transferência começar. Normalmente isto significa que o emparelhamento Bluetooth está desatualizado: esqueça o computador de mergulho nas definições de Bluetooth do seu dispositivo e tente novamente.';
 
   @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {
-    return 'NÃ£o foi possÃ­vel conectar ao computador de mergulho.\n\nDetalhes de diagnÃ³stico (compartilhe com os desenvolvedores):\n$details';
+    return 'Não foi possível conectar ao computador de mergulho.\n\nDetalhes de diagnóstico (compartilhe com os desenvolvedores):\n$details';
   }
 
   @override
@@ -24166,7 +24135,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveComputer_download_newDivesOnlySubtitle =>
-      'Baixa apenas mergulhos adicionados desde a Ãºltima sincronizaÃ§Ã£o';
+      'Baixa apenas mergulhos adicionados desde a última sincronização';
 
   @override
   String get diveComputer_download_newDivesOnlyTitle =>
@@ -24182,7 +24151,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveComputer_download_reimportHint =>
-      'Procurando mergulhos antigos ou excluÃ­dos? Reimportar todos';
+      'Procurando mergulhos antigos ou excluídos? Reimportar todos';
 
   @override
   String get diveComputer_download_retry => 'Tentar Novamente';
@@ -24209,7 +24178,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveComputer_download_upToDate =>
-      'Nenhum mergulho novo encontrado -- seu registro estÃ¡ atualizado';
+      'Nenhum mergulho novo encontrado -- seu registro está atualizado';
 
   @override
   String get diveComputer_list_addComputer => 'Adicionar Computador';
@@ -24313,7 +24282,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveComputer_scan_emptyStateInstructions =>
-      'Certifique-se de que seu computador de mergulho:\nâ€¢ Esta ligado\nâ€¢ Esta no modo de emparelhamento Bluetooth\nâ€¢ Esta perto do seu dispositivo';
+      'Certifique-se de que seu computador de mergulho:\n• Esta ligado\n• Esta no modo de emparelhamento Bluetooth\n• Esta perto do seu dispositivo';
 
   @override
   String get diveComputer_scan_knownBadge => 'Conhecido';
@@ -24537,7 +24506,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'A importaÃ§Ã£o do Apple Watch precisa de um iPhone com a app SaÃºde.';
+      'A importação do Apple Watch precisa de um iPhone com a app Saúde.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>
@@ -24957,7 +24926,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gpsLogger_androidNotificationText =>
-      'Gravando sua trilha de superfÃ­cie';
+      'Gravando sua trilha de superfície';
 
   @override
   String get gpsLogger_androidNotificationTitle =>
@@ -24965,23 +24934,23 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gpsLogger_deleteTrackMessage =>
-      'Remove a trilha GPS gravada. As posiÃ§Ãµes jÃ¡ atribuÃ­das aos mergulhos sÃ£o mantidas.';
+      'Remove a trilha GPS gravada. As posições já atribuídas aos mergulhos são mantidas.';
 
   @override
   String get gpsLogger_deleteTrackTitle => 'Excluir trilha?';
 
   @override
   String get gpsLogger_interruptedNotice =>
-      'Uma gravaÃ§Ã£o anterior foi interrompida. A trilha foi salva.';
+      'Uma gravação anterior foi interrompida. A trilha foi salva.';
 
   @override
   String gpsLogger_lastFix(String age, String accuracy) {
-    return 'Ãšltima posiÃ§Ã£o hÃ¡ $age ($accuracy)';
+    return 'Última posição há $age ($accuracy)';
   }
 
   @override
   String get gpsLogger_locationOff =>
-      'Os serviÃ§os de localizaÃ§Ã£o estÃ£o desativados.';
+      'Os serviços de localização estão desativados.';
 
   @override
   String get gpsLogger_matchButton => 'Associar mergulhos aos registros GPS';
@@ -25003,7 +24972,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gpsLogger_permissionDenied =>
-      'A permissÃ£o de localizaÃ§Ã£o Ã© necessÃ¡ria para gravar uma trilha GPS. Ative-a nas configuraÃ§Ãµes do sistema.';
+      'A permissão de localização é necessária para gravar uma trilha GPS. Ative-a nas configurações do sistema.';
 
   @override
   String gpsLogger_recordingStatus(num count) {
@@ -25018,7 +24987,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gpsLogger_reviewSites =>
-      'Revisar correspondÃªncias de pontos de mergulho';
+      'Revisar correspondências de pontos de mergulho';
 
   @override
   String get gpsLogger_startButton => 'Iniciar registro';
@@ -25034,7 +25003,7 @@ class AppLocalizationsPt extends AppLocalizations {
       other: '$count pontos',
       one: '$count ponto',
     );
-    return 'Gravando trilha GPS Â· $_temp0';
+    return 'Gravando trilha GPS · $_temp0';
   }
 
   @override
@@ -25082,7 +25051,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gpsTrack_edit_splitWarning =>
-      'Dividir cria duas trilhas e remove a original. NÃ£o Ã© possÃ­vel desfazer.';
+      'Dividir cria duas trilhas e remove a original. Não é possível desfazer.';
 
   @override
   String get gpsTrack_edit_cancel => 'Cancelar';
@@ -25091,14 +25060,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gpsTrack_import_action => 'Importar trilha...';
 
   @override
-  String get gpsTrack_import_reviewTitle => 'Rever importaÃ§Ã£o';
+  String get gpsTrack_import_reviewTitle => 'Rever importação';
 
   @override
   String get gpsTrack_import_timezone => 'Gravada em';
 
   @override
   String get gpsTrack_import_timezoneHint =>
-      'As horas no ficheiro estÃ£o em UTC. Defina o fuso em que a trilha foi gravada para coincidir com os seus mergulhos.';
+      'As horas no ficheiro estão em UTC. Defina o fuso em que a trilha foi gravada para coincidir com os seus mergulhos.';
 
   @override
   String get gpsTrack_import_duplicate =>
@@ -25126,28 +25095,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String gpsTrack_import_failed(String reason) {
-    return 'NÃ£o foi possÃ­vel ler o ficheiro: $reason';
+    return 'Não foi possível ler o ficheiro: $reason';
   }
 
   @override
   String get gpsTrack_importError_unsupportedFormat =>
-      'Esse tipo de arquivo nÃ£o Ã© compatÃ­vel. Importe um arquivo GPX, KML, CSV ou FIT.';
+      'Esse tipo de arquivo não é compatível. Importe um arquivo GPX, KML, CSV ou FIT.';
 
   @override
   String get gpsTrack_importError_unreadable =>
-      'NÃ£o foi possÃ­vel ler esse arquivo. Ele pode estar danificado ou incompleto.';
+      'Não foi possível ler esse arquivo. Ele pode estar danificado ou incompleto.';
 
   @override
   String get gpsTrack_importError_noPositions =>
-      'Esse arquivo nÃ£o tem posiÃ§Ãµes GPS com data e hora.';
+      'Esse arquivo não tem posições GPS com data e hora.';
 
   @override
   String get gpsTrack_importError_badData =>
-      'Esse arquivo tem uma posiÃ§Ã£o ou data e hora que o app nÃ£o consegue ler.';
+      'Esse arquivo tem uma posição ou data e hora que o app não consegue ler.';
 
   @override
   String get gpsTrack_importError_tooLarge =>
-      'Esse arquivo tem posiÃ§Ãµes demais para ser salvo como um Ãºnico trajeto. Divida-o em trajetos menores e importe cada um separadamente.';
+      'Esse arquivo tem posições demais para ser salvo como um único trajeto. Divida-o em trajetos menores e importe cada um separadamente.';
 
   @override
   String get gpsTrack_export_saved => 'Trilha guardada';
@@ -25168,7 +25137,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gpsTrack_action_saveKml => 'Guardar como KML...';
 
   @override
-  String get gpsTrack_export_failed => 'Falha na exportaÃ§Ã£o.';
+  String get gpsTrack_export_failed => 'Falha na exportação.';
 
   @override
   String get gpsTrack_map_title => 'Mapa de trilhas';
@@ -25179,7 +25148,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get gpsTrack_map_noTracks => 'NÃ£o hÃ¡ trilhas gravadas para mostrar.';
+  String get gpsTrack_map_noTracks => 'Não há trilhas gravadas para mostrar.';
 
   @override
   String get gpsTrack_map_showMap => 'Mostrar mapa';
@@ -25194,19 +25163,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gpsTrack_inspect_speed => 'Velocidade';
 
   @override
-  String get gpsTrack_inspect_accuracy => 'PrecisÃ£o';
+  String get gpsTrack_inspect_accuracy => 'Precisão';
 
   @override
-  String get gpsTrack_stats_distance => 'DistÃ¢ncia';
+  String get gpsTrack_stats_distance => 'Distância';
 
   @override
-  String get gpsTrack_stats_duration => 'DuraÃ§Ã£o';
+  String get gpsTrack_stats_duration => 'Duração';
 
   @override
-  String get gpsTrack_stats_avgSpeed => 'Vel. mÃ©dia';
+  String get gpsTrack_stats_avgSpeed => 'Vel. média';
 
   @override
-  String get gpsTrack_stats_maxSpeed => 'Vel. mÃ¡x.';
+  String get gpsTrack_stats_maxSpeed => 'Vel. máx.';
 
   @override
   String get gpsTrack_stats_fixes => 'Pontos';
@@ -25227,10 +25196,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gpsTrack_legend_slower => 'Mais lento';
 
   @override
-  String get gpsTrack_legend_faster => 'Mais rÃ¡pido';
+  String get gpsTrack_legend_faster => 'Mais rápido';
 
   @override
-  String get gpsTrack_legend_start => 'InÃ­cio';
+  String get gpsTrack_legend_start => 'Início';
 
   @override
   String get gpsTrack_legend_end => 'Fim';
@@ -25239,20 +25208,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gpsTrack_detail_title => 'Trilha GPS';
 
   @override
-  String get gpsTrack_detail_notFound =>
-      'Esta trilha jÃ¡ nÃ£o estÃ¡ disponÃ­vel.';
+  String get gpsTrack_detail_notFound => 'Esta trilha já não está disponível.';
 
   @override
   String get gpsTrack_detail_unreadable =>
-      'NÃ£o foi possÃ­vel ler os dados da trilha.';
+      'Não foi possível ler os dados da trilha.';
 
   @override
   String get gpsTrack_detail_noPoints =>
-      'Esta trilha nÃ£o tem posiÃ§Ãµes registadas.';
+      'Esta trilha não tem posições registadas.';
 
   @override
   String get maps_compass_resetLabel =>
-      'Redefinir a orientaÃ§Ã£o do mapa para o norte';
+      'Redefinir a orientação do mapa para o norte';
 
   @override
   String get maps_compass_resetTooltip => 'Norte para cima';
@@ -25324,7 +25292,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String maps_offline_deleteRegionLegacyMessage(Object name) {
-    return 'Excluir \"$name\"?\n\nEsta regiÃ£o foi baixada por uma versÃ£o anterior, portanto seus tiles estÃ£o armazenados junto com os de outras regiÃµes e nÃ£o podem ser liberados separadamente. ExcluÃ­-la nÃ£o libera armazenamento.';
+    return 'Excluir \"$name\"?\n\nEsta região foi baixada por uma versão anterior, portanto seus tiles estão armazenados junto com os de outras regiões e não podem ser liberados separadamente. Excluí-la não libera armazenamento.';
   }
 
   @override
@@ -25462,21 +25430,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tankPresets_builtInPresets => 'Presets Integrados';
 
   @override
-  String get tankPresets_currentDefault => 'PadrÃ£o atual';
+  String get tankPresets_currentDefault => 'Padrão atual';
 
   @override
   String get tankPresets_customPresets => 'Presets Personalizados';
 
   @override
-  String get tankPresets_defaultSettings => 'Cilindro padrÃ£o';
+  String get tankPresets_defaultSettings => 'Cilindro padrão';
 
   @override
   String get tankPresets_defaultSettings_description =>
-      'O preset marcado com estrela Ã© usado como cilindro padrÃ£o ao registrar novos mergulhos.';
+      'O preset marcado com estrela é usado como cilindro padrão ao registrar novos mergulhos.';
 
   @override
   String tankPresets_deleteDefaultMessage(String name) {
-    return 'Tem certeza de que deseja excluir \"$name\"? Este Ã© seu preset de cilindro padrÃ£o atual e serÃ¡ redefinido para AL80.';
+    return 'Tem certeza de que deseja excluir \"$name\"? Este é seu preset de cilindro padrão atual e será redefinido para AL80.';
   }
 
   @override
@@ -25599,11 +25567,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tankPresets_applyToImports =>
-      'Aplicar tambÃ©m a mergulhos importados';
+      'Aplicar também a mergulhos importados';
 
   @override
   String get tankPresets_applyToImports_subtitle =>
-      'Preencher dados de cilindro ausentes em mergulhos importados usando o preset padrÃ£o';
+      'Preencher dados de cilindro ausentes em mergulhos importados usando o preset padrão';
 
   @override
   String get tankPresets_new_title => 'Novo Preset de Cilindro';
@@ -25612,17 +25580,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tankPresets_noPresets => 'Nenhum preset de cilindro disponivel';
 
   @override
-  String get tankPresets_setAsDefault => 'Definir como padrÃ£o';
+  String get tankPresets_setAsDefault => 'Definir como padrão';
 
   @override
   String get tankPresets_title => 'Presets de Cilindro';
 
   @override
   String get tools_gpsLogger_description =>
-      'Grave sua posiÃ§Ã£o durante um dia de mergulho e associe automaticamente os mergulhos importados a localizaÃ§Ãµes GPS.';
+      'Grave sua posição durante um dia de mergulho e associe automaticamente os mergulhos importados a localizações GPS.';
 
   @override
-  String get tools_gpsLogger_subtitle => 'Grave uma trilha de superfÃ­cie';
+  String get tools_gpsLogger_subtitle => 'Grave uma trilha de superfície';
 
   @override
   String get tools_gpsLogger_title => 'Registrador GPS';
@@ -25714,19 +25682,19 @@ class AppLocalizationsPt extends AppLocalizations {
       'Connected services & integrations';
 
   @override
-  String get settings_siteMatch_title => 'AssociaÃ§Ã£o automÃ¡tica de pontos';
+  String get settings_siteMatch_title => 'Associação automática de pontos';
 
   @override
   String get settings_siteMatch_subtitle =>
-      'Com que intensidade os mergulhos baixados sÃ£o associados aos pontos';
+      'Com que intensidade os mergulhos baixados são associados aos pontos';
 
   @override
   String get settings_tankPressureAtSurfacing_title =>
-      'PressÃ£o da garrafa Ã  superfÃ­cie';
+      'Pressão da garrafa à superfície';
 
   @override
   String get settings_tankPressureAtSurfacing_subtitle =>
-      'Usar a pressÃ£o final ao chegar Ã  superfÃ­cie, nÃ£o no fim da gravaÃ§Ã£o';
+      'Usar a pressão final ao chegar à superfície, não no fim da gravação';
 
   @override
   String get settings_siteMatch_strict => 'Rigoroso';
@@ -25735,7 +25703,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_siteMatch_balanced => 'Equilibrado';
 
   @override
-  String get settings_siteMatch_relaxed => 'FlexÃ­vel';
+  String get settings_siteMatch_relaxed => 'Flexível';
 
   @override
   String get settings_dataSources_header => 'Data Sources';
@@ -25795,32 +25763,31 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_edit_section_environment => 'Ambiente';
 
   @override
-  String get diveLog_edit_subsection_autofill => 'Preenchimento automÃ¡tico';
+  String get diveLog_edit_subsection_autofill => 'Preenchimento automático';
 
   @override
   String get diveLog_edit_subsection_weather => 'Clima';
 
   @override
-  String get diveLog_edit_subsection_diveConditions =>
-      'CondiÃ§Ãµes de mergulho';
+  String get diveLog_edit_subsection_diveConditions => 'Condições de mergulho';
 
   @override
   String get diveLog_edit_label_windSpeed => 'Velocidade do vento';
 
   @override
-  String get diveLog_edit_label_windDirection => 'DireÃ§Ã£o do vento';
+  String get diveLog_edit_label_windDirection => 'Direção do vento';
 
   @override
   String get diveLog_edit_label_cloudCover => 'Cobertura de nuvens';
 
   @override
-  String get diveLog_edit_label_precipitation => 'PrecipitaÃ§Ã£o';
+  String get diveLog_edit_label_precipitation => 'Precipitação';
 
   @override
   String get diveLog_edit_label_humidity => 'Umidade';
 
   @override
-  String get diveLog_edit_label_weatherDescription => 'DescriÃ§Ã£o do clima';
+  String get diveLog_edit_label_weatherDescription => 'Descrição do clima';
 
   @override
   String get diveLog_edit_button_fetchWeather => 'Fetch Weather';
@@ -25857,25 +25824,25 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_detail_subsection_diveConditions =>
-      'CondiÃ§Ãµes de mergulho';
+      'Condições de mergulho';
 
   @override
   String get diveLog_detail_label_windSpeed => 'Velocidade do vento';
 
   @override
-  String get diveLog_detail_label_windDirection => 'DireÃ§Ã£o do vento';
+  String get diveLog_detail_label_windDirection => 'Direção do vento';
 
   @override
   String get diveLog_detail_label_cloudCover => 'Cobertura de nuvens';
 
   @override
-  String get diveLog_detail_label_precipitation => 'PrecipitaÃ§Ã£o';
+  String get diveLog_detail_label_precipitation => 'Precipitação';
 
   @override
   String get diveLog_detail_label_humidity => 'Umidade';
 
   @override
-  String get diveLog_detail_label_weatherDescription => 'DescriÃ§Ã£o';
+  String get diveLog_detail_label_weatherDescription => 'Descrição';
 
   @override
   String get diveLog_detail_weatherSourceOpenMeteo => 'via Open-Meteo';
@@ -25885,18 +25852,18 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dropTarget_subtitle =>
-      'Solte para abrir o assistente de importaÃ§Ã£o';
+      'Solte para abrir o assistente de importação';
 
   @override
   String get dropTarget_error_unsupportedFile =>
-      'Tipo de arquivo nÃ£o suportado';
+      'Tipo de arquivo não suportado';
 
   @override
   String get dropTarget_error_wizardActive =>
-      'Conclua a importaÃ§Ã£o atual primeiro';
+      'Conclua a importação atual primeiro';
 
   @override
-  String get dropTarget_error_readFailed => 'NÃ£o foi possÃ­vel ler o arquivo';
+  String get dropTarget_error_readFailed => 'Não foi possível ler o arquivo';
 
   @override
   String get enum_cloudCover_clear => 'Limpo';
@@ -25929,7 +25896,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_precipitation_snow => 'Neve';
 
   @override
-  String get enum_precipitation_sleet => 'Granizo miÃºdo';
+  String get enum_precipitation_sleet => 'Granizo miúdo';
 
   @override
   String get enum_precipitation_hail => 'Granizo';
@@ -25938,38 +25905,38 @@ class AppLocalizationsPt extends AppLocalizations {
   String get columnConfig_title => 'Campos da lista de detalhes de mergulhos';
 
   @override
-  String get columnConfig_viewMode => 'Modo de visualizaÃ§Ã£o';
+  String get columnConfig_viewMode => 'Modo de visualização';
 
   @override
-  String get columnConfig_visibleColumns => 'Colunas visÃ­veis';
+  String get columnConfig_visibleColumns => 'Colunas visíveis';
 
   @override
-  String get columnConfig_availableFields => 'Campos disponÃ­veis';
+  String get columnConfig_availableFields => 'Campos disponíveis';
 
   @override
   String get columnConfig_extraFields => 'Campos extras';
 
   @override
   String get columnConfig_extraFields_description =>
-      'Exibidos abaixo do conteÃºdo principal do cartÃ£o';
+      'Exibidos abaixo do conteúdo principal do cartão';
 
   @override
-  String get columnConfig_slotAssignments => 'AtribuiÃ§Ãµes de posiÃ§Ãµes';
+  String get columnConfig_slotAssignments => 'Atribuições de posições';
 
   @override
-  String get columnConfig_resetToDefault => 'Redefinir para o padrÃ£o';
+  String get columnConfig_resetToDefault => 'Redefinir para o padrão';
 
   @override
-  String get columnConfig_preset => 'PredefiniÃ§Ã£o';
+  String get columnConfig_preset => 'Predefinição';
 
   @override
   String get columnConfig_presetSaveAs => 'Salvar como';
 
   @override
-  String get columnConfig_presetName => 'Nome da predefiniÃ§Ã£o';
+  String get columnConfig_presetName => 'Nome da predefinição';
 
   @override
-  String get columnConfig_presetNameHint => 'ex.: Mergulho tÃ©cnico';
+  String get columnConfig_presetNameHint => 'ex.: Mergulho técnico';
 
   @override
   String get columnConfig_presetSave => 'Salvar';
@@ -25981,7 +25948,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get columnConfig_columns => 'Colunas';
 
   @override
-  String get columnConfig_done => 'ConcluÃ­do';
+  String get columnConfig_done => 'Concluído';
 
   @override
   String get settings_appearance_columnConfig =>
@@ -25989,7 +25956,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_appearance_columnConfig_subtitle =>
-      'Personalizar os campos exibidos nas visualizaÃ§Ãµes de lista de mergulhos';
+      'Personalizar os campos exibidos nas visualizações de lista de mergulhos';
 
   @override
   String get diveField_category_core => 'Essencial';
@@ -25998,7 +25965,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveField_category_environment => 'Ambiente';
 
   @override
-  String get diveField_category_gas => 'GÃ¡s';
+  String get diveField_category_gas => 'Gás';
 
   @override
   String get diveField_category_tank => 'Cilindro';
@@ -26010,7 +25977,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveField_category_equipment => 'Equipamento';
 
   @override
-  String get diveField_category_deco => 'DescompressÃ£o';
+  String get diveField_category_deco => 'Descompressão';
 
   @override
   String get diveField_category_physiology => 'Fisiologia';
@@ -26022,13 +25989,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveField_category_people => 'Pessoas';
 
   @override
-  String get diveField_category_location => 'LocalizaÃ§Ã£o';
+  String get diveField_category_location => 'Localização';
 
   @override
   String get diveField_category_trip => 'Viagem';
 
   @override
-  String get diveField_category_rating => 'AvaliaÃ§Ã£o';
+  String get diveField_category_rating => 'Avaliação';
 
   @override
   String get diveField_category_metadata => 'Metadados';
@@ -26040,34 +26007,33 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_appearance_general => 'Geral';
 
   @override
-  String get settings_appearance_sections => 'SeÃ§Ãµes';
+  String get settings_appearance_sections => 'Seções';
 
   @override
   String get settings_appearance_colorAccents => 'Acentos de cor';
 
   @override
   String get settings_appearance_accentNavIcons =>
-      'Ãcones de navegaÃ§Ã£o coloridos';
+      'Ícones de navegação coloridos';
 
   @override
   String get settings_appearance_accentNavIcons_subtitle =>
-      'Colorir os Ã­cones do menu principal com a cor de cada seÃ§Ã£o';
+      'Colorir os ícones do menu principal com a cor de cada seção';
 
   @override
   String get settings_appearance_accentSectionHeaders =>
-      'CabeÃ§alhos de seÃ§Ã£o coloridos';
+      'Cabeçalhos de seção coloridos';
 
   @override
   String get settings_appearance_accentSectionHeaders_subtitle =>
-      'Mostrar um Ã­cone de seÃ§Ã£o colorido ao lado dos tÃ­tulos das pÃ¡ginas';
+      'Mostrar um ícone de seção colorido ao lado dos títulos das páginas';
 
   @override
-  String get settings_appearance_accentListIcons =>
-      'Ãcones de lista coloridos';
+  String get settings_appearance_accentListIcons => 'Ícones de lista coloridos';
 
   @override
   String get settings_appearance_accentListIcons_subtitle =>
-      'Colorir os Ã­cones nas listas e nas pÃ¡ginas de configuraÃ§Ãµes';
+      'Colorir os ícones nas listas e nas páginas de configurações';
 
   @override
   String get settings_appearance_showDetailsPane =>
@@ -26079,11 +26045,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_appearance_showProfilePanel =>
-      'Mostrar painel de perfil na visualizaÃ§Ã£o de tabela';
+      'Mostrar painel de perfil na visualização de tabela';
 
   @override
   String get settings_appearance_showProfilePanel_subtitle =>
-      'Exibir grÃ¡fico de perfil de mergulho acima da tabela por padrÃ£o';
+      'Exibir gráfico de perfil de mergulho acima da tabela por padrão';
 
   @override
   String get settings_appearance_mapStyle => 'Estilo do Mapa';
@@ -26092,10 +26058,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_appearance_mapStyle_openStreetMap => 'Mapa de Ruas';
 
   @override
-  String get settings_appearance_mapStyle_openTopoMap => 'TopogrÃ¡fico';
+  String get settings_appearance_mapStyle_openTopoMap => 'Topográfico';
 
   @override
-  String get settings_appearance_mapStyle_esriSatellite => 'SatÃ©lite';
+  String get settings_appearance_mapStyle_esriSatellite => 'Satélite';
 
   @override
   String get settings_appearance_bathymetryRefresh =>
@@ -26103,7 +26069,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_appearance_bathymetryRefresh_subtitle =>
-      'Verifica se hÃ¡ atualizaÃ§Ãµes nos dados de profundidade swissBATHY3D';
+      'Verifica se há atualizações nos dados de profundidade swissBATHY3D';
 
   @override
   String settings_appearance_bathymetryRefresh_resultUpdated(int count) {
@@ -26118,15 +26084,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_appearance_bathymetryRefresh_resultUpToDate =>
-      'Todos os dados estÃ£o atualizados';
+      'Todos os dados estão atualizados';
 
   @override
   String get settings_appearance_bathymetryRefresh_resultFailed =>
-      'NÃ£o foi possÃ­vel verificar todos os dados; os valores existentes foram mantidos';
+      'Não foi possível verificar todos os dados; os valores existentes foram mantidos';
 
   @override
   String get settings_appearance_bathymetryRefresh_resultNothingCached =>
-      'Ainda nÃ£o hÃ¡ dados de profundidade de lagos armazenados';
+      'Ainda não há dados de profundidade de lagos armazenados';
 
   @override
   String get common_action_reparse => 'Reanalisar';
@@ -26141,7 +26107,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveComputer_detail_reparseAllMessage(int count) {
-    return 'Reexecute o analisador de mergulhos em $count mergulhos com dados brutos armazenados. Isso atualiza os dados de perfil e de sensores, mas preserva suas notas, locais, parceiros e outras ediÃ§Ãµes.';
+    return 'Reexecute o analisador de mergulhos em $count mergulhos com dados brutos armazenados. Isso atualiza os dados de perfil e de sensores, mas preserva suas notas, locais, parceiros e outras edições.';
   }
 
   @override
@@ -26185,11 +26151,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_detail_reparseProfilePreserved =>
-      'Detalhes da fonte atualizados. Este mergulho foi combinado a partir de outros mergulhos, por isso o seu perfil nÃ£o foi alterado.';
+      'Detalhes da fonte atualizados. Este mergulho foi combinado a partir de outros mergulhos, por isso o seu perfil não foi alterado.';
 
   @override
   String diveLog_detail_reparseFailed(String error) {
-    return 'Falha na reanÃ¡lise: $error';
+    return 'Falha na reanálise: $error';
   }
 
   @override
@@ -26202,27 +26168,27 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_detail_resyncFailed_diveMissing =>
-      'NÃ£o foi possÃ­vel ressincronizar: este mergulho nÃ£o existe mais';
+      'Não foi possível ressincronizar: este mergulho não existe mais';
 
   @override
   String get diveLog_detail_resyncFailed_noStoredFile =>
-      'NÃ£o foi possÃ­vel ressincronizar: nenhum arquivo original foi salvo para este mergulho';
+      'Não foi possível ressincronizar: nenhum arquivo original foi salvo para este mergulho';
 
   @override
   String get diveLog_detail_resyncFailed_unsupportedFormat =>
-      'NÃ£o foi possÃ­vel ressincronizar: este formato de arquivo nÃ£o Ã© compatÃ­vel';
+      'Não foi possível ressincronizar: este formato de arquivo não é compatível';
 
   @override
   String get diveLog_detail_resyncFailed_storedFileMissing =>
-      'NÃ£o foi possÃ­vel ressincronizar: o arquivo original nÃ£o estÃ¡ mais neste dispositivo';
+      'Não foi possível ressincronizar: o arquivo original não está mais neste dispositivo';
 
   @override
   String get diveLog_detail_resyncFailed_noMatchingDive =>
-      'NÃ£o foi possÃ­vel ressincronizar: o arquivo original nÃ£o contÃ©m mais um mergulho correspondente';
+      'Não foi possível ressincronizar: o arquivo original não contém mais um mergulho correspondente';
 
   @override
   String get diveLog_detail_resyncFailed_unexpectedError =>
-      'NÃ£o foi possÃ­vel ressincronizar: ocorreu um erro inesperado ao ler o arquivo original';
+      'Não foi possível ressincronizar: ocorreu um erro inesperado ao ler o arquivo original';
 
   @override
   String get universalImport_label_replaceSource => 'Substituir Fonte';
@@ -26232,30 +26198,30 @@ class AppLocalizationsPt extends AppLocalizations {
       'Atualizar a partir do mesmo computador';
 
   @override
-  String get universalImport_title_importOptions => 'OpÃ§Ãµes de ImportaÃ§Ã£o';
+  String get universalImport_title_importOptions => 'Opções de Importação';
 
   @override
-  String get universalImport_label_options => 'OpÃ§Ãµes';
+  String get universalImport_label_options => 'Opções';
 
   @override
   String get universalImport_label_retainDiveNumbers =>
-      'Manter nÃºmeros de mergulho da origem';
+      'Manter números de mergulho da origem';
 
   @override
   String get universalImport_label_retainDiveNumbersSubtitle =>
-      'Usar os nÃºmeros de mergulho do arquivo importado em vez de atribuÃ­-los automaticamente';
+      'Usar os números de mergulho do arquivo importado em vez de atribuí-los automaticamente';
 
   @override
   String get universalImport_label_retainDiveNumbersUnavailable =>
-      'Esta origem nÃ£o fornece nÃºmeros de mergulho, por isso os mergulhos sÃ£o numerados automaticamente';
+      'Esta origem não fornece números de mergulho, por isso os mergulhos são numerados automaticamente';
 
   @override
   String get universalImport_label_autoTagThisImport =>
-      'Marcar esta importaÃ§Ã£o automaticamente';
+      'Marcar esta importação automaticamente';
 
   @override
   String get universalImport_label_autoTagThisImportSubtitle =>
-      'ComeÃ§a com a sua preferÃªncia guardada nas configuraÃ§Ãµes de Etiquetas. AlterÃ¡-la aqui afeta apenas esta importaÃ§Ã£o.';
+      'Começa com a sua preferência guardada nas configurações de Etiquetas. Alterá-la aqui afeta apenas esta importação.';
 
   @override
   String get universalImport_title_successImported => 'Importados com Sucesso';
@@ -26277,7 +26243,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_label_replacedSourceData =>
-      'Dados de origem substituÃ­dos';
+      'Dados de origem substituídos';
 
   @override
   String get universalImport_label_consolidated => 'Consolidados';
@@ -26295,7 +26261,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_shareByDefault_title =>
-      'Partilhar novos locais e viagens por predefiniÃ§Ã£o';
+      'Partilhar novos locais e viagens por predefinição';
 
   @override
   String get settings_shareAllSites_title => 'Partilhar todos os meus locais';
@@ -26306,12 +26272,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String settings_shareAllSites_confirm(int count) {
-    return 'Tornar os teus $count locais visÃ­veis a todos os perfis de mergulho desta app? PoderÃ¡s deixar de partilhar locais individuais mais tarde.';
+    return 'Tornar os teus $count locais visíveis a todos os perfis de mergulho desta app? Poderás deixar de partilhar locais individuais mais tarde.';
   }
 
   @override
   String settings_shareAllTrips_confirm(int count) {
-    return 'Tornar as tuas $count viagens visÃ­veis a todos os perfis de mergulho desta app? PoderÃ¡s deixar de partilhar viagens individuais mais tarde.';
+    return 'Tornar as tuas $count viagens visíveis a todos os perfis de mergulho desta app? Poderás deixar de partilhar viagens individuais mais tarde.';
   }
 
   @override
@@ -26342,7 +26308,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String trips_unshareConfirm_body(String name) {
-    return 'Isto irÃ¡ remover Â«$nameÂ» das vistas dos outros perfis de mergulho. PoderÃ¡s voltar a partilhar mais tarde.';
+    return 'Isto irá remover «$name» das vistas dos outros perfis de mergulho. Poderás voltar a partilhar mais tarde.';
   }
 
   @override
@@ -26350,7 +26316,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String sites_unshareConfirm_body(String name) {
-    return 'Isto irÃ¡ remover Â«$nameÂ» das vistas dos outros perfis de mergulho. PoderÃ¡s voltar a partilhar mais tarde.';
+    return 'Isto irá remover «$name» das vistas dos outros perfis de mergulho. Poderás voltar a partilhar mais tarde.';
   }
 
   @override
@@ -26358,7 +26324,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String trips_deleteShared_body(String name) {
-    return 'Â«$nameÂ» estÃ¡ partilhada com outros perfis de mergulho. EliminÃ¡-la aqui remove-a para todos.';
+    return '«$name» está partilhada com outros perfis de mergulho. Eliminá-la aqui remove-a para todos.';
   }
 
   @override
@@ -26366,7 +26332,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String sites_deleteShared_body(String name) {
-    return 'Â«$nameÂ» estÃ¡ partilhado com outros perfis de mergulho. EliminÃ¡-lo aqui remove-o para todos.';
+    return '«$name» está partilhado com outros perfis de mergulho. Eliminá-lo aqui remove-o para todos.';
   }
 
   @override
@@ -26383,7 +26349,7 @@ class AppLocalizationsPt extends AppLocalizations {
       other: 'locais partilhados',
       one: 'local partilhado',
     );
-    return 'Mergulhador eliminado. $trips $_temp0 e $sites $_temp1 reatribuÃ­dos a $name.';
+    return 'Mergulhador eliminado. $trips $_temp0 e $sites $_temp1 reatribuídos a $name.';
   }
 
   @override
@@ -26392,7 +26358,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_duplicateDivers_description =>
-      'A sincronizaÃ§Ã£o encontrou mais de um perfil com o mesmo nome. Isso acontece normalmente quando cada dispositivo criou o seu prÃ³prio perfil antes de sincronizar. A fusÃ£o move todos os mergulhos e dados para um Ãºnico perfil.';
+      'A sincronização encontrou mais de um perfil com o mesmo nome. Isso acontece normalmente quando cada dispositivo criou o seu próprio perfil antes de sincronizar. A fusão move todos os mergulhos e dados para um único perfil.';
 
   @override
   String settings_cloudSync_duplicateDivers_groupLabel(String name, int count) {
@@ -26417,7 +26383,7 @@ class AppLocalizationsPt extends AppLocalizations {
       other: '$count perfis duplicados',
       one: 'um perfil duplicado',
     );
-    return 'Todos os mergulhos, certificaÃ§Ãµes, equipamento e outros dados de $_temp0 serÃ£o movidos para \"$name\". Esta aÃ§Ã£o nÃ£o pode ser desfeita automaticamente.';
+    return 'Todos os mergulhos, certificações, equipamento e outros dados de $_temp0 serão movidos para \"$name\". Esta ação não pode ser desfeita automaticamente.';
   }
 
   @override
@@ -26440,11 +26406,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_cloudSync_duplicateDivers_undo => 'Desfazer';
 
   @override
-  String get divers_edit_priorExperienceSection => 'ExperiÃªncia Anterior';
+  String get divers_edit_priorExperienceSection => 'Experiência Anterior';
 
   @override
   String get divers_edit_priorExperienceHelp =>
-      'Mergulhos e tempo de antes de comeÃ§ar a registar no Submersion.';
+      'Mergulhos e tempo de antes de começar a registar no Submersion.';
 
   @override
   String get divers_edit_priorDivesLabel => 'Mergulhos anteriores';
@@ -26459,13 +26425,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get divers_edit_divingSinceLabel => 'Mergulha desde';
 
   @override
-  String get divers_edit_divingSinceNotSet => 'NÃ£o definido';
+  String get divers_edit_divingSinceNotSet => 'Não definido';
 
   @override
   String get divers_edit_clearDivingSinceTooltip => 'Limpar mergulha desde';
 
   @override
-  String get divers_edit_priorInvalidNumber => 'Introduza um nÃºmero vÃ¡lido';
+  String get divers_edit_priorInvalidNumber => 'Introduza um número válido';
 
   @override
   String statistics_priorBreakdown(String logged, String prior) {
@@ -26484,15 +26450,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get db_location_internal => 'Armazenamento interno';
 
   @override
-  String get db_location_sd_card => 'CartÃ£o SD';
+  String get db_location_sd_card => 'Cartão SD';
 
   @override
   String get db_location_external_note =>
-      'Os arquivos aqui sÃ£o removidos se vocÃª desinstalar o aplicativo.';
+      'Os arquivos aqui são removidos se você desinstalar o aplicativo.';
 
   @override
   String get db_location_backup_note =>
-      'O Android nÃ£o consegue executar o banco de dados a partir de uma pasta sincronizada na nuvem. Para manter uma cÃ³pia no Dropbox, Nextcloud ou Google Drive, defina o Local do Backup em Backup e RestauraÃ§Ã£o.';
+      'O Android não consegue executar o banco de dados a partir de uma pasta sincronizada na nuvem. Para manter uma cópia no Dropbox, Nextcloud ou Google Drive, defina o Local do Backup em Backup e Restauração.';
 
   @override
   String diveLog_bulkEdit_membership_onAll(int count) {
@@ -26514,18 +26480,18 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_bulkEdit_membership_empty =>
-      'Ainda nÃ£o hÃ¡ itens nos mergulhos selecionados';
+      'Ainda não há itens nos mergulhos selecionados';
 
   @override
-  String get settings_mediaStorage_entry_title => 'Armazenamento de mÃ­dia';
+  String get settings_mediaStorage_entry_title => 'Armazenamento de mídia';
 
   @override
   String get settings_mediaStorage_entry_subtitle =>
-      'Guarde os originais de fotos e vÃ­deos no seu prÃ³prio armazenamento em nuvem';
+      'Guarde os originais de fotos e vídeos no seu próprio armazenamento em nuvem';
 
   @override
   String get settings_mediaStorage_status_notConfigured =>
-      'Nenhum armazenamento de mÃ­dia conectado neste dispositivo';
+      'Nenhum armazenamento de mídia conectado neste dispositivo';
 
   @override
   String settings_mediaStorage_status_connected(String hint) {
@@ -26533,45 +26499,45 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get settings_mediaStorage_test_success => 'ConexÃ£o bem-sucedida';
+  String get settings_mediaStorage_test_success => 'Conexão bem-sucedida';
 
   @override
-  String get settings_mediaStorage_saved => 'Armazenamento de mÃ­dia conectado';
+  String get settings_mediaStorage_saved => 'Armazenamento de mídia conectado';
 
   @override
   String get settings_mediaStorage_error_notReady =>
-      'Ainda nÃ£o foi possÃ­vel ler o armazenamento na nuvem. Aguarde um momento e tente novamente.';
+      'Ainda não foi possível ler o armazenamento na nuvem. Aguarde um momento e tente novamente.';
 
   @override
   String get settings_mediaStorage_action_disconnect => 'Desconectar';
 
   @override
   String get settings_mediaStorage_disconnect_confirm_title =>
-      'Desconectar o armazenamento de mÃ­dia?';
+      'Desconectar o armazenamento de mídia?';
 
   @override
   String get settings_mediaStorage_disconnect_confirm_body =>
-      'Este dispositivo deixa de enviar e buscar mÃ­dia. Nada Ã© excluÃ­do do seu bucket.';
+      'Este dispositivo deixa de enviar e buscar mídia. Nada é excluído do seu bucket.';
 
   @override
   String get settings_mediaStorage_action_copyFromSync =>
-      'Copiar configuraÃ§Ãµes do Sync';
+      'Copiar configurações do Sync';
 
   @override
-  String get settings_mediaStorage_transfers_title => 'TransferÃªncias';
+  String get settings_mediaStorage_transfers_title => 'Transferências';
 
   @override
-  String get settings_mediaStorage_transfers_entry => 'Ver transferÃªncias';
+  String get settings_mediaStorage_transfers_entry => 'Ver transferências';
 
   @override
-  String get settings_mediaStorage_transfers_empty => 'Sem transferÃªncias';
+  String get settings_mediaStorage_transfers_empty => 'Sem transferências';
 
   @override
   String get settings_mediaStorage_transfers_retry => 'Tentar novamente';
 
   @override
   String get settings_mediaStorage_transfers_clearCompleted =>
-      'Limpar concluÃ­das';
+      'Limpar concluídas';
 
   @override
   String get settings_mediaStorage_transfers_state_pending => 'Aguardando';
@@ -26584,18 +26550,18 @@ class AppLocalizationsPt extends AppLocalizations {
       'Removendo da nuvem';
 
   @override
-  String get settings_mediaStorage_transfers_state_done => 'ConcluÃ­do';
+  String get settings_mediaStorage_transfers_state_done => 'Concluído';
 
   @override
   String get settings_mediaStorage_transfers_state_failed => 'Falhou';
 
   @override
   String get settings_mediaStorage_transfers_suspended_title =>
-      'TransferÃªncias pausadas';
+      'Transferências pausadas';
 
   @override
   String get settings_mediaStorage_transfers_suspended_subtitle =>
-      'Este dispositivo e o armazenamento na nuvem nÃ£o concordam mais sobre qual repositÃ³rio estÃ¡ em uso. Reconectar o armazenamento de mÃ­dia adota o que a nuvem contÃ©m agora.';
+      'Este dispositivo e o armazenamento na nuvem não concordam mais sobre qual repositório está em uso. Reconectar o armazenamento de mídia adota o que a nuvem contém agora.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {
@@ -26612,7 +26578,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_verify_running =>
-      'Verificando a biblioteca de mÃ­dia...';
+      'Verificando a biblioteca de mídia...';
 
   @override
   String settings_mediaStorage_verify_summary(
@@ -26639,10 +26605,10 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp2 = intl.Intl.pluralLogic(
       renditions,
       locale: localeName,
-      other: '$renditions versÃµes comprimidas',
-      one: '1 versÃ£o comprimida',
+      other: '$renditions versões comprimidas',
+      one: '1 versão comprimida',
     );
-    return '$checked objetos na nuvem verificados ($_temp0, $_temp1, $_temp2): $removed Ã³rfÃ£os removidos, $repaired reparos na fila, $aborted envios obsoletos cancelados';
+    return '$checked objetos na nuvem verificados ($_temp0, $_temp1, $_temp2): $removed órfãos removidos, $repaired reparos na fila, $aborted envios obsoletos cancelados';
   }
 
   @override
@@ -26660,22 +26626,22 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_policy_photosOnCellular =>
-      'Enviar fotos pela rede mÃ³vel';
+      'Enviar fotos pela rede móvel';
 
   @override
   String get settings_mediaStorage_provider_label => 'Provedor';
 
   @override
   String get settings_mediaStorage_connect_dropbox_hint =>
-      'Usa sua conexÃ£o do Dropbox da sincronizaÃ§Ã£o na nuvem. As mÃ­dias ficam na pasta do app no Dropbox.';
+      'Usa sua conexão do Dropbox da sincronização na nuvem. As mídias ficam na pasta do app no Dropbox.';
 
   @override
   String get settings_mediaStorage_connect_gdrive_hint =>
-      'Entra com o Google. As mÃ­dias ficam no espaÃ§o privado do Drive deste app.';
+      'Entra com o Google. As mídias ficam no espaço privado do Drive deste app.';
 
   @override
   String get settings_mediaStorage_connect_icloud_hint =>
-      'As mÃ­dias ficam no contÃªiner do iCloud deste app e sincronizam pelo seu ID Apple.';
+      'As mídias ficam no contêiner do iCloud deste app e sincronizam pelo seu ID Apple.';
 
   @override
   String settings_mediaStorage_connect_action(String provider) {
@@ -26683,7 +26649,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get bodyWeight_addEntry => 'Adicionar mediÃ§Ã£o';
+  String get bodyWeight_addEntry => 'Adicionar medição';
 
   @override
   String get bodyWeight_dateLabel => 'Data';
@@ -26723,13 +26689,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_edit_weightFeedback_under => 'Lastro insuficiente';
 
   @override
-  String get diverProfile_bodyWeight_empty => 'NÃ£o registrado';
+  String get diverProfile_bodyWeight_empty => 'Não registrado';
 
   @override
   String get diverProfile_bodyWeight_title => 'Peso corporal';
 
   @override
-  String get equipment_edit_advanced_title => 'AvanÃ§ado';
+  String get equipment_edit_advanced_title => 'Avançado';
 
   @override
   String get equipment_edit_buoyancyHint_exposure => 'Positivo: quanto flutua';
@@ -26739,7 +26705,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_edit_buoyancyHint_tank =>
-      'Deixe vazio - cilindros usam suas prÃ³prias especificaÃ§Ãµes';
+      'Deixe vazio - cilindros usam suas próprias especificações';
 
   @override
   String equipment_edit_buoyancyLabel(String unit) {
@@ -26753,12 +26719,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String equipment_edit_liftCapacityLabel(String unit) {
-    return 'Capacidade de sustentaÃ§Ã£o ($unit)';
+    return 'Capacidade de sustentação ($unit)';
   }
 
   @override
   String get equipment_edit_liftCapacityHint =>
-      'SustentaÃ§Ã£o nominal do wing ou colete';
+      'Sustentação nominal do wing ou colete';
 
   @override
   String get planner_gearWeights_accept => 'Usar como lastro planejado';
@@ -26803,23 +26769,23 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get tools_weight_bmiTerm => 'ComposiÃ§Ã£o corporal';
+  String get tools_weight_bmiTerm => 'Composição corporal';
 
   @override
   String get tools_weight_breakdownTitle => 'Como isso foi calculado';
 
   @override
-  String get tools_weight_confidence_high => 'Alta confianÃ§a';
+  String get tools_weight_confidence_high => 'Alta confiança';
 
   @override
-  String get tools_weight_confidence_low => 'Baixa confianÃ§a - estimativa';
+  String get tools_weight_confidence_low => 'Baixa confiança - estimativa';
 
   @override
-  String get tools_weight_confidence_medium => 'ConfianÃ§a mÃ©dia';
+  String get tools_weight_confidence_medium => 'Confiança média';
 
   @override
   String tools_weight_deltaVsPrevious(String delta) {
-    return '$delta em relaÃ§Ã£o ao conjunto anterior';
+    return '$delta em relação ao conjunto anterior';
   }
 
   @override
@@ -26827,13 +26793,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tools_weight_noGear =>
-      'Adicione o equipamento com que vai mergulhar para personalizar a previsÃ£o.';
+      'Adicione o equipamento com que vai mergulhar para personalizar a previsão.';
 
   @override
   String get tools_weight_personalTerm => 'Base pessoal';
 
   @override
-  String get tools_weight_placementTitle => 'DistribuiÃ§Ã£o sugerida';
+  String get tools_weight_placementTitle => 'Distribuição sugerida';
 
   @override
   String get tools_weight_predictedWeight => 'Lastro previsto';
@@ -26848,14 +26814,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tools_weight_source_measured => 'medido dos seus mergulhos';
 
   @override
-  String get tools_weight_source_physics => 'fÃ­sica';
+  String get tools_weight_source_physics => 'física';
 
   @override
-  String get tools_weight_source_typeDefault => 'estimativa padrÃ£o';
+  String get tools_weight_source_typeDefault => 'estimativa padrão';
 
   @override
   String get tools_weight_source_userSpec =>
-      'das especificaÃ§Ãµes do seu equipamento';
+      'das especificações do seu equipamento';
 
   @override
   String get tools_weight_tanks => 'Cilindros';
@@ -26864,16 +26830,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tools_weight_useSet => 'Usar conjunto';
 
   @override
-  String get tools_weight_waterTerm => 'Tipo de Ã¡gua';
+  String get tools_weight_waterTerm => 'Tipo de água';
 
   @override
-  String get dive3d_previewTitle => 'VisualizaÃ§Ã£o 3D';
+  String get dive3d_previewTitle => 'Visualização 3D';
 
   @override
   String get dive3d_previewHint => 'Toque para explorar em 3D';
 
   @override
-  String get dive3d_resetView => 'Redefinir visualizaÃ§Ã£o';
+  String get dive3d_resetView => 'Redefinir visualização';
 
   @override
   String get dive3d_zoomIn => 'Ampliar';
@@ -26888,7 +26854,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dive3d_pause => 'Pausar';
 
   @override
-  String get dive3d_overlays => 'SobreposiÃ§Ãµes';
+  String get dive3d_overlays => 'Sobreposições';
 
   @override
   String get dive3d_overlay_strata => 'Camadas de temperatura';
@@ -26906,22 +26872,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'Trajetos de mergulho';
 
   @override
-  String get dive3d_seascape_overlay_contours => 'IsÃ³batas';
+  String get dive3d_seascape_overlay_contours => 'Isóbatas';
 
   @override
-  String get dive3d_seascape_overlay_walls => 'Paredes Ã­ngremes';
+  String get dive3d_seascape_overlay_walls => 'Paredes íngremes';
 
   @override
   String get dive3d_seascape_showRoute => 'Mostrar rota';
 
   @override
-  String get dive3d_overlay_water => 'SuperfÃ­cie da Ã¡gua';
+  String get dive3d_overlay_water => 'Superfície da água';
 
   @override
   String get dive3d_seascape_legend_land => 'Terra';
 
   @override
-  String get dive3d_seascape_appearance => 'AparÃªncia do terreno';
+  String get dive3d_seascape_appearance => 'Aparência do terreno';
 
   @override
   String get dive3d_seascape_chartView => 'Vista de carta';
@@ -26930,7 +26896,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dive3d_seascape_orbitView => 'Vista 3D';
 
   @override
-  String get dive3d_seascape_appearance_surface => 'SuperfÃ­cie do terreno';
+  String get dive3d_seascape_appearance_surface => 'Superfície do terreno';
 
   @override
   String get dive3d_seascape_appearance_surfaceDepth => 'Cores de profundidade';
@@ -26942,16 +26908,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Mistura';
 
   @override
-  String get siteFeature_type_wreck => 'NaufrÃ¡gio';
+  String get siteFeature_type_wreck => 'Naufrágio';
 
   @override
-  String get siteFeature_type_mooring => 'Boia de amarraÃ§Ã£o';
+  String get siteFeature_type_mooring => 'Boia de amarração';
 
   @override
   String get siteFeature_type_entry => 'Ponto de entrada';
 
   @override
-  String get siteFeature_type_exit => 'Ponto de saÃ­da';
+  String get siteFeature_type_exit => 'Ponto de saída';
 
   @override
   String get siteFeature_type_swimThrough => 'Passagem';
@@ -26963,26 +26929,26 @@ class AppLocalizationsPt extends AppLocalizations {
   String get siteFeature_type_current => 'Correnteza';
 
   @override
-  String get siteFeature_sectionTitle => 'CaracterÃ­sticas';
+  String get siteFeature_sectionTitle => 'Características';
 
   @override
-  String get siteFeature_addAction => 'Adicionar caracterÃ­stica';
+  String get siteFeature_addAction => 'Adicionar característica';
 
   @override
   String get siteFeature_placeHint =>
-      'Toque no mapa para posicionar a caracterÃ­stica';
+      'Toque no mapa para posicionar a característica';
 
   @override
-  String get siteFeature_addTitle => 'Adicionar caracterÃ­stica';
+  String get siteFeature_addTitle => 'Adicionar característica';
 
   @override
-  String get siteFeature_editTitle => 'Editar caracterÃ­stica';
+  String get siteFeature_editTitle => 'Editar característica';
 
   @override
   String get siteFeature_field_name => 'Nome';
 
   @override
-  String get siteFeature_field_bearing => 'Rumo (Â°)';
+  String get siteFeature_field_bearing => 'Rumo (°)';
 
   @override
   String get siteFeature_field_depth => 'Profundidade';
@@ -27015,27 +26981,26 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dive3d_seascape_appearance_banded => 'Gradiente em faixas';
 
   @override
-  String get dive3d_seascape_appearance_contours => 'NÃ­veis de isÃ³batas';
+  String get dive3d_seascape_appearance_contours => 'Níveis de isóbatas';
 
   @override
-  String get dive3d_seascape_appearance_contourAuto => 'AutomÃ¡tico';
+  String get dive3d_seascape_appearance_contourAuto => 'Automático';
 
   @override
   String get dive3d_seascape_appearance_contourCustom => 'Personalizado';
 
   @override
-  String get dive3d_seascape_appearance_addLevel => 'Adicionar nÃ­vel';
+  String get dive3d_seascape_appearance_addLevel => 'Adicionar nível';
 
   @override
-  String get dive3d_seascape_appearance_defaultColor => 'PadrÃ£o';
+  String get dive3d_seascape_appearance_defaultColor => 'Padrão';
 
   @override
-  String get dive3d_seascape_appearance_wallAngle =>
-      'Ã‚ngulo de parede Ã­ngreme';
+  String get dive3d_seascape_appearance_wallAngle => 'Ângulo de parede íngreme';
 
   @override
   String get dive3d_seascape_appearance_wallAngleNote =>
-      'As cÃ©lulas batimÃ©tricas fazem a mÃ©dia do declive interno, entÃ£o paredes reais parecem menos Ã­ngremes. Mantenha bem abaixo de 45 graus.';
+      'As células batimétricas fazem a média do declive interno, então paredes reais parecem menos íngremes. Mantenha bem abaixo de 45 graus.';
 
   @override
   String get dive3d_seascape_siteTitle => 'Paisagem marinha do local';
@@ -27047,15 +27012,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dive3d_seascape_noCoordinates =>
-      'Este local nÃ£o tem coordenadas GPS';
+      'Este local não tem coordenadas GPS';
 
   @override
   String get dive3d_seascape_noData =>
-      'Nenhuma batimetria disponÃ­vel para este local';
+      'Nenhuma batimetria disponível para este local';
 
   @override
   String dive3d_seascape_axis_distance(String unitSymbol) {
-    return 'DistÃ¢ncia ($unitSymbol)';
+    return 'Distância ($unitSymbol)';
   }
 
   @override
@@ -27077,7 +27042,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dive3d_metric_heartRate => 'FC';
 
   @override
-  String get dive3d_metric_tankPressure => 'PressÃ£o';
+  String get dive3d_metric_tankPressure => 'Pressão';
 
   @override
   String get dive3d_zAxis => 'Eixo Z';
@@ -27100,19 +27065,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dive3d_axis_time => 'Tempo de mergulho (min)';
 
   @override
-  String get dive3d_pose_menu => 'CÃ¢mera';
+  String get dive3d_pose_menu => 'Câmera';
 
   @override
-  String get dive3d_pose_default => 'Vista padrÃ£o';
+  String get dive3d_pose_default => 'Vista padrão';
 
   @override
   String get dive3d_pose_front => 'Frente (profundidade vs. tempo)';
 
   @override
-  String get dive3d_pose_side => 'Lado (profundidade vs. mÃ©trica)';
+  String get dive3d_pose_side => 'Lado (profundidade vs. métrica)';
 
   @override
-  String get dive3d_pose_top => 'Topo (mÃ©trica vs. tempo)';
+  String get dive3d_pose_top => 'Topo (métrica vs. tempo)';
 
   @override
   String get dive3d_readout_runTime => 'Tempo de mergulho';
@@ -27150,13 +27115,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dive3d_tissue_controlling => 'Controlador';
 
   @override
-  String get dive3d_tissue_surfaceInterval => 'Intervalo de superfÃ­cie';
+  String get dive3d_tissue_surfaceInterval => 'Intervalo de superfície';
 
   @override
-  String get dive3d_career_title => 'HistÃ³rico 3D';
+  String get dive3d_career_title => 'Histórico 3D';
 
   @override
-  String get dive3d_career_colorRecency => 'RecÃªncia';
+  String get dive3d_career_colorRecency => 'Recência';
 
   @override
   String get dive3d_career_colorDepth => 'Profundidade';
@@ -27169,7 +27134,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dive3d_spatial_estimatedPath =>
-      'Trajeto estimado (navegaÃ§Ã£o estimada)';
+      'Trajeto estimado (navegação estimada)';
 
   @override
   String get dive3d_spatial_recordedPath => 'Rota registada';
@@ -27195,16 +27160,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dive3d_tissue_legendAxes =>
-      'Esqâ†’dir: tempo Â· Frenteâ†’trÃ¡s: tecidos rÃ¡pidosâ†’lentos';
+      'Esq→dir: tempo · Frente→trás: tecidos rápidos→lentos';
 
   @override
   String get dive3d_tissue_legendDepth => 'Curva azul: sua profundidade';
 
   @override
-  String get dive3d_tissue_onGassing => 'AbsorÃ§Ã£o';
+  String get dive3d_tissue_onGassing => 'Absorção';
 
   @override
-  String get dive3d_tissue_offGassing => 'LiberaÃ§Ã£o';
+  String get dive3d_tissue_offGassing => 'Liberação';
 
   @override
   String dive3d_tissue_tooltipCompartment(int number) {
@@ -27218,7 +27183,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String dive3d_tissue_tooltipSaturation(int percent) {
-    return 'SaturaÃ§Ã£o $percent%';
+    return 'Saturação $percent%';
   }
 
   @override
@@ -27227,7 +27192,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get dive3d_tissue_stateEquilibrium => 'EquilÃ­brio';
+  String get dive3d_tissue_stateEquilibrium => 'Equilíbrio';
 
   @override
   String get dive3d_tissue_statePastMValue => 'Acima do valor M';
@@ -27236,7 +27201,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dive3d_tissue_axisTime => 'Tempo';
 
   @override
-  String get dive3d_tissue_axisSaturation => 'SaturaÃ§Ã£o %';
+  String get dive3d_tissue_axisSaturation => 'Saturação %';
 
   @override
   String get dive3d_tissue_axisCompartment => 'Compartimento';
@@ -27258,7 +27223,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dive3d_compare_empty =>
-      'SÃ£o necessÃ¡rios pelo menos 2 perfis com dados de profundidade para comparar';
+      'São necessários pelo menos 2 perfis com dados de profundidade para comparar';
 
   @override
   String dive3d_compare_showing(Object shown, Object total) {
@@ -27266,7 +27231,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get dive3d_compare_setReference => 'Definir como referÃªncia';
+  String get dive3d_compare_setReference => 'Definir como referência';
 
   @override
   String get diveLog_selection_tooltip_compare3d => 'Comparar em 3D';
@@ -27276,11 +27241,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_setup_pendingTitle =>
-      'Conclua a configuraÃ§Ã£o deste dispositivo';
+      'Conclua a configuração deste dispositivo';
 
   @override
   String settings_setup_mediaStoreAttach(String hint) {
-    return 'Conectar armazenamento de mÃ­dia ($hint)';
+    return 'Conectar armazenamento de mídia ($hint)';
   }
 
   @override
@@ -27292,26 +27257,26 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_setup_dismiss => 'Dispensar';
 
   @override
-  String get settings_photosMedia_title => 'Fotos e mÃ­dia';
+  String get settings_photosMedia_title => 'Fotos e mídia';
 
   @override
   String get settings_photosMedia_subtitle => 'Fontes, armazenamento e contas';
 
   @override
-  String get settings_photosMedia_sourcesHeader => 'De onde vÃªm as fotos';
+  String get settings_photosMedia_sourcesHeader => 'De onde vêm as fotos';
 
   @override
   String get settings_photosMedia_storageHeader =>
-      'Onde as cÃ³pias sÃ£o mantidas';
+      'Onde as cópias são mantidas';
 
   @override
   String get settings_photosMedia_accountsHeader => 'Contas';
 
   @override
-  String get settings_photosMedia_displayHeader => 'ExibiÃ§Ã£o';
+  String get settings_photosMedia_displayHeader => 'Exibição';
 
   @override
-  String get settings_photosMedia_guidedSetup => 'ConfiguraÃ§Ã£o guiada';
+  String get settings_photosMedia_guidedSetup => 'Configuração guiada';
 
   @override
   String get settings_photosMedia_photoSources_title =>
@@ -27319,21 +27284,21 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_photosMedia_photoSources_subtitle =>
-      'Galeria, arquivos e opÃ§Ãµes de importaÃ§Ã£o';
+      'Galeria, arquivos e opções de importação';
 
   @override
   String get settings_photosMedia_networkSources_title => 'Fontes de rede';
 
   @override
   String get settings_photosMedia_networkSources_subtitle =>
-      'URLs e feeds de manifesto (avanÃ§ado)';
+      'URLs e feeds de manifesto (avançado)';
 
   @override
   String get settings_connectedAccounts_title => 'Contas conectadas';
 
   @override
   String get settings_connectedAccounts_subtitle =>
-      'Logins de nuvem e serviÃ§os';
+      'Logins de nuvem e serviços';
 
   @override
   String get settings_connectedAccounts_empty =>
@@ -27347,7 +27312,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_connectedAccounts_status_unavailable =>
-      'IndisponÃ­vel neste dispositivo';
+      'Indisponível neste dispositivo';
 
   @override
   String get settings_connectedAccounts_disconnectDevice =>
@@ -27362,14 +27327,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_connectedAccounts_removeConfirmBody =>
-      'A conta Ã© removida de todos os dispositivos sincronizados. Credenciais armazenadas em outros dispositivos nÃ£o sÃ£o excluÃ­das.';
+      'A conta é removida de todos os dispositivos sincronizados. Credenciais armazenadas em outros dispositivos não são excluídas.';
 
   @override
-  String get settings_setupGuide_title => 'Configurar fotos e mÃ­dia';
+  String get settings_setupGuide_title => 'Configurar fotos e mídia';
 
   @override
   String get settings_setupGuide_intro =>
-      'Conecte de onde vÃªm suas fotos e onde as cÃ³pias sÃ£o mantidas. VocÃª pode executar isso novamente a qualquer momento.';
+      'Conecte de onde vêm suas fotos e onde as cópias são mantidas. Você pode executar isso novamente a qualquer momento.';
 
   @override
   String get settings_setupGuide_stepSources => 'Fontes de fotos';
@@ -27379,14 +27344,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'Anexe fotos da sua biblioteca, de arquivos ou do Lightroom.';
 
   @override
-  String get settings_setupGuide_stepStorage => 'Armazenamento de mÃ­dia';
+  String get settings_setupGuide_stepStorage => 'Armazenamento de mídia';
 
   @override
   String get settings_setupGuide_stepStorage_desc =>
-      'Mantenha cÃ³pias de suas fotos na sua prÃ³pria nuvem para que todos os dispositivos possam exibi-las.';
+      'Mantenha cópias de suas fotos na sua própria nuvem para que todos os dispositivos possam exibi-las.';
 
   @override
-  String get settings_setupGuide_stepSync => 'SincronizaÃ§Ã£o na nuvem';
+  String get settings_setupGuide_stepSync => 'Sincronização na nuvem';
 
   @override
   String get settings_setupGuide_stepSync_desc =>
@@ -27396,18 +27361,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_setupGuide_statusDone => 'Configurado';
 
   @override
-  String get settings_setupGuide_statusTodo => 'NÃ£o configurado';
+  String get settings_setupGuide_statusTodo => 'Não configurado';
 
   @override
   String get settings_setupGuide_open => 'Abrir';
 
   @override
   String get settings_connectedAccounts_loadError =>
-      'NÃ£o foi possÃ­vel carregar as contas';
+      'Não foi possível carregar as contas';
 
   @override
-  String get media_unavailablePlaceholder_volumeOffline =>
-      'Volume nÃ£o montado';
+  String get media_unavailablePlaceholder_volumeOffline => 'Volume não montado';
 
   @override
   String get media_unavailablePlaceholder_stillFetching =>
@@ -27415,7 +27379,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_unavailablePlaceholder_accessDenied =>
-      'Sem acesso Ã  biblioteca de fotos';
+      'Sem acesso à biblioteca de fotos';
 
   @override
   String get attrLabel_hose_length_m => 'Comprimento da mangueira';
@@ -27439,49 +27403,49 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrLabel_shell_material => 'Material externo';
 
   @override
-  String get attrLabel_seal_type => 'Tipo de vedaÃ§Ã£o';
+  String get attrLabel_seal_type => 'Tipo de vedação';
 
   @override
   String get attrLabel_volume_l => 'Volume';
 
   @override
-  String get attrLabel_working_pressure_bar => 'PressÃ£o de trabalho';
+  String get attrLabel_working_pressure_bar => 'Pressão de trabalho';
 
   @override
   String get attrLabel_tank_material => 'Material';
 
   @override
-  String get attrLabel_valve_type => 'VÃ¡lvula';
+  String get attrLabel_valve_type => 'Válvula';
 
   @override
   String get attrLabel_tank_identifier => 'Identificador';
 
   @override
-  String get attrLabel_last_visual_inspection => 'Ãšltima inspeÃ§Ã£o visual';
+  String get attrLabel_last_visual_inspection => 'Última inspeção visual';
 
   @override
-  String get attrLabel_last_hydro_test => 'Ãšltimo teste hidrostÃ¡tico';
+  String get attrLabel_last_hydro_test => 'Último teste hidrostático';
 
   @override
-  String get attrLabel_connection => 'ConexÃ£o';
+  String get attrLabel_connection => 'Conexão';
 
   @override
-  String get attrLabel_cold_water_rated => 'Adequado para Ã¡gua fria';
+  String get attrLabel_cold_water_rated => 'Adequado para água fria';
 
   @override
   String get attrLabel_bcd_style => 'Estilo';
 
   @override
-  String get attrLabel_lift_capacity_kg => 'Capacidade de elevaÃ§Ã£o';
+  String get attrLabel_lift_capacity_kg => 'Capacidade de elevação';
 
   @override
   String get attrLabel_heel_type => 'Calcanhar';
 
   @override
-  String get attrLabel_blade_style => 'LÃ¢mina';
+  String get attrLabel_blade_style => 'Lâmina';
 
   @override
-  String get attrLabel_mount => 'FixaÃ§Ã£o';
+  String get attrLabel_mount => 'Fixação';
 
   @override
   String get attrLabel_connectivity => 'Conectividade';
@@ -27496,13 +27460,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrLabel_weight_style => 'Estilo';
 
   @override
-  String get attrLabel_lumens => 'LÃºmens';
+  String get attrLabel_lumens => 'Lúmens';
 
   @override
   String get attrLabel_beam_type => 'Feixe';
 
   @override
-  String get attrLabel_depth_rating_m => 'Profundidade mÃ¡xima';
+  String get attrLabel_depth_rating_m => 'Profundidade máxima';
 
   @override
   String get attrLabel_smb_type => 'Tipo';
@@ -27517,7 +27481,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrLabel_line_length_m => 'Comprimento da linha';
 
   @override
-  String get attrLabel_blade_material => 'Material da lÃ¢mina';
+  String get attrLabel_blade_material => 'Material da lâmina';
 
   @override
   String get attrLabel_tip_type => 'Ponta';
@@ -27526,7 +27490,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrLabel_glove_type => 'Tipo';
 
   @override
-  String get attrLabel_insulation_level => 'NÃ­vel de isolamento';
+  String get attrLabel_insulation_level => 'Nível de isolamento';
 
   @override
   String get attrLabel_fill_material => 'Material';
@@ -27550,10 +27514,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrLabel_scrubber_type => 'Tipo de cal';
 
   @override
-  String get attrLabel_scrubber_duration_h => 'DuraÃ§Ã£o da cal (h)';
+  String get attrLabel_scrubber_duration_h => 'Duração da cal (h)';
 
   @override
-  String get attrLabel_o2_cell_count => 'CÃ©lulas de O2';
+  String get attrLabel_o2_cell_count => 'Células de O2';
 
   @override
   String get attrLabel_diluent_cylinder_l => 'Cilindro de diluente';
@@ -27568,13 +27532,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrLabel_burn_time_h => 'Autonomia';
 
   @override
-  String get attrLabel_cell_slot => 'PosiÃ§Ã£o da cÃ©lula';
+  String get attrLabel_cell_slot => 'Posição da célula';
 
   @override
   String get attrLabel_installed_date => 'Instalada em';
 
   @override
-  String get attrLabel_rechargeable => 'RecarregÃ¡vel';
+  String get attrLabel_rechargeable => 'Recarregável';
 
   @override
   String get attrLabel_battery_type => 'Bateria';
@@ -27586,7 +27550,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrLabel_motor_type => 'Motor';
 
   @override
-  String get attrLabel_speed_mps => 'Velocidade mÃ¡xima';
+  String get attrLabel_speed_mps => 'Velocidade máxima';
 
   @override
   String get attrLabel_sku => 'SKU';
@@ -27601,28 +27565,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrLabel_sleeve_length => 'Mangas';
 
   @override
-  String get attrLabel_upf_rating => 'Ãndice UPF';
+  String get attrLabel_upf_rating => 'Índice UPF';
 
   @override
   String get attrLabel_snorkel_type => 'Tipo';
 
   @override
-  String get attrLabel_purge_valve => 'VÃ¡lvula de purga';
+  String get attrLabel_purge_valve => 'Válvula de purga';
 
   @override
   String get attrLabel_instrument_type => 'Instrumento';
 
   @override
-  String get attrLabel_gauge_max_pressure_bar => 'Escala do manÃ³metro';
+  String get attrLabel_gauge_max_pressure_bar => 'Escala do manómetro';
 
   @override
   String get attrLabel_compass_type => 'Tipo';
 
   @override
-  String get attrLabel_balance_zone => 'Zona de equilÃ­brio';
+  String get attrLabel_balance_zone => 'Zona de equilíbrio';
 
   @override
-  String get attrLabel_tilt_tolerance_deg => 'TolerÃ¢ncia de inclinaÃ§Ã£o (Â°)';
+  String get attrLabel_tilt_tolerance_deg => 'Tolerância de inclinação (°)';
 
   @override
   String get attrLabel_tool_type => 'Tipo de ferramenta';
@@ -27634,34 +27598,34 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrLabel_pocket_capacity_kg => 'Capacidade';
 
   @override
-  String get attrLabel_pocket_mount => 'FixaÃ§Ã£o';
+  String get attrLabel_pocket_mount => 'Fixação';
 
   @override
-  String get attrChoice_plate_material_aluminum => 'AlumÃ­nio';
+  String get attrChoice_plate_material_aluminum => 'Alumínio';
 
   @override
   String get attrChoice_plate_material_carbon_fiber => 'Fibra de carbono';
 
   @override
-  String get attrChoice_plate_material_steel => 'AÃ§o';
+  String get attrChoice_plate_material_steel => 'Aço';
 
   @override
-  String get attrChoice_unit_type_eccr => 'CCR eletrÃ³nico (eCCR)';
+  String get attrChoice_unit_type_eccr => 'CCR eletrónico (eCCR)';
 
   @override
   String get attrChoice_unit_type_mccr => 'CCR manual (mCCR)';
 
   @override
-  String get attrChoice_unit_type_hccr => 'CCR hÃ­brido (hCCR)';
+  String get attrChoice_unit_type_hccr => 'CCR híbrido (hCCR)';
 
   @override
-  String get attrChoice_unit_type_scr_cmf => 'SCR - fluxo mÃ¡ssico constante';
+  String get attrChoice_unit_type_scr_cmf => 'SCR - fluxo mássico constante';
 
   @override
-  String get attrChoice_unit_type_scr_pascr => 'SCR - adiÃ§Ã£o passiva';
+  String get attrChoice_unit_type_scr_pascr => 'SCR - adição passiva';
 
   @override
-  String get attrChoice_unit_type_scr_escr => 'SCR - controlo eletrÃ³nico';
+  String get attrChoice_unit_type_scr_escr => 'SCR - controlo eletrónico';
 
   @override
   String get attrChoice_mount_configuration_back => 'Montagem dorsal';
@@ -27685,7 +27649,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_suit_style_shorty => 'Shorty';
 
   @override
-  String get attrChoice_suit_style_two_piece => 'Duas peÃ§as';
+  String get attrChoice_suit_style_two_piece => 'Duas peças';
 
   @override
   String get attrChoice_suit_style_semi_dry => 'Semisseca';
@@ -27705,7 +27669,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Borracha vulcanizada';
 
   @override
-  String get attrChoice_seal_type_latex => 'LÃ¡tex';
+  String get attrChoice_seal_type_latex => 'Látex';
 
   @override
   String get attrChoice_seal_type_silicone => 'Silicone';
@@ -27717,7 +27681,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_insulation_level_light => 'Leve';
 
   @override
-  String get attrChoice_insulation_level_mid => 'MÃ©dio';
+  String get attrChoice_insulation_level_mid => 'Médio';
 
   @override
   String get attrChoice_insulation_level_heavy => 'Pesado';
@@ -27738,20 +27702,20 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_fill_material_fleece => 'Polar';
 
   @override
-  String get attrChoice_fill_material_merino => 'LÃ£ merino';
+  String get attrChoice_fill_material_merino => 'Lã merino';
 
   @override
   String get attrChoice_fill_material_polypropylene => 'Polipropileno';
 
   @override
-  String get attrChoice_tank_material_aluminum => 'AlumÃ­nio';
+  String get attrChoice_tank_material_aluminum => 'Alumínio';
 
   @override
-  String get attrChoice_tank_material_steel => 'AÃ§o';
+  String get attrChoice_tank_material_steel => 'Aço';
 
   @override
   String get attrChoice_tank_material_carbon_composite =>
-      'CompÃ³sito de carbono';
+      'Compósito de carbono';
 
   @override
   String get attrChoice_valve_type_din => 'DIN';
@@ -27760,7 +27724,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_valve_type_yoke => 'Garra (INT)';
 
   @override
-  String get attrChoice_valve_type_convertible => 'ConvertÃ­vel';
+  String get attrChoice_valve_type_convertible => 'Convertível';
 
   @override
   String get attrChoice_connection_din => 'DIN';
@@ -27769,10 +27733,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_connection_yoke => 'Garra (INT)';
 
   @override
-  String get attrChoice_hose_type_lp => 'LP (baixa pressÃ£o)';
+  String get attrChoice_hose_type_lp => 'LP (baixa pressão)';
 
   @override
-  String get attrChoice_hose_type_hp => 'HP (alta pressÃ£o)';
+  String get attrChoice_hose_type_hp => 'HP (alta pressão)';
 
   @override
   String get attrChoice_hose_type_lpi => 'Inflador (LPI)';
@@ -27781,11 +27745,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_band_style_cam_strap => 'Cinta com fivela de came';
 
   @override
-  String get attrChoice_band_style_stainless_band =>
-      'AbraÃ§adeira de aÃ§o inox';
+  String get attrChoice_band_style_stainless_band => 'Abraçadeira de aço inox';
 
   @override
-  String get attrChoice_pocket_mount_harness => 'ArnÃªs';
+  String get attrChoice_pocket_mount_harness => 'Arnês';
 
   @override
   String get attrChoice_pocket_mount_waist_belt => 'Cinto abdominal';
@@ -27809,10 +27772,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_heel_type_open_heel => 'Calcanhar aberto';
 
   @override
-  String get attrChoice_heel_type_full_foot => 'PÃ© inteiro';
+  String get attrChoice_heel_type_full_foot => 'Pé inteiro';
 
   @override
-  String get attrChoice_blade_style_paddle => 'PÃ¡';
+  String get attrChoice_blade_style_paddle => 'Pá';
 
   @override
   String get attrChoice_blade_style_split => 'Dividida';
@@ -27842,13 +27805,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_connectivity_none => 'Nenhuma';
 
   @override
-  String get attrChoice_lens_config_single => 'Lente Ãºnica';
+  String get attrChoice_lens_config_single => 'Lente única';
 
   @override
   String get attrChoice_lens_config_twin => 'Lentes duplas';
 
   @override
-  String get attrChoice_lens_config_frameless => 'Sem armaÃ§Ã£o';
+  String get attrChoice_lens_config_frameless => 'Sem armação';
 
   @override
   String get attrChoice_weight_style_belt => 'Cinto';
@@ -27869,7 +27832,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_beam_type_flood => 'Difuso';
 
   @override
-  String get attrChoice_beam_type_adjustable => 'AjustÃ¡vel';
+  String get attrChoice_beam_type_adjustable => 'Ajustável';
 
   @override
   String get attrChoice_smb_type_open => 'Aberta';
@@ -27884,10 +27847,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_reel_type_ratchet => 'Carretilha com catraca';
 
   @override
-  String get attrChoice_blade_material_stainless => 'AÃ§o inoxidÃ¡vel';
+  String get attrChoice_blade_material_stainless => 'Aço inoxidável';
 
   @override
-  String get attrChoice_blade_material_titanium => 'TitÃ¢nio';
+  String get attrChoice_blade_material_titanium => 'Titânio';
 
   @override
   String get attrChoice_tip_type_pointed => 'Pontiaguda';
@@ -27902,7 +27865,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_glove_type_five_finger => 'Cinco dedos';
 
   @override
-  String get attrChoice_glove_type_three_finger => 'TrÃªs dedos';
+  String get attrChoice_glove_type_three_finger => 'Três dedos';
 
   @override
   String get attrChoice_glove_type_mitt => 'Mitene';
@@ -27917,7 +27880,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_glove_type_utility => 'Trabalho';
 
   @override
-  String get attrChoice_sole_type_hard => 'Sola rÃ­gida';
+  String get attrChoice_sole_type_hard => 'Sola rígida';
 
   @override
   String get attrChoice_sole_type_soft => 'Sola macia';
@@ -27929,23 +27892,23 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_dpv_style_ride_on => 'De montar';
 
   @override
-  String get attrChoice_dpv_style_handheld => 'De mÃ£o';
+  String get attrChoice_dpv_style_handheld => 'De mão';
 
   @override
-  String get attrChoice_battery_type_lithium_ion => 'IÃµes de lÃ­tio';
+  String get attrChoice_battery_type_lithium_ion => 'Iões de lítio';
 
   @override
   String get attrChoice_battery_type_nimh => 'NiMH';
 
   @override
-  String get attrChoice_battery_type_lead_acid => 'Chumbo-Ã¡cido';
+  String get attrChoice_battery_type_lead_acid => 'Chumbo-ácido';
 
   @override
   String get attrChoice_battery_type_alkaline => 'Alcalina';
 
   @override
   String get attrChoice_battery_type_lithium_primary =>
-      'LÃ­tio (nÃ£o recarregÃ¡vel)';
+      'Lítio (não recarregável)';
 
   @override
   String get attrChoice_motor_type_brushless => 'Sem escovas';
@@ -27963,7 +27926,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_sleeve_length_sleeveless => 'Sem mangas';
 
   @override
-  String get attrChoice_snorkel_type_classic => 'ClÃ¡ssico';
+  String get attrChoice_snorkel_type_classic => 'Clássico';
 
   @override
   String get attrChoice_snorkel_type_semi_dry => 'Semi-seco';
@@ -27972,37 +27935,37 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_snorkel_type_dry => 'Seco';
 
   @override
-  String get attrChoice_snorkel_type_foldable => 'DobrÃ¡vel';
+  String get attrChoice_snorkel_type_foldable => 'Dobrável';
 
   @override
-  String get attrChoice_instrument_type_spg => 'ManÃ³metro (SPG)';
+  String get attrChoice_instrument_type_spg => 'Manómetro (SPG)';
 
   @override
-  String get attrChoice_instrument_type_depth_gauge => 'ProfundÃ­metro';
+  String get attrChoice_instrument_type_depth_gauge => 'Profundímetro';
 
   @override
-  String get attrChoice_instrument_type_bottom_timer => 'CronÃ³metro de fundo';
+  String get attrChoice_instrument_type_bottom_timer => 'Cronómetro de fundo';
 
   @override
   String get attrChoice_instrument_type_console => 'Console';
 
   @override
-  String get attrChoice_instrument_type_gas_analyzer => 'Analisador de gÃ¡s';
+  String get attrChoice_instrument_type_gas_analyzer => 'Analisador de gás';
 
   @override
-  String get attrChoice_instrument_type_thermometer => 'TermÃ³metro';
+  String get attrChoice_instrument_type_thermometer => 'Termómetro';
 
   @override
-  String get attrChoice_compass_type_analog => 'AnalÃ³gica';
+  String get attrChoice_compass_type_analog => 'Analógica';
 
   @override
   String get attrChoice_compass_type_digital => 'Digital';
 
   @override
-  String get attrChoice_balance_zone_northern => 'HemisfÃ©rio norte';
+  String get attrChoice_balance_zone_northern => 'Hemisfério norte';
 
   @override
-  String get attrChoice_balance_zone_southern => 'HemisfÃ©rio sul';
+  String get attrChoice_balance_zone_southern => 'Hemisfério sul';
 
   @override
   String get attrChoice_balance_zone_global => 'Global';
@@ -28014,13 +27977,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrChoice_tool_type_o_ring_kit => 'Kit de O-rings';
 
   @override
-  String get attrChoice_tool_type_save_a_dive_kit => 'Kit de emergÃªncia';
+  String get attrChoice_tool_type_save_a_dive_kit => 'Kit de emergência';
 
   @override
-  String get attrChoice_tool_type_torque_wrench => 'Chave dinamomÃ©trica';
+  String get attrChoice_tool_type_torque_wrench => 'Chave dinamométrica';
 
   @override
-  String get attrChoice_tool_type_spares_kit => 'Kit de peÃ§as';
+  String get attrChoice_tool_type_spares_kit => 'Kit de peças';
 
   @override
   String get equipment_edit_customFieldsTitle => 'Campos personalizados';
@@ -28032,14 +27995,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attr_flagYes => 'Sim';
 
   @override
-  String get attr_flagNo => 'NÃ£o';
+  String get attr_flagNo => 'Não';
 
   @override
   String get equipment_edit_invalidThickness => 'Use 5, 5/4 ou 7/5/3';
 
   @override
   String get equipment_edit_invalidWebLink =>
-      'Introduza um endereÃ§o web, p. ex. shop.example.com';
+      'Introduza um endereço web, p. ex. shop.example.com';
 
   @override
   String get statistics_progression_divesBySuitThickness_title =>
@@ -28055,7 +28018,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_progression_divesBySuitThickness_error =>
-      'NÃ£o foi possÃ­vel carregar os dados de espessura';
+      'Não foi possível carregar os dados de espessura';
 
   @override
   String get statistics_progression_divesBySuitThickness_unknown =>
@@ -28074,30 +28037,30 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_filter_gearCategoryAny => 'Qualquer categoria';
 
   @override
-  String get diveLog_filter_thicknessMin => 'MÃ­n';
+  String get diveLog_filter_thicknessMin => 'Mín';
 
   @override
-  String get diveLog_filter_thicknessMax => 'MÃ¡x';
+  String get diveLog_filter_thicknessMax => 'Máx';
 
   @override
   String get safetySettings_noFlyHeader => 'Voar depois de mergulhar';
 
   @override
-  String get safetySettings_noFlyPreset_standard => 'PadrÃ£o (12/18/24 h)';
+  String get safetySettings_noFlyPreset_standard => 'Padrão (12/18/24 h)';
 
   @override
   String get safetySettings_noFlyPreset_strict => 'Rigoroso (18/24/48 h)';
 
   @override
   String get safetySettings_noFlyPreset_subtitle =>
-      'Intervalos orientativos apÃ³s um Ãºnico mergulho sem deco, mergulhos repetitivos e mergulhos com deco';
+      'Intervalos orientativos após um único mergulho sem deco, mergulhos repetitivos e mergulhos com deco';
 
   @override
-  String get flightWindow_closed => 'NÃ£o mergulhe mais antes do seu voo';
+  String get flightWindow_closed => 'Não mergulhe mais antes do seu voo';
 
   @override
   String get flightWindow_conflict =>
-      'Seu tempo de nÃ£o voar ultrapassa a partida do voo';
+      'Seu tempo de não voar ultrapassa a partida do voo';
 
   @override
   String flightWindow_departs(String time) {
@@ -28111,44 +28074,43 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String flightWindow_surfaceBy(String time) {
-    return 'Emergir atÃ© $time';
+    return 'Emergir até $time';
   }
 
   @override
   String safetyHub_noFly_active_title(String remaining) {
-    return 'NÃ£o voar: faltam $remaining';
+    return 'Não voar: faltam $remaining';
   }
 
   @override
   String safetyHub_noFly_until(String time) {
-    return 'AtÃ© $time';
+    return 'Até $time';
   }
 
   @override
-  String get safetyHub_noFly_clear_title => 'Sem restriÃ§Ã£o de voo';
+  String get safetyHub_noFly_clear_title => 'Sem restrição de voo';
 
   @override
-  String get safetyHub_noFly_clear_subtitle =>
-      'Nenhuma restriÃ§Ã£o de voo ativa';
+  String get safetyHub_noFly_clear_subtitle => 'Nenhuma restrição de voo ativa';
 
   @override
   String safetyHub_noFly_category_single(int hours) {
-    return 'ApÃ³s um Ãºnico mergulho sem deco: orientaÃ§Ã£o de $hours h';
+    return 'Após um único mergulho sem deco: orientação de $hours h';
   }
 
   @override
   String safetyHub_noFly_category_repetitive(int hours) {
-    return 'ApÃ³s mergulhos repetitivos: orientaÃ§Ã£o de $hours h';
+    return 'Após mergulhos repetitivos: orientação de $hours h';
   }
 
   @override
   String safetyHub_noFly_category_deco(int hours) {
-    return 'ApÃ³s um mergulho com descompressÃ£o: orientaÃ§Ã£o de $hours h';
+    return 'Após um mergulho com descompressão: orientação de $hours h';
   }
 
   @override
   String get safetyHub_noFly_disclaimer =>
-      'OrientaÃ§Ãµes DAN/UHMS desde o Ãºltimo mergulho. NÃ£o substitui o tempo de nÃ£o voar do seu computador de mergulho.';
+      'Orientações DAN/UHMS desde o último mergulho. Não substitui o tempo de não voar do seu computador de mergulho.';
 
   @override
   String get diveLog_detail_altitudeMismatch_title =>
@@ -28156,7 +28118,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_detail_altitudeMismatch_subtitle =>
-      'Este ponto registra uma altitude, mas o mergulho nÃ£o tem nenhuma, entÃ£o a anÃ¡lise de descompressÃ£o assumiu o nÃ­vel do mar. Defina a altitude do mergulho para corrigir.';
+      'Este ponto registra uma altitude, mas o mergulho não tem nenhuma, então a análise de descompressão assumiu o nível do mar. Defina a altitude do mergulho para corrigir.';
 
   @override
   String diveLog_detail_sacVolumeHint(String unit) {
@@ -28165,11 +28127,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String safetyHub_alert_noFly(String remaining) {
-    return 'NÃ£o voar: faltam $remaining';
+    return 'Não voar: faltam $remaining';
   }
 
   @override
-  String get emergencyCard_title => 'EmergÃªncia';
+  String get emergencyCard_title => 'Emergência';
 
   @override
   String emergencyCard_callDan(String name) {
@@ -28178,30 +28140,29 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get emergencyCard_callDan_subtitle =>
-      'Linha de emergÃªncia para mergulhadores. Ligue primeiro: eles coordenam a evacuaÃ§Ã£o e o encaminhamento para cÃ¢mara.';
+      'Linha de emergência para mergulhadores. Ligue primeiro: eles coordenam a evacuação e o encaminhamento para câmara.';
 
   @override
   String get emergencyCard_callInsurer_subtitle =>
-      'Linha de emergÃªncia do seu seguro de mergulho. Ligue primeiro: a seguradora autoriza a evacuaÃ§Ã£o e coordena o encaminhamento para cÃ¢mara.';
+      'Linha de emergência do seu seguro de mergulho. Ligue primeiro: a seguradora autoriza a evacuação e coordena o encaminhamento para câmara.';
 
   @override
   String get emergencyCard_hotlineSecondary_subtitle =>
-      'Linha regional de emergÃªncia para mergulhadores. Ligue se a linha da sua seguradora nÃ£o atender.';
+      'Linha regional de emergência para mergulhadores. Ligue se a linha da sua seguradora não atender.';
 
   @override
-  String get emergencyCard_insuranceEmergencyLine =>
-      'Linha de emergÃªncia 24 h';
+  String get emergencyCard_insuranceEmergencyLine => 'Linha de emergência 24 h';
 
   @override
-  String get emergencyCard_insuranceOfficeLine => 'Linha do escritÃ³rio';
+  String get emergencyCard_insuranceOfficeLine => 'Linha do escritório';
 
   @override
   String get emergencyCard_insuranceNoPhone =>
-      'Nenhum nÃºmero de emergÃªncia da seguradora guardado. Adicione-o nas definiÃ§Ãµes do perfil de mergulhador para que este cartÃ£o o mostre primeiro.';
+      'Nenhum número de emergência da seguradora guardado. Adicione-o nas definições do perfil de mergulhador para que este cartão o mostre primeiro.';
 
   @override
   String emergencyCard_ems(String number) {
-    return 'EmergÃªncia local: $number';
+    return 'Emergência local: $number';
   }
 
   @override
@@ -28209,7 +28170,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String emergencyCard_bloodType(String value) {
-    return 'Tipo sanguÃ­neo: $value';
+    return 'Tipo sanguíneo: $value';
   }
 
   @override
@@ -28223,22 +28184,22 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get emergencyCard_contactsSection => 'Contatos de emergÃªncia';
+  String get emergencyCard_contactsSection => 'Contatos de emergência';
 
   @override
   String get emergencyCard_insuranceSection => 'Seguro de mergulho';
 
   @override
   String emergencyCard_insurancePolicy(String number) {
-    return 'ApÃ³lice $number';
+    return 'Apólice $number';
   }
 
   @override
-  String get emergencyCard_chambersSection => 'CÃ¢maras hiperbÃ¡ricas';
+  String get emergencyCard_chambersSection => 'Câmaras hiperbáricas';
 
   @override
   String get emergencyCard_chambersNote =>
-      'A disponibilidade muda. Ligue sempre primeiro para a linha de emergÃªncia de mergulhadores para encaminhamento.';
+      'A disponibilidade muda. Ligue sempre primeiro para a linha de emergência de mergulhadores para encaminhamento.';
 
   @override
   String emergencyCard_chamberVerified(String date) {
@@ -28246,16 +28207,16 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get emergencyCard_chambersNearby => 'CÃ¢maras mais prÃ³ximas';
+  String get emergencyCard_chambersNearby => 'Câmaras mais próximas';
 
   @override
   String emergencyCard_chamberViewAll(int count) {
-    return 'Ver todas as $count cÃ¢maras';
+    return 'Ver todas as $count câmaras';
   }
 
   @override
   String get emergencyCard_chambersNoneNearby =>
-      'Nenhuma cÃ¢mara listada dentro do alcance. Ligue para a linha de emergÃªncia para mergulhadores: eles encaminharÃ£o vocÃª para a unidade mais prÃ³xima capaz de tratÃ¡-lo.';
+      'Nenhuma câmara listada dentro do alcance. Ligue para a linha de emergência para mergulhadores: eles encaminharão você para a unidade mais próxima capaz de tratá-lo.';
 
   @override
   String get emergencyCard_chamberCapability_divingEmergency =>
@@ -28263,7 +28224,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get emergencyCard_chamberCapability_hyperbaricUnit =>
-      'Unidade hiperbÃ¡rica hospitalar';
+      'Unidade hiperbárica hospitalar';
 
   @override
   String get emergencyCard_chamberCapability_elective =>
@@ -28271,7 +28232,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get emergencyCard_chamberCapability_unknown =>
-      'Capacidade nÃ£o confirmada';
+      'Capacidade não confirmada';
 
   @override
   String get emergencyCard_chamberAvailability_h24 => '24 h';
@@ -28281,28 +28242,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get emergencyCard_chamberAvailability_businessHours =>
-      'HorÃ¡rio comercial';
+      'Horário comercial';
 
   @override
-  String get emergencyCard_chamberUnverified => 'NÃ£o confirmado com a unidade';
+  String get emergencyCard_chamberUnverified => 'Não confirmado com a unidade';
 
   @override
-  String get chambersDirectory_title => 'CÃ¢maras hiperbÃ¡ricas';
+  String get chambersDirectory_title => 'Câmaras hiperbáricas';
 
   @override
-  String get chambersDirectory_search => 'Pesquisar por nome, cidade ou paÃ­s';
+  String get chambersDirectory_search => 'Pesquisar por nome, cidade ou país';
 
   @override
   String get chambersDirectory_empty =>
-      'Nenhuma cÃ¢mara corresponde a essa pesquisa.';
+      'Nenhuma câmara corresponde a essa pesquisa.';
 
   @override
   String chambersDirectory_count(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count cÃ¢maras',
-      one: '1 cÃ¢mara',
+      other: '$count câmaras',
+      one: '1 câmara',
     );
     return '$_temp0';
   }
@@ -28311,38 +28272,38 @@ class AppLocalizationsPt extends AppLocalizations {
   String get emergencyCard_hideChamber => 'Ocultar';
 
   @override
-  String get emergencyCard_chamberHidden => 'CÃ¢mara ocultada';
+  String get emergencyCard_chamberHidden => 'Câmara ocultada';
 
   @override
   String get emergencyCard_undo => 'Desfazer';
 
   @override
-  String get emergencyCard_addChamber => 'Adicionar cÃ¢mara';
+  String get emergencyCard_addChamber => 'Adicionar câmara';
 
   @override
   String get emergencyCard_deleteChamber => 'Excluir';
 
   @override
   String emergencyCard_regionLabel(String region) {
-    return 'RegiÃ£o: $region';
+    return 'Região: $region';
   }
 
   @override
   String get emergencyCard_regionUnknown =>
-      'RegiÃ£o desconhecida - usando a linha mundial';
+      'Região desconhecida - usando a linha mundial';
 
   @override
   String get emergencyCard_noDiverData =>
-      'Sem dados do perfil do mergulhador. Adicione contatos de emergÃªncia, dados mÃ©dicos e seguro no perfil do mergulhador.';
+      'Sem dados do perfil do mergulhador. Adicione contatos de emergência, dados médicos e seguro no perfil do mergulhador.';
 
   @override
-  String get addChamber_title => 'Adicionar cÃ¢mara';
+  String get addChamber_title => 'Adicionar câmara';
 
   @override
   String get addChamber_name => 'Nome';
 
   @override
-  String get addChamber_country => 'CÃ³digo do paÃ­s (ex. BR)';
+  String get addChamber_country => 'Código do país (ex. BR)';
 
   @override
   String get addChamber_city => 'Cidade';
@@ -28357,31 +28318,30 @@ class AppLocalizationsPt extends AppLocalizations {
   String get addChamber_save => 'Salvar';
 
   @override
-  String get addChamber_nameRequired => 'O nome Ã© obrigatÃ³rio';
+  String get addChamber_nameRequired => 'O nome é obrigatório';
 
   @override
-  String get addChamber_countryRequired => 'O cÃ³digo do paÃ­s Ã© obrigatÃ³rio';
+  String get addChamber_countryRequired => 'O código do país é obrigatório';
 
   @override
-  String get addChamber_phoneRequired =>
-      'O nÃºmero de telefone Ã© obrigatÃ³rio';
+  String get addChamber_phoneRequired => 'O número de telefone é obrigatório';
 
   @override
-  String get safetyHub_emergencyCardLink => 'CartÃ£o de emergÃªncia';
+  String get safetyHub_emergencyCardLink => 'Cartão de emergência';
 
   @override
   String get safetyHub_emergencyCardLink_subtitle =>
-      'Offline: linha direta, emergÃªncia, cÃ¢maras, seus dados mÃ©dicos e de seguro';
+      'Offline: linha direta, emergência, câmaras, seus dados médicos e de seguro';
 
   @override
-  String get dashboard_quickAction_emergency => 'CartÃ£o de emergÃªncia';
+  String get dashboard_quickAction_emergency => 'Cartão de emergência';
 
   @override
   String get incidents_title => 'Registro de quase acidentes';
 
   @override
   String get incidents_empty =>
-      'Nenhum quase acidente registrado. Anotar o que quase deu errado - sem julgamento - torna os padrÃµes visÃ­veis antes que virem acidentes.';
+      'Nenhum quase acidente registrado. Anotar o que quase deu errado - sem julgamento - torna os padrões visíveis antes que virem acidentes.';
 
   @override
   String get incidents_add => 'Registrar quase acidente';
@@ -28394,8 +28354,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Excluir este relato de quase acidente?';
 
   @override
-  String get incidents_notFound =>
-      'RelatÃ³rio de quase acidente nÃ£o encontrado';
+  String get incidents_notFound => 'Relatório de quase acidente não encontrado';
 
   @override
   String get incidentEdit_title_new => 'Registrar quase acidente';
@@ -28416,7 +28375,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get incidentEdit_severity_moderate => 'Moderado';
 
   @override
-  String get incidentEdit_severity_serious => 'SÃ©rio';
+  String get incidentEdit_severity_serious => 'Sério';
 
   @override
   String get incidentEdit_date => 'Quando aconteceu';
@@ -28436,14 +28395,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get incidentEdit_lessonsLearned =>
-      'O que ajudaria da prÃ³xima vez (opcional)';
+      'O que ajudaria da próxima vez (opcional)';
 
   @override
   String get incidentEdit_save => 'Salvar';
 
   @override
   String get incidentEdit_privacyNote =>
-      'Relatos de quase acidentes sincronizam entre seus dispositivos e entram nos backups, mas nunca em exportaÃ§Ãµes ou pÃ¡ginas compartilhadas do logbook.';
+      'Relatos de quase acidentes sincronizam entre seus dispositivos e entram nos backups, mas nunca em exportações ou páginas compartilhadas do logbook.';
 
   @override
   String get incidentEdit_equipment => 'Equipamento envolvido';
@@ -28461,22 +28420,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String get incidentCategory_buoyancy => 'Flutuabilidade';
 
   @override
-  String get incidentCategory_gasSupply => 'Suprimento de gÃ¡s';
+  String get incidentCategory_gasSupply => 'Suprimento de gás';
 
   @override
   String get incidentCategory_equipment => 'Equipamento';
 
   @override
-  String get incidentCategory_buddySeparation => 'SeparaÃ§Ã£o do dupla';
+  String get incidentCategory_buddySeparation => 'Separação do dupla';
 
   @override
   String get incidentCategory_marineLife => 'Vida marinha';
 
   @override
-  String get incidentCategory_boatSurface => 'Barco / superfÃ­cie';
+  String get incidentCategory_boatSurface => 'Barco / superfície';
 
   @override
-  String get incidentCategory_medical => 'MÃ©dico';
+  String get incidentCategory_medical => 'Médico';
 
   @override
   String get incidentCategory_planning => 'Planejamento';
@@ -28489,7 +28448,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get safetyHub_incidentsLink_subtitle =>
-      'Notas de incidentes privadas e nÃ£o punitivas';
+      'Notas de incidentes privadas e não punitivas';
 
   @override
   String get diveLog_detail_menu_logNearMiss => 'Registrar quase acidente';
@@ -28507,14 +28466,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get planning_card_noFly_subtitle =>
-      'Contagem orientativa desde seus Ãºltimos mergulhos';
+      'Contagem orientativa desde seus últimos mergulhos';
 
   @override
-  String get settings_section_safety_title => 'SeguranÃ§a';
+  String get settings_section_safety_title => 'Segurança';
 
   @override
   String get settings_section_safety_subtitle =>
-      'Regras de revisÃ£o e voar apÃ³s mergulhar';
+      'Regras de revisão e voar após mergulhar';
 
   @override
   String get settings_section_equipmentCondition_title =>
@@ -28522,13 +28481,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_section_equipmentCondition_subtitle =>
-      'Limites de exposiÃ§Ã£o para os relÃ³gios de manutenÃ§Ã£o';
+      'Limites de exposição para os relógios de manutenção';
 
   @override
   String get equipmentConditionSettings_title => 'Estado do equipamento';
 
   @override
-  String get equipmentCondition_children_title => 'PeÃ§as instaladas';
+  String get equipmentCondition_children_title => 'Peças instaladas';
 
   @override
   String equipmentCondition_children_slot(int slot) {
@@ -28545,8 +28504,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'hÃ¡ $days dias',
-      one: 'hÃ¡ 1 dia',
+      other: 'há $days dias',
+      one: 'há 1 dia',
       zero: 'hoje',
     );
     return '$_temp0';
@@ -28557,8 +28516,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       months,
       locale: localeName,
-      other: 'hÃ¡ $months meses',
-      one: 'hÃ¡ 1 mÃªs',
+      other: 'há $months meses',
+      one: 'há 1 mês',
     );
     return '$_temp0';
   }
@@ -28576,7 +28535,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String equipmentCondition_children_replaceBody(String name, String type) {
-    return '$name Ã© retirado hoje e um novo $type ocupa o seu lugar na mesma ranhura. O nÃºmero de sÃ©rie e as notas comeÃ§am vazios.';
+    return '$name é retirado hoje e um novo $type ocupa o seu lugar na mesma ranhura. O número de série e as notas começam vazios.';
   }
 
   @override
@@ -28587,32 +28546,32 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String equipmentCondition_children_replaced(String name) {
-    return '$name substituÃ­do';
+    return '$name substituído';
   }
 
   @override
   String get equipmentCondition_children_empty =>
-      'Sem cÃ©lulas ou baterias registadas';
+      'Sem células ou baterias registadas';
 
   @override
   String get equipmentCondition_children_add => 'Adicionar';
 
   @override
-  String get equipmentCondition_findings_title => 'ConstataÃ§Ãµes de estado';
+  String get equipmentCondition_findings_title => 'Constatações de estado';
 
   @override
   String equipmentCondition_findings_count(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count constataÃ§Ãµes',
-      one: '1 constataÃ§Ã£o',
+      other: '$count constatações',
+      one: '1 constatação',
     );
     return '$_temp0';
   }
 
   @override
-  String get equipmentCondition_findings_evidence => 'Mergulhos de evidÃªncia';
+  String get equipmentCondition_findings_evidence => 'Mergulhos de evidência';
 
   @override
   String get equipmentCondition_findings_dismiss => 'Dispensar';
@@ -28632,7 +28591,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get equipmentCondition_evidence_title => 'Mergulhos de evidÃªncia';
+  String get equipmentCondition_evidence_title => 'Mergulhos de evidência';
 
   @override
   String equipmentCondition_evidence_dive(int number) {
@@ -28649,7 +28608,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipmentCondition_trend_title_cellGain =>
-      'SaÃ­da das cÃ©lulas por mergulho';
+      'Saída das células por mergulho';
 
   @override
   String get equipmentCondition_trend_title_gap =>
@@ -28661,11 +28620,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipmentCondition_trend_title_temperature =>
-      'Temperatura mÃ­nima por mergulho';
+      'Temperatura mínima por mergulho';
 
   @override
   String equipmentCondition_trend_cell(int slot) {
-    return 'CÃ©lula $slot';
+    return 'Célula $slot';
   }
 
   @override
@@ -28678,17 +28637,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipmentCondition_trend_gap => 'Percentagem de falhas';
 
   @override
-  String get equipmentCondition_trend_temperature => 'Temperatura mÃ­nima';
+  String get equipmentCondition_trend_temperature => 'Temperatura mínima';
 
   @override
   String get equipmentCondition_trend_axis_minutes => 'min';
 
   @override
-  String get equipmentCondition_exposure_title => 'ExposiÃ§Ã£o';
+  String get equipmentCondition_exposure_title => 'Exposição';
 
   @override
   String get equipmentCondition_exposure_empty =>
-      'Ainda nÃ£o hÃ¡ mergulhos com este item';
+      'Ainda não há mergulhos com este item';
 
   @override
   String equipmentCondition_exposure_footer(int n, String range) {
@@ -28719,7 +28678,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String equipmentCondition_exposure_saltHours(String n) {
-    return '$n horas em Ã¡gua salgada';
+    return '$n horas em água salgada';
   }
 
   @override
@@ -28767,7 +28726,7 @@ class AppLocalizationsPt extends AppLocalizations {
     int n,
     String since,
   ) {
-    return 'A saÃ­da da cÃ©lula $slot caiu $percent por cento em $n mergulhos desde $since';
+    return 'A saída da célula $slot caiu $percent por cento em $n mergulhos desde $since';
   }
 
   @override
@@ -28776,7 +28735,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String gain,
     int n,
   ) {
-    return 'A saÃ­da da cÃ©lula $slot Ã© de $gain mV por bar nos Ãºltimos $n mergulhos';
+    return 'A saída da célula $slot é de $gain mV por bar nos últimos $n mergulhos';
   }
 
   @override
@@ -28786,7 +28745,7 @@ class AppLocalizationsPt extends AppLocalizations {
     int count,
     int n,
   ) {
-    return 'A cÃ©lula $slot discordou das outras atÃ© $bar bar em $count dos Ãºltimos $n mergulhos';
+    return 'A célula $slot discordou das outras até $bar bar em $count dos últimos $n mergulhos';
   }
 
   @override
@@ -28796,7 +28755,7 @@ class AppLocalizationsPt extends AppLocalizations {
     int n,
     String percent,
   ) {
-    return 'A cÃ©lula $slot leu baixo a ppO2 alta em $count dos Ãºltimos $n mergulhos, atÃ© $percent por cento das amostras';
+    return 'A célula $slot leu baixo a ppO2 alta em $count dos últimos $n mergulhos, até $percent por cento das amostras';
   }
 
   @override
@@ -28805,7 +28764,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String prior,
     int priorCount,
   ) {
-    return 'A pressÃ£o falhou durante $recent por cento dos Ãºltimos 5 mergulhos, contra $prior por cento nos $priorCount anteriores';
+    return 'A pressão falhou durante $recent por cento dos últimos 5 mergulhos, contra $prior por cento nos $priorCount anteriores';
   }
 
   @override
@@ -28814,7 +28773,7 @@ class AppLocalizationsPt extends AppLocalizations {
     int n,
     int count,
   ) {
-    return 'A pressÃ£o falhou em mÃ©dia durante $recent por cento dos Ãºltimos $n mergulhos, $count deles acima de 10 por cento';
+    return 'A pressão falhou em média durante $recent por cento dos últimos $n mergulhos, $count deles acima de 10 por cento';
   }
 
   @override
@@ -28823,7 +28782,7 @@ class AppLocalizationsPt extends AppLocalizations {
     int count,
     int n,
   ) {
-    return '$tag registado $count vezes nos Ãºltimos $n mergulhos';
+    return '$tag registado $count vezes nos últimos $n mergulhos';
   }
 
   @override
@@ -28843,7 +28802,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String threshold,
     int n,
   ) {
-    return '$insideIssue de $totalIssue mergulhos com problemas foram alÃ©m de $threshold, em $n mergulhos com este item';
+    return '$insideIssue de $totalIssue mergulhos com problemas foram além de $threshold, em $n mergulhos com este item';
   }
 
   @override
@@ -28870,14 +28829,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipmentConditionSettings_thresholdsHeader =>
-      'Limites de exposiÃ§Ã£o';
+      'Limites de exposição';
 
   @override
   String get equipmentConditionSettings_thresholdsHelp =>
-      'Um mergulho conta como frio, profundo ou com O2 elevado para os relÃ³gios de manutenÃ§Ã£o quando ultrapassa estes limites.';
+      'Um mergulho conta como frio, profundo ou com O2 elevado para os relógios de manutenção quando ultrapassa estes limites.';
 
   @override
-  String get equipmentConditionSettings_coldLabel => 'Ãgua fria abaixo de';
+  String get equipmentConditionSettings_coldLabel => 'Água fria abaixo de';
 
   @override
   String get equipmentConditionSettings_deepLabel =>
@@ -28888,18 +28847,18 @@ class AppLocalizationsPt extends AppLocalizations {
       'Mistura com O2 elevado acima de (% O2)';
 
   @override
-  String get equipmentConditionSettings_invalid => 'Introduza um nÃºmero';
+  String get equipmentConditionSettings_invalid => 'Introduza um número';
 
   @override
   String get equipmentConditionSettings_saveFailed =>
-      'NÃ£o foi possÃ­vel guardar. Tente novamente.';
+      'Não foi possível guardar. Tente novamente.';
 
   @override
   String get equipmentConditionSettings_sensorHeader => 'Resumos de sensores';
 
   @override
   String get equipmentConditionSettings_sensorHelp =>
-      'O perfil de cada mergulho Ã© resumido uma vez para a saÃ­da das cÃ©lulas, as falhas do transmissor e o uso do absorvente. Mergulhos novos e editados sÃ£o resumidos sozinhos.';
+      'O perfil de cada mergulho é resumido uma vez para a saída das células, as falhas do transmissor e o uso do absorvente. Mergulhos novos e editados são resumidos sozinhos.';
 
   @override
   String get equipmentConditionSettings_rebuild =>
@@ -28916,7 +28875,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipmentConditionSettings_rebuild_done =>
-      'Resumos de sensores reconstruÃ­dos';
+      'Resumos de sensores reconstruídos';
 
   @override
   String equipmentConditionSettings_rebuild_doneWithBothErrors(
@@ -28926,8 +28885,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       dives,
       locale: localeName,
-      other: '$dives mergulhos nÃ£o puderam ser resumidos',
-      one: '1 mergulho nÃ£o pÃ´de ser resumido',
+      other: '$dives mergulhos não puderam ser resumidos',
+      one: '1 mergulho não pôde ser resumido',
     );
     String _temp1 = intl.Intl.pluralLogic(
       items,
@@ -28935,7 +28894,7 @@ class AppLocalizationsPt extends AppLocalizations {
       other: '$items equipamentos',
       one: '1 equipamento',
     );
-    return '$_temp0; nÃ£o foi possÃ­vel atualizar as constataÃ§Ãµes de estado de $_temp1';
+    return '$_temp0; não foi possível atualizar as constatações de estado de $_temp1';
   }
 
   @override
@@ -28943,10 +28902,10 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count mergulhos nÃ£o puderam ser resumidos',
-      one: '1 mergulho nÃ£o pÃ´de ser resumido',
+      other: '$count mergulhos não puderam ser resumidos',
+      one: '1 mergulho não pôde ser resumido',
     );
-    return 'Resumos de sensores reconstruÃ­dos; $_temp0';
+    return 'Resumos de sensores reconstruídos; $_temp0';
   }
 
   @override
@@ -28957,39 +28916,39 @@ class AppLocalizationsPt extends AppLocalizations {
       other: '$count equipamentos',
       one: '1 equipamento',
     );
-    return 'Resumos de sensores reconstruÃ­dos; nÃ£o foi possÃ­vel atualizar as constataÃ§Ãµes de estado de $_temp0';
+    return 'Resumos de sensores reconstruídos; não foi possível atualizar as constatações de estado de $_temp0';
   }
 
   @override
   String get equipmentConditionSettings_rebuild_failed =>
-      'NÃ£o foi possÃ­vel reconstruir os resumos de sensores.';
+      'Não foi possível reconstruir os resumos de sensores.';
 
   @override
   String get equipmentConditionSettings_masterToggle =>
-      'ConstataÃ§Ãµes de estado';
+      'Constatações de estado';
 
   @override
   String get equipmentConditionSettings_masterToggle_subtitle =>
-      'Relata tendÃªncias na saÃ­da das cÃ©lulas, falhas de sinal do transmissor e problemas registados, com os nÃºmeros por trÃ¡s';
+      'Relata tendências na saída das células, falhas de sinal do transmissor e problemas registados, com os números por trás';
 
   @override
   String get equipmentConditionSettings_rulesHeader => 'Regras';
 
   @override
   String get equipmentConditionSettings_rule_cellOutputDeclining =>
-      'SaÃ­da da cÃ©lula em queda';
+      'Saída da célula em queda';
 
   @override
   String get equipmentConditionSettings_rule_cellOutputLow =>
-      'SaÃ­da da cÃ©lula baixa';
+      'Saída da célula baixa';
 
   @override
   String get equipmentConditionSettings_rule_cellDivergent =>
-      'CÃ©lula discorda das outras';
+      'Célula discorda das outras';
 
   @override
   String get equipmentConditionSettings_rule_cellCurrentLimited =>
-      'CÃ©lula limitada por corrente a ppO2 alta';
+      'Célula limitada por corrente a ppO2 alta';
 
   @override
   String get equipmentConditionSettings_rule_transmitterDropoutRising =>
@@ -29016,13 +28975,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'Incidentes associados';
 
   @override
-  String get equipmentObservation_tag_freeFlow => 'Fluxo contÃ­nuo';
+  String get equipmentObservation_tag_freeFlow => 'Fluxo contínuo';
 
   @override
-  String get equipmentObservation_tag_hardBreathing => 'RespiraÃ§Ã£o dura';
+  String get equipmentObservation_tag_hardBreathing => 'Respiração dura';
 
   @override
-  String get equipmentObservation_tag_wetBreathing => 'RespiraÃ§Ã£o hÃºmida';
+  String get equipmentObservation_tag_wetBreathing => 'Respiração húmida';
 
   @override
   String get equipmentObservation_tag_leak => 'Fuga';
@@ -29040,10 +28999,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipmentObservation_tag_bladderLeak => 'Fuga na bexiga';
 
   @override
-  String get equipmentObservation_tag_dumpLeak => 'Fuga na vÃ¡lvula de purga';
+  String get equipmentObservation_tag_dumpLeak => 'Fuga na válvula de purga';
 
   @override
-  String get equipmentObservation_tag_leakNeck => 'Fuga no vedante do pescoÃ§o';
+  String get equipmentObservation_tag_leakNeck => 'Fuga no vedante do pescoço';
 
   @override
   String get equipmentObservation_tag_leakWrist => 'Fuga no vedante do pulso';
@@ -29055,7 +29014,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipmentObservation_tag_leakBoot => 'Fuga na bota';
 
   @override
-  String get equipmentObservation_tag_leakValve => 'Fuga na vÃ¡lvula';
+  String get equipmentObservation_tag_leakValve => 'Fuga na válvula';
 
   @override
   String get equipmentObservation_tag_leakSeam => 'Fuga na costura';
@@ -29082,16 +29041,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipmentObservation_tag_batteryLow => 'Bateria fraca';
 
   @override
-  String get equipmentObservation_tag_screenFault => 'Falha do ecrÃ£';
+  String get equipmentObservation_tag_screenFault => 'Falha do ecrã';
 
   @override
-  String get equipmentObservation_tag_connectionFault => 'Falha de ligaÃ§Ã£o';
+  String get equipmentObservation_tag_connectionFault => 'Falha de ligação';
 
   @override
   String get equipmentObservation_tag_dropout => 'Perda de sinal';
 
   @override
-  String get equipmentObservation_tag_cellWarning => 'Aviso de cÃ©lula';
+  String get equipmentObservation_tag_cellWarning => 'Aviso de célula';
 
   @override
   String get equipmentObservation_tag_loopLeak => 'Fuga no circuito';
@@ -29107,13 +29066,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipmentObservation_tag_slowResponse => 'Resposta lenta';
 
   @override
-  String get equipmentObservation_tag_erratic => 'ErrÃ¡tico';
+  String get equipmentObservation_tag_erratic => 'Errático';
 
   @override
   String get equipmentObservation_tag_lowCapacity => 'Pouca capacidade';
 
   @override
-  String get equipmentObservation_tag_propFault => 'Falha da hÃ©lice';
+  String get equipmentObservation_tag_propFault => 'Falha da hélice';
 
   @override
   String get equipmentObservation_tag_strapBroke => 'Fita partida';
@@ -29129,29 +29088,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String equipmentObservation_sheet_title(String item) {
-    return 'VerificaÃ§Ã£o: $item';
+    return 'Verificação: $item';
   }
 
   @override
   String get equipmentObservation_sheet_empty =>
-      'Ainda sem verificaÃ§Ãµes neste mergulho.';
+      'Ainda sem verificações neste mergulho.';
 
   @override
-  String get equipmentObservation_sheet_emptyBench =>
-      'Ainda sem verificaÃ§Ãµes.';
+  String get equipmentObservation_sheet_emptyBench => 'Ainda sem verificações.';
 
   @override
-  String get equipmentObservation_sheet_add => 'Adicionar verificaÃ§Ã£o';
+  String get equipmentObservation_sheet_add => 'Adicionar verificação';
 
   @override
-  String get equipmentObservation_sheet_edit => 'Editar verificaÃ§Ã£o';
+  String get equipmentObservation_sheet_edit => 'Editar verificação';
 
   @override
-  String get equipmentObservation_sheet_delete => 'Eliminar verificaÃ§Ã£o';
+  String get equipmentObservation_sheet_delete => 'Eliminar verificação';
 
   @override
   String get equipmentObservation_sheet_deleteConfirm =>
-      'Eliminar esta verificaÃ§Ã£o?';
+      'Eliminar esta verificação?';
 
   @override
   String get equipmentObservation_sheet_noteLabel => 'Nota';
@@ -29191,25 +29149,25 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipmentObservation_chip_none => 'Verificar';
 
   @override
-  String get equipmentObservation_card_title => 'VerificaÃ§Ãµes';
+  String get equipmentObservation_card_title => 'Verificações';
 
   @override
   String get equipmentObservation_card_empty =>
-      'Sem verificaÃ§Ãµes registadas para este item.';
+      'Sem verificações registadas para este item.';
 
   @override
-  String get equipmentObservation_card_add => 'Adicionar verificaÃ§Ã£o';
+  String get equipmentObservation_card_add => 'Adicionar verificação';
 
   @override
   String equipmentObservation_card_onDive(int number) {
-    return 'Mergulho n.Âº $number';
+    return 'Mergulho n.º $number';
   }
 
   @override
   String get equipmentObservation_card_bench => 'Bancada';
 
   @override
-  String get settings_section_security_title => 'SeguranÃ§a do app';
+  String get settings_section_security_title => 'Segurança do app';
 
   @override
   String get settings_section_security_subtitle =>
@@ -29220,7 +29178,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_section_trimixMixer_subtitle =>
-      'Gases de enchimento, condiÃ§Ãµes e definiÃ§Ãµes padrÃ£o de faturaÃ§Ã£o';
+      'Gases de enchimento, condições e definições padrão de faturação';
 
   @override
   String get settings_security_appLock => 'Bloqueio do app';
@@ -29233,7 +29191,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_security_biometrics => 'Desbloquear com biometria';
 
   @override
-  String get settings_security_autoLock => 'Bloqueio automÃ¡tico';
+  String get settings_security_autoLock => 'Bloqueio automático';
 
   @override
   String get settings_security_autoLock_immediately => 'Imediatamente';
@@ -29243,8 +29201,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       minutes,
       locale: localeName,
-      other: 'ApÃ³s $minutes minutos',
-      one: 'ApÃ³s 1 minuto',
+      other: 'Após $minutes minutos',
+      one: 'Após 1 minuto',
     );
     return '$_temp0';
   }
@@ -29261,7 +29219,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_security_encryption_progress_backup =>
-      'Criando backup de seguranÃ§a...';
+      'Criando backup de segurança...';
 
   @override
   String get settings_security_encryption_progress_encrypt =>
@@ -29280,7 +29238,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_security_regenerateRecovery =>
-      'Novo cÃ³digo de recuperaÃ§Ã£o';
+      'Novo código de recuperação';
 
   @override
   String get settings_security_setPassword => 'Definir senha do app';
@@ -29302,26 +29260,26 @@ class AppLocalizationsPt extends AppLocalizations {
       'A senha deve ter pelo menos 4 caracteres.';
 
   @override
-  String get settings_security_passwordMismatch => 'As senhas nÃ£o coincidem.';
+  String get settings_security_passwordMismatch => 'As senhas não coincidem.';
 
   @override
   String get settings_security_wrongPassword => 'Senha incorreta.';
 
   @override
   String get settings_security_recoveryCode_title =>
-      'Seu cÃ³digo de recuperaÃ§Ã£o';
+      'Seu código de recuperação';
 
   @override
   String get settings_security_recoveryCode_explain =>
-      'Anote-o e guarde-o em local seguro. Ã‰ a Ãºnica forma de desbloquear o app se vocÃª esquecer sua senha, e ele substitui qualquer cÃ³digo de recuperaÃ§Ã£o anterior.';
+      'Anote-o e guarde-o em local seguro. É a única forma de desbloquear o app se você esquecer sua senha, e ele substitui qualquer código de recuperação anterior.';
 
   @override
   String get settings_security_recoveryCode_savedConfirm =>
-      'Salvei meu cÃ³digo de recuperaÃ§Ã£o';
+      'Salvei meu código de recuperação';
 
   @override
   String get settings_security_disableBlockedByEncryption_title =>
-      'A criptografia estÃ¡ ativada';
+      'A criptografia está ativada';
 
   @override
   String get settings_security_disableBlockedByEncryption_body =>
@@ -29333,7 +29291,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      'Primeiro Ã© criado um backup de seguranÃ§a e depois o arquivo do banco Ã© recriptografado no local. Pode demorar com registros grandes. A criptografia pode afetar o desempenho.';
+      'Primeiro é criado um backup de segurança e depois o arquivo do banco é recriptografado no local. Pode demorar com registros grandes. A criptografia pode afetar o desempenho.';
 
   @override
   String get settings_security_disableEncryption_title =>
@@ -29341,7 +29299,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_security_disableEncryption_body =>
-      'O arquivo do banco de dados voltarÃ¡ a ser armazenado sem criptografia no disco.';
+      'O arquivo do banco de dados voltará a ser armazenado sem criptografia no disco.';
 
   @override
   String get settings_security_turnOffAppLock_title =>
@@ -29349,7 +29307,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_security_turnOffAppLock_body =>
-      'O app abrirÃ¡ sem pedir sua senha.';
+      'O app abrirá sem pedir sua senha.';
 
   @override
   String get settings_security_unlock_title => 'Digite sua senha';
@@ -29361,7 +29319,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_security_continue => 'Continuar';
 
   @override
-  String get settings_security_done => 'ConcluÃ­do';
+  String get settings_security_done => 'Concluído';
 
   @override
   String get settings_security_turnOff => 'Desativar';
@@ -29370,7 +29328,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dataQuality_inbox_title => 'Qualidade dos dados';
 
   @override
-  String get dataQuality_dive_unknown => 'Detalhes do mergulho indisponÃ­veis';
+  String get dataQuality_dive_unknown => 'Detalhes do mergulho indisponíveis';
 
   @override
   String dataQuality_dive_number(int number) {
@@ -29388,7 +29346,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get dataQuality_badge_tooltip => 'RevisÃ£o da qualidade dos dados';
+  String get dataQuality_badge_tooltip => 'Revisão da qualidade dos dados';
 
   @override
   String get dataQuality_scan_start => 'Analisar biblioteca';
@@ -29406,37 +29364,37 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'AnÃ¡lise concluÃ­da - $count itens para revisar',
-      one: 'AnÃ¡lise concluÃ­da - 1 item para revisar',
-      zero: 'AnÃ¡lise concluÃ­da - nenhuma nova constataÃ§Ã£o',
+      other: 'Análise concluída - $count itens para revisar',
+      one: 'Análise concluída - 1 item para revisar',
+      zero: 'Análise concluída - nenhuma nova constatação',
     );
     return '$_temp0';
   }
 
   @override
   String dataQuality_scan_errors(int count) {
-    return 'NÃ£o foi possÃ­vel verificar completamente $count mergulhos';
+    return 'Não foi possível verificar completamente $count mergulhos';
   }
 
   @override
   String dataQuality_lastScan(String when) {
-    return 'Ãšltima anÃ¡lise: $when';
+    return 'Última análise: $when';
   }
 
   @override
   String get dataQuality_neverScanned =>
-      'O seu diÃ¡rio de mergulho ainda nÃ£o foi analisado';
+      'O seu diário de mergulho ainda não foi analisado';
 
   @override
   String get dataQuality_empty_title => 'Tudo em ordem';
 
   @override
   String get dataQuality_empty_subtitle =>
-      'Sem constataÃ§Ãµes de qualidade dos dados. Analise a sua biblioteca para verificar problemas nos mergulhos importados.';
+      'Sem constatações de qualidade dos dados. Analise a sua biblioteca para verificar problemas nos mergulhos importados.';
 
   @override
   String get dataQuality_banner_newChecks =>
-      'HÃ¡ novas verificaÃ§Ãµes de qualidade disponÃ­veis';
+      'Há novas verificações de qualidade disponíveis';
 
   @override
   String get dataQuality_banner_rescan => 'Analisar novamente';
@@ -29446,7 +29404,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dataQuality_action_dismissFiltered =>
-      'Dispensar tudo o que Ã© mostrado';
+      'Dispensar tudo o que é mostrado';
 
   @override
   String get dataQuality_action_goToDive => 'Ir para o mergulho';
@@ -29455,17 +29413,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dataQuality_action_undo => 'Desfazer';
 
   @override
-  String get dataQuality_repair_applied => 'CorreÃ§Ã£o aplicada';
+  String get dataQuality_repair_applied => 'Correção aplicada';
 
   @override
-  String get dataQuality_repair_noChange => 'NÃ£o hÃ¡ nada a corrigir aqui';
+  String get dataQuality_repair_noChange => 'Não há nada a corrigir aqui';
 
   @override
   String get dataQuality_repair_needsReview =>
-      'Sem correÃ§Ã£o automÃ¡tica. Abra o mergulho para corrigir.';
+      'Sem correção automática. Abra o mergulho para corrigir.';
 
   @override
-  String get dataQuality_repair_failed => 'Falha na correÃ§Ã£o';
+  String get dataQuality_repair_failed => 'Falha na correção';
 
   @override
   String get dataQuality_chip_all => 'Todos';
@@ -29477,7 +29435,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dataQuality_chip_profile => 'Perfil';
 
   @override
-  String get dataQuality_chip_gas => 'GÃ¡s';
+  String get dataQuality_chip_gas => 'Gás';
 
   @override
   String get dataQuality_chip_tanks => 'Cilindros';
@@ -29489,13 +29447,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dataQuality_chip_sources => 'Fontes';
 
   @override
-  String get dataQuality_detector_clock_offset => 'RelÃ³gio e fuso horÃ¡rio';
+  String get dataQuality_detector_clock_offset => 'Relógio e fuso horário';
 
   @override
-  String get dataQuality_detector_duplicate => 'ProvÃ¡vel duplicado';
+  String get dataQuality_detector_duplicate => 'Provável duplicado';
 
   @override
-  String get dataQuality_detector_split_pair => 'DivisÃ£o acidental';
+  String get dataQuality_detector_split_pair => 'Divisão acidental';
 
   @override
   String get dataQuality_detector_sample_gap => 'Lacunas nas amostras';
@@ -29504,16 +29462,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dataQuality_detector_depth_spike => 'Pico de profundidade';
 
   @override
-  String get dataQuality_detector_impossible_rate => 'Velocidade impossÃ­vel';
+  String get dataQuality_detector_impossible_rate => 'Velocidade impossível';
 
   @override
   String get dataQuality_detector_temp_anomaly => 'Anomalia de temperatura';
 
   @override
-  String get dataQuality_detector_pressure_anomaly => 'Anomalia de pressÃ£o';
+  String get dataQuality_detector_pressure_anomaly => 'Anomalia de pressão';
 
   @override
-  String get dataQuality_detector_gas_mod => 'InconsistÃªncia de gÃ¡s/MOD';
+  String get dataQuality_detector_gas_mod => 'Inconsistência de gás/MOD';
 
   @override
   String get dataQuality_detector_tank_assignment => 'Cilindro incorreto';
@@ -29523,32 +29481,32 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String dataQuality_msg_clock_future(String date) {
-    return 'O mergulho estÃ¡ datado no futuro ($date)';
+    return 'O mergulho está datado no futuro ($date)';
   }
 
   @override
   String dataQuality_msg_clock_ancient(String date) {
-    return 'O mergulho estÃ¡ datado antes de 1950 ($date)';
+    return 'O mergulho está datado antes de 1950 ($date)';
   }
 
   @override
   String dataQuality_msg_clock_offset(int hours) {
-    return 'O relÃ³gio de uma fonte difere em $hours horas';
+    return 'O relógio de uma fonte difere em $hours horas';
   }
 
   @override
   String dataQuality_msg_clock_overlap(int minutes) {
-    return 'SobrepÃµe-se a outro mergulho em $minutes min';
+    return 'Sobrepõe-se a outro mergulho em $minutes min';
   }
 
   @override
   String dataQuality_msg_duplicate(int percent, int minutes) {
-    return '$percent% de correspondÃªncia com um mergulho a $minutes min de distÃ¢ncia';
+    return '$percent% de correspondência com um mergulho a $minutes min de distância';
   }
 
   @override
   String dataQuality_msg_split(int minutes) {
-    return 'O mesmo computador foi retomado apÃ³s um intervalo de superfÃ­cie de $minutes min';
+    return 'O mesmo computador foi retomado após um intervalo de superfície de $minutes min';
   }
 
   @override
@@ -29564,7 +29522,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String dataQuality_msg_spike(String depth, String time) {
-    return 'Pico de profundidade atÃ© $depth Ã s $time';
+    return 'Pico de profundidade até $depth às $time';
   }
 
   @override
@@ -29574,7 +29532,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String dataQuality_msg_maxDepthMismatch(String stored, String profile) {
-    return 'Profundidade mÃ¡xima registada $stored, mas o perfil mostra $profile';
+    return 'Profundidade máxima registada $stored, mas o perfil mostra $profile';
   }
 
   @override
@@ -29584,7 +29542,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String dataQuality_msg_tempRange(String min, String max) {
-    return 'Temperatura da Ã¡gua fora do intervalo plausÃ­vel ($min a $max)';
+    return 'Temperatura da água fora do intervalo plausível ($min a $max)';
   }
 
   @override
@@ -29593,32 +29551,32 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String dataQuality_msg_tempJump(String delta) {
-    return 'A temperatura saltou $delta numa Ãºnica amostra';
+    return 'A temperatura saltou $delta numa única amostra';
   }
 
   @override
   String dataQuality_msg_tempScalar(String temp) {
-    return 'A temperatura da Ã¡gua registada $temp Ã© implausÃ­vel';
+    return 'A temperatura da água registada $temp é implausível';
   }
 
   @override
   String dataQuality_msg_pressureSwap(String end, String start) {
-    return 'A pressÃ£o final $end Ã© superior Ã  pressÃ£o inicial $start';
+    return 'A pressão final $end é superior à pressão inicial $start';
   }
 
   @override
   String dataQuality_msg_pressureEndpoint(String record, String series) {
-    return 'O registo do cilindro indica $record, mas a sÃ©rie do sensor mostra $series';
+    return 'O registo do cilindro indica $record, mas a série do sensor mostra $series';
   }
 
   @override
   String dataQuality_msg_pressureRise(String rise) {
-    return 'A pressÃ£o subiu $rise a meio do mergulho sem troca de gÃ¡s';
+    return 'A pressão subiu $rise a meio do mergulho sem troca de gás';
   }
 
   @override
   String dataQuality_msg_sac(String sac) {
-    return 'O consumo Ã  superfÃ­cie implÃ­cito de $sac Ã© implausÃ­vel';
+    return 'O consumo à superfície implícito de $sac é implausível';
   }
 
   @override
@@ -29628,39 +29586,39 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String dataQuality_msg_hypoxic(String gas) {
-    return 'Mistura hipÃ³xica ($gas) indicada em uso Ã  superfÃ­cie';
+    return 'Mistura hipóxica ($gas) indicada em uso à superfície';
   }
 
   @override
   String dataQuality_msg_switchMod(String depth, String mod) {
-    return 'A troca de gÃ¡s a $depth ultrapassa a MOD desse gÃ¡s de $mod';
+    return 'A troca de gás a $depth ultrapassa a MOD desse gás de $mod';
   }
 
   @override
   String dataQuality_msg_tankInactive(String drop) {
-    return 'Este cilindro perdeu $drop enquanto a linha temporal de gÃ¡s indica que nÃ£o estava em uso';
+    return 'Este cilindro perdeu $drop enquanto a linha temporal de gás indica que não estava em uso';
   }
 
   @override
   String get dataQuality_msg_twinTanks =>
-      'Dois cilindros apresentam uma sÃ©rie de pressÃ£o quase idÃªntica';
+      'Dois cilindros apresentam uma série de pressão quase idêntica';
 
   @override
   String dataQuality_msg_sourceDepth(String primary, String source) {
-    return 'As fontes divergem sobre a profundidade mÃ¡xima: $primary vs. $source';
+    return 'As fontes divergem sobre a profundidade máxima: $primary vs. $source';
   }
 
   @override
   String get dataQuality_msg_salinityHint =>
-      'A proporÃ§Ã£o constante sugere uma diferenÃ§a na definiÃ§Ã£o de Ã¡gua salgada/doce';
+      'A proporção constante sugere uma diferença na definição de água salgada/doce';
 
   @override
   String get dataQuality_msg_sourceDuration =>
-      'As fontes divergem sobre a duraÃ§Ã£o do mergulho';
+      'As fontes divergem sobre a duração do mergulho';
 
   @override
   String get dataQuality_msg_sourceTemp =>
-      'As fontes divergem sobre a temperatura da Ã¡gua';
+      'As fontes divergem sobre a temperatura da água';
 
   @override
   String dataQuality_repairLabel_shiftTime(String offset) {
@@ -29669,7 +29627,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dataQuality_repairLabel_shiftImport =>
-      'Deslocar todos os mergulhos desta importaÃ§Ã£o';
+      'Deslocar todos os mergulhos desta importação';
 
   @override
   String get dataQuality_repairLabel_consolidate => 'Consolidar';
@@ -29679,11 +29637,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dataQuality_deleteDuplicate_title =>
-      'Eliminar a cÃ³pia redundante?';
+      'Eliminar a cópia redundante?';
 
   @override
   String get dataQuality_deleteDuplicate_body =>
-      'Ambos foram registados pelo mesmo computador de mergulho. A cÃ³pia com menos dados do mergulho serÃ¡ eliminada. Pode anular esta aÃ§Ã£o depois.';
+      'Ambos foram registados pelo mesmo computador de mergulho. A cópia com menos dados do mergulho será eliminada. Pode anular esta ação depois.';
 
   @override
   String dataQuality_deleteDuplicate_keep(String dive) {
@@ -29697,7 +29655,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String dataQuality_deleteDuplicate_carries(String items) {
-    return 'Esta cÃ³pia tambÃ©m tem: $items';
+    return 'Esta cópia também tem: $items';
   }
 
   @override
@@ -29749,8 +29707,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count fotos ou vÃ­deos',
-      one: '1 foto ou vÃ­deo',
+      other: '$count fotos ou vídeos',
+      one: '1 foto ou vídeo',
     );
     return '$_temp0';
   }
@@ -29778,7 +29736,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get dataQuality_carries_rating => 'uma avaliaÃ§Ã£o';
+  String get dataQuality_carries_rating => 'uma avaliação';
 
   @override
   String get dataQuality_carries_favorite => 'um favorito';
@@ -29803,11 +29761,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dataQuality_repairLabel_clampNegative =>
-      'Limitar profundidades acima da superfÃ­cie';
+      'Limitar profundidades acima da superfície';
 
   @override
   String get dataQuality_repairLabel_smoothRates =>
-      'Suavizar taxas impossÃ­veis';
+      'Suavizar taxas impossíveis';
 
   @override
   String get dataQuality_repairLabel_fillGaps => 'Preencher lacunas';
@@ -29824,18 +29782,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dataQuality_repairLabel_swapPressures =>
-      'Trocar pressÃ£o inicial/final';
+      'Trocar pressão inicial/final';
 
   @override
   String get dataQuality_repairLabel_setFromSeries => 'Usar valores do sensor';
 
   @override
-  String get dataQuality_repairLabel_swapSeries =>
-      'Trocar sÃ©ries de cilindros';
+  String get dataQuality_repairLabel_swapSeries => 'Trocar séries de cilindros';
 
   @override
   String get dataQuality_repairLabel_reassignSeries =>
-      'Mover a sÃ©rie para outro cilindro';
+      'Mover a série para outro cilindro';
 
   @override
   String get dataQuality_repairLabel_setPrimary =>
@@ -29852,15 +29809,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dataQuality_settings_subtitle =>
-      'Escolher que verificaÃ§Ãµes sÃ£o executadas durante a anÃ¡lise';
+      'Escolher que verificações são executadas durante a análise';
 
   @override
   String dataQuality_summary_flagged(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count itens assinalados para revisÃ£o',
-      one: '1 item assinalado para revisÃ£o',
+      other: '$count itens assinalados para revisão',
+      one: '1 item assinalado para revisão',
     );
     return '$_temp0';
   }
@@ -29883,7 +29840,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_mediaStorage_quality_photos => 'Fotos';
 
   @override
-  String get settings_mediaStorage_quality_video => 'VÃ­deo';
+  String get settings_mediaStorage_quality_video => 'Vídeo';
 
   @override
   String get settings_mediaStorage_quality_original => 'Original';
@@ -29899,7 +29856,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_quality_caveat =>
-      'Com um nÃ­vel de compressÃ£o definido, os originais em resoluÃ§Ã£o total nÃ£o sÃ£o enviados; permanecem apenas neste dispositivo.';
+      'Com um nível de compressão definido, os originais em resolução total não são enviados; permanecem apenas neste dispositivo.';
 
   @override
   String get settings_mediaStorage_quality_reuploadQueued =>
@@ -29907,15 +29864,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
-      'Instale o ffmpeg para ativar a compressÃ£o de vÃ­deo. AtÃ© lÃ¡, os originais sÃ£o enviados.';
+      'Instale o ffmpeg para ativar a compressão de vídeo. Até lá, os originais são enviados.';
 
   @override
   String get settings_mediaStorage_quality_saveFailed =>
-      'NÃ£o foi possÃ­vel guardar a qualidade de envio. Tente novamente.';
+      'Não foi possível guardar a qualidade de envio. Tente novamente.';
 
   @override
   String get settings_mediaStorage_quality_noTranscoderHint =>
-      'Este dispositivo nÃ£o consegue comprimir vÃ­deo. A partir dele sÃ£o enviados os originais.';
+      'Este dispositivo não consegue comprimir vídeo. A partir dele são enviados os originais.';
 
   @override
   String get reef_section_title => 'Ecossistema';
@@ -29925,41 +29882,41 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get reef_section_loadError =>
-      'NÃ£o foi possÃ­vel carregar os dados do ecossistema agora';
+      'Não foi possível carregar os dados do ecossistema agora';
 
   @override
-  String get reef_habitat_title => 'HÃ¡bitat do recife';
+  String get reef_habitat_title => 'Hábitat do recife';
 
   @override
   String get reef_habitat_onReef => 'Em um recife de coral';
 
   @override
   String reef_habitat_onReefWithThreat(String threat) {
-    return 'Em um recife de coral, nÃ­vel de ameaÃ§a $threat';
+    return 'Em um recife de coral, nível de ameaça $threat';
   }
 
   @override
   String get reef_habitat_noReef =>
-      'Nenhum recife de coral mapeado nesta localizaÃ§Ã£o';
+      'Nenhum recife de coral mapeado nesta localização';
 
   @override
   String get reef_habitat_unavailable =>
-      'NÃ£o foi possÃ­vel verificar o hÃ¡bitat do recife agora';
+      'Não foi possível verificar o hábitat do recife agora';
 
   @override
-  String get water_conditions_title => 'CondiÃ§Ãµes da Ã¡gua';
+  String get water_conditions_title => 'Condições da água';
 
   @override
   String get water_conditions_unavailable =>
-      'NÃ£o foi possÃ­vel verificar as condiÃ§Ãµes da Ã¡gua agora';
+      'Não foi possível verificar as condições da água agora';
 
   @override
   String get water_conditions_noData =>
-      'Sem dados de satÃ©lite da Ã¡gua para este local';
+      'Sem dados de satélite da água para este local';
 
   @override
   String get water_conditions_freshwater =>
-      'A temperatura da Ã¡gua por satÃ©lite cobre apenas os oceanos';
+      'A temperatura da água por satélite cobre apenas os oceanos';
 
   @override
   String water_conditions_anomaly(String value) {
@@ -29973,7 +29930,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String reef_health_seaSurface(String value) {
-    return 'SuperfÃ­cie do mar $value';
+    return 'Superfície do mar $value';
   }
 
   @override
@@ -29982,38 +29939,38 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get reef_health_levelNoStress => 'Sem estresse tÃ©rmico';
+  String get reef_health_levelNoStress => 'Sem estresse térmico';
 
   @override
-  String get reef_health_levelWatch => 'VigilÃ¢ncia de branqueamento';
+  String get reef_health_levelWatch => 'Vigilância de branqueamento';
 
   @override
   String get reef_health_levelWarning => 'Aviso de branqueamento';
 
   @override
-  String get reef_health_levelAlert1 => 'Alerta de branqueamento nÃ­vel 1';
+  String get reef_health_levelAlert1 => 'Alerta de branqueamento nível 1';
 
   @override
-  String get reef_health_levelAlert2 => 'Alerta de branqueamento nÃ­vel 2';
+  String get reef_health_levelAlert2 => 'Alerta de branqueamento nível 2';
 
   @override
-  String get reef_health_levelAlert3 => 'Alerta de branqueamento nÃ­vel 3';
+  String get reef_health_levelAlert3 => 'Alerta de branqueamento nível 3';
 
   @override
-  String get reef_health_levelAlert4 => 'Alerta de branqueamento nÃ­vel 4';
+  String get reef_health_levelAlert4 => 'Alerta de branqueamento nível 4';
 
   @override
-  String get reef_health_levelAlert5 => 'Alerta de branqueamento nÃ­vel 5';
+  String get reef_health_levelAlert5 => 'Alerta de branqueamento nível 5';
 
   @override
-  String get reef_protection_title => 'Ãrea protegida';
+  String get reef_protection_title => 'Área protegida';
 
   @override
-  String get reef_protection_none => 'Fora de Ã¡rea marinha protegida';
+  String get reef_protection_none => 'Fora de área marinha protegida';
 
   @override
   String get reef_protection_unavailable =>
-      'NÃ£o foi possÃ­vel verificar o estado de proteÃ§Ã£o agora';
+      'Não foi possível verificar o estado de proteção agora';
 
   @override
   String get reef_protection_viewRegulations => 'Ver regulamentos';
@@ -30027,11 +29984,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get reef_species_recordedNearby => 'Registrado nas proximidades';
 
   @override
-  String get reef_species_addToExpected => 'Adicionar Ã s espÃ©cies esperadas';
+  String get reef_species_addToExpected => 'Adicionar às espécies esperadas';
 
   @override
   String get reef_species_addFromLookup =>
-      'Pesquisar e adicionar Ã s suas espÃ©cies';
+      'Pesquisar e adicionar às suas espécies';
 
   @override
   String reef_species_showAll(int count) {
@@ -30046,19 +30003,19 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get reef_attribution_wri =>
-      'PresenÃ§a de recife e nÃ­vel de ameaÃ§a. CC BY 3.0.';
+      'Presença de recife e nível de ameaça. CC BY 3.0.';
 
   @override
   String get reef_attribution_noaa =>
-      'Temperatura da superfÃ­cie do mar e estresse tÃ©rmico. DomÃ­nio pÃºblico.';
+      'Temperatura da superfície do mar e estresse térmico. Domínio público.';
 
   @override
   String get reef_attribution_gbif =>
-      'Registros de ocorrÃªncia de espÃ©cies, filtrados para CC0 e CC BY 4.0.';
+      'Registros de ocorrência de espécies, filtrados para CC0 e CC BY 4.0.';
 
   @override
   String get reef_attribution_protectedSeas =>
-      'Limites de Ã¡reas marinhas protegidas. CC BY 4.0.';
+      'Limites de áreas marinhas protegidas. CC BY 4.0.';
 
   @override
   String get enum_visibilityBand_excellent => 'Excelente';
@@ -30092,14 +30049,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_coordinateFormat_subtitle =>
-      'Como as posiÃ§Ãµes GPS sÃ£o apresentadas e introduzidas';
+      'Como as posições GPS são apresentadas e introduzidas';
 
   @override
   String get settings_placeNameLanguage_title => 'Idioma dos nomes de lugares';
 
   @override
   String get settings_placeNameLanguage_subtitle =>
-      'Usado quando paÃ­s, regiÃ£o, cidade e corpo de Ã¡gua sÃ£o obtidos a partir das coordenadas. Os locais existentes nÃ£o sÃ£o alterados.';
+      'Usado quando país, região, cidade e corpo de água são obtidos a partir das coordenadas. Os locais existentes não são alterados.';
 
   @override
   String get settings_coordinateFormat_decimalDegrees => 'Graus decimais';
@@ -30123,7 +30080,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_visibilityScale_subtitle =>
-      'Que distÃ¢ncias contam como boa visibilidade onde mergulha';
+      'Que distâncias contam como boa visibilidade onde mergulha';
 
   @override
   String get settings_visibilityScale_preset_tropical => 'Tropical';
@@ -30133,7 +30090,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_visibilityScale_preset_coldWater =>
-      'Ãgua fria / Interior';
+      'Água fria / Interior';
 
   @override
   String get settings_visibilityScale_preset_custom => 'Personalizada';
@@ -30154,7 +30111,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String statistics_conditions_visibility_legacySuffix(String band) {
-    return '$band (registado antes da mediÃ§Ã£o)';
+    return '$band (registado antes da medição)';
   }
 
   @override
@@ -30166,7 +30123,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get common_selection_enterTooltip => 'Selecionar itens';
 
   @override
-  String get common_selection_exitTooltip => 'Sair da seleÃ§Ã£o';
+  String get common_selection_exitTooltip => 'Sair da seleção';
 
   @override
   String get common_selection_selectAllTooltip => 'Selecionar tudo';
@@ -30186,7 +30143,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get common_bulkDelete_body => 'Esta aÃ§Ã£o nÃ£o pode ser anulada.';
+  String get common_bulkDelete_body => 'Esta ação não pode ser anulada.';
 
   @override
   String common_bulkDelete_snackbar(int count) {
@@ -30200,7 +30157,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get marineLife_species_delete_confirmTitle => 'Eliminar espÃ©cie?';
+  String get marineLife_species_delete_confirmTitle => 'Eliminar espécie?';
 
   @override
   String marineLife_species_delete_confirmBody(String name) {
@@ -30209,7 +30166,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String marineLife_species_delete_inUseError(String name) {
-    return 'NÃ£o Ã© possÃ­vel eliminar \"$name\" - tem avistamentos';
+    return 'Não é possível eliminar \"$name\" - tem avistamentos';
   }
 
   @override
@@ -30219,11 +30176,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String marineLife_species_delete_error(String error) {
-    return 'Erro ao eliminar a espÃ©cie: $error';
+    return 'Erro ao eliminar a espécie: $error';
   }
 
   @override
-  String get enum_diveField_diveNumber => 'NÃºmero do Mergulho';
+  String get enum_diveField_diveNumber => 'Número do Mergulho';
 
   @override
   String get enum_diveField_dateTime => 'Data e Hora';
@@ -30235,10 +30192,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveField_diveName => 'Nome do Mergulho';
 
   @override
-  String get enum_diveField_maxDepth => 'Profundidade MÃ¡xima';
+  String get enum_diveField_maxDepth => 'Profundidade Máxima';
 
   @override
-  String get enum_diveField_avgDepth => 'Profundidade MÃ©dia';
+  String get enum_diveField_avgDepth => 'Profundidade Média';
 
   @override
   String get enum_diveField_bottomTime => 'Tempo de Fundo';
@@ -30247,7 +30204,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveField_runtime => 'Tempo Total';
 
   @override
-  String get enum_diveField_waterTemp => 'Temperatura da Ãgua';
+  String get enum_diveField_waterTemp => 'Temperatura da Água';
 
   @override
   String get enum_diveField_airTemp => 'Temperatura do Ar';
@@ -30256,28 +30213,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveField_visibility => 'Visibilidade';
 
   @override
-  String get enum_diveField_currentDirection => 'DireÃ§Ã£o da Corrente';
+  String get enum_diveField_currentDirection => 'Direção da Corrente';
 
   @override
-  String get enum_diveField_currentStrength => 'ForÃ§a da Corrente';
+  String get enum_diveField_currentStrength => 'Força da Corrente';
 
   @override
-  String get enum_diveField_swellHeight => 'Altura da OndulaÃ§Ã£o';
+  String get enum_diveField_swellHeight => 'Altura da Ondulação';
 
   @override
-  String get enum_diveField_entryMethod => 'MÃ©todo de Entrada';
+  String get enum_diveField_entryMethod => 'Método de Entrada';
 
   @override
-  String get enum_diveField_exitMethod => 'MÃ©todo de SaÃ­da';
+  String get enum_diveField_exitMethod => 'Método de Saída';
 
   @override
-  String get enum_diveField_waterType => 'Tipo de Ãgua';
+  String get enum_diveField_waterType => 'Tipo de Água';
 
   @override
   String get enum_diveField_altitude => 'Altitude';
 
   @override
-  String get enum_diveField_surfacePressure => 'PressÃ£o de SuperfÃ­cie';
+  String get enum_diveField_surfacePressure => 'Pressão de Superfície';
 
   @override
   String get enum_diveField_windSpeed => 'Velocidade do Vento';
@@ -30286,7 +30243,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveField_cloudCover => 'Cobertura de Nuvens';
 
   @override
-  String get enum_diveField_precipitation => 'PrecipitaÃ§Ã£o';
+  String get enum_diveField_precipitation => 'Precipitação';
 
   @override
   String get enum_diveField_humidity => 'Umidade';
@@ -30295,28 +30252,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveField_weatherDescription => 'Clima';
 
   @override
-  String get enum_diveField_primaryGas => 'GÃ¡s Principal';
+  String get enum_diveField_primaryGas => 'Gás Principal';
 
   @override
-  String get enum_diveField_diluentGas => 'GÃ¡s Diluente';
+  String get enum_diveField_diluentGas => 'Gás Diluente';
 
   @override
-  String get enum_diveField_tankCount => 'NÃºmero de Cilindros';
+  String get enum_diveField_tankCount => 'Número de Cilindros';
 
   @override
-  String get enum_diveField_startPressure => 'PressÃ£o Inicial';
+  String get enum_diveField_startPressure => 'Pressão Inicial';
 
   @override
-  String get enum_diveField_endPressure => 'PressÃ£o Final';
+  String get enum_diveField_endPressure => 'Pressão Final';
 
   @override
   String get enum_diveField_rmv => 'RMV (taxa de volume)';
 
   @override
-  String get enum_diveField_sac => 'SAC (taxa de pressÃ£o)';
+  String get enum_diveField_sac => 'SAC (taxa de pressão)';
 
   @override
-  String get enum_diveField_gasConsumed => 'GÃ¡s Consumido';
+  String get enum_diveField_gasConsumed => 'Gás Consumido';
 
   @override
   String get enum_diveField_totalWeight => 'Lastro Total';
@@ -30379,7 +30336,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveField_tripName => 'Viagem';
 
   @override
-  String get enum_diveField_ratingStars => 'AvaliaÃ§Ã£o';
+  String get enum_diveField_ratingStars => 'Avaliação';
 
   @override
   String get enum_diveField_isFavorite => 'Favorito';
@@ -30391,13 +30348,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveField_tags => 'Tags';
 
   @override
-  String get enum_diveField_importSource => 'Origem da ImportaÃ§Ã£o';
+  String get enum_diveField_importSource => 'Origem da Importação';
 
   @override
   String get enum_diveField_diveTypeName => 'Tipo de Mergulho';
 
   @override
-  String get enum_diveField_surfaceInterval => 'Intervalo de SuperfÃ­cie';
+  String get enum_diveField_surfaceInterval => 'Intervalo de Superfície';
 
   @override
   String get enum_diveField_diveNumber_short => '#';
@@ -30412,10 +30369,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveField_diveName_short => 'Nome';
 
   @override
-  String get enum_diveField_maxDepth_short => 'P. MÃ¡x';
+  String get enum_diveField_maxDepth_short => 'P. Máx';
 
   @override
-  String get enum_diveField_avgDepth_short => 'P. MÃ©d';
+  String get enum_diveField_avgDepth_short => 'P. Méd';
 
   @override
   String get enum_diveField_bottomTime_short => 'TF';
@@ -30424,7 +30381,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveField_runtime_short => 'TT';
 
   @override
-  String get enum_diveField_waterTemp_short => 'T Ãgua';
+  String get enum_diveField_waterTemp_short => 'T Água';
 
   @override
   String get enum_diveField_airTemp_short => 'T Ar';
@@ -30445,10 +30402,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveField_entryMethod_short => 'Entr.';
 
   @override
-  String get enum_diveField_exitMethod_short => 'SaÃ­da';
+  String get enum_diveField_exitMethod_short => 'Saída';
 
   @override
-  String get enum_diveField_waterType_short => 'Ãgua';
+  String get enum_diveField_waterType_short => 'Água';
 
   @override
   String get enum_diveField_altitude_short => 'Alt';
@@ -30472,7 +30429,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveField_weatherDescription_short => 'Clima';
 
   @override
-  String get enum_diveField_primaryGas_short => 'GÃ¡s';
+  String get enum_diveField_primaryGas_short => 'Gás';
 
   @override
   String get enum_diveField_diluentGas_short => 'Dil';
@@ -30493,7 +30450,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveField_sac_short => 'SAC';
 
   @override
-  String get enum_diveField_gasConsumed_short => 'GÃ¡s Cons';
+  String get enum_diveField_gasConsumed_short => 'Gás Cons';
 
   @override
   String get enum_diveField_totalWeight_short => 'Lastro';
@@ -30580,13 +30537,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_siteField_siteName => 'Nome';
 
   @override
-  String get enum_siteField_location => 'LocalizaÃ§Ã£o';
+  String get enum_siteField_location => 'Localização';
 
   @override
-  String get enum_siteField_country => 'PaÃ­s';
+  String get enum_siteField_country => 'País';
 
   @override
-  String get enum_siteField_region => 'RegiÃ£o';
+  String get enum_siteField_region => 'Região';
 
   @override
   String get enum_siteField_city => 'Cidade';
@@ -30595,28 +30552,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_siteField_island => 'Ilha';
 
   @override
-  String get enum_siteField_bodyOfWater => 'Corpo de Ãgua';
+  String get enum_siteField_bodyOfWater => 'Corpo de Água';
 
   @override
-  String get enum_siteField_diveCount => 'NÃºmero de Mergulhos';
+  String get enum_siteField_diveCount => 'Número de Mergulhos';
 
   @override
-  String get enum_siteField_maxDepth => 'Profundidade MÃ¡xima';
+  String get enum_siteField_maxDepth => 'Profundidade Máxima';
 
   @override
-  String get enum_siteField_minDepth => 'Profundidade MÃ­nima';
+  String get enum_siteField_minDepth => 'Profundidade Mínima';
 
   @override
   String get enum_siteField_altitude => 'Altitude';
 
   @override
-  String get enum_siteField_waterType => 'Tipo de Ãgua';
+  String get enum_siteField_waterType => 'Tipo de Água';
 
   @override
-  String get enum_siteField_typicalVisibility => 'Visibilidade TÃ­pica';
+  String get enum_siteField_typicalVisibility => 'Visibilidade Típica';
 
   @override
-  String get enum_siteField_typicalCurrent => 'Corrente TÃ­pica';
+  String get enum_siteField_typicalCurrent => 'Corrente Típica';
 
   @override
   String get enum_siteField_difficulty => 'Dificuldade';
@@ -30625,16 +30582,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_siteField_entryType => 'Tipo de Entrada';
 
   @override
-  String get enum_siteField_bestSeason => 'Melhor Ã‰poca';
+  String get enum_siteField_bestSeason => 'Melhor Época';
 
   @override
-  String get enum_siteField_mooringNumber => 'NÃºmero do Fundeadouro';
+  String get enum_siteField_mooringNumber => 'Número do Fundeadouro';
 
   @override
   String get enum_siteField_hazards => 'Perigos';
 
   @override
-  String get enum_siteField_rating => 'AvaliaÃ§Ã£o';
+  String get enum_siteField_rating => 'Avaliação';
 
   @override
   String get enum_siteField_notes => 'Notas';
@@ -30652,10 +30609,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_siteField_location_short => 'Local';
 
   @override
-  String get enum_siteField_country_short => 'PaÃ­s';
+  String get enum_siteField_country_short => 'País';
 
   @override
-  String get enum_siteField_region_short => 'RegiÃ£o';
+  String get enum_siteField_region_short => 'Região';
 
   @override
   String get enum_siteField_city_short => 'Cidade';
@@ -30664,22 +30621,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_siteField_island_short => 'Ilha';
 
   @override
-  String get enum_siteField_bodyOfWater_short => 'Corpo Ãgua';
+  String get enum_siteField_bodyOfWater_short => 'Corpo Água';
 
   @override
   String get enum_siteField_diveCount_short => 'Merg.';
 
   @override
-  String get enum_siteField_maxDepth_short => 'P. MÃ¡x';
+  String get enum_siteField_maxDepth_short => 'P. Máx';
 
   @override
-  String get enum_siteField_minDepth_short => 'P. MÃ­n';
+  String get enum_siteField_minDepth_short => 'P. Mín';
 
   @override
   String get enum_siteField_altitude_short => 'Alt';
 
   @override
-  String get enum_siteField_waterType_short => 'Ãgua';
+  String get enum_siteField_waterType_short => 'Água';
 
   @override
   String get enum_siteField_typicalVisibility_short => 'Vis';
@@ -30694,13 +30651,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_siteField_entryType_short => 'Entr.';
 
   @override
-  String get enum_siteField_exitMethod => 'MÃ©todo de saÃ­da';
+  String get enum_siteField_exitMethod => 'Método de saída';
 
   @override
-  String get enum_siteField_exitMethod_short => 'SaÃ­da';
+  String get enum_siteField_exitMethod_short => 'Saída';
 
   @override
-  String get enum_siteField_bestSeason_short => 'Ã‰poca';
+  String get enum_siteField_bestSeason_short => 'Época';
 
   @override
   String get enum_siteField_mooringNumber_short => 'Fundead.';
@@ -30727,13 +30684,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_siteField_depthRange_short => 'Prof.';
 
   @override
-  String get enum_siteField_lastDived => 'Ãšltimo mergulho';
+  String get enum_siteField_lastDived => 'Último mergulho';
 
   @override
-  String get enum_siteField_lastDived_short => 'Ãšltimo';
+  String get enum_siteField_lastDived_short => 'Último';
 
   @override
-  String get enum_siteField_maxDepthReached => 'Sua prof. mÃ¡xima';
+  String get enum_siteField_maxDepthReached => 'Sua prof. máxima';
 
   @override
   String get enum_siteField_firstDived => 'Primeiro mergulho';
@@ -30742,10 +30699,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_siteField_firstDived_short => 'Primeiro';
 
   @override
-  String get enum_siteField_averageDepthReached => 'Prof. mÃ©dia';
+  String get enum_siteField_averageDepthReached => 'Prof. média';
 
   @override
-  String get enum_siteField_averageDepthReached_short => 'MÃ©dia';
+  String get enum_siteField_averageDepthReached_short => 'Média';
 
   @override
   String get enum_siteField_longestDive => 'Mergulho mais longo';
@@ -30754,10 +30711,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_siteField_longestDive_short => 'Mais longo';
 
   @override
-  String get enum_siteField_averageDuration => 'DuraÃ§Ã£o mÃ©dia';
+  String get enum_siteField_averageDuration => 'Duração média';
 
   @override
-  String get enum_siteField_averageDuration_short => 'DuraÃ§Ã£o';
+  String get enum_siteField_averageDuration_short => 'Duração';
 
   @override
   String get enum_siteField_siteTypes => 'Tipos de ponto';
@@ -30772,7 +30729,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_siteField_tags_short => 'Etiq.';
 
   @override
-  String get enum_siteField_maxDepthReached_short => 'Seu mÃ¡x.';
+  String get enum_siteField_maxDepthReached_short => 'Seu máx.';
 
   @override
   String get enum_buddyField_buddyName => 'Nome';
@@ -30784,13 +30741,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_buddyField_phone => 'Telefone';
 
   @override
-  String get enum_buddyField_certificationLevel => 'NÃ­vel de CertificaÃ§Ã£o';
+  String get enum_buddyField_certificationLevel => 'Nível de Certificação';
 
   @override
-  String get enum_buddyField_certificationAgency => 'AgÃªncia Certificadora';
+  String get enum_buddyField_certificationAgency => 'Agência Certificadora';
 
   @override
-  String get enum_buddyField_diveCount => 'NÃºmero de Mergulhos';
+  String get enum_buddyField_diveCount => 'Número de Mergulhos';
 
   @override
   String get enum_buddyField_notes => 'Notas';
@@ -30805,10 +30762,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_buddyField_phone_short => 'Tel.';
 
   @override
-  String get enum_buddyField_certificationLevel_short => 'NÃ­vel Cert';
+  String get enum_buddyField_certificationLevel_short => 'Nível Cert';
 
   @override
-  String get enum_buddyField_certificationAgency_short => 'AgÃªncia';
+  String get enum_buddyField_certificationAgency_short => 'Agência';
 
   @override
   String get enum_buddyField_diveCount_short => 'Merg.';
@@ -30817,25 +30774,25 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_buddyField_notes_short => 'Notas';
 
   @override
-  String get enum_buddyField_lastDive => 'Ãšltimo mergulho';
+  String get enum_buddyField_lastDive => 'Último mergulho';
 
   @override
-  String get enum_buddyField_lastDive_short => 'Ãšltimo';
+  String get enum_buddyField_lastDive_short => 'Último';
 
   @override
   String get enum_tripField_tripName => 'Nome';
 
   @override
-  String get enum_tripField_startDate => 'Data de InÃ­cio';
+  String get enum_tripField_startDate => 'Data de Início';
 
   @override
-  String get enum_tripField_endDate => 'Data de TÃ©rmino';
+  String get enum_tripField_endDate => 'Data de Término';
 
   @override
-  String get enum_tripField_durationDays => 'DuraÃ§Ã£o';
+  String get enum_tripField_durationDays => 'Duração';
 
   @override
-  String get enum_tripField_location => 'LocalizaÃ§Ã£o';
+  String get enum_tripField_location => 'Localização';
 
   @override
   String get enum_tripField_tripType => 'Tipo de Viagem';
@@ -30847,16 +30804,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_tripField_liveaboardName => 'Liveaboard';
 
   @override
-  String get enum_tripField_diveCount => 'NÃºmero de Mergulhos';
+  String get enum_tripField_diveCount => 'Número de Mergulhos';
 
   @override
   String get enum_tripField_totalRuntime => 'Tempo Total Acumulado';
 
   @override
-  String get enum_tripField_maxDepth => 'Profundidade MÃ¡xima';
+  String get enum_tripField_maxDepth => 'Profundidade Máxima';
 
   @override
-  String get enum_tripField_avgDepth => 'Profundidade MÃ©dia';
+  String get enum_tripField_avgDepth => 'Profundidade Média';
 
   @override
   String get enum_tripField_notes => 'Notas';
@@ -30865,7 +30822,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_tripField_tripName_short => 'Nome';
 
   @override
-  String get enum_tripField_startDate_short => 'InÃ­cio';
+  String get enum_tripField_startDate_short => 'Início';
 
   @override
   String get enum_tripField_endDate_short => 'Fim';
@@ -30892,10 +30849,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_tripField_totalRuntime_short => 'TT Acum.';
 
   @override
-  String get enum_tripField_maxDepth_short => 'P. MÃ¡x';
+  String get enum_tripField_maxDepth_short => 'P. Máx';
 
   @override
-  String get enum_tripField_avgDepth_short => 'P. MÃ©d';
+  String get enum_tripField_avgDepth_short => 'P. Méd';
 
   @override
   String get enum_tripField_notes_short => 'Notas';
@@ -30904,7 +30861,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_equipmentField_components => 'Componentes';
 
   @override
-  String get enum_equipmentField_components_short => 'PeÃ§as';
+  String get enum_equipmentField_components_short => 'Peças';
 
   @override
   String get enum_equipmentField_itemName => 'Nome';
@@ -30922,7 +30879,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_equipmentField_model => 'Modelo';
 
   @override
-  String get enum_equipmentField_serialNumber => 'NÃºmero de SÃ©rie';
+  String get enum_equipmentField_serialNumber => 'Número de Série';
 
   @override
   String get enum_equipmentField_size => 'Tamanho';
@@ -30937,20 +30894,20 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_equipmentField_purchaseDate => 'Data de Compra';
 
   @override
-  String get enum_equipmentField_purchasePrice => 'PreÃ§o de Compra';
+  String get enum_equipmentField_purchasePrice => 'Preço de Compra';
 
   @override
-  String get enum_equipmentField_lastServiceDate => 'Ãšltima ManutenÃ§Ã£o';
+  String get enum_equipmentField_lastServiceDate => 'Última Manutenção';
 
   @override
-  String get enum_equipmentField_nextServiceDue => 'PrÃ³xima ManutenÃ§Ã£o';
+  String get enum_equipmentField_nextServiceDue => 'Próxima Manutenção';
 
   @override
-  String get enum_equipmentField_daysUntilService => 'Dias AtÃ© a ManutenÃ§Ã£o';
+  String get enum_equipmentField_daysUntilService => 'Dias Até a Manutenção';
 
   @override
   String get enum_equipmentField_serviceIntervalDays =>
-      'Intervalo de ManutenÃ§Ã£o';
+      'Intervalo de Manutenção';
 
   @override
   String get enum_equipmentField_notes => 'Notas';
@@ -30971,7 +30928,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_equipmentField_model_short => 'Modelo';
 
   @override
-  String get enum_equipmentField_serialNumber_short => 'SÃ©rie #';
+  String get enum_equipmentField_serialNumber_short => 'Série #';
 
   @override
   String get enum_equipmentField_size_short => 'Tam.';
@@ -30986,13 +30943,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_equipmentField_purchaseDate_short => 'Comprado';
 
   @override
-  String get enum_equipmentField_purchasePrice_short => 'PreÃ§o';
+  String get enum_equipmentField_purchasePrice_short => 'Preço';
 
   @override
-  String get enum_equipmentField_lastServiceDate_short => 'Ãšlt Manut';
+  String get enum_equipmentField_lastServiceDate_short => 'Últ Manut';
 
   @override
-  String get enum_equipmentField_nextServiceDue_short => 'PrÃ³x Manut';
+  String get enum_equipmentField_nextServiceDue_short => 'Próx Manut';
 
   @override
   String get enum_equipmentField_daysUntilService_short => 'Dias Rest';
@@ -31010,10 +30967,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveCenterField_city => 'Cidade';
 
   @override
-  String get enum_diveCenterField_country => 'PaÃ­s';
+  String get enum_diveCenterField_country => 'País';
 
   @override
-  String get enum_diveCenterField_stateProvince => 'Estado / ProvÃ­ncia';
+  String get enum_diveCenterField_stateProvince => 'Estado / Província';
 
   @override
   String get enum_diveCenterField_street => 'Rua';
@@ -31031,10 +30988,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveCenterField_website => 'Site';
 
   @override
-  String get enum_diveCenterField_affiliations => 'AfiliaÃ§Ãµes';
+  String get enum_diveCenterField_affiliations => 'Afiliações';
 
   @override
-  String get enum_diveCenterField_rating => 'AvaliaÃ§Ã£o';
+  String get enum_diveCenterField_rating => 'Avaliação';
 
   @override
   String get enum_diveCenterField_latitude => 'Latitude';
@@ -31043,7 +31000,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveCenterField_longitude => 'Longitude';
 
   @override
-  String get enum_diveCenterField_diveCount => 'NÃºmero de Mergulhos';
+  String get enum_diveCenterField_diveCount => 'Número de Mergulhos';
 
   @override
   String get enum_diveCenterField_notes => 'Notas';
@@ -31055,7 +31012,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveCenterField_city_short => 'Cidade';
 
   @override
-  String get enum_diveCenterField_country_short => 'PaÃ­s';
+  String get enum_diveCenterField_country_short => 'País';
 
   @override
   String get enum_diveCenterField_stateProvince_short => 'Estado';
@@ -31076,7 +31033,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_diveCenterField_website_short => 'Site';
 
   @override
-  String get enum_diveCenterField_affiliations_short => 'AfiliaÃ§Ãµes';
+  String get enum_diveCenterField_affiliations_short => 'Afiliações';
 
   @override
   String get enum_diveCenterField_rating_short => 'Aval.';
@@ -31097,16 +31054,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_certificationField_certName => 'Nome';
 
   @override
-  String get enum_certificationField_agency => 'AgÃªncia';
+  String get enum_certificationField_agency => 'Agência';
 
   @override
-  String get enum_certificationField_level => 'CertificaÃ§Ã£o';
+  String get enum_certificationField_level => 'Certificação';
 
   @override
-  String get enum_certificationField_cardNumber => 'NÃºmero do CartÃ£o';
+  String get enum_certificationField_cardNumber => 'Número do Cartão';
 
   @override
-  String get enum_certificationField_issueDate => 'Data de EmissÃ£o';
+  String get enum_certificationField_issueDate => 'Data de Emissão';
 
   @override
   String get enum_certificationField_expiryDate => 'Data de Validade';
@@ -31115,7 +31072,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_certificationField_instructorName => 'Nome do Instrutor';
 
   @override
-  String get enum_certificationField_instructorNumber => 'NÃºmero do Instrutor';
+  String get enum_certificationField_instructorNumber => 'Número do Instrutor';
 
   @override
   String get enum_certificationField_expiryStatus => 'Status de Validade';
@@ -31127,16 +31084,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_certificationField_certName_short => 'Nome';
 
   @override
-  String get enum_certificationField_agency_short => 'AgÃªncia';
+  String get enum_certificationField_agency_short => 'Agência';
 
   @override
-  String get enum_certificationField_level_short => 'CertificaÃ§Ã£o';
+  String get enum_certificationField_level_short => 'Certificação';
 
   @override
-  String get enum_certificationField_cardNumber_short => 'CartÃ£o #';
+  String get enum_certificationField_cardNumber_short => 'Cartão #';
 
   @override
-  String get enum_certificationField_issueDate_short => 'EmissÃ£o';
+  String get enum_certificationField_issueDate_short => 'Emissão';
 
   @override
   String get enum_certificationField_expiryDate_short => 'Validade';
@@ -31157,28 +31114,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_courseField_courseName => 'Nome';
 
   @override
-  String get enum_courseField_agency => 'AgÃªncia';
+  String get enum_courseField_agency => 'Agência';
 
   @override
-  String get enum_courseField_startDate => 'Data de InÃ­cio';
+  String get enum_courseField_startDate => 'Data de Início';
 
   @override
-  String get enum_courseField_completionDate => 'Data de ConclusÃ£o';
+  String get enum_courseField_completionDate => 'Data de Conclusão';
 
   @override
-  String get enum_courseField_durationDays => 'DuraÃ§Ã£o';
+  String get enum_courseField_durationDays => 'Duração';
 
   @override
   String get enum_courseField_instructorName => 'Nome do Instrutor';
 
   @override
-  String get enum_courseField_instructorNumber => 'NÃºmero do Instrutor';
+  String get enum_courseField_instructorNumber => 'Número do Instrutor';
 
   @override
   String get enum_courseField_location => 'Local';
 
   @override
-  String get enum_courseField_isCompleted => 'ConcluÃ­do';
+  String get enum_courseField_isCompleted => 'Concluído';
 
   @override
   String get enum_courseField_notes => 'Notas';
@@ -31187,16 +31144,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_courseField_courseName_short => 'Nome';
 
   @override
-  String get enum_courseField_agency_short => 'AgÃªncia';
+  String get enum_courseField_agency_short => 'Agência';
 
   @override
-  String get enum_courseField_startDate_short => 'InÃ­cio';
+  String get enum_courseField_startDate_short => 'Início';
 
   @override
-  String get enum_courseField_completionDate_short => 'ConcluÃ­do';
+  String get enum_courseField_completionDate_short => 'Concluído';
 
   @override
-  String get enum_courseField_durationDays_short => 'DuraÃ§Ã£o';
+  String get enum_courseField_durationDays_short => 'Duração';
 
   @override
   String get enum_courseField_instructorName_short => 'Instrutor';
@@ -31217,13 +31174,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_fieldCategory_accommodation => 'Hospedagem';
 
   @override
-  String get enum_fieldCategory_address => 'EndereÃ§o';
+  String get enum_fieldCategory_address => 'Endereço';
 
   @override
-  String get enum_fieldCategory_certification => 'CertificaÃ§Ã£o';
+  String get enum_fieldCategory_certification => 'Certificação';
 
   @override
-  String get enum_fieldCategory_conditions => 'CondiÃ§Ãµes';
+  String get enum_fieldCategory_conditions => 'Condições';
 
   @override
   String get enum_fieldCategory_contact => 'Contato';
@@ -31250,324 +31207,324 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_fieldCategory_purchase => 'Compra';
 
   @override
-  String get enum_fieldCategory_service => 'ManutenÃ§Ã£o';
+  String get enum_fieldCategory_service => 'Manutenção';
 
   @override
-  String get enum_fieldCategory_statistics => 'EstatÃ­sticas';
+  String get enum_fieldCategory_statistics => 'Estatísticas';
 
   @override
-  String get species_whale_shark_name => 'TubarÃ£o-baleia';
+  String get species_whale_shark_name => 'Tubarão-baleia';
 
   @override
   String get species_whale_shark_desc =>
-      'O maior peixe do oceano, um filtrador dÃ³cil com um padrÃ£o de manchas inconfundÃ­vel.';
+      'O maior peixe do oceano, um filtrador dócil com um padrão de manchas inconfundível.';
 
   @override
-  String get species_great_white_shark_name => 'TubarÃ£o-branco';
+  String get species_great_white_shark_name => 'Tubarão-branco';
 
   @override
   String get species_great_white_shark_desc =>
-      'Predador de topo icÃ³nico, avistado ocasionalmente por mergulhadores em gaiola em Ã¡guas temperadas.';
+      'Predador de topo icónico, avistado ocasionalmente por mergulhadores em gaiola em águas temperadas.';
 
   @override
-  String get species_great_hammerhead_shark_name => 'TubarÃ£o-martelo-gigante';
+  String get species_great_hammerhead_shark_name => 'Tubarão-martelo-gigante';
 
   @override
   String get species_great_hammerhead_shark_desc =>
-      'A maior das espÃ©cies de tubarÃ£o-martelo, com cabeÃ§a larga e achatada e barbatana dorsal alta.';
+      'A maior das espécies de tubarão-martelo, com cabeça larga e achatada e barbatana dorsal alta.';
 
   @override
   String get species_scalloped_hammerhead_shark_name =>
-      'TubarÃ£o-martelo-recortado';
+      'Tubarão-martelo-recortado';
 
   @override
   String get species_scalloped_hammerhead_shark_desc =>
-      'Visto muitas vezes em grandes cardumes junto a montes submarinos e estaÃ§Ãµes de limpeza.';
+      'Visto muitas vezes em grandes cardumes junto a montes submarinos e estações de limpeza.';
 
   @override
-  String get species_smooth_hammerhead_shark_name => 'TubarÃ£o-martelo-liso';
+  String get species_smooth_hammerhead_shark_name => 'Tubarão-martelo-liso';
 
   @override
   String get species_smooth_hammerhead_shark_desc =>
-      'TubarÃ£o-martelo com o bordo da cabeÃ§a liso e arredondado, presente em mares temperados.';
+      'Tubarão-martelo com o bordo da cabeça liso e arredondado, presente em mares temperados.';
 
   @override
   String get species_whitetip_reef_shark_name =>
-      'TubarÃ£o-de-pontas-brancas-do-recife';
+      'Tubarão-de-pontas-brancas-do-recife';
 
   @override
   String get species_whitetip_reef_shark_desc =>
-      'Habitante dÃ³cil dos recifes, encontrado muitas vezes a repousar em grutas e sob saliÃªncias durante o dia.';
+      'Habitante dócil dos recifes, encontrado muitas vezes a repousar em grutas e sob saliências durante o dia.';
 
   @override
   String get species_blacktip_reef_shark_name =>
-      'TubarÃ£o-de-pontas-negras-do-recife';
+      'Tubarão-de-pontas-negras-do-recife';
 
   @override
   String get species_blacktip_reef_shark_desc =>
-      'TubarÃ£o de recife comum em Ã¡guas pouco profundas, com as pontas das barbatanas nitidamente negras.';
+      'Tubarão de recife comum em águas pouco profundas, com as pontas das barbatanas nitidamente negras.';
 
   @override
-  String get species_grey_reef_shark_name => 'TubarÃ£o-cinzento-do-recife';
+  String get species_grey_reef_shark_name => 'Tubarão-cinzento-do-recife';
 
   @override
   String get species_grey_reef_shark_desc =>
-      'Predador ativo dos recifes, encontrado com frequÃªncia em grupo ao longo de paredes e canais.';
+      'Predador ativo dos recifes, encontrado com frequência em grupo ao longo de paredes e canais.';
 
   @override
   String get species_caribbean_reef_shark_name =>
-      'TubarÃ£o-do-recife-das-CaraÃ­bas';
+      'Tubarão-do-recife-das-Caraíbas';
 
   @override
   String get species_caribbean_reef_shark_desc =>
-      'O tubarÃ£o de recife mais frequente nas CaraÃ­bas, robusto e curioso.';
+      'O tubarão de recife mais frequente nas Caraíbas, robusto e curioso.';
 
   @override
-  String get species_nurse_shark_name => 'TubarÃ£o-lixa';
+  String get species_nurse_shark_name => 'Tubarão-lixa';
 
   @override
   String get species_nurse_shark_desc =>
-      'Habitante lento do fundo, encontrado muitas vezes a repousar sob saliÃªncias de coral.';
+      'Habitante lento do fundo, encontrado muitas vezes a repousar sob saliências de coral.';
 
   @override
-  String get species_tawny_nurse_shark_name => 'TubarÃ£o-lixa-fulvo';
+  String get species_tawny_nurse_shark_name => 'Tubarão-lixa-fulvo';
 
   @override
   String get species_tawny_nurse_shark_desc =>
-      'Habitante do fundo do Indo-PacÃ­fico, encontrado a repousar em grutas do recife e zonas arenosas.';
+      'Habitante do fundo do Indo-Pacífico, encontrado a repousar em grutas do recife e zonas arenosas.';
 
   @override
-  String get species_bull_shark_name => 'TubarÃ£o-touro';
+  String get species_bull_shark_name => 'Tubarão-touro';
 
   @override
   String get species_bull_shark_desc =>
-      'TubarÃ£o robusto e poderoso, presente em ambientes costeiros e de Ã¡gua doce em todo o mundo.';
+      'Tubarão robusto e poderoso, presente em ambientes costeiros e de água doce em todo o mundo.';
 
   @override
-  String get species_tiger_shark_name => 'TubarÃ£o-tigre';
+  String get species_tiger_shark_name => 'Tubarão-tigre';
 
   @override
   String get species_tiger_shark_desc =>
-      'Grande predador com um padrÃ£o listado caracterÃ­stico, encontrado em mergulhos em recifes profundos.';
+      'Grande predador com um padrão listado característico, encontrado em mergulhos em recifes profundos.';
 
   @override
   String get species_oceanic_whitetip_shark_name =>
-      'TubarÃ£o-de-pontas-brancas-oceÃ¢nico';
+      'Tubarão-de-pontas-brancas-oceânico';
 
   @override
   String get species_oceanic_whitetip_shark_desc =>
-      'TubarÃ£o pelÃ¡gico com barbatanas arredondadas de pontas brancas, avistado em mergulhos em mar aberto.';
+      'Tubarão pelágico com barbatanas arredondadas de pontas brancas, avistado em mergulhos em mar aberto.';
 
   @override
-  String get species_thresher_shark_name => 'TubarÃ£o-raposo';
+  String get species_thresher_shark_name => 'Tubarão-raposo';
 
   @override
   String get species_thresher_shark_desc =>
-      'ReconhecÃ­vel pela barbatana caudal extremamente longa, por vezes avistado em estaÃ§Ãµes de limpeza.';
+      'Reconhecível pela barbatana caudal extremamente longa, por vezes avistado em estações de limpeza.';
 
   @override
-  String get species_pelagic_thresher_shark_name => 'TubarÃ£o-raposo-pelÃ¡gico';
+  String get species_pelagic_thresher_shark_name => 'Tubarão-raposo-pelágico';
 
   @override
   String get species_pelagic_thresher_shark_desc =>
-      'A mais pequena das espÃ©cies de tubarÃ£o-raposo, cÃ©lebre pelos avistamentos em Monad Shoal, nas Filipinas.';
+      'A mais pequena das espécies de tubarão-raposo, célebre pelos avistamentos em Monad Shoal, nas Filipinas.';
 
   @override
-  String get species_shortfin_mako_shark_name => 'TubarÃ£o-anequim';
+  String get species_shortfin_mako_shark_name => 'Tubarão-anequim';
 
   @override
   String get species_shortfin_mako_shark_desc =>
-      'O tubarÃ£o mais rÃ¡pido do oceano, um predador esguio de mar aberto com coloraÃ§Ã£o azul metÃ¡lica.';
+      'O tubarão mais rápido do oceano, um predador esguio de mar aberto com coloração azul metálica.';
 
   @override
-  String get species_blue_shark_name => 'TubarÃ£o-azul';
+  String get species_blue_shark_name => 'Tubarão-azul';
 
   @override
   String get species_blue_shark_desc =>
-      'TubarÃ£o pelÃ¡gico esguio e de azul intenso, encontrado com frequÃªncia em mergulhos em Ã¡gua azul.';
+      'Tubarão pelágico esguio e de azul intenso, encontrado com frequência em mergulhos em água azul.';
 
   @override
-  String get species_spotted_wobbegong_name => 'TubarÃ£o-tapete-malhado';
+  String get species_spotted_wobbegong_name => 'Tubarão-tapete-malhado';
 
   @override
   String get species_spotted_wobbegong_desc =>
-      'TubarÃ£o-tapete achatado e camuflado que fica imÃ³vel sobre os recifes rochosos da AustrÃ¡lia.';
+      'Tubarão-tapete achatado e camuflado que fica imóvel sobre os recifes rochosos da Austrália.';
 
   @override
-  String get species_tasselled_wobbegong_name => 'TubarÃ£o-tapete-franjado';
+  String get species_tasselled_wobbegong_name => 'Tubarão-tapete-franjado';
 
   @override
   String get species_tasselled_wobbegong_desc =>
-      'TubarÃ£o-tapete ornamentado, com lobos franjados em redor da cabeÃ§a, presente em recifes de coral.';
+      'Tubarão-tapete ornamentado, com lobos franjados em redor da cabeça, presente em recifes de coral.';
 
   @override
-  String get species_epaulette_shark_name => 'TubarÃ£o-charreteira';
+  String get species_epaulette_shark_name => 'Tubarão-charreteira';
 
   @override
   String get species_epaulette_shark_desc =>
-      'Pequeno tubarÃ£o que caminha pelo fundo do recife apoiado nas barbatanas peitorais.';
+      'Pequeno tubarão que caminha pelo fundo do recife apoiado nas barbatanas peitorais.';
 
   @override
-  String get species_horn_shark_name => 'TubarÃ£o-corno';
+  String get species_horn_shark_name => 'Tubarão-corno';
 
   @override
   String get species_horn_shark_desc =>
-      'Habitante noturno do fundo, com cristas por cima dos olhos, presente ao largo da CalifÃ³rnia.';
+      'Habitante noturno do fundo, com cristas por cima dos olhos, presente ao largo da Califórnia.';
 
   @override
-  String get species_leopard_shark_name => 'TubarÃ£o-leopardo';
+  String get species_leopard_shark_name => 'Tubarão-leopardo';
 
   @override
   String get species_leopard_shark_desc =>
-      'TubarÃ£o de padrÃ£o belÃ­ssimo, encontrado em baÃ­as pouco profundas da costa do PacÃ­fico dos EUA.';
+      'Tubarão de padrão belíssimo, encontrado em baías pouco profundas da costa do Pacífico dos EUA.';
 
   @override
-  String get species_pacific_angel_shark_name => 'Anjo-do-mar-do-PacÃ­fico';
+  String get species_pacific_angel_shark_name => 'Anjo-do-mar-do-Pacífico';
 
   @override
   String get species_pacific_angel_shark_desc =>
       'Predador de emboscada de corpo achatado que fica enterrado na areia do fundo.';
 
   @override
-  String get species_sand_tiger_shark_name => 'TubarÃ£o-de-areia';
+  String get species_sand_tiger_shark_name => 'Tubarão-de-areia';
 
   @override
   String get species_sand_tiger_shark_desc =>
-      'TubarÃ£o de aspeto feroz mas dÃ³cil, avistado muitas vezes a pairar em grutas e destroÃ§os.';
+      'Tubarão de aspeto feroz mas dócil, avistado muitas vezes a pairar em grutas e destroços.';
 
   @override
-  String get species_zebra_shark_name => 'TubarÃ£o-zebra';
+  String get species_zebra_shark_name => 'Tubarão-zebra';
 
   @override
   String get species_zebra_shark_desc =>
-      'TubarÃ£o de recife pintalgado que repousa sobre fundos arenosos, comum no Indo-PacÃ­fico.';
+      'Tubarão de recife pintalgado que repousa sobre fundos arenosos, comum no Indo-Pacífico.';
 
   @override
-  String get species_blacktip_shark_name => 'TubarÃ£o-de-pontas-negras';
+  String get species_blacktip_shark_name => 'Tubarão-de-pontas-negras';
 
   @override
   String get species_blacktip_shark_desc =>
-      'TubarÃ£o costeiro veloz, conhecido pelos saltos em espiral, presente em Ã¡guas quentes de todo o mundo.';
+      'Tubarão costeiro veloz, conhecido pelos saltos em espiral, presente em águas quentes de todo o mundo.';
 
   @override
-  String get species_silvertip_shark_name => 'TubarÃ£o-de-pontas-prateadas';
+  String get species_silvertip_shark_name => 'Tubarão-de-pontas-prateadas';
 
   @override
   String get species_silvertip_shark_desc =>
-      'TubarÃ£o de recife audaz, com as barbatanas orladas de branco, presente junto a grandes paredes e atÃ³is.';
+      'Tubarão de recife audaz, com as barbatanas orladas de branco, presente junto a grandes paredes e atóis.';
 
   @override
-  String get species_silky_shark_name => 'TubarÃ£o-lombo-preto';
+  String get species_silky_shark_name => 'Tubarão-lombo-preto';
 
   @override
   String get species_silky_shark_desc =>
-      'TubarÃ£o pelÃ¡gico esguio de pele lisa, encontrado muitas vezes junto a recifes ao largo.';
+      'Tubarão pelágico esguio de pele lisa, encontrado muitas vezes junto a recifes ao largo.';
 
   @override
-  String get species_lemon_shark_name => 'TubarÃ£o-limÃ£o';
+  String get species_lemon_shark_name => 'Tubarão-limão';
 
   @override
   String get species_lemon_shark_desc =>
-      'TubarÃ£o de tom castanho-amarelado, visto com frequÃªncia em mangais e planÃ­cies arenosas pouco profundas.';
+      'Tubarão de tom castanho-amarelado, visto com frequência em mangais e planícies arenosas pouco profundas.';
 
   @override
-  String get species_galapagos_shark_name => 'TubarÃ£o-dos-GalÃ¡pagos';
+  String get species_galapagos_shark_name => 'Tubarão-dos-Galápagos';
 
   @override
   String get species_galapagos_shark_desc =>
-      'Grande tubarÃ£o de recife encontrado em redor de ilhas oceÃ¢nicas, curioso perante os mergulhadores.';
+      'Grande tubarão de recife encontrado em redor de ilhas oceânicas, curioso perante os mergulhadores.';
 
   @override
-  String get species_port_jackson_shark_name => 'TubarÃ£o-de-Port Jackson';
+  String get species_port_jackson_shark_name => 'Tubarão-de-Port Jackson';
 
   @override
   String get species_port_jackson_shark_desc =>
-      'Habitante noturno do fundo, com marcas semelhantes a um arnÃªs, endÃ©mico da AustrÃ¡lia.';
+      'Habitante noturno do fundo, com marcas semelhantes a um arnês, endémico da Austrália.';
 
   @override
-  String get species_bamboo_shark_name => 'TubarÃ£o-bambu-de-bandas-castanhas';
+  String get species_bamboo_shark_name => 'Tubarão-bambu-de-bandas-castanhas';
 
   @override
   String get species_bamboo_shark_desc =>
-      'Pequeno tubarÃ£o de fundo, dÃ³cil e comum nos recifes de coral do Indo-PacÃ­fico.';
+      'Pequeno tubarão de fundo, dócil e comum nos recifes de coral do Indo-Pacífico.';
 
   @override
-  String get species_basking_shark_name => 'TubarÃ£o-frade';
+  String get species_basking_shark_name => 'Tubarão-frade';
 
   @override
   String get species_basking_shark_desc =>
-      'O segundo maior peixe do mundo, um filtrador avistado Ã  superfÃ­cie em Ã¡guas temperadas.';
+      'O segundo maior peixe do mundo, um filtrador avistado à superfície em águas temperadas.';
 
   @override
-  String get species_greenland_shark_name => 'TubarÃ£o-da-GronelÃ¢ndia';
+  String get species_greenland_shark_name => 'Tubarão-da-Gronelândia';
 
   @override
   String get species_greenland_shark_desc =>
-      'TubarÃ£o lento de Ã¡guas profundas, um dos vertebrados mais longevos da Terra.';
+      'Tubarão lento de águas profundas, um dos vertebrados mais longevos da Terra.';
 
   @override
-  String get species_cookiecutter_shark_name => 'TubarÃ£o-charuto';
+  String get species_cookiecutter_shark_name => 'Tubarão-charuto';
 
   @override
   String get species_cookiecutter_shark_desc =>
-      'Pequeno tubarÃ£o de profundidade que arranca dentadas circulares a animais marinhos maiores.';
+      'Pequeno tubarão de profundidade que arranca dentadas circulares a animais marinhos maiores.';
 
   @override
   String get species_sevengill_shark_name =>
-      'TubarÃ£o-de-sete-guelras-de-focinho-largo';
+      'Tubarão-de-sete-guelras-de-focinho-largo';
 
   @override
   String get species_sevengill_shark_desc =>
-      'TubarÃ£o primitivo com sete fendas branquiais, encontrado em mergulhos temperados em florestas de kelp.';
+      'Tubarão primitivo com sete fendas branquiais, encontrado em mergulhos temperados em florestas de kelp.';
 
   @override
-  String get species_pyjama_shark_name => 'TubarÃ£o-pijama';
+  String get species_pyjama_shark_name => 'Tubarão-pijama';
 
   @override
   String get species_pyjama_shark_desc =>
-      'Pata-roxa listada endÃ©mica da Ãfrica do Sul, presente em recifes rochosos e florestas de kelp.';
+      'Pata-roxa listada endémica da África do Sul, presente em recifes rochosos e florestas de kelp.';
 
   @override
   String get species_spiny_dogfish_name => 'Galhudo-malhado';
 
   @override
   String get species_spiny_dogfish_desc =>
-      'TubarÃ£o pequeno e abundante, com espinhos dorsais venenosos, presente em Ã¡guas temperadas.';
+      'Tubarão pequeno e abundante, com espinhos dorsais venenosos, presente em águas temperadas.';
 
   @override
-  String get species_swell_shark_name => 'TubarÃ£o-balÃ£o';
+  String get species_swell_shark_name => 'Tubarão-balão';
 
   @override
   String get species_swell_shark_desc =>
-      'Pata-roxa noturna que insufla o corpo quando ameaÃ§ada, presente ao largo da CalifÃ³rnia.';
+      'Pata-roxa noturna que insufla o corpo quando ameaçada, presente ao largo da Califórnia.';
 
   @override
-  String get species_giant_oceanic_manta_ray_name => 'Manta-gigante-oceÃ¢nica';
+  String get species_giant_oceanic_manta_ray_name => 'Manta-gigante-oceânica';
 
   @override
   String get species_giant_oceanic_manta_ray_desc =>
-      'A maior espÃ©cie de raia, um filtrador majestoso com atÃ© 7 metros de envergadura.';
+      'A maior espécie de raia, um filtrador majestoso com até 7 metros de envergadura.';
 
   @override
   String get species_reef_manta_ray_name => 'Manta-de-recife';
 
   @override
   String get species_reef_manta_ray_desc =>
-      'EspÃ©cie de manta mais pequena, vista com frequÃªncia em estaÃ§Ãµes de limpeza nos recifes tropicais.';
+      'Espécie de manta mais pequena, vista com frequência em estações de limpeza nos recifes tropicais.';
 
   @override
-  String get species_spotted_eagle_ray_name => 'Raia-Ã¡guia-pintada';
+  String get species_spotted_eagle_ray_name => 'Raia-águia-pintada';
 
   @override
   String get species_spotted_eagle_ray_desc =>
-      'Raia elegante com pintas brancas e uma cauda longa em chicote, avistada muitas vezes a meia-Ã¡gua.';
+      'Raia elegante com pintas brancas e uma cauda longa em chicote, avistada muitas vezes a meia-água.';
 
   @override
-  String get species_common_eagle_ray_name => 'Raia-Ã¡guia-comum';
+  String get species_common_eagle_ray_name => 'Raia-águia-comum';
 
   @override
   String get species_common_eagle_ray_desc =>
-      'Raia em forma de losango, presente em Ã¡guas temperadas do AtlÃ¢ntico oriental e do MediterrÃ¢neo.';
+      'Raia em forma de losango, presente em águas temperadas do Atlântico oriental e do Mediterrâneo.';
 
   @override
   String get species_blue_spotted_ribbontail_ray_name =>
@@ -31575,7 +31532,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_blue_spotted_ribbontail_ray_desc =>
-      'Raia de cores vivas com pintas de azul intenso, comum nos recifes do Indo-PacÃ­fico.';
+      'Raia de cores vivas com pintas de azul intenso, comum nos recifes do Indo-Pacífico.';
 
   @override
   String get species_blue_spotted_stingray_name => 'Uge-de-pintas-azuis';
@@ -31589,57 +31546,57 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_southern_stingray_desc =>
-      'Grande uge dos fundos arenosos das CaraÃ­bas, cÃ©lebre em Stingray City.';
+      'Grande uge dos fundos arenosos das Caraíbas, célebre em Stingray City.';
 
   @override
   String get species_round_stingray_name => 'Uge-redonda';
 
   @override
   String get species_round_stingray_desc =>
-      'Pequena uge circular, comum em zonas arenosas pouco profundas do PacÃ­fico oriental.';
+      'Pequena uge circular, comum em zonas arenosas pouco profundas do Pacífico oriental.';
 
   @override
   String get species_short_tail_stingray_name => 'Uge-de-cauda-curta';
 
   @override
   String get species_short_tail_stingray_desc =>
-      'Uma das maiores raias-uge, presente em Ã¡guas temperadas do hemisfÃ©rio sul.';
+      'Uma das maiores raias-uge, presente em águas temperadas do hemisfério sul.';
 
   @override
   String get species_cowtail_stingray_name => 'Uge-rabo-de-vaca';
 
   @override
   String get species_cowtail_stingray_desc =>
-      'Grande uge escura com uma prega caudal caracterÃ­stica em forma de bandeira, presente em recifes arenosos.';
+      'Grande uge escura com uma prega caudal característica em forma de bandeira, presente em recifes arenosos.';
 
   @override
-  String get species_atlantic_torpedo_ray_name => 'Tremelga-do-AtlÃ¢ntico';
+  String get species_atlantic_torpedo_ray_name => 'Tremelga-do-Atlântico';
 
   @override
   String get species_atlantic_torpedo_ray_desc =>
-      'Raia elÃ©trica capaz de produzir descargas fortes, presente em fundos arenosos do AtlÃ¢ntico.';
+      'Raia elétrica capaz de produzir descargas fortes, presente em fundos arenosos do Atlântico.';
 
   @override
   String get species_marbled_electric_ray_name => 'Tremelga-marmoreada';
 
   @override
   String get species_marbled_electric_ray_desc =>
-      'Tremelga do MediterrÃ¢neo com padrÃ£o marmoreado, capaz de aplicar um choque elÃ©trico notÃ¡vel.';
+      'Tremelga do Mediterrâneo com padrão marmoreado, capaz de aplicar um choque elétrico notável.';
 
   @override
   String get species_giant_guitarfish_name => 'Peixe-viola-gigante';
 
   @override
   String get species_giant_guitarfish_desc =>
-      'Raia com forma de tubarÃ£o, presente em fundos arenosos do Indo-PacÃ­fico junto a recifes de coral.';
+      'Raia com forma de tubarão, presente em fundos arenosos do Indo-Pacífico junto a recifes de coral.';
 
   @override
   String get species_shovelnose_guitarfish_name =>
-      'Peixe-viola-de-focinho-de-pÃ¡';
+      'Peixe-viola-de-focinho-de-pá';
 
   @override
   String get species_shovelnose_guitarfish_desc =>
-      'Silhueta achatada, entre raia e tubarÃ£o, comum nos baixios arenosos do PacÃ­fico oriental.';
+      'Silhueta achatada, entre raia e tubarão, comum nos baixios arenosos do Pacífico oriental.';
 
   @override
   String get species_smalltooth_sawfish_name =>
@@ -31647,49 +31604,49 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_smalltooth_sawfish_desc =>
-      'Raia criticamente ameaÃ§ada, com um rostro dentado, presente em Ã¡guas costeiras tropicais.';
+      'Raia criticamente ameaçada, com um rostro dentado, presente em águas costeiras tropicais.';
 
   @override
   String get species_green_sawfish_name => 'Peixe-serra-verde';
 
   @override
   String get species_green_sawfish_desc =>
-      'Grande peixe-serra de corpo verde-azeitona, que habita estuÃ¡rios do Indo-PacÃ­fico ocidental.';
+      'Grande peixe-serra de corpo verde-azeitona, que habita estuários do Indo-Pacífico ocidental.';
 
   @override
   String get species_devil_ray_name => 'Jamanta';
 
   @override
   String get species_devil_ray_desc =>
-      'Grande mobula com barbatanas cefÃ¡licas, vista a saltar fora de Ã¡gua em grupo.';
+      'Grande mobula com barbatanas cefálicas, vista a saltar fora de água em grupo.';
 
   @override
   String get species_spinetail_devil_ray_name => 'Jamanta-de-cauda-espinhosa';
 
   @override
   String get species_spinetail_devil_ray_desc =>
-      'Jamanta pelÃ¡gica, avistada muitas vezes em grandes agregaÃ§Ãµes junto Ã  superfÃ­cie.';
+      'Jamanta pelágica, avistada muitas vezes em grandes agregações junto à superfície.';
 
   @override
   String get species_lesser_devil_ray_name => 'Jamanta-pigmeia';
 
   @override
   String get species_lesser_devil_ray_desc =>
-      'A mais pequena das mobulas, forma grandes cardumes no golfo da CalifÃ³rnia.';
+      'A mais pequena das mobulas, forma grandes cardumes no golfo da Califórnia.';
 
   @override
   String get species_bat_ray_name => 'Raia-morcego';
 
   @override
   String get species_bat_ray_desc =>
-      'Raia em forma de losango, comum nas florestas de kelp e nas baÃ­as arenosas da CalifÃ³rnia.';
+      'Raia em forma de losango, comum nas florestas de kelp e nas baías arenosas da Califórnia.';
 
   @override
   String get species_undulate_ray_name => 'Raia-curva';
 
   @override
   String get species_undulate_ray_desc =>
-      'Raia de padrÃ£o belÃ­ssimo, com linhas onduladas, presente no AtlÃ¢ntico oriental.';
+      'Raia de padrão belíssimo, com linhas onduladas, presente no Atlântico oriental.';
 
   @override
   String get species_thornback_ray_name => 'Raia-lenga';
@@ -31703,119 +31660,119 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_cownose_ray_desc =>
-      'CabeÃ§a com um entalhe caracterÃ­stico; vista muitas vezes em grandes cardumes durante as migraÃ§Ãµes sazonais.';
+      'Cabeça com um entalhe característico; vista muitas vezes em grandes cardumes durante as migrações sazonais.';
 
   @override
   String get species_marble_ray_name => 'Uge-marmoreada';
 
   @override
   String get species_marble_ray_desc =>
-      'Grande uge escura com pintas brancas, avistada com frequÃªncia em estaÃ§Ãµes de limpeza do Indo-PacÃ­fico.';
+      'Grande uge escura com pintas brancas, avistada com frequência em estações de limpeza do Indo-Pacífico.';
 
   @override
   String get species_ocellate_river_stingray_name => 'Raia-motoro';
 
   @override
   String get species_ocellate_river_stingray_desc =>
-      'Raia de Ã¡gua doce com marcantes manchas de anel alaranjado, nativa dos rios da AmÃ©rica do Sul.';
+      'Raia de água doce com marcantes manchas de anel alaranjado, nativa dos rios da América do Sul.';
 
   @override
-  String get species_ocellaris_clownfish_name => 'Peixe-palhaÃ§o-ocelar';
+  String get species_ocellaris_clownfish_name => 'Peixe-palhaço-ocelar';
 
   @override
   String get species_ocellaris_clownfish_desc =>
-      'Pequeno peixe laranja com riscas brancas, encontrado a viver em simbiose com anÃ©monas nos recifes de coral.';
+      'Pequeno peixe laranja com riscas brancas, encontrado a viver em simbiose com anémonas nos recifes de coral.';
 
   @override
-  String get species_clarkii_clownfish_name => 'Peixe-palhaÃ§o-de-Clark';
+  String get species_clarkii_clownfish_name => 'Peixe-palhaço-de-Clark';
 
   @override
   String get species_clarkii_clownfish_desc =>
-      'Peixe-palhaÃ§o resistente, de corpo escuro e duas barras brancas, presente em todo o Indo-PacÃ­fico em vÃ¡rias espÃ©cies de anÃ©mona.';
+      'Peixe-palhaço resistente, de corpo escuro e duas barras brancas, presente em todo o Indo-Pacífico em várias espécies de anémona.';
 
   @override
-  String get species_tomato_clownfish_name => 'Peixe-palhaÃ§o-tomate';
+  String get species_tomato_clownfish_name => 'Peixe-palhaço-tomate';
 
   @override
   String get species_tomato_clownfish_desc =>
-      'Peixe-palhaÃ§o vermelho-alaranjado vivo, com uma Ãºnica barra branca na cabeÃ§a, comum nos recifes do Indo-PacÃ­fico.';
+      'Peixe-palhaço vermelho-alaranjado vivo, com uma única barra branca na cabeça, comum nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_regal_blue_tang_name => 'CirurgiÃ£o-azul-real';
+  String get species_regal_blue_tang_name => 'Cirurgião-azul-real';
 
   @override
   String get species_regal_blue_tang_desc =>
-      'Peixe-cirurgiÃ£o de azul intenso, com uma marca negra em forma de paleta e cauda amarela, presente nos recifes de coral do Indo-PacÃ­fico.';
+      'Peixe-cirurgião de azul intenso, com uma marca negra em forma de paleta e cauda amarela, presente nos recifes de coral do Indo-Pacífico.';
 
   @override
-  String get species_yellow_tang_name => 'CirurgiÃ£o-amarelo';
+  String get species_yellow_tang_name => 'Cirurgião-amarelo';
 
   @override
   String get species_yellow_tang_desc =>
-      'Peixe-cirurgiÃ£o amarelo-vivo, comum nos recifes do Havai e do PacÃ­fico, visto muitas vezes a pastar algas em grupo.';
+      'Peixe-cirurgião amarelo-vivo, comum nos recifes do Havai e do Pacífico, visto muitas vezes a pastar algas em grupo.';
 
   @override
-  String get species_powder_blue_surgeonfish_name => 'CirurgiÃ£o-azul-celeste';
+  String get species_powder_blue_surgeonfish_name => 'Cirurgião-azul-celeste';
 
   @override
   String get species_powder_blue_surgeonfish_desc =>
-      'Peixe-cirurgiÃ£o de azul-claro marcante, com a face negra e a barbatana dorsal amarela, presente no oceano Ãndico.';
+      'Peixe-cirurgião de azul-claro marcante, com a face negra e a barbatana dorsal amarela, presente no oceano Índico.';
 
   @override
-  String get species_sohal_surgeonfish_name => 'CirurgiÃ£o-sohal';
+  String get species_sohal_surgeonfish_name => 'Cirurgião-sohal';
 
   @override
   String get species_sohal_surgeonfish_desc =>
-      'Peixe-cirurgiÃ£o listado e audaz, com o bisturi caudal alaranjado, endÃ©mico dos recifes do mar Vermelho e do golfo ArÃ¡bico.';
+      'Peixe-cirurgião listado e audaz, com o bisturi caudal alaranjado, endémico dos recifes do mar Vermelho e do golfo Arábico.';
 
   @override
-  String get species_blue_tang_name => 'CirurgiÃ£o-azul-das-CaraÃ­bas';
+  String get species_blue_tang_name => 'Cirurgião-azul-das-Caraíbas';
 
   @override
   String get species_blue_tang_desc =>
-      'Peixe-cirurgiÃ£o de azul profundo, comum nos recifes das CaraÃ­bas; os juvenis sÃ£o amarelo-vivos.';
+      'Peixe-cirurgião de azul profundo, comum nos recifes das Caraíbas; os juvenis são amarelo-vivos.';
 
   @override
   String get species_emperor_angelfish_name => 'Peixe-anjo-imperador';
 
   @override
   String get species_emperor_angelfish_desc =>
-      'Grande peixe-anjo com marcantes riscas horizontais azuis e amarelas. Os juvenis exibem cÃ­rculos concÃªntricos azuis e brancos.';
+      'Grande peixe-anjo com marcantes riscas horizontais azuis e amarelas. Os juvenis exibem círculos concêntricos azuis e brancos.';
 
   @override
-  String get species_french_angelfish_name => 'Peixe-anjo-francÃªs';
+  String get species_french_angelfish_name => 'Peixe-anjo-francês';
 
   @override
   String get species_french_angelfish_desc =>
-      'Grande peixe-anjo escuro, com escamas orladas a dourado, visto normalmente aos pares nos recifes das CaraÃ­bas e do AtlÃ¢ntico ocidental.';
+      'Grande peixe-anjo escuro, com escamas orladas a dourado, visto normalmente aos pares nos recifes das Caraíbas e do Atlântico ocidental.';
 
   @override
   String get species_queen_angelfish_name => 'Peixe-anjo-rainha';
 
   @override
   String get species_queen_angelfish_desc =>
-      'Espetacular peixe-anjo azul e amarelo, com uma coroa distintiva na fronte, presente nos recifes de coral das CaraÃ­bas.';
+      'Espetacular peixe-anjo azul e amarelo, com uma coroa distintiva na fronte, presente nos recifes de coral das Caraíbas.';
 
   @override
   String get species_regal_angelfish_name => 'Peixe-anjo-real';
 
   @override
   String get species_regal_angelfish_desc =>
-      'Peixe-anjo elegante, com bandas verticais alternadas em laranja, branco e azul, presente nos recifes do Indo-PacÃ­fico.';
+      'Peixe-anjo elegante, com bandas verticais alternadas em laranja, branco e azul, presente nos recifes do Indo-Pacífico.';
 
   @override
   String get species_rock_beauty_name => 'Peixe-anjo-tricolor';
 
   @override
   String get species_rock_beauty_desc =>
-      'Peixe-anjo marcante das CaraÃ­bas, com a metade dianteira amarela e a traseira negra, presente junto a recifes rochosos e saliÃªncias.';
+      'Peixe-anjo marcante das Caraíbas, com a metade dianteira amarela e a traseira negra, presente junto a recifes rochosos e saliências.';
 
   @override
   String get species_gray_angelfish_name => 'Peixe-anjo-cinzento';
 
   @override
   String get species_gray_angelfish_desc =>
-      'Grande peixe-anjo cinzento, com a face pÃ¡lida e o interior da barbatana peitoral amarelo, comum nos recifes das CaraÃ­bas.';
+      'Grande peixe-anjo cinzento, com a face pálida e o interior da barbatana peitoral amarelo, comum nos recifes das Caraíbas.';
 
   @override
   String get species_copperband_butterflyfish_name =>
@@ -31823,14 +31780,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_copperband_butterflyfish_desc =>
-      'Peixe-borboleta inconfundÃ­vel, com bandas verticais alaranjadas e focinho alongado, presente nos recifes do Indo-PacÃ­fico.';
+      'Peixe-borboleta inconfundível, com bandas verticais alaranjadas e focinho alongado, presente nos recifes do Indo-Pacífico.';
 
   @override
   String get species_raccoon_butterflyfish_name => 'Peixe-borboleta-guaxinim';
 
   @override
   String get species_raccoon_butterflyfish_desc =>
-      'Peixe-borboleta amarelo com uma mÃ¡scara escura Ã  volta dos olhos, comum nos recifes do Indo-PacÃ­fico e do Havai.';
+      'Peixe-borboleta amarelo com uma máscara escura à volta dos olhos, comum nos recifes do Indo-Pacífico e do Havai.';
 
   @override
   String get species_longnose_butterflyfish_name =>
@@ -31838,7 +31795,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_longnose_butterflyfish_desc =>
-      'Peixe-borboleta amarelo-vivo, com um focinho muito comprido que usa para retirar alimento das fendas dos recifes do Indo-PacÃ­fico.';
+      'Peixe-borboleta amarelo-vivo, com um focinho muito comprido que usa para retirar alimento das fendas dos recifes do Indo-Pacífico.';
 
   @override
   String get species_threadfin_butterflyfish_name =>
@@ -31846,7 +31803,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_threadfin_butterflyfish_desc =>
-      'Peixe-borboleta branco com padrÃ£o em galÃµes e um filamento dorsal a arrastar, muito difundido pelo Indo-PacÃ­fico.';
+      'Peixe-borboleta branco com padrão em galões e um filamento dorsal a arrastar, muito difundido pelo Indo-Pacífico.';
 
   @override
   String get species_foureye_butterflyfish_name =>
@@ -31854,7 +31811,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_foureye_butterflyfish_desc =>
-      'Peixe-borboleta pÃ¡lido, com um falso olho bem visÃ­vel junto Ã  cauda, comum nos recifes das CaraÃ­bas.';
+      'Peixe-borboleta pálido, com um falso olho bem visível junto à cauda, comum nos recifes das Caraíbas.';
 
   @override
   String get species_spotfin_butterflyfish_name =>
@@ -31862,7 +31819,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_spotfin_butterflyfish_desc =>
-      'Peixe-borboleta branco e amarelo, com uma pequena mancha escura na barbatana dorsal, presente no AtlÃ¢ntico ocidental.';
+      'Peixe-borboleta branco e amarelo, com uma pequena mancha escura na barbatana dorsal, presente no Atlântico ocidental.';
 
   @override
   String get species_banner_butterflyfish_name =>
@@ -31870,140 +31827,140 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_banner_butterflyfish_desc =>
-      'Peixe-bandeira preto e branco, com barbatana dorsal alongada e ventre amarelo, endÃ©mico do mar Vermelho.';
+      'Peixe-bandeira preto e branco, com barbatana dorsal alongada e ventre amarelo, endémico do mar Vermelho.';
 
   @override
-  String get species_moorish_idol_name => 'Ãdolo-mourisco';
+  String get species_moorish_idol_name => 'Ídolo-mourisco';
 
   @override
   String get species_moorish_idol_desc =>
-      'Peixe de recife icÃ³nico, com bandas marcadas a preto, branco e amarelo e um longo filamento dorsal.';
+      'Peixe de recife icónico, com bandas marcadas a preto, branco e amarelo e um longo filamento dorsal.';
 
   @override
   String get species_green_moray_eel_name => 'Moreia-verde';
 
   @override
   String get species_green_moray_eel_desc =>
-      'Grande moreia verde que chega aos 2,5 m, vista muitas vezes de boca aberta nas fendas dos recifes do AtlÃ¢ntico ocidental.';
+      'Grande moreia verde que chega aos 2,5 m, vista muitas vezes de boca aberta nas fendas dos recifes do Atlântico ocidental.';
 
   @override
   String get species_giant_moray_eel_name => 'Moreia-gigante';
 
   @override
   String get species_giant_moray_eel_desc =>
-      'A maior espÃ©cie de moreia, com mais de 3 m e manchas semelhantes Ã s de um leopardo. Presente nos recifes de coral do Indo-PacÃ­fico.';
+      'A maior espécie de moreia, com mais de 3 m e manchas semelhantes às de um leopardo. Presente nos recifes de coral do Indo-Pacífico.';
 
   @override
   String get species_spotted_moray_eel_name => 'Moreia-pintada';
 
   @override
   String get species_spotted_moray_eel_desc =>
-      'Moreia branca com manchas castanho-escuras, encontrada normalmente a espreitar de buracos do recife nas CaraÃ­bas.';
+      'Moreia branca com manchas castanho-escuras, encontrada normalmente a espreitar de buracos do recife nas Caraíbas.';
 
   @override
   String get species_ribbon_eel_name => 'Moreia-fita';
 
   @override
   String get species_ribbon_eel_desc =>
-      'Moreia esguia de narinas em leque; os machos sÃ£o azul-vivos e as fÃªmeas amarelas. Presente em lagunas arenosas do Indo-PacÃ­fico.';
+      'Moreia esguia de narinas em leque; os machos são azul-vivos e as fêmeas amarelas. Presente em lagunas arenosas do Indo-Pacífico.';
 
   @override
   String get species_spotted_garden_eel_name => 'Enguia-de-jardim-pintada';
 
   @override
   String get species_spotted_garden_eel_desc =>
-      'Enguia branca e fina com pintas negras que vive em colÃ³nias na areia, ondulando na corrente para capturar plÃ¢ncton.';
+      'Enguia branca e fina com pintas negras que vive em colónias na areia, ondulando na corrente para capturar plâncton.';
 
   @override
-  String get species_splendid_garden_eel_name => 'Enguia-de-jardim-esplÃªndida';
+  String get species_splendid_garden_eel_name => 'Enguia-de-jardim-esplêndida';
 
   @override
   String get species_splendid_garden_eel_desc =>
-      'Enguia-de-jardim com bandas laranja e brancas, presente em grandes colÃ³nias arenosas do PacÃ­fico ocidental.';
+      'Enguia-de-jardim com bandas laranja e brancas, presente em grandes colónias arenosas do Pacífico ocidental.';
 
   @override
   String get species_snowflake_moray_name => 'Moreia-floco-de-neve';
 
   @override
   String get species_snowflake_moray_desc =>
-      'Pequena moreia de corpo branco com marcas negras em forma de floco de neve, comum nos cascalhos de recife do Indo-PacÃ­fico.';
+      'Pequena moreia de corpo branco com marcas negras em forma de floco de neve, comum nos cascalhos de recife do Indo-Pacífico.';
 
   @override
   String get species_mandarin_dragonet_name => 'Peixe-mandarim';
 
   @override
   String get species_mandarin_dragonet_desc =>
-      'Peixe minÃºsculo de cores brilhantes, com padrÃµes psicadÃ©licos em azul e laranja, presente nas zonas de cascalho do PacÃ­fico ocidental.';
+      'Peixe minúsculo de cores brilhantes, com padrões psicadélicos em azul e laranja, presente nas zonas de cascalho do Pacífico ocidental.';
 
   @override
-  String get species_common_lionfish_name => 'Peixe-leÃ£o-comum';
+  String get species_common_lionfish_name => 'Peixe-leão-comum';
 
   @override
   String get species_common_lionfish_desc =>
-      'Peixe-escorpiÃ£o venenoso, com barbatanas peitorais em leque e riscas vermelhas e brancas. Invasor nas CaraÃ­bas.';
+      'Peixe-escorpião venenoso, com barbatanas peitorais em leque e riscas vermelhas e brancas. Invasor nas Caraíbas.';
 
   @override
-  String get species_leaf_scorpionfish_name => 'Peixe-escorpiÃ£o-folha';
+  String get species_leaf_scorpionfish_name => 'Peixe-escorpião-folha';
 
   @override
   String get species_leaf_scorpionfish_desc =>
-      'Peixe-escorpiÃ£o muito comprimido, em forma de folha, que baloiÃ§a com a corrente para imitar detritos nos recifes do Indo-PacÃ­fico.';
+      'Peixe-escorpião muito comprimido, em forma de folha, que baloiça com a corrente para imitar detritos nos recifes do Indo-Pacífico.';
 
   @override
   String get species_stonefish_name => 'Peixe-pedra';
 
   @override
   String get species_stonefish_desc =>
-      'O peixe mais venenoso do mundo, camuflado na perfeiÃ§Ã£o como uma rocha nos fundos de recife do Indo-PacÃ­fico. Extremamente perigoso.';
+      'O peixe mais venenoso do mundo, camuflado na perfeição como uma rocha nos fundos de recife do Indo-Pacífico. Extremamente perigoso.';
 
   @override
   String get species_painted_frogfish_name => 'Peixe-sapo-pintado';
 
   @override
   String get species_painted_frogfish_desc =>
-      'Predador de emboscada atarracado, com um engodo na cabeÃ§a e cor muito variÃ¡vel. Presente nos recifes do Indo-PacÃ­fico.';
+      'Predador de emboscada atarracado, com um engodo na cabeça e cor muito variável. Presente nos recifes do Indo-Pacífico.';
 
   @override
   String get species_giant_frogfish_name => 'Peixe-sapo-gigante';
 
   @override
   String get species_giant_frogfish_desc =>
-      'A maior espÃ©cie de peixe-sapo, com atÃ© 40 cm, e uma camuflagem excelente entre esponjas e cascalho de coral.';
+      'A maior espécie de peixe-sapo, com até 40 cm, e uma camuflagem excelente entre esponjas e cascalho de coral.';
 
   @override
   String get species_hairy_frogfish_name => 'Peixe-sapo-peludo';
 
   @override
   String get species_hairy_frogfish_desc =>
-      'Peixe-sapo coberto de apÃªndices carnudos semelhantes a vermes que imitam algas, um achado cobiÃ§ado pelos fotÃ³grafos subaquÃ¡ticos.';
+      'Peixe-sapo coberto de apêndices carnudos semelhantes a vermes que imitam algas, um achado cobiçado pelos fotógrafos subaquáticos.';
 
   @override
-  String get species_clown_triggerfish_name => 'Peixe-porco-palhaÃ§o';
+  String get species_clown_triggerfish_name => 'Peixe-porco-palhaço';
 
   @override
   String get species_clown_triggerfish_desc =>
-      'Peixe-porco de padrÃ£o marcante, com grandes pintas brancas sobre corpo escuro e lÃ¡bios amarelos, presente nos recifes do Indo-PacÃ­fico.';
+      'Peixe-porco de padrão marcante, com grandes pintas brancas sobre corpo escuro e lábios amarelos, presente nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_titan_triggerfish_name => 'Peixe-porco-titÃ£';
+  String get species_titan_triggerfish_name => 'Peixe-porco-titã';
 
   @override
   String get species_titan_triggerfish_desc =>
-      'Grande peixe-porco agressivo, conhecido por investir contra os mergulhadores junto ao ninho. Comum nos recifes de coral do Indo-PacÃ­fico.';
+      'Grande peixe-porco agressivo, conhecido por investir contra os mergulhadores junto ao ninho. Comum nos recifes de coral do Indo-Pacífico.';
 
   @override
   String get species_queen_triggerfish_name => 'Peixe-porco-rainha';
 
   @override
   String get species_queen_triggerfish_desc =>
-      'Peixe-porco colorido das CaraÃ­bas, com marcas azuis na face e longos filamentos caudais.';
+      'Peixe-porco colorido das Caraíbas, com marcas azuis na face e longos filamentos caudais.';
 
   @override
   String get species_picasso_triggerfish_name => 'Peixe-porco-picasso';
 
   @override
   String get species_picasso_triggerfish_desc =>
-      'Peixe-porco com um padrÃ£o abstrato de riscas azuis, amarelas e negras, comum nos planaltos de recife do Indo-PacÃ­fico.';
+      'Peixe-porco com um padrão abstrato de riscas azuis, amarelas e negras, comum nos planaltos de recife do Indo-Pacífico.';
 
   @override
   String get species_yellowmargin_triggerfish_name =>
@@ -32011,206 +31968,206 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_yellowmargin_triggerfish_desc =>
-      'Grande peixe-porco de tom castanho-claro, com as barbatanas orladas de amarelo, conhecido por defender o ninho com agressividade nos recifes do Indo-PacÃ­fico.';
+      'Grande peixe-porco de tom castanho-claro, com as barbatanas orladas de amarelo, conhecido por defender o ninho com agressividade nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_porcupinefish_name => 'Peixe-ouriÃ§o';
+  String get species_porcupinefish_name => 'Peixe-ouriço';
 
   @override
   String get species_porcupinefish_desc =>
-      'Grande peixe espinhoso que se insufla como uma bola quando ameaÃ§ado, presente em recifes tropicais de todo o mundo.';
+      'Grande peixe espinhoso que se insufla como uma bola quando ameaçado, presente em recifes tropicais de todo o mundo.';
 
   @override
   String get species_guineafowl_pufferfish_name =>
-      'Peixe-balÃ£o-de-pintas-brancas';
+      'Peixe-balão-de-pintas-brancas';
 
   @override
   String get species_guineafowl_pufferfish_desc =>
-      'Peixe-balÃ£o escuro coberto de pequenas pintas brancas, por vezes numa fase de cor amarelo-dourada, nos recifes do Indo-PacÃ­fico.';
+      'Peixe-balão escuro coberto de pequenas pintas brancas, por vezes numa fase de cor amarelo-dourada, nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_map_pufferfish_name => 'Peixe-balÃ£o-mapa';
+  String get species_map_pufferfish_name => 'Peixe-balão-mapa';
 
   @override
   String get species_map_pufferfish_desc =>
-      'Grande peixe-balÃ£o pÃ¡lido, com marcas escuras intrincadas semelhantes a um mapa, presente nos recifes do Indo-PacÃ­fico.';
+      'Grande peixe-balão pálido, com marcas escuras intrincadas semelhantes a um mapa, presente nos recifes do Indo-Pacífico.';
 
   @override
   String get species_sharpnose_pufferfish_name =>
-      'Peixe-balÃ£o-de-focinho-afiado';
+      'Peixe-balão-de-focinho-afiado';
 
   @override
   String get species_sharpnose_pufferfish_desc =>
-      'Peixe-balÃ£o minÃºsculo, com linhas azuis na face e cauda alaranjada, visto com frequÃªncia nos recifes das CaraÃ­bas.';
+      'Peixe-balão minúsculo, com linhas azuis na face e cauda alaranjada, visto com frequência nos recifes das Caraíbas.';
 
   @override
   String get species_boxfish_name => 'Peixe-cofre-amarelo';
 
   @override
   String get species_boxfish_desc =>
-      'Os juvenis sÃ£o cubos amarelo-vivos com pintas negras. Os adultos escurecem para cinzento-azulado. Presente em todo o Indo-PacÃ­fico.';
+      'Os juvenis são cubos amarelo-vivos com pintas negras. Os adultos escurecem para cinzento-azulado. Presente em todo o Indo-Pacífico.';
 
   @override
   String get species_cowfish_name => 'Peixe-vaca-de-chifres-longos';
 
   @override
   String get species_cowfish_desc =>
-      'Peixe amarelo de corpo cÃºbico, com projeÃ§Ãµes em forma de chifre sobre cada olho, presente nos recifes do Indo-PacÃ­fico.';
+      'Peixe amarelo de corpo cúbico, com projeções em forma de chifre sobre cada olho, presente nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_napoleon_wrasse_name => 'BodiÃ£o-napoleÃ£o';
+  String get species_napoleon_wrasse_name => 'Bodião-napoleão';
 
   @override
   String get species_napoleon_wrasse_desc =>
-      'BodiÃ£o enorme, com atÃ© 2 m e uma protuberÃ¢ncia frontal proeminente. AmeaÃ§ado e protegido, presente nos recifes do Indo-PacÃ­fico.';
+      'Bodião enorme, com até 2 m e uma protuberância frontal proeminente. Ameaçado e protegido, presente nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_cleaner_wrasse_name => 'BodiÃ£o-limpador';
+  String get species_cleaner_wrasse_name => 'Bodião-limpador';
 
   @override
   String get species_cleaner_wrasse_desc =>
-      'Pequeno bodiÃ£o de riscas azuis que gere estaÃ§Ãµes de limpeza, retirando parasitas a peixes maiores nos recifes do Indo-PacÃ­fico.';
+      'Pequeno bodião de riscas azuis que gere estações de limpeza, retirando parasitas a peixes maiores nos recifes do Indo-Pacífico.';
 
   @override
   String get species_yellowtail_coris_name => 'Coris-de-cauda-amarela';
 
   @override
   String get species_yellowtail_coris_desc =>
-      'BodiÃ£o colorido, de corpo pintalgado e cauda amarela; os juvenis sÃ£o laranja-avermelhados com marcas brancas.';
+      'Bodião colorido, de corpo pintalgado e cauda amarela; os juvenis são laranja-avermelhados com marcas brancas.';
 
   @override
-  String get species_bluehead_wrasse_name => 'BodiÃ£o-de-cabeÃ§a-azul';
+  String get species_bluehead_wrasse_name => 'Bodião-de-cabeça-azul';
 
   @override
   String get species_bluehead_wrasse_desc =>
-      'BodiÃ£o abundante nas CaraÃ­bas; os machos terminais tÃªm a cabeÃ§a azul-viva e o corpo verde com barras pretas e brancas.';
+      'Bodião abundante nas Caraíbas; os machos terminais têm a cabeça azul-viva e o corpo verde com barras pretas e brancas.';
 
   @override
-  String get species_spanish_hogfish_name => 'BodiÃ£o-espanhol';
+  String get species_spanish_hogfish_name => 'Bodião-espanhol';
 
   @override
   String get species_spanish_hogfish_desc =>
-      'BodiÃ£o roxo e amarelo, comum nos recifes das CaraÃ­bas; os juvenis atuam como peixes-limpadores.';
+      'Bodião roxo e amarelo, comum nos recifes das Caraíbas; os juvenis atuam como peixes-limpadores.';
 
   @override
   String get species_bumphead_parrotfish_name =>
-      'Peixe-papagaio-de-cabeÃ§a-gibosa';
+      'Peixe-papagaio-de-cabeça-gibosa';
 
   @override
   String get species_bumphead_parrotfish_desc =>
-      'A maior espÃ©cie de peixe-papagaio, com atÃ© 1,3 m e uma enorme protuberÃ¢ncia frontal. Desloca-se em cardumes nos recifes do Indo-PacÃ­fico.';
+      'A maior espécie de peixe-papagaio, com até 1,3 m e uma enorme protuberância frontal. Desloca-se em cardumes nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_stoplight_parrotfish_name => 'Peixe-papagaio-semÃ¡foro';
+  String get species_stoplight_parrotfish_name => 'Peixe-papagaio-semáforo';
 
   @override
   String get species_stoplight_parrotfish_desc =>
-      'Peixe-papagaio comum das CaraÃ­bas, com mudanÃ§as de cor dramÃ¡ticas entre a fase inicial e a terminal.';
+      'Peixe-papagaio comum das Caraíbas, com mudanças de cor dramáticas entre a fase inicial e a terminal.';
 
   @override
   String get species_queen_parrotfish_name => 'Peixe-papagaio-rainha';
 
   @override
   String get species_queen_parrotfish_desc =>
-      'Grande peixe-papagaio azul-esverdeado dos recifes das CaraÃ­bas, visto muitas vezes a morder o coral para se alimentar de algas.';
+      'Grande peixe-papagaio azul-esverdeado dos recifes das Caraíbas, visto muitas vezes a morder o coral para se alimentar de algas.';
 
   @override
   String get species_yellowtail_damselfish_name => 'Donzela-de-cauda-amarela';
 
   @override
   String get species_yellowtail_damselfish_desc =>
-      'Donzela azul-escura com a cauda amarelo-viva, comum nos topos e cristas dos recifes das CaraÃ­bas.';
+      'Donzela azul-escura com a cauda amarelo-viva, comum nos topos e cristas dos recifes das Caraíbas.';
 
   @override
   String get species_sergeant_major_name => 'Sargento';
 
   @override
   String get species_sergeant_major_desc =>
-      'Donzela prateada e amarela, com cinco barras negras bem marcadas, presente em grandes agregaÃ§Ãµes nos recifes do AtlÃ¢ntico tropical.';
+      'Donzela prateada e amarela, com cinco barras negras bem marcadas, presente em grandes agregações nos recifes do Atlântico tropical.';
 
   @override
-  String get species_three_spot_damselfish_name => 'Donzela-de-trÃªs-manchas';
+  String get species_three_spot_damselfish_name => 'Donzela-de-três-manchas';
 
   @override
   String get species_three_spot_damselfish_desc =>
-      'Donzela castanho-escura e territorial, que defende com agressividade o seu jardim de algas nos recifes das CaraÃ­bas.';
+      'Donzela castanho-escura e territorial, que defende com agressividade o seu jardim de algas nos recifes das Caraíbas.';
 
   @override
   String get species_chromis_viridis_name => 'Castanheta-verde-azulada';
 
   @override
   String get species_chromis_viridis_desc =>
-      'Pequena castanheta verde iridescente, vista em grandes cardumes a pairar sobre corais ramificados nos recifes do Indo-PacÃ­fico.';
+      'Pequena castanheta verde iridescente, vista em grandes cardumes a pairar sobre corais ramificados nos recifes do Indo-Pacífico.';
 
   @override
   String get species_blue_chromis_name => 'Castanheta-azul';
 
   @override
   String get species_blue_chromis_desc =>
-      'Castanheta planctÃ­vora de azul brilhante, encontrada em grandes agregaÃ§Ãµes a meia-Ã¡gua sobre as paredes de recife das CaraÃ­bas.';
+      'Castanheta planctívora de azul brilhante, encontrada em grandes agregações a meia-água sobre as paredes de recife das Caraíbas.';
 
   @override
   String get species_nassau_grouper_name => 'Garoupa-de-Nassau';
 
   @override
   String get species_nassau_grouper_desc =>
-      'Grande garoupa das CaraÃ­bas, com uma risca ocular escura e padrÃ£o de bandas, hoje ameaÃ§ada devido Ã  sobrepesca.';
+      'Grande garoupa das Caraíbas, com uma risca ocular escura e padrão de bandas, hoje ameaçada devido à sobrepesca.';
 
   @override
   String get species_giant_grouper_name => 'Mero-gigante';
 
   @override
   String get species_giant_grouper_desc =>
-      'O maior peixe Ã³sseo de recife, com atÃ© 2,7 m e 400 kg. Presente em grutas e destroÃ§os de todo o Indo-PacÃ­fico.';
+      'O maior peixe ósseo de recife, com até 2,7 m e 400 kg. Presente em grutas e destroços de todo o Indo-Pacífico.';
 
   @override
   String get species_coral_grouper_name => 'Garoupa-de-coral';
 
   @override
   String get species_coral_grouper_desc =>
-      'Garoupa vermelho-alaranjada viva coberta de pintas azuis, uma espÃ©cie emblemÃ¡tica dos recifes de coral do Indo-PacÃ­fico.';
+      'Garoupa vermelho-alaranjada viva coberta de pintas azuis, uma espécie emblemática dos recifes de coral do Indo-Pacífico.';
 
   @override
   String get species_goliath_grouper_name => 'Mero-golias';
 
   @override
   String get species_goliath_grouper_desc =>
-      'Mero atlÃ¢ntico enorme, com atÃ© 2,5 m, encontrado muitas vezes junto a destroÃ§os e saliÃªncias na Florida e nas CaraÃ­bas.';
+      'Mero atlântico enorme, com até 2,5 m, encontrado muitas vezes junto a destroços e saliências na Florida e nas Caraíbas.';
 
   @override
   String get species_potato_grouper_name => 'Garoupa-batata';
 
   @override
   String get species_potato_grouper_desc =>
-      'Garoupa grande e sociÃ¡vel, com manchas escuras em forma de batata, cÃ©lebre no Cod Hole da Grande Barreira de Coral.';
+      'Garoupa grande e sociável, com manchas escuras em forma de batata, célebre no Cod Hole da Grande Barreira de Coral.';
 
   @override
-  String get species_peacock_grouper_name => 'Garoupa-pavÃ£o';
+  String get species_peacock_grouper_name => 'Garoupa-pavão';
 
   @override
   String get species_peacock_grouper_desc =>
-      'Garoupa castanho-escura com pintas azuis vivas e barras verticais claras na parte traseira, comum nos recifes do Indo-PacÃ­fico.';
+      'Garoupa castanho-escura com pintas azuis vivas e barras verticais claras na parte traseira, comum nos recifes do Indo-Pacífico.';
 
   @override
   String get species_yellowfin_tuna_name => 'Atum-albacora';
 
   @override
   String get species_yellowfin_tuna_desc =>
-      'Predador pelÃ¡gico veloz, com longas barbatanas dorsal e anal amarelas, avistado ocasionalmente pelos mergulhadores em locais ao largo.';
+      'Predador pelágico veloz, com longas barbatanas dorsal e anal amarelas, avistado ocasionalmente pelos mergulhadores em locais ao largo.';
 
   @override
   String get species_dogtooth_tuna_name => 'Atum-dentudo';
 
   @override
   String get species_dogtooth_tuna_desc =>
-      'Atum potente associado aos recifes, de dentes bem visÃ­veis, encontrado em paredes profundas do Indo-PacÃ­fico.';
+      'Atum potente associado aos recifes, de dentes bem visíveis, encontrado em paredes profundas do Indo-Pacífico.';
 
   @override
   String get species_great_barracuda_name => 'Barracuda-gigante';
 
   @override
   String get species_great_barracuda_desc =>
-      'Predador prateado e esguio, com atÃ© 1,8 m e dentes bem visÃ­veis, visto muitas vezes a pairar imÃ³vel junto aos recifes tropicais.';
+      'Predador prateado e esguio, com até 1,8 m e dentes bem visíveis, visto muitas vezes a pairar imóvel junto aos recifes tropicais.';
 
   @override
   String get species_blackfin_barracuda_name =>
@@ -32218,84 +32175,84 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_blackfin_barracuda_desc =>
-      'Barracuda do Indo-PacÃ­fico conhecida por formar enormes cardumes em espiral em locais como Barracuda Point.';
+      'Barracuda do Indo-Pacífico conhecida por formar enormes cardumes em espiral em locais como Barracuda Point.';
 
   @override
   String get species_mahi_mahi_name => 'Dourado';
 
   @override
   String get species_mahi_mahi_desc =>
-      'Peixe pelÃ¡gico deslumbrante em verde-azulado e dourado, de fronte alta, avistado ocasionalmente em locais de mergulho ao largo.';
+      'Peixe pelágico deslumbrante em verde-azulado e dourado, de fronte alta, avistado ocasionalmente em locais de mergulho ao largo.';
 
   @override
-  String get species_giant_trevally_name => 'XarÃ©u-gigante';
+  String get species_giant_trevally_name => 'Xaréu-gigante';
 
   @override
   String get species_giant_trevally_desc =>
-      'Predador prateado poderoso, com atÃ© 1,7 m, conhecido por caÃ§ar em canais e paredes de recife de todo o Indo-PacÃ­fico.';
+      'Predador prateado poderoso, com até 1,7 m, conhecido por caçar em canais e paredes de recife de todo o Indo-Pacífico.';
 
   @override
-  String get species_bluefin_trevally_name => 'XarÃ©u-de-barbatanas-azuis';
+  String get species_bluefin_trevally_name => 'Xaréu-de-barbatanas-azuis';
 
   @override
   String get species_bluefin_trevally_desc =>
-      'XarÃ©u esguio com pintas azuis, visto com frequÃªncia a patrulhar em pequenos grupos de caÃ§a os bordos dos recifes do Indo-PacÃ­fico.';
+      'Xaréu esguio com pintas azuis, visto com frequência a patrulhar em pequenos grupos de caça os bordos dos recifes do Indo-Pacífico.';
 
   @override
-  String get species_bigeye_trevally_name => 'XarÃ©u-olhudo';
+  String get species_bigeye_trevally_name => 'Xaréu-olhudo';
 
   @override
   String get species_bigeye_trevally_desc =>
-      'XarÃ©u prateado de olhos grandes que forma cardumes impressionantes em redemoinho junto a paredes e estaÃ§Ãµes de limpeza.';
+      'Xaréu prateado de olhos grandes que forma cardumes impressionantes em redemoinho junto a paredes e estações de limpeza.';
 
   @override
-  String get species_bar_jack_name => 'XarÃ©u-de-barra';
+  String get species_bar_jack_name => 'Xaréu-de-barra';
 
   @override
   String get species_bar_jack_desc =>
-      'XarÃ©u prateado e esguio das CaraÃ­bas, com uma risca azul-escura marcante ao longo do dorso que se prolonga atÃ© ao lobo inferior da cauda.';
+      'Xaréu prateado e esguio das Caraíbas, com uma risca azul-escura marcante ao longo do dorso que se prolonga até ao lobo inferior da cauda.';
 
   @override
-  String get species_horse_eye_jack_name => 'XarÃ©u-olho-de-boi';
+  String get species_horse_eye_jack_name => 'Xaréu-olho-de-boi';
 
   @override
   String get species_horse_eye_jack_desc =>
-      'XarÃ©u prateado de olhos grandes que forma cardumes junto a recifes e destroÃ§os nas CaraÃ­bas e no AtlÃ¢ntico ocidental.';
+      'Xaréu prateado de olhos grandes que forma cardumes junto a recifes e destroços nas Caraíbas e no Atlântico ocidental.';
 
   @override
   String get species_yellowtail_snapper_name => 'Luciano-de-cauda-amarela';
 
   @override
   String get species_yellowtail_snapper_desc =>
-      'Luciano esguio com uma risca lateral e cauda amarelas, visto muitas vezes em cardumes a meia-Ã¡gua nos recifes das CaraÃ­bas.';
+      'Luciano esguio com uma risca lateral e cauda amarelas, visto muitas vezes em cardumes a meia-água nos recifes das Caraíbas.';
 
   @override
   String get species_schoolmaster_snapper_name => 'Luciano-mestre-escola';
 
   @override
   String get species_schoolmaster_snapper_desc =>
-      'Luciano amarelo e prateado, com linhas azuis sob o olho, encontrado em grupo sob saliÃªncias nos recifes das CaraÃ­bas.';
+      'Luciano amarelo e prateado, com linhas azuis sob o olho, encontrado em grupo sob saliências nos recifes das Caraíbas.';
 
   @override
   String get species_bluestripe_snapper_name => 'Luciano-de-riscas-azuis';
 
   @override
   String get species_bluestripe_snapper_desc =>
-      'Luciano amarelo-vivo com quatro riscas azuis horizontais, que forma cardumes densos nos recifes do Indo-PacÃ­fico.';
+      'Luciano amarelo-vivo com quatro riscas azuis horizontais, que forma cardumes densos nos recifes do Indo-Pacífico.';
 
   @override
   String get species_twinspot_snapper_name => 'Luciano-de-duas-manchas';
 
   @override
   String get species_twinspot_snapper_desc =>
-      'Grande luciano vermelho dos recifes exteriores do Indo-PacÃ­fico, por vezes em cardumes em paredes profundas e canais.';
+      'Grande luciano vermelho dos recifes exteriores do Indo-Pacífico, por vezes em cardumes em paredes profundas e canais.';
 
   @override
   String get species_humphead_snapper_name => 'Luciano-da-meia-noite';
 
   @override
   String get species_humphead_snapper_desc =>
-      'Grande luciano escuro encontrado em cardumes junto a paredes Ã­ngremes do Indo-PacÃ­fico; os juvenis sÃ£o vistosamente pretos e brancos.';
+      'Grande luciano escuro encontrado em cardumes junto a paredes íngremes do Indo-Pacífico; os juvenis são vistosamente pretos e brancos.';
 
   @override
   String get species_longfin_bannerfish_name =>
@@ -32303,106 +32260,106 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_longfin_bannerfish_desc =>
-      'Peixe preto e branco com uma longa barbatana dorsal a arrastar e cauda amarela, visto muitas vezes aos pares nos recifes do Indo-PacÃ­fico.';
+      'Peixe preto e branco com uma longa barbatana dorsal a arrastar e cauda amarela, visto muitas vezes aos pares nos recifes do Indo-Pacífico.';
 
   @override
   String get species_batfish_orbicular_name => 'Peixe-morcego-orbicular';
 
   @override
   String get species_batfish_orbicular_desc =>
-      'Peixe prateado em forma de disco, de barbatanas altas, que se aproxima dos mergulhadores por curiosidade. Comum em destroÃ§os e recifes do Indo-PacÃ­fico.';
+      'Peixe prateado em forma de disco, de barbatanas altas, que se aproxima dos mergulhadores por curiosidade. Comum em destroços e recifes do Indo-Pacífico.';
 
   @override
   String get species_batfish_teira_name => 'Peixe-morcego-de-barbatana-longa';
 
   @override
   String get species_batfish_teira_desc =>
-      'Peixe-morcego de barbatanas altas, com uma mancha escura junto Ã  barbatana peitoral, visto muitas vezes em estaÃ§Ãµes de limpeza e destroÃ§os.';
+      'Peixe-morcego de barbatanas altas, com uma mancha escura junto à barbatana peitoral, visto muitas vezes em estações de limpeza e destroços.';
 
   @override
   String get species_batfish_pinnatus_name => 'Peixe-morcego-pinado';
 
   @override
   String get species_batfish_pinnatus_desc =>
-      'Os juvenis sÃ£o negros com bordos laranja vivos, lembrando um platelminte tÃ³xico. Presente no PacÃ­fico ocidental.';
+      'Os juvenis são negros com bordos laranja vivos, lembrando um platelminte tóxico. Presente no Pacífico ocidental.';
 
   @override
   String get species_banggai_cardinalfish_name => 'Peixe-cardeal-de-Banggai';
 
   @override
   String get species_banggai_cardinalfish_desc =>
-      'Peixe-cardeal marcante, prateado e negro, de barbatanas alongadas, endÃ©mico das ilhas Banggai, na IndonÃ©sia.';
+      'Peixe-cardeal marcante, prateado e negro, de barbatanas alongadas, endémico das ilhas Banggai, na Indonésia.';
 
   @override
   String get species_pajama_cardinalfish_name => 'Peixe-cardeal-pijama';
 
   @override
   String get species_pajama_cardinalfish_desc =>
-      'Peixe-cardeal invulgar, com a face amarela, uma faixa escura a meio e a traseira pintalgada, encontrado entre corais no Indo-PacÃ­fico.';
+      'Peixe-cardeal invulgar, com a face amarela, uma faixa escura a meio e a traseira pintalgada, encontrado entre corais no Indo-Pacífico.';
 
   @override
   String get species_longnose_hawkfish_name =>
-      'Peixe-falcÃ£o-de-focinho-comprido';
+      'Peixe-falcão-de-focinho-comprido';
 
   @override
   String get species_longnose_hawkfish_desc =>
-      'Peixe pequeno e branco, com um padrÃ£o vermelho quadriculado e focinho alongado, que pousa em gorgÃ³nias e corais negros.';
+      'Peixe pequeno e branco, com um padrão vermelho quadriculado e focinho alongado, que pousa em gorgónias e corais negros.';
 
   @override
-  String get species_arc_eye_hawkfish_name => 'Peixe-falcÃ£o-de-arco-ocular';
+  String get species_arc_eye_hawkfish_name => 'Peixe-falcão-de-arco-ocular';
 
   @override
   String get species_arc_eye_hawkfish_desc =>
-      'Pequeno peixe-falcÃ£o com um arco laranja distintivo atrÃ¡s do olho, muitas vezes pousado em cabeÃ§os de coral nos recifes do Indo-PacÃ­fico.';
+      'Pequeno peixe-falcão com um arco laranja distintivo atrás do olho, muitas vezes pousado em cabeços de coral nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_flame_hawkfish_name => 'Peixe-falcÃ£o-chama';
+  String get species_flame_hawkfish_name => 'Peixe-falcão-chama';
 
   @override
   String get species_flame_hawkfish_desc =>
-      'Peixe-falcÃ£o vermelho brilhante, com marcas escuras Ã  volta dos olhos, que pousa em corais Pocillopora por todo o PacÃ­fico ocidental.';
+      'Peixe-falcão vermelho brilhante, com marcas escuras à volta dos olhos, que pousa em corais Pocillopora por todo o Pacífico ocidental.';
 
   @override
-  String get species_fire_goby_name => 'GÃ³bio-de-fogo';
+  String get species_fire_goby_name => 'Góbio-de-fogo';
 
   @override
   String get species_fire_goby_desc =>
-      'GÃ³bio branco e elegante, com a primeira barbatana dorsal alta e a cauda vermelho-alaranjada, paira sobre o cascalho dos recifes do Indo-PacÃ­fico.';
+      'Góbio branco e elegante, com a primeira barbatana dorsal alta e a cauda vermelho-alaranjada, paira sobre o cascalho dos recifes do Indo-Pacífico.';
 
   @override
   String get species_purple_firefish_name => 'Peixe-de-fogo-roxo';
 
   @override
   String get species_purple_firefish_desc =>
-      'GÃ³bio delicado, de barbatanas roxas e espinho dorsal alto, que paira junto Ã s tocas nos recifes exteriores do Indo-PacÃ­fico.';
+      'Góbio delicado, de barbatanas roxas e espinho dorsal alto, que paira junto às tocas nos recifes exteriores do Indo-Pacífico.';
 
   @override
-  String get species_yellownose_goby_name => 'GÃ³bio-de-focinho-amarelo';
+  String get species_yellownose_goby_name => 'Góbio-de-focinho-amarelo';
 
   @override
   String get species_yellownose_goby_desc =>
-      'MinÃºsculo gÃ³bio-limpador das CaraÃ­bas, com o focinho amarelo e uma risca lateral azul, encontrado em esponjas e cabeÃ§os de coral.';
+      'Minúsculo góbio-limpador das Caraíbas, com o focinho amarelo e uma risca lateral azul, encontrado em esponjas e cabeços de coral.';
 
   @override
-  String get species_citron_goby_name => 'GÃ³bio-citrino';
+  String get species_citron_goby_name => 'Góbio-citrino';
 
   @override
   String get species_citron_goby_desc =>
-      'GÃ³bio minÃºsculo, de amarelo vivo, que vive entre os ramos dos corais Acropora nos recifes do Indo-PacÃ­fico.';
+      'Góbio minúsculo, de amarelo vivo, que vive entre os ramos dos corais Acropora nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_shrimp_goby_name => 'GÃ³bio-de-camarÃ£o-de-Steinitz';
+  String get species_shrimp_goby_name => 'Góbio-de-camarão-de-Steinitz';
 
   @override
   String get species_shrimp_goby_desc =>
-      'GÃ³bio cor de areia que partilha uma toca com camarÃµes alfeÃ­deos numa relaÃ§Ã£o mutualista, nas planÃ­cies arenosas do Indo-PacÃ­fico.';
+      'Góbio cor de areia que partilha uma toca com camarões alfeídeos numa relação mutualista, nas planícies arenosas do Indo-Pacífico.';
 
   @override
-  String get species_neon_goby_name => 'GÃ³bio-nÃ©on';
+  String get species_neon_goby_name => 'Góbio-néon';
 
   @override
   String get species_neon_goby_desc =>
-      'GÃ³bio minÃºsculo e escuro, com uma risca azul-nÃ©on brilhante, que gere estaÃ§Ãµes de limpeza em cabeÃ§os de coral das CaraÃ­bas.';
+      'Góbio minúsculo e escuro, com uma risca azul-néon brilhante, que gere estações de limpeza em cabeços de coral das Caraíbas.';
 
   @override
   String get species_bluestriped_fangblenny_name =>
@@ -32410,28 +32367,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_bluestriped_fangblenny_desc =>
-      'Pequeno caboz de riscas azuis que imita os bodiÃµes-limpadores para arrancar escamas a peixes desprevenidos.';
+      'Pequeno caboz de riscas azuis que imita os bodiões-limpadores para arrancar escamas a peixes desprevenidos.';
 
   @override
   String get species_sailfin_blenny_name => 'Caboz-de-vela';
 
   @override
   String get species_sailfin_blenny_desc =>
-      'MinÃºsculo caboz das CaraÃ­bas que ergue uma grande barbatana dorsal em forma de vela Ã  saÃ­da do seu tubo para atrair parceiras.';
+      'Minúsculo caboz das Caraíbas que ergue uma grande barbatana dorsal em forma de vela à saída do seu tubo para atrair parceiras.';
 
   @override
   String get species_bicolor_blenny_name => 'Caboz-bicolor';
 
   @override
   String get species_bicolor_blenny_desc =>
-      'Pequeno caboz com a metade dianteira castanho-escura e a traseira laranja, que espreita de buracos nos recifes do Indo-PacÃ­fico.';
+      'Pequeno caboz com a metade dianteira castanho-escura e a traseira laranja, que espreita de buracos nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_redlip_blenny_name => 'Caboz-de-lÃ¡bios-vermelhos';
+  String get species_redlip_blenny_name => 'Caboz-de-lábios-vermelhos';
 
   @override
   String get species_redlip_blenny_desc =>
-      'Caboz escuro, de lÃ¡bios vermelho-alaranjados bem visÃ­veis, que defende manchas de algas nas cristas dos recifes das CaraÃ­bas.';
+      'Caboz escuro, de lábios vermelho-alaranjados bem visíveis, que defende manchas de algas nas cristas dos recifes das Caraíbas.';
 
   @override
   String get species_pygmy_seahorse_name =>
@@ -32439,21 +32396,21 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_pygmy_seahorse_desc =>
-      'Cavalo-marinho minÃºsculo, com menos de 2 cm, que iguala na perfeiÃ§Ã£o a gorgÃ³nia onde vive, um objeto cobiÃ§ado da fotografia macro.';
+      'Cavalo-marinho minúsculo, com menos de 2 cm, que iguala na perfeição a gorgónia onde vive, um objeto cobiçado da fotografia macro.';
 
   @override
   String get species_common_seahorse_name => 'Cavalo-marinho-comum';
 
   @override
   String get species_common_seahorse_desc =>
-      'Cavalo-marinho de tamanho mÃ©dio, presente em pradarias marinhas e cascalho de coral de todo o Indo-PacÃ­fico, de cor variÃ¡vel.';
+      'Cavalo-marinho de tamanho médio, presente em pradarias marinhas e cascalho de coral de todo o Indo-Pacífico, de cor variável.';
 
   @override
   String get species_thorny_seahorse_name => 'Cavalo-marinho-espinhoso';
 
   @override
   String get species_thorny_seahorse_desc =>
-      'Cavalo-marinho coberto de espinhos longos, presente em pradarias marinhas e fundos moles de todo o Indo-PacÃ­fico.';
+      'Cavalo-marinho coberto de espinhos longos, presente em pradarias marinhas e fundos moles de todo o Indo-Pacífico.';
 
   @override
   String get species_ornate_ghost_pipefish_name =>
@@ -32461,7 +32418,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_ornate_ghost_pipefish_desc =>
-      'Peixe-cachimbo de camuflagem elaborada, que paira de cabeÃ§a para baixo junto a crinoides e corais moles no Indo-PacÃ­fico.';
+      'Peixe-cachimbo de camuflagem elaborada, que paira de cabeça para baixo junto a crinoides e corais moles no Indo-Pacífico.';
 
   @override
   String get species_robust_ghost_pipefish_name =>
@@ -32469,36 +32426,36 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_robust_ghost_pipefish_desc =>
-      'Grande peixe-cachimbo-fantasma que imita ervas marinhas ou algas, encontrado muitas vezes aos pares em Ã¡guas costeiras do Indo-PacÃ­fico.';
+      'Grande peixe-cachimbo-fantasma que imita ervas marinhas ou algas, encontrado muitas vezes aos pares em águas costeiras do Indo-Pacífico.';
 
   @override
   String get species_trumpetfish_name => 'Peixe-trombeta';
 
   @override
   String get species_trumpetfish_desc =>
-      'Peixe comprido e esguio que caÃ§a acompanhando a sombra de peixes maiores, presente em vÃ¡rias cores nos recifes das CaraÃ­bas e do AtlÃ¢ntico.';
+      'Peixe comprido e esguio que caça acompanhando a sombra de peixes maiores, presente em várias cores nos recifes das Caraíbas e do Atlântico.';
 
   @override
   String get species_cornetfish_name => 'Peixe-corneta';
 
   @override
   String get species_cornetfish_desc =>
-      'Peixe extremamente alongado, com atÃ© 1,5 m e um filamento caudal a arrastar, visto muitas vezes a planar sobre os planaltos de recife.';
+      'Peixe extremamente alongado, com até 1,5 m e um filamento caudal a arrastar, visto muitas vezes a planar sobre os planaltos de recife.';
 
   @override
   String get species_yellowhead_jawfish_name =>
-      'Peixe-mandÃ­bula-de-cabeÃ§a-amarela';
+      'Peixe-mandíbula-de-cabeça-amarela';
 
   @override
   String get species_yellowhead_jawfish_desc =>
-      'Peixe pequeno de corpo azul e cabeÃ§a amarela, que paira sobre a sua toca de areia nos recifes das CaraÃ­bas. Os machos incubam os ovos na boca.';
+      'Peixe pequeno de corpo azul e cabeça amarela, que paira sobre a sua toca de areia nos recifes das Caraíbas. Os machos incubam os ovos na boca.';
 
   @override
   String get species_flamefish_name => 'Peixe-cardeal-chama';
 
   @override
   String get species_flamefish_desc =>
-      'Pequeno peixe-cardeal vermelho-vivo, com uma mancha escura sob a segunda barbatana dorsal, que se esconde de dia nas fendas dos recifes das CaraÃ­bas.';
+      'Pequeno peixe-cardeal vermelho-vivo, com uma mancha escura sob a segunda barbatana dorsal, que se esconde de dia nas fendas dos recifes das Caraíbas.';
 
   @override
   String get species_longspine_squirrelfish_name =>
@@ -32506,7 +32463,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_longspine_squirrelfish_desc =>
-      'Peixe noturno vermelho, de olhos grandes e espinho dorsal comprido, encontrado de dia sob saliÃªncias nos recifes das CaraÃ­bas.';
+      'Peixe noturno vermelho, de olhos grandes e espinho dorsal comprido, encontrado de dia sob saliências nos recifes das Caraíbas.';
 
   @override
   String get species_soldierfish_name => 'Peixe-soldado-de-escamas-grandes';
@@ -32520,148 +32477,148 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_flame_angelfish_desc =>
-      'Peixe-anjo anÃ£o de vermelho-alaranjado brilhante, com barras verticais negras e barbatanas de pontas azuis, presente em todo o PacÃ­fico.';
+      'Peixe-anjo anão de vermelho-alaranjado brilhante, com barras verticais negras e barbatanas de pontas azuis, presente em todo o Pacífico.';
 
   @override
   String get species_royal_gramma_name => 'Gramma-real';
 
   @override
   String get species_royal_gramma_desc =>
-      'Pequeno peixe bicolor das CaraÃ­bas, com a metade dianteira roxa e a traseira amarela, encontrado sob saliÃªncias.';
+      'Pequeno peixe bicolor das Caraíbas, com a metade dianteira roxa e a traseira amarela, encontrado sob saliências.';
 
   @override
   String get species_anthias_lyretail_name => 'Antias-de-cauda-de-lira';
 
   @override
   String get species_anthias_lyretail_desc =>
-      'Peixe de recife abundante que forma grandes nuvens laranja e rosa sobre as formaÃ§Ãµes de coral do Indo-PacÃ­fico. Os machos sÃ£o roxos.';
+      'Peixe de recife abundante que forma grandes nuvens laranja e rosa sobre as formações de coral do Indo-Pacífico. Os machos são roxos.';
 
   @override
   String get species_mediterranean_grouper_name => 'Mero';
 
   @override
   String get species_mediterranean_grouper_desc =>
-      'Grande garoupa castanho-escura com manchas claras, o predador emblemÃ¡tico dos recifes rochosos do MediterrÃ¢neo.';
+      'Grande garoupa castanho-escura com manchas claras, o predador emblemático dos recifes rochosos do Mediterrâneo.';
 
   @override
-  String get species_mediterranean_moray_name => 'Moreia-do-MediterrÃ¢neo';
+  String get species_mediterranean_moray_name => 'Moreia-do-Mediterrâneo';
 
   @override
   String get species_mediterranean_moray_desc =>
-      'Moreia castanho-escura com manchas amareladas, vista com frequÃªncia a espreitar das fendas rochosas do MediterrÃ¢neo.';
+      'Moreia castanho-escura com manchas amareladas, vista com frequência a espreitar das fendas rochosas do Mediterrâneo.';
 
   @override
   String get species_ornate_wrasse_name => 'Peixe-verde';
 
   @override
   String get species_ornate_wrasse_desc =>
-      'BodiÃ£o verde e colorido, com marcas vermelhas na cabeÃ§a, um dos bodiÃµes mais comuns dos recifes do MediterrÃ¢neo.';
+      'Bodião verde e colorido, com marcas vermelhas na cabeça, um dos bodiões mais comuns dos recifes do Mediterrâneo.';
 
   @override
   String get species_red_sea_bannerfish_name => 'Peixe-borboleta-mascarado';
 
   @override
   String get species_red_sea_bannerfish_desc =>
-      'Peixe-borboleta amarelo-vivo com uma mÃ¡scara escura sobre os olhos, endÃ©mico do mar Vermelho. Visto muitas vezes aos pares.';
+      'Peixe-borboleta amarelo-vivo com uma máscara escura sobre os olhos, endémico do mar Vermelho. Visto muitas vezes aos pares.';
 
   @override
   String get species_red_sea_anemonefish_name =>
-      'Peixe-palhaÃ§o-do-mar-Vermelho';
+      'Peixe-palhaço-do-mar-Vermelho';
 
   @override
   String get species_red_sea_anemonefish_desc =>
-      'Peixe-palhaÃ§o amarelo-alaranjado com duas barras brancas, endÃ©mico do mar Vermelho e do golfo de Ãden.';
+      'Peixe-palhaço amarelo-alaranjado com duas barras brancas, endémico do mar Vermelho e do golfo de Áden.';
 
   @override
-  String get species_arabian_angelfish_name => 'Peixe-anjo-arÃ¡bico';
+  String get species_arabian_angelfish_name => 'Peixe-anjo-arábico';
 
   @override
   String get species_arabian_angelfish_desc =>
-      'Grande peixe-anjo azul-escuro com uma barra vertical e cauda amarelas bem marcadas, endÃ©mico do oceano Ãndico ocidental.';
+      'Grande peixe-anjo azul-escuro com uma barra vertical e cauda amarelas bem marcadas, endémico do oceano Índico ocidental.';
 
   @override
   String get species_king_angelfish_name => 'Peixe-anjo-rei';
 
   @override
   String get species_king_angelfish_desc =>
-      'Grande peixe-anjo azul-escuro com uma barra vertical branca e cauda amarela, presente no PacÃ­fico oriental e nos GalÃ¡pagos.';
+      'Grande peixe-anjo azul-escuro com uma barra vertical branca e cauda amarela, presente no Pacífico oriental e nos Galápagos.';
 
   @override
   String get species_ocean_sunfish_name => 'Peixe-lua';
 
   @override
   String get species_ocean_sunfish_desc =>
-      'O peixe Ã³sseo mais pesado do mundo, com mais de 2 toneladas. Avistado ocasionalmente em estaÃ§Ãµes de limpeza em Bali e nos GalÃ¡pagos.';
+      'O peixe ósseo mais pesado do mundo, com mais de 2 toneladas. Avistado ocasionalmente em estações de limpeza em Bali e nos Galápagos.';
 
   @override
   String get species_lingcod_name => 'Lingcod';
 
   @override
   String get species_lingcod_desc =>
-      'Grande predador malhado dos recifes rochosos do noroeste do PacÃ­fico, encontrado muitas vezes a guardar massas de ovos.';
+      'Grande predador malhado dos recifes rochosos do noroeste do Pacífico, encontrado muitas vezes a guardar massas de ovos.';
 
   @override
-  String get species_wolf_eel_name => 'Peixe-lobo-do-PacÃ­fico';
+  String get species_wolf_eel_name => 'Peixe-lobo-do-Pacífico';
 
   @override
   String get species_wolf_eel_desc =>
-      'Grande peixe-lobo cinzento, de cabeÃ§a bolbosa e mandÃ­bulas potentes, encontrado em covis rochosos no noroeste do PacÃ­fico.';
+      'Grande peixe-lobo cinzento, de cabeça bolbosa e mandíbulas potentes, encontrado em covis rochosos no noroeste do Pacífico.';
 
   @override
   String get species_giant_sea_bass_name => 'Robalo-gigante';
 
   @override
   String get species_giant_sea_bass_desc =>
-      'Robalo enorme, com mais de 2 m e 250 kg, presente em recifes rochosos e florestas de kelp ao largo do sul da CalifÃ³rnia.';
+      'Robalo enorme, com mais de 2 m e 250 kg, presente em recifes rochosos e florestas de kelp ao largo do sul da Califórnia.';
 
   @override
   String get species_garibaldi_name => 'Garibaldi';
 
   @override
   String get species_garibaldi_desc =>
-      'Donzela laranja-viva e peixe marinho oficial da CalifÃ³rnia, territorial nos recifes das florestas de kelp.';
+      'Donzela laranja-viva e peixe marinho oficial da Califórnia, territorial nos recifes das florestas de kelp.';
 
   @override
-  String get species_sheephead_name => 'BodiÃ£o-da-CalifÃ³rnia';
+  String get species_sheephead_name => 'Bodião-da-Califórnia';
 
   @override
   String get species_sheephead_desc =>
-      'Grande bodiÃ£o com a cabeÃ§a e a cauda negras, o meio vermelho e o queixo branco. Presente nas florestas de kelp da CalifÃ³rnia.';
+      'Grande bodião com a cabeça e a cauda negras, o meio vermelho e o queixo branco. Presente nas florestas de kelp da Califórnia.';
 
   @override
   String get species_copper_rockfish_name => 'Cantarilho-cobre';
 
   @override
   String get species_copper_rockfish_desc =>
-      'Cantarilho laranja-acobreado com manchas claras, presenÃ§a comum nos recifes rochosos e florestas de kelp do noroeste do PacÃ­fico.';
+      'Cantarilho laranja-acobreado com manchas claras, presença comum nos recifes rochosos e florestas de kelp do noroeste do Pacífico.';
 
   @override
-  String get species_oriental_sweetlips_name => 'Peixe-lÃ¡bios-doces-oriental';
+  String get species_oriental_sweetlips_name => 'Peixe-lábios-doces-oriental';
 
   @override
   String get species_oriental_sweetlips_desc =>
-      'Grande peixe de recife do Indo-PacÃ­fico, com riscas pretas e brancas marcadas e barbatanas amarelas. Os juvenis fazem uma danÃ§a ondulante.';
+      'Grande peixe de recife do Indo-Pacífico, com riscas pretas e brancas marcadas e barbatanas amarelas. Os juvenis fazem uma dança ondulante.';
 
   @override
-  String get species_harlequin_sweetlips_name => 'Peixe-lÃ¡bios-doces-arlequim';
+  String get species_harlequin_sweetlips_name => 'Peixe-lábios-doces-arlequim';
 
   @override
   String get species_harlequin_sweetlips_desc =>
-      'Os adultos sÃ£o cinzentos com manchas escuras; os juvenis sÃ£o castanhos com grandes pintas brancas e nadam com um movimento ondulante.';
+      'Os adultos são cinzentos com manchas escuras; os juvenis são castanhos com grandes pintas brancas e nadam com um movimento ondulante.';
 
   @override
   String get species_blue_ringed_angelfish_name => 'Peixe-anjo-de-anel-azul';
 
   @override
   String get species_blue_ringed_angelfish_desc =>
-      'Grande peixe-anjo castanho com linhas azuis curvas e um anel azul distintivo por cima do opÃ©rculo.';
+      'Grande peixe-anjo castanho com linhas azuis curvas e um anel azul distintivo por cima do opérculo.';
 
   @override
   String get species_yellowbar_angelfish_name => 'Peixe-anjo-de-barra-amarela';
 
   @override
   String get species_yellowbar_angelfish_desc =>
-      'Grande peixe-anjo cinzento-azulado com uma mancha amarela bem visÃ­vel no corpo, presente no mar Vermelho e no oceano Ãndico ocidental.';
+      'Grande peixe-anjo cinzento-azulado com uma mancha amarela bem visível no corpo, presente no mar Vermelho e no oceano Índico ocidental.';
 
   @override
   String get species_filefish_scrawled_name => 'Peixe-lima-rabiscado';
@@ -32675,162 +32632,161 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_clown_filefish_desc =>
-      'Pequeno peixe-lima verde com pintas laranja e focinho comprido, que se alimenta exclusivamente de pÃ³lipos de coral Acropora.';
+      'Pequeno peixe-lima verde com pintas laranja e focinho comprido, que se alimenta exclusivamente de pólipos de coral Acropora.';
 
   @override
-  String get species_unicornfish_name => 'Peixe-unicÃ³rnio-de-espinho-azul';
+  String get species_unicornfish_name => 'Peixe-unicórnio-de-espinho-azul';
 
   @override
   String get species_unicornfish_desc =>
-      'Peixe-cirurgiÃ£o cinzento com um corno frontal proeminente e dois espinhos caudais azuis, comum nos planaltos de recife do Indo-PacÃ­fico.';
+      'Peixe-cirurgião cinzento com um corno frontal proeminente e dois espinhos caudais azuis, comum nos planaltos de recife do Indo-Pacífico.';
 
   @override
-  String get species_surgeonfish_sailfin_name => 'CirurgiÃ£o-de-vela';
+  String get species_surgeonfish_sailfin_name => 'Cirurgião-de-vela';
 
   @override
   String get species_surgeonfish_sailfin_desc =>
-      'Peixe-cirurgiÃ£o de bandas marcadas, com as barbatanas dorsal e anal muito desenvolvidas, presente em todo o Indo-PacÃ­fico.';
+      'Peixe-cirurgião de bandas marcadas, com as barbatanas dorsal e anal muito desenvolvidas, presente em todo o Indo-Pacífico.';
 
   @override
-  String get species_achilles_tang_name => 'CirurgiÃ£o-de-Aquiles';
+  String get species_achilles_tang_name => 'Cirurgião-de-Aquiles';
 
   @override
   String get species_achilles_tang_desc =>
-      'Peixe-cirurgiÃ£o castanho-escuro com uma marcante lÃ¡grima laranja junto Ã  cauda, presente nas zonas de rebentaÃ§Ã£o do PacÃ­fico central.';
+      'Peixe-cirurgião castanho-escuro com uma marcante lágrima laranja junto à cauda, presente nas zonas de rebentação do Pacífico central.';
 
   @override
-  String get species_doctorfish_name => 'CirurgiÃ£o-doutor';
+  String get species_doctorfish_name => 'Cirurgião-doutor';
 
   @override
   String get species_doctorfish_desc =>
-      'Peixe-cirurgiÃ£o castanho-acinzentado com barras escuras tÃ©nues e um bisturi caudal bem visÃ­vel, comum nos recifes das CaraÃ­bas.';
+      'Peixe-cirurgião castanho-acinzentado com barras escuras ténues e um bisturi caudal bem visível, comum nos recifes das Caraíbas.';
 
   @override
-  String get species_checkerboard_wrasse_name => 'BodiÃ£o-xadrez';
+  String get species_checkerboard_wrasse_name => 'Bodião-xadrez';
 
   @override
   String get species_checkerboard_wrasse_desc =>
-      'BodiÃ£o colorido com um padrÃ£o axadrezado de quadrados verdes, rosa e negros por todo o corpo.';
+      'Bodião colorido com um padrão axadrezado de quadrados verdes, rosa e negros por todo o corpo.';
 
   @override
-  String get species_bird_wrasse_name => 'BodiÃ£o-pÃ¡ssaro';
+  String get species_bird_wrasse_name => 'Bodião-pássaro';
 
   @override
   String get species_bird_wrasse_desc =>
-      'BodiÃ£o de focinho extremamente alongado, semelhante a um bico de ave; os machos sÃ£o verde-escuros e as fÃªmeas castanhas.';
+      'Bodião de focinho extremamente alongado, semelhante a um bico de ave; os machos são verde-escuros e as fêmeas castanhas.';
 
   @override
-  String get species_sling_jaw_wrasse_name =>
-      'BodiÃ£o-de-mandÃ­bula-projetÃ¡vel';
+  String get species_sling_jaw_wrasse_name => 'Bodião-de-mandíbula-projetável';
 
   @override
   String get species_sling_jaw_wrasse_desc =>
-      'BodiÃ£o com uma mandÃ­bula extensÃ­vel que dispara para a frente para capturar presas, existente em variantes amarela ou castanha.';
+      'Bodião com uma mandíbula extensível que dispara para a frente para capturar presas, existente em variantes amarela ou castanha.';
 
   @override
-  String get species_peacock_flounder_name => 'Linguado-pavÃ£o';
+  String get species_peacock_flounder_name => 'Linguado-pavão';
 
   @override
   String get species_peacock_flounder_desc =>
-      'Peixe achatado de fundo, com anÃ©is e pintas azuis, capaz de mudar de cor para se igualar ao substrato.';
+      'Peixe achatado de fundo, com anéis e pintas azuis, capaz de mudar de cor para se igualar ao substrato.';
 
   @override
-  String get species_hogfish_name => 'BodiÃ£o-porco';
+  String get species_hogfish_name => 'Bodião-porco';
 
   @override
   String get species_hogfish_desc =>
-      'Grande bodiÃ£o do AtlÃ¢ntico ocidental, com focinho de porco e espinhos dorsais alongados, encontrado junto a recifes e destroÃ§os.';
+      'Grande bodião do Atlântico ocidental, com focinho de porco e espinhos dorsais alongados, encontrado junto a recifes e destroços.';
 
   @override
-  String get species_tarpon_name => 'TarpÃ£o-do-AtlÃ¢ntico';
+  String get species_tarpon_name => 'Tarpão-do-Atlântico';
 
   @override
   String get species_tarpon_desc =>
-      'Peixe prateado enorme, de escamas grandes como espelhos, encontrado por vezes pelos mergulhadores em grutas e canais das CaraÃ­bas.';
+      'Peixe prateado enorme, de escamas grandes como espelhos, encontrado por vezes pelos mergulhadores em grutas e canais das Caraíbas.';
 
   @override
   String get species_permit_name => 'Pampo-real';
 
   @override
   String get species_permit_desc =>
-      'XarÃ©u prateado de corpo alto e cauda escura bifurcada, presente nas planÃ­cies arenosas e junto aos recifes das CaraÃ­bas.';
+      'Xaréu prateado de corpo alto e cauda escura bifurcada, presente nas planícies arenosas e junto aos recifes das Caraíbas.';
 
   @override
   String get species_spotted_drum_name => 'Peixe-tambor-pintado';
 
   @override
   String get species_spotted_drum_desc =>
-      'Peixe marcante das CaraÃ­bas, com uma barbatana dorsal alta e alongada e um padrÃ£o vistoso de pintas pretas e brancas.';
+      'Peixe marcante das Caraíbas, com uma barbatana dorsal alta e alongada e um padrão vistoso de pintas pretas e brancas.';
 
   @override
   String get species_jackknife_fish_name => 'Peixe-canivete';
 
   @override
   String get species_jackknife_fish_desc =>
-      'Peixe elegante das CaraÃ­bas, com uma risca dorsal negra alta e uma banda diagonal no corpo, encontrado sob saliÃªncias.';
+      'Peixe elegante das Caraíbas, com uma risca dorsal negra alta e uma banda diagonal no corpo, encontrado sob saliências.';
 
   @override
   String get species_bigeye_name => 'Olho-de-vidro';
 
   @override
   String get species_bigeye_desc =>
-      'Peixe noturno vermelho-vivo, de olhos grandes e refletores, encontrado escondido em grutas nos recifes das CaraÃ­bas e do AtlÃ¢ntico.';
+      'Peixe noturno vermelho-vivo, de olhos grandes e refletores, encontrado escondido em grutas nos recifes das Caraíbas e do Atlântico.';
 
   @override
-  String get species_remora_name => 'RÃ©mora';
+  String get species_remora_name => 'Rémora';
 
   @override
   String get species_remora_desc =>
-      'Peixe esguio com um disco de sucÃ§Ã£o na cabeÃ§a, que se faz transportar por tubarÃµes, raias, tartarugas e outros animais grandes.';
+      'Peixe esguio com um disco de sucção na cabeça, que se faz transportar por tubarões, raias, tartarugas e outros animais grandes.';
 
   @override
   String get species_tilefish_sand_name => 'Peixe-azulejo-da-areia';
 
   @override
   String get species_tilefish_sand_desc =>
-      'Peixe alongado de azul-claro que constrÃ³i montÃ­culos de cascalho sobre as zonas arenosas dos recifes das CaraÃ­bas.';
+      'Peixe alongado de azul-claro que constrói montículos de cascalho sobre as zonas arenosas dos recifes das Caraíbas.';
 
   @override
-  String get species_weedy_seadragon_name => 'DragÃ£o-marinho-comum';
+  String get species_weedy_seadragon_name => 'Dragão-marinho-comum';
 
   @override
   String get species_weedy_seadragon_desc =>
-      'Parente ornamentado dos cavalos-marinhos, com apÃªndices em forma de folha, endÃ©mico das Ã¡guas temperadas do sul da AustrÃ¡lia.';
+      'Parente ornamentado dos cavalos-marinhos, com apêndices em forma de folha, endémico das águas temperadas do sul da Austrália.';
 
   @override
-  String get species_leafy_seadragon_name => 'DragÃ£o-marinho-folhado';
+  String get species_leafy_seadragon_name => 'Dragão-marinho-folhado';
 
   @override
   String get species_leafy_seadragon_desc =>
-      'DragÃ£o-marinho espetacular, coberto de elaboradas projeÃ§Ãµes em forma de folha, endÃ©mico do sul da AustrÃ¡lia. Um avistamento de sonho.';
+      'Dragão-marinho espetacular, coberto de elaboradas projeções em forma de folha, endémico do sul da Austrália. Um avistamento de sonho.';
 
   @override
   String get species_sailfin_snapper_name => 'Luciano-de-vela';
 
   @override
   String get species_sailfin_snapper_desc =>
-      'Luciano elegante, amarelo e azul, com as barbatanas dorsal e anal alongadas, presente nas encostas de recife do Indo-PacÃ­fico.';
+      'Luciano elegante, amarelo e azul, com as barbatanas dorsal e anal alongadas, presente nas encostas de recife do Indo-Pacífico.';
 
   @override
   String get species_sweetlip_emperor_name => 'Imperador-salpicado';
 
   @override
   String get species_sweetlip_emperor_desc =>
-      'Grande imperador prateado, com linhas azuis na face e bordos das barbatanas amarelos, comum nas zonas arenosas de recife do Indo-PacÃ­fico.';
+      'Grande imperador prateado, com linhas azuis na face e bordos das barbatanas amarelos, comum nas zonas arenosas de recife do Indo-Pacífico.';
 
   @override
   String get species_crocodilefish_name => 'Peixe-crocodilo';
 
   @override
   String get species_crocodilefish_desc =>
-      'Predador de emboscada de cabeÃ§a achatada, com franjas elaboradas nos olhos, que fica perfeitamente camuflado nos fundos de recife do Indo-PacÃ­fico.';
+      'Predador de emboscada de cabeça achatada, com franjas elaboradas nos olhos, que fica perfeitamente camuflado nos fundos de recife do Indo-Pacífico.';
 
   @override
-  String get species_devil_scorpionfish_name => 'Peixe-escorpiÃ£o-diabo';
+  String get species_devil_scorpionfish_name => 'Peixe-escorpião-diabo';
 
   @override
   String get species_devil_scorpionfish_desc =>
-      'Peixe-escorpiÃ£o robusto e camuflado, que exibe o interior colorido das barbatanas peitorais como aviso aos predadores.';
+      'Peixe-escorpião robusto e camuflado, que exibe o interior colorido das barbatanas peitorais como aviso aos predadores.';
 
   @override
   String get species_spiny_devilfish_name => 'Peixe-diabo-espinhoso';
@@ -32844,303 +32800,303 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_waspfish_desc =>
-      'Pequeno peixe-escorpiÃ£o comprimido que baloiÃ§a na corrente como uma folha morta, nos fundos lodosos do Indo-PacÃ­fico.';
+      'Pequeno peixe-escorpião comprimido que baloiça na corrente como uma folha morta, nos fundos lodosos do Indo-Pacífico.';
 
   @override
   String get species_stargazer_name => 'Peixe-olha-estrelas-de-bordo-branco';
 
   @override
   String get species_stargazer_desc =>
-      'Predador de emboscada que se enterra na areia deixando apenas os olhos de fora e pode aplicar choques elÃ©tricos. Presente no Indo-PacÃ­fico.';
+      'Predador de emboscada que se enterra na areia deixando apenas os olhos de fora e pode aplicar choques elétricos. Presente no Indo-Pacífico.';
 
   @override
   String get species_striped_catfish_name => 'Bagre-listado';
 
   @override
   String get species_striped_catfish_desc =>
-      'Bagre de espinhos venenosos; os juvenis formam cardumes densos em bola que rolam pelos fundos de recife do Indo-PacÃ­fico.';
+      'Bagre de espinhos venenosos; os juvenis formam cardumes densos em bola que rolam pelos fundos de recife do Indo-Pacífico.';
 
   @override
   String get species_red_emperor_name => 'Imperador-vermelho';
 
   @override
   String get species_red_emperor_desc =>
-      'Grande luciano; os adultos sÃ£o rosa-avermelhados e os juvenis tÃªm bandas vermelhas e brancas marcadas. Presente nos recifes do Indo-PacÃ­fico.';
+      'Grande luciano; os adultos são rosa-avermelhados e os juvenis têm bandas vermelhas e brancas marcadas. Presente nos recifes do Indo-Pacífico.';
 
   @override
   String get species_mangrove_snapper_name => 'Luciano-do-mangal';
 
   @override
   String get species_mangrove_snapper_desc =>
-      'Luciano cinzento presente nos mangais, pradarias marinhas e recifes das CaraÃ­bas, muitas vezes agregado junto a estruturas.';
+      'Luciano cinzento presente nos mangais, pradarias marinhas e recifes das Caraíbas, muitas vezes agregado junto a estruturas.';
 
   @override
-  String get species_dottyback_orchid_name => 'Pseudocromis-orquÃ­dea';
+  String get species_dottyback_orchid_name => 'Pseudocromis-orquídea';
 
   @override
   String get species_dottyback_orchid_desc =>
-      'Pequeno peixe de roxo vivo, endÃ©mico do mar Vermelho, que entra e sai das fendas das paredes de recife mais Ã­ngremes.';
+      'Pequeno peixe de roxo vivo, endémico do mar Vermelho, que entra e sai das fendas das paredes de recife mais íngremes.';
 
   @override
   String get species_dottyback_royal_name => 'Pseudocromis-real';
 
   @override
   String get species_dottyback_royal_desc =>
-      'Pequeno peixe bicolor, com a frente magenta e a traseira amarelo-viva, presente nas paredes de recife do Indo-PacÃ­fico.';
+      'Pequeno peixe bicolor, com a frente magenta e a traseira amarelo-viva, presente nas paredes de recife do Indo-Pacífico.';
 
   @override
   String get species_coral_trout_name => 'Truta-de-coral';
 
   @override
   String get species_coral_trout_desc =>
-      'Predador cobiÃ§ado da Grande Barreira de Coral, de corpo vermelho-alaranjado coberto de pintas azuis.';
+      'Predador cobiçado da Grande Barreira de Coral, de corpo vermelho-alaranjado coberto de pintas azuis.';
 
   @override
   String get species_barramundi_cod_name => 'Garoupa-barramundi';
 
   @override
   String get species_barramundi_cod_desc =>
-      'Garoupa inconfundÃ­vel, de cabeÃ§a pequena, corpo arqueado e pintas escuras sobre fundo claro.';
+      'Garoupa inconfundível, de cabeça pequena, corpo arqueado e pintas escuras sobre fundo claro.';
 
   @override
-  String get species_spadefish_atlantic_name => 'Peixe-enxada-do-AtlÃ¢ntico';
+  String get species_spadefish_atlantic_name => 'Peixe-enxada-do-Atlântico';
 
   @override
   String get species_spadefish_atlantic_desc =>
-      'Peixe prateado em forma de disco, com barras verticais escuras, visto muitas vezes em grandes cardumes Ã  volta de destroÃ§os nas CaraÃ­bas.';
+      'Peixe prateado em forma de disco, com barras verticais escuras, visto muitas vezes em grandes cardumes à volta de destroços nas Caraíbas.';
 
   @override
   String get species_fusilier_yellowback_name => 'Fuzileiro-de-dorso-amarelo';
 
   @override
   String get species_fusilier_yellowback_desc =>
-      'Peixe planctÃ­voro azul e esguio, de dorso amarelo, que forma cardumes enormes sobre as encostas de recife do Indo-PacÃ­fico.';
+      'Peixe planctívoro azul e esguio, de dorso amarelo, que forma cardumes enormes sobre as encostas de recife do Indo-Pacífico.';
 
   @override
   String get species_fusilier_bluestreak_name => 'Fuzileiro-de-risca-azul';
 
   @override
   String get species_fusilier_bluestreak_desc =>
-      'Pequeno fuzileiro azul com uma risca lateral escura, visto em cardumes velozes ao longo das paredes de recife do Indo-PacÃ­fico.';
+      'Pequeno fuzileiro azul com uma risca lateral escura, visto em cardumes velozes ao longo das paredes de recife do Indo-Pacífico.';
 
   @override
   String get species_porkfish_name => 'Roncador-porco';
 
   @override
   String get species_porkfish_desc =>
-      'Roncador colorido das CaraÃ­bas, com riscas azuis e amarelas e duas barras negras na cabeÃ§a, encontrado junto a recifes e destroÃ§os.';
+      'Roncador colorido das Caraíbas, com riscas azuis e amarelas e duas barras negras na cabeça, encontrado junto a recifes e destroços.';
 
   @override
   String get species_blue_striped_grunt_name => 'Roncador-de-riscas-azuis';
 
   @override
   String get species_blue_striped_grunt_desc =>
-      'Roncador amarelo das CaraÃ­bas com riscas horizontais de azul vivo, que forma grandes cardumes em repouso sob saliÃªncias durante o dia.';
+      'Roncador amarelo das Caraíbas com riscas horizontais de azul vivo, que forma grandes cardumes em repouso sob saliências durante o dia.';
 
   @override
-  String get species_french_grunt_name => 'Roncador-francÃªs';
+  String get species_french_grunt_name => 'Roncador-francês';
 
   @override
   String get species_french_grunt_desc =>
-      'Pequeno roncador de riscas amarelas que forma cardumes densos em repouso nos recifes das CaraÃ­bas durante as horas de luz.';
+      'Pequeno roncador de riscas amarelas que forma cardumes densos em repouso nos recifes das Caraíbas durante as horas de luz.';
 
   @override
-  String get species_convict_tang_name => 'CirurgiÃ£o-condenado';
+  String get species_convict_tang_name => 'Cirurgião-condenado';
 
   @override
   String get species_convict_tang_desc =>
-      'Peixe-cirurgiÃ£o claro com seis barras verticais negras, visto muitas vezes a pastar em grandes cardumes nos planaltos de recife do Indo-PacÃ­fico.';
+      'Peixe-cirurgião claro com seis barras verticais negras, visto muitas vezes a pastar em grandes cardumes nos planaltos de recife do Indo-Pacífico.';
 
   @override
-  String get species_great_hammerhead_name => 'TubarÃ£o-martelo-recortado';
+  String get species_great_hammerhead_name => 'Tubarão-martelo-recortado';
 
   @override
   String get species_great_hammerhead_desc =>
-      'TubarÃ£o inconfundÃ­vel, de cabeÃ§a em martelo recortado, que forma grandes cardumes em montes submarinos e ilhas ao largo.';
+      'Tubarão inconfundível, de cabeça em martelo recortado, que forma grandes cardumes em montes submarinos e ilhas ao largo.';
 
   @override
-  String get species_wobbegong_name => 'TubarÃ£o-tapete-malhado';
+  String get species_wobbegong_name => 'Tubarão-tapete-malhado';
 
   @override
   String get species_wobbegong_desc =>
-      'TubarÃ£o-tapete achatado e bem camuflado, com lobos franjados em redor da boca, presente nos recifes temperados da AustrÃ¡lia.';
+      'Tubarão-tapete achatado e bem camuflado, com lobos franjados em redor da boca, presente nos recifes temperados da Austrália.';
 
   @override
   String get species_manta_ray_name => 'Manta-de-recife';
 
   @override
   String get species_manta_ray_desc =>
-      'Gigante gracioso de atÃ© 5 m de envergadura, que visita estaÃ§Ãµes de limpeza e se alimenta de plÃ¢ncton nos recifes do Indo-PacÃ­fico.';
+      'Gigante gracioso de até 5 m de envergadura, que visita estações de limpeza e se alimenta de plâncton nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_oceanic_manta_name => 'Manta-oceÃ¢nica';
+  String get species_oceanic_manta_name => 'Manta-oceânica';
 
   @override
   String get species_oceanic_manta_desc =>
-      'A maior espÃ©cie de raia, com envergaduras superiores a 7 m, encontrada em montes submarinos ao largo e em estaÃ§Ãµes de limpeza.';
+      'A maior espécie de raia, com envergaduras superiores a 7 m, encontrada em montes submarinos ao largo e em estações de limpeza.';
 
   @override
   String get species_undulated_moray_name => 'Moreia-ondulada';
 
   @override
   String get species_undulated_moray_desc =>
-      'Moreia verde-amarelada com marcas escuras onduladas, vista com frequÃªncia a caÃ§ar de noite nos recifes do Indo-PacÃ­fico.';
+      'Moreia verde-amarelada com marcas escuras onduladas, vista com frequência a caçar de noite nos recifes do Indo-Pacífico.';
 
   @override
   String get species_whitemouth_moray_name => 'Moreia-de-boca-branca';
 
   @override
   String get species_whitemouth_moray_desc =>
-      'Moreia castanho-escura com pequenas pintas brancas e o interior da boca nitidamente branco, presente em todo o Indo-PacÃ­fico.';
+      'Moreia castanho-escura com pequenas pintas brancas e o interior da boca nitidamente branco, presente em todo o Indo-Pacífico.';
 
   @override
-  String get species_dragon_moray_name => 'Moreia-dragÃ£o';
+  String get species_dragon_moray_name => 'Moreia-dragão';
 
   @override
   String get species_dragon_moray_desc =>
-      'Moreia impressionante, com cornos de dragÃ£o sobre as narinas e manchas laranja-avermelhadas de leopardo, presente no Indo-PacÃ­fico.';
+      'Moreia impressionante, com cornos de dragão sobre as narinas e manchas laranja-avermelhadas de leopardo, presente no Indo-Pacífico.';
 
   @override
   String get species_lyretail_grouper_name => 'Garoupa-de-cauda-de-lira';
 
   @override
   String get species_lyretail_grouper_desc =>
-      'Garoupa rosa-avermelhada com pintas azuis e uma cauda em crescente inconfundÃ­vel, presente nas paredes exteriores de recife do Indo-PacÃ­fico.';
+      'Garoupa rosa-avermelhada com pintas azuis e uma cauda em crescente inconfundível, presente nas paredes exteriores de recife do Indo-Pacífico.';
 
   @override
   String get species_banded_butterflyfish_name => 'Peixe-borboleta-de-bandas';
 
   @override
   String get species_banded_butterflyfish_desc =>
-      'Peixe-borboleta branco com quatro bandas verticais negras bem marcadas, um dos mais comuns dos recifes das CaraÃ­bas.';
+      'Peixe-borboleta branco com quatro bandas verticais negras bem marcadas, um dos mais comuns dos recifes das Caraíbas.';
 
   @override
   String get species_ringed_pipefish_name => 'Peixe-cachimbo-anelado';
 
   @override
   String get species_ringed_pipefish_desc =>
-      'Peixe-cachimbo esguio, com anÃ©is alternados vermelhos e brancos, encontrado em grutas e sob saliÃªncias nos recifes do Indo-PacÃ­fico.';
+      'Peixe-cachimbo esguio, com anéis alternados vermelhos e brancos, encontrado em grutas e sob saliências nos recifes do Indo-Pacífico.';
 
   @override
   String get species_razorfish_name => 'Peixe-navalha';
 
   @override
   String get species_razorfish_desc =>
-      'Peixe minÃºsculo que nada na vertical, de cabeÃ§a para baixo e em grupo, muitas vezes escondido entre espinhos de ouriÃ§o nos recifes do Indo-PacÃ­fico.';
+      'Peixe minúsculo que nada na vertical, de cabeça para baixo e em grupo, muitas vezes escondido entre espinhos de ouriço nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_harlequin_tuskfish_name => 'BodiÃ£o-arlequim-de-presas';
+  String get species_harlequin_tuskfish_name => 'Bodião-arlequim-de-presas';
 
   @override
   String get species_harlequin_tuskfish_desc =>
-      'BodiÃ£o colorido, com presas azul-vivas, barras vermelho-alaranjadas e manchas brancas, presente nos recifes do PacÃ­fico ocidental.';
+      'Bodião colorido, com presas azul-vivas, barras vermelho-alaranjadas e manchas brancas, presente nos recifes do Pacífico ocidental.';
 
   @override
-  String get species_blue_groper_name => 'BodiÃ£o-azul-australiano';
+  String get species_blue_groper_name => 'Bodião-azul-australiano';
 
   @override
   String get species_blue_groper_desc =>
-      'Grande bodiÃ£o azul endÃ©mico do leste da AustrÃ¡lia, sociÃ¡vel e habitualmente aproxima-se dos mergulhadores nos recifes temperados.';
+      'Grande bodião azul endémico do leste da Austrália, sociável e habitualmente aproxima-se dos mergulhadores nos recifes temperados.';
 
   @override
   String get species_red_lipped_batfish_name =>
-      'Peixe-morcego-de-lÃ¡bios-vermelhos';
+      'Peixe-morcego-de-lábios-vermelhos';
 
   @override
   String get species_red_lipped_batfish_desc =>
-      'Peixe bizarro de corpo achatado, com lÃ¡bios vermelho-vivos, que caminha sobre barbatanas modificadas no fundo dos GalÃ¡pagos.';
+      'Peixe bizarro de corpo achatado, com lábios vermelho-vivos, que caminha sobre barbatanas modificadas no fundo dos Galápagos.';
 
   @override
   String get species_orangeband_surgeonfish_name =>
-      'CirurgiÃ£o-de-banda-laranja';
+      'Cirurgião-de-banda-laranja';
 
   @override
   String get species_orangeband_surgeonfish_desc =>
-      'Peixe-cirurgiÃ£o castanho-acinzentado com uma banda horizontal laranja atrÃ¡s do olho, presente nas encostas de recife do PacÃ­fico.';
+      'Peixe-cirurgião castanho-acinzentado com uma banda horizontal laranja atrás do olho, presente nas encostas de recife do Pacífico.';
 
   @override
-  String get species_maori_wrasse_name => 'BodiÃ£o-maori';
+  String get species_maori_wrasse_name => 'Bodião-maori';
 
   @override
   String get species_maori_wrasse_desc =>
-      'BodiÃ£o de tamanho mÃ©dio, com uma banda escura atrÃ¡s da barbatana peitoral, comum nos recifes do PacÃ­fico e do oceano Ãndico.';
+      'Bodião de tamanho médio, com uma banda escura atrás da barbatana peitoral, comum nos recifes do Pacífico e do oceano Índico.';
 
   @override
-  String get species_blue_ringed_octopus_name => 'Polvo-de-anÃ©is-azuis';
+  String get species_blue_ringed_octopus_name => 'Polvo-de-anéis-azuis';
 
   @override
   String get species_blue_ringed_octopus_desc =>
-      'Polvo pequeno mas extremamente venenoso, com anÃ©is azuis vivos que se acendem quando ameaÃ§ado.';
+      'Polvo pequeno mas extremamente venenoso, com anéis azuis vivos que se acendem quando ameaçado.';
 
   @override
   String get species_common_octopus_name => 'Polvo-comum';
 
   @override
   String get species_common_octopus_desc =>
-      'Polvo muito inteligente, conhecido pelas mudanÃ§as rÃ¡pidas de cor e pela capacidade de resolver problemas.';
+      'Polvo muito inteligente, conhecido pelas mudanças rápidas de cor e pela capacidade de resolver problemas.';
 
   @override
-  String get species_giant_pacific_octopus_name => 'Polvo-gigante-do-PacÃ­fico';
+  String get species_giant_pacific_octopus_name => 'Polvo-gigante-do-Pacífico';
 
   @override
   String get species_giant_pacific_octopus_desc =>
-      'A maior espÃ©cie de polvo, com braÃ§os que ultrapassam os 4 metros de envergadura nas Ã¡guas frias do PacÃ­fico.';
+      'A maior espécie de polvo, com braços que ultrapassam os 4 metros de envergadura nas águas frias do Pacífico.';
 
   @override
-  String get species_mimic_octopus_name => 'Polvo-mÃ­mico';
+  String get species_mimic_octopus_name => 'Polvo-mímico';
 
   @override
   String get species_mimic_octopus_desc =>
-      'Polvo notÃ¡vel que imita o aspeto e o comportamento de outras espÃ©cies marinhas.';
+      'Polvo notável que imita o aspeto e o comportamento de outras espécies marinhas.';
 
   @override
   String get species_coconut_octopus_name => 'Polvo-do-coco';
 
   @override
   String get species_coconut_octopus_desc =>
-      'Pequeno polvo cÃ©lebre por transportar cascas de coco e usÃ¡-las como abrigo portÃ¡til.';
+      'Pequeno polvo célebre por transportar cascas de coco e usá-las como abrigo portátil.';
 
   @override
   String get species_day_octopus_name => 'Polvo-diurno';
 
   @override
   String get species_day_octopus_desc =>
-      'CaÃ§ador ativo durante o dia, comum nos recifes do Indo-PacÃ­fico e com uma camuflagem impressionante.';
+      'Caçador ativo durante o dia, comum nos recifes do Indo-Pacífico e com uma camuflagem impressionante.';
 
   @override
   String get species_wonderpus_octopus_name => 'Polvo-wonderpus';
 
   @override
   String get species_wonderpus_octopus_desc =>
-      'Polvo marcante, com bandas brancas e castanhas Ãºnicas, encontrado em locais de mergulho de fundo arenoso.';
+      'Polvo marcante, com bandas brancas e castanhas únicas, encontrado em locais de mergulho de fundo arenoso.';
 
   @override
   String get species_broadclub_cuttlefish_name => 'Choco-de-clava-larga';
 
   @override
   String get species_broadclub_cuttlefish_desc =>
-      'Choco grande, de exibiÃ§Ãµes de cor hipnotizantes, visto com frequÃªncia nos recifes do Indo-PacÃ­fico.';
+      'Choco grande, de exibições de cor hipnotizantes, visto com frequência nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_pharaoh_cuttlefish_name => 'Choco-faraÃ³';
+  String get species_pharaoh_cuttlefish_name => 'Choco-faraó';
 
   @override
   String get species_pharaoh_cuttlefish_desc =>
-      'Choco grande presente em todo o oceano Ãndico, conhecido pelos padrÃµes de cor pulsantes.';
+      'Choco grande presente em todo o oceano Índico, conhecido pelos padrões de cor pulsantes.';
 
   @override
   String get species_flamboyant_cuttlefish_name => 'Choco-flamejante';
 
   @override
   String get species_flamboyant_cuttlefish_desc =>
-      'Choco minÃºsculo que caminha pelo fundo exibindo pulsos vivos de roxo, rosa e amarelo.';
+      'Choco minúsculo que caminha pelo fundo exibindo pulsos vivos de roxo, rosa e amarelo.';
 
   @override
   String get species_giant_cuttlefish_name => 'Choco-gigante';
 
   @override
   String get species_giant_cuttlefish_desc =>
-      'O maior choco do mundo, cÃ©lebre pelas agregaÃ§Ãµes de desova em massa no sul da AustrÃ¡lia.';
+      'O maior choco do mundo, célebre pelas agregações de desova em massa no sul da Austrália.';
 
   @override
   String get species_bigfin_reef_squid_name =>
@@ -33148,328 +33104,325 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_bigfin_reef_squid_desc =>
-      'Lula gregÃ¡ria encontrada com frequÃªncia em mergulhos noturnos, atraÃ­da pelas luzes de mergulho.';
+      'Lula gregária encontrada com frequência em mergulhos noturnos, atraída pelas luzes de mergulho.';
 
   @override
-  String get species_caribbean_reef_squid_name =>
-      'Lula-de-recife-das-CaraÃ­bas';
+  String get species_caribbean_reef_squid_name => 'Lula-de-recife-das-Caraíbas';
 
   @override
   String get species_caribbean_reef_squid_desc =>
-      'Lula curiosa, muitas vezes a pairar em pequenos grupos junto aos bordos do recife nas CaraÃ­bas.';
+      'Lula curiosa, muitas vezes a pairar em pequenos grupos junto aos bordos do recife nas Caraíbas.';
 
   @override
-  String get species_bobtail_squid_name => 'SÃ©piola';
+  String get species_bobtail_squid_name => 'Sépiola';
 
   @override
   String get species_bobtail_squid_desc =>
-      'Lula minÃºscula e noturna que se enterra na areia de dia, um achado cobiÃ§ado no mergulho em fundos lodosos.';
+      'Lula minúscula e noturna que se enterra na areia de dia, um achado cobiçado no mergulho em fundos lodosos.';
 
   @override
-  String get species_chambered_nautilus_name => 'NÃ¡utilo';
+  String get species_chambered_nautilus_name => 'Náutilo';
 
   @override
   String get species_chambered_nautilus_desc =>
-      'FÃ³ssil vivo ancestral, de concha enrolada, raramente visto pelos mergulhadores em Ã¡gua profunda ao amanhecer.';
+      'Fóssil vivo ancestral, de concha enrolada, raramente visto pelos mergulhadores em água profunda ao amanhecer.';
 
   @override
   String get species_spanish_dancer_name => 'Bailarina-espanhola';
 
   @override
   String get species_spanish_dancer_desc =>
-      'A maior espÃ©cie de nudibrÃ¢nquio, que nada ondulando o manto vermelho como uma bailarina de flamenco.';
+      'A maior espécie de nudibrânquio, que nada ondulando o manto vermelho como uma bailarina de flamenco.';
 
   @override
-  String get species_chromodoris_willani_name => 'CromodÃ³ris-de-Willan';
+  String get species_chromodoris_willani_name => 'Cromodóris-de-Willan';
 
   @override
   String get species_chromodoris_willani_desc =>
-      'NudibrÃ¢nquio marcante, azul e negro com margem branca, comum no Indo-PacÃ­fico.';
+      'Nudibrânquio marcante, azul e negro com margem branca, comum no Indo-Pacífico.';
 
   @override
-  String get species_chromodoris_lochi_name => 'CromodÃ³ris-de-Loch';
+  String get species_chromodoris_lochi_name => 'Cromodóris-de-Loch';
 
   @override
   String get species_chromodoris_lochi_desc =>
-      'NudibrÃ¢nquio azul com linhas escuras e bordo branco, presente em todo o PacÃ­fico tropical.';
+      'Nudibrânquio azul com linhas escuras e bordo branco, presente em todo o Pacífico tropical.';
 
   @override
-  String get species_chromodoris_magnifica_name => 'CromodÃ³ris-magnÃ­fica';
+  String get species_chromodoris_magnifica_name => 'Cromodóris-magnífica';
 
   @override
   String get species_chromodoris_magnifica_desc =>
-      'NudibrÃ¢nquio de azul, branco e laranja brilhantes, presente nos recifes de coral do Indo-PacÃ­fico.';
+      'Nudibrânquio de azul, branco e laranja brilhantes, presente nos recifes de coral do Indo-Pacífico.';
 
   @override
-  String get species_chromodoris_annae_name => 'CromodÃ³ris-de-Anna';
+  String get species_chromodoris_annae_name => 'Cromodóris-de-Anna';
 
   @override
   String get species_chromodoris_annae_desc =>
-      'NudibrÃ¢nquio de azul profundo, com linhas negras e rinÃ³foros e brÃ¢nquias de pontas laranja.';
+      'Nudibrânquio de azul profundo, com linhas negras e rinóforos e brânquias de pontas laranja.';
 
   @override
-  String get species_nembrotha_kubaryana_name => 'Lesma-nÃ©on-variÃ¡vel';
+  String get species_nembrotha_kubaryana_name => 'Lesma-néon-variável';
 
   @override
   String get species_nembrotha_kubaryana_desc =>
-      'NudibrÃ¢nquio verde-escuro com marcas laranja ou vermelhas vivas, que se alimenta de tunicados.';
+      'Nudibrânquio verde-escuro com marcas laranja ou vermelhas vivas, que se alimenta de tunicados.';
 
   @override
   String get species_nembrotha_cristata_name => 'Nembrota-crista';
 
   @override
   String get species_nembrotha_cristata_desc =>
-      'NudibrÃ¢nquio negro com pÃºstulas e riscas verde-vivas, encontrado nos recifes do Indo-PacÃ­fico.';
+      'Nudibrânquio negro com pústulas e riscas verde-vivas, encontrado nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_phyllidia_varicosa_name => 'FilÃ­dia-varicosa';
+  String get species_phyllidia_varicosa_name => 'Filídia-varicosa';
 
   @override
   String get species_phyllidia_varicosa_desc =>
-      'NudibrÃ¢nquio cinzento-azulado com tubÃ©rculos salientes de pontas amarelas, tÃ³xico para os predadores.';
+      'Nudibrânquio cinzento-azulado com tubérculos salientes de pontas amarelas, tóxico para os predadores.';
 
   @override
-  String get species_phyllidia_ocellata_name => 'FilÃ­dia-ocelada';
+  String get species_phyllidia_ocellata_name => 'Filídia-ocelada';
 
   @override
   String get species_phyllidia_ocellata_desc =>
-      'NudibrÃ¢nquio branco com tubÃ©rculos salientes rodeados de rosa, encontrado em recifes tropicais.';
+      'Nudibrânquio branco com tubérculos salientes rodeados de rosa, encontrado em recifes tropicais.';
 
   @override
-  String get species_pikachu_nudibranch_name => 'NudibrÃ¢nquio-pikachu';
+  String get species_pikachu_nudibranch_name => 'Nudibrânquio-pikachu';
 
   @override
   String get species_pikachu_nudibranch_desc =>
-      'Lesma do mar minÃºscula, amarela e negra, parecida com uma personagem de desenhos animados, presente no PacÃ­fico.';
+      'Lesma do mar minúscula, amarela e negra, parecida com uma personagem de desenhos animados, presente no Pacífico.';
 
   @override
-  String get species_anna_rosefieldi_name => 'NudibrÃ¢nquio-roboastra';
+  String get species_anna_rosefieldi_name => 'Nudibrânquio-roboastra';
 
   @override
   String get species_anna_rosefieldi_desc =>
-      'NudibrÃ¢nquio predador de corpo escuro e riscas longitudinais vivas, que caÃ§a outras lesmas.';
+      'Nudibrânquio predador de corpo escuro e riscas longitudinais vivas, que caça outras lesmas.';
 
   @override
   String get species_lettuce_sea_slug_name => 'Lesma-do-mar-alface';
 
   @override
   String get species_lettuce_sea_slug_desc =>
-      'Lesma do mar verde e franzida que retÃ©m os cloroplastos das algas para fazer fotossÃ­ntese.';
+      'Lesma do mar verde e franzida que retém os cloroplastos das algas para fazer fotossíntese.';
 
   @override
-  String get species_blue_dragon_nudibranch_name =>
-      'NudibrÃ¢nquio-dragÃ£o-azul';
+  String get species_blue_dragon_nudibranch_name => 'Nudibrânquio-dragão-azul';
 
   @override
   String get species_blue_dragon_nudibranch_desc =>
-      'NudibrÃ¢nquio eÃ³lido comprido, com cerata de pontas azuis, que aloja zooxantelas simbiÃ³ticas.';
+      'Nudibrânquio eólido comprido, com cerata de pontas azuis, que aloja zooxantelas simbióticas.';
 
   @override
-  String get species_gloomy_nudibranch_name => 'NudibrÃ¢nquio-sombrio';
+  String get species_gloomy_nudibranch_name => 'Nudibrânquio-sombrio';
 
   @override
   String get species_gloomy_nudibranch_desc =>
-      'NudibrÃ¢nquio verde-azulado escuro, com cristas orladas de azul, comum nos recifes do Indo-PacÃ­fico.';
+      'Nudibrânquio verde-azulado escuro, com cristas orladas de azul, comum nos recifes do Indo-Pacífico.';
 
   @override
   String get species_ocellined_nudibranch_name =>
-      'NudibrÃ¢nquio-de-linhas-oceladas';
+      'Nudibrânquio-de-linhas-oceladas';
 
   @override
   String get species_ocellined_nudibranch_desc =>
-      'NudibrÃ¢nquio branco com cristas orladas de laranja que formam padrÃµes geomÃ©tricos no manto.';
+      'Nudibrânquio branco com cristas orladas de laranja que formam padrões geométricos no manto.';
 
   @override
-  String get species_glossodoris_cincta_name => 'NudibrÃ¢nquio-glossodÃ³ris';
+  String get species_glossodoris_cincta_name => 'Nudibrânquio-glossodóris';
 
   @override
   String get species_glossodoris_cincta_desc =>
-      'NudibrÃ¢nquio cor de creme, com bordo castanho-escuro e margem laranja no manto.';
+      'Nudibrânquio cor de creme, com bordo castanho-escuro e margem laranja no manto.';
 
   @override
-  String get species_jorunna_funebris_name => 'NudibrÃ¢nquio-pontilhado';
+  String get species_jorunna_funebris_name => 'Nudibrânquio-pontilhado';
 
   @override
   String get species_jorunna_funebris_desc =>
-      'NudibrÃ¢nquio branco coberto de carifilÃ­dias de pontas negras, com o aspeto de um coelhinho felpudo.';
+      'Nudibrânquio branco coberto de carifilídias de pontas negras, com o aspeto de um coelhinho felpudo.';
 
   @override
-  String get species_ceratosoma_trilobatum_name => 'NudibrÃ¢nquio-trilobado';
+  String get species_ceratosoma_trilobatum_name => 'Nudibrânquio-trilobado';
 
   @override
   String get species_ceratosoma_trilobatum_desc =>
-      'NudibrÃ¢nquio grande, com um corno dorsal alto e lobos laterais em tons de roxo e amarelo.';
+      'Nudibrânquio grande, com um corno dorsal alto e lobos laterais em tons de roxo e amarelo.';
 
   @override
-  String get species_hypselodoris_apolegma_name => 'HipselodÃ³ris-roxa';
+  String get species_hypselodoris_apolegma_name => 'Hipselodóris-roxa';
 
   @override
   String get species_hypselodoris_apolegma_desc =>
-      'NudibrÃ¢nquio roxo e elegante, com bordo do manto branco, presente nos recifes do Indo-PacÃ­fico.';
+      'Nudibrânquio roxo e elegante, com bordo do manto branco, presente nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_hypselodoris_bullockii_name => 'HipselodÃ³ris-de-Bullock';
+  String get species_hypselodoris_bullockii_name => 'Hipselodóris-de-Bullock';
 
   @override
   String get species_hypselodoris_bullockii_desc =>
-      'NudibrÃ¢nquio rosa e roxo, com rinÃ³foros de pontas amarelas, nos recifes do Indo-PacÃ­fico.';
+      'Nudibrânquio rosa e roxo, com rinóforos de pontas amarelas, nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_flabellina_exoptata_name => 'Flabelina-desejÃ¡vel';
+  String get species_flabellina_exoptata_name => 'Flabelina-desejável';
 
   @override
   String get species_flabellina_exoptata_desc =>
-      'NudibrÃ¢nquio eÃ³lido translÃºcido, com cerata laranja de pontas roxas, presente em Ã¡guas tropicais.';
+      'Nudibrânquio eólido translúcido, com cerata laranja de pontas roxas, presente em águas tropicais.';
 
   @override
-  String get species_risbecia_tryoni_name => 'RisbÃ©cia-de-Tryon';
+  String get species_risbecia_tryoni_name => 'Risbécia-de-Tryon';
 
   @override
   String get species_risbecia_tryoni_desc =>
-      'NudibrÃ¢nquio grande, castanho e azul, encontrado muitas vezes em pares de acasalamento nos recifes do Indo-PacÃ­fico.';
+      'Nudibrânquio grande, castanho e azul, encontrado muitas vezes em pares de acasalamento nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_goniobranchus_kuniei_name => 'NudibrÃ¢nquio-de-Kunie';
+  String get species_goniobranchus_kuniei_name => 'Nudibrânquio-de-Kunie';
 
   @override
   String get species_goniobranchus_kuniei_desc =>
-      'NudibrÃ¢nquio branco com pintas laranja e margem do manto roxa, presente no PacÃ­fico ocidental.';
+      'Nudibrânquio branco com pintas laranja e margem do manto roxa, presente no Pacífico ocidental.';
 
   @override
   String get species_mexichromis_multituberculata_name =>
-      'NudibrÃ¢nquio-multituberculado';
+      'Nudibrânquio-multituberculado';
 
   @override
   String get species_mexichromis_multituberculata_desc =>
-      'NudibrÃ¢nquio roxo e branco, com tubÃ©rculos salientes e apÃªndices de pontas laranja.';
+      'Nudibrânquio roxo e branco, com tubérculos salientes e apêndices de pontas laranja.';
 
   @override
-  String get species_chromodoris_dianae_name => 'CromodÃ³ris-de-Diana';
+  String get species_chromodoris_dianae_name => 'Cromodóris-de-Diana';
 
   @override
   String get species_chromodoris_dianae_desc =>
-      'NudibrÃ¢nquio azul-vivo com riscas negras e brÃ¢nquias laranja, presente no PacÃ­fico ocidental.';
+      'Nudibrânquio azul-vivo com riscas negras e brânquias laranja, presente no Pacífico ocidental.';
 
   @override
-  String get species_phyllodesmium_poindimiei_name => 'NudibrÃ¢nquio-solar';
+  String get species_phyllodesmium_poindimiei_name => 'Nudibrânquio-solar';
 
   @override
   String get species_phyllodesmium_poindimiei_desc =>
-      'NudibrÃ¢nquio eÃ³lido translÃºcido, de cerata ramificados, que aloja zooxantelas.';
+      'Nudibrânquio eólido translúcido, de cerata ramificados, que aloja zooxantelas.';
 
   @override
-  String get species_chromodoris_elisabethina_name =>
-      'CromodÃ³ris-de-Elizabeth';
+  String get species_chromodoris_elisabethina_name => 'Cromodóris-de-Elizabeth';
 
   @override
   String get species_chromodoris_elisabethina_desc =>
-      'NudibrÃ¢nquio com linhas azuis e amarelas e bordo do manto branco, comum no Sudeste AsiÃ¡tico.';
+      'Nudibrânquio com linhas azuis e amarelas e bordo do manto branco, comum no Sudeste Asiático.';
 
   @override
-  String get species_doridella_batava_name => 'DÃ³rido-de-BatÃ¡via';
+  String get species_doridella_batava_name => 'Dórido-de-Batávia';
 
   @override
   String get species_doridella_batava_desc =>
-      'NudibrÃ¢nquio dÃ³rido de cor variÃ¡vel, do negro ao castanho, encontrado sob pedras e cascalho nos recifes do Indo-PacÃ­fico.';
+      'Nudibrânquio dórido de cor variável, do negro ao castanho, encontrado sob pedras e cascalho nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_tiger_cowrie_name => 'BÃºzio-tigre';
+  String get species_tiger_cowrie_name => 'Búzio-tigre';
 
   @override
   String get species_tiger_cowrie_desc =>
-      'BÃºzio grande e pintalgado dos recifes tropicais, muitas vezes parcialmente coberto pelo prÃ³prio manto.';
+      'Búzio grande e pintalgado dos recifes tropicais, muitas vezes parcialmente coberto pelo próprio manto.';
 
   @override
-  String get species_tritons_trumpet_name => 'Trombeta-de-tritÃ£o';
+  String get species_tritons_trumpet_name => 'Trombeta-de-tritão';
 
   @override
   String get species_tritons_trumpet_desc =>
       'Grande caracol predador e inimigo natural da estrela-do-mar coroa-de-espinhos.';
 
   @override
-  String get species_queen_conch_name => 'BÃºzio-rainha';
+  String get species_queen_conch_name => 'Búzio-rainha';
 
   @override
   String get species_queen_conch_desc =>
-      'BÃºzio grande e icÃ³nico das pradarias marinhas das CaraÃ­bas, com o lÃ¡bio interior de um rosa caracterÃ­stico.';
+      'Búzio grande e icónico das pradarias marinhas das Caraíbas, com o lábio interior de um rosa característico.';
 
   @override
-  String get species_banded_coral_shrimp_name => 'CamarÃ£o-limpador-de-bandas';
+  String get species_banded_coral_shrimp_name => 'Camarão-limpador-de-bandas';
 
   @override
   String get species_banded_coral_shrimp_desc =>
-      'CamarÃ£o-limpador de bandas vermelhas e brancas, com longas antenas brancas, encontrado nas fendas do recife.';
+      'Camarão-limpador de bandas vermelhas e brancas, com longas antenas brancas, encontrado nas fendas do recife.';
 
   @override
-  String get species_mantis_shrimp_name => 'CamarÃ£o-louva-a-deus-pavÃ£o';
+  String get species_mantis_shrimp_name => 'Camarão-louva-a-deus-pavão';
 
   @override
   String get species_mantis_shrimp_desc =>
-      'Predador colorido com apÃªndices potentes em forma de maÃ§a, capazes de partir conchas.';
+      'Predador colorido com apêndices potentes em forma de maça, capazes de partir conchas.';
 
   @override
-  String get species_cleaner_shrimp_name => 'CamarÃ£o-limpador-escarlate';
+  String get species_cleaner_shrimp_name => 'Camarão-limpador-escarlate';
 
   @override
   String get species_cleaner_shrimp_desc =>
-      'CamarÃ£o vermelho e branco vivo que monta estaÃ§Ãµes de limpeza para atender os peixes do recife.';
+      'Camarão vermelho e branco vivo que monta estações de limpeza para atender os peixes do recife.';
 
   @override
   String get species_pederson_cleaner_shrimp_name =>
-      'CamarÃ£o-limpador-de-Pederson';
+      'Camarão-limpador-de-Pederson';
 
   @override
   String get species_pederson_cleaner_shrimp_desc =>
-      'CamarÃ£o-limpador translÃºcido das CaraÃ­bas, que vive entre os tentÃ¡culos das anÃ©monas.';
+      'Camarão-limpador translúcido das Caraíbas, que vive entre os tentáculos das anémonas.';
 
   @override
-  String get species_harlequin_shrimp_name => 'CamarÃ£o-arlequim';
+  String get species_harlequin_shrimp_name => 'Camarão-arlequim';
 
   @override
   String get species_harlequin_shrimp_desc =>
-      'CamarÃ£o de padrÃ£o espetacular, com pinÃ§as achatadas, que se alimenta exclusivamente de estrelas-do-mar.';
+      'Camarão de padrão espetacular, com pinças achatadas, que se alimenta exclusivamente de estrelas-do-mar.';
 
   @override
-  String get species_coleman_shrimp_name => 'CamarÃ£o-de-Coleman';
+  String get species_coleman_shrimp_name => 'Camarão-de-Coleman';
 
   @override
   String get species_coleman_shrimp_desc =>
-      'CamarÃ£o minÃºsculo que vive aos pares sobre ouriÃ§os-de-fogo, muito cobiÃ§ado pelos fotÃ³grafos subaquÃ¡ticos.';
+      'Camarão minúsculo que vive aos pares sobre ouriços-de-fogo, muito cobiçado pelos fotógrafos subaquáticos.';
 
   @override
-  String get species_emperor_shrimp_name => 'CamarÃ£o-imperador';
+  String get species_emperor_shrimp_name => 'Camarão-imperador';
 
   @override
   String get species_emperor_shrimp_desc =>
-      'CamarÃ£o comensal e colorido que viaja sobre pepinos-do-mar e nudibrÃ¢nquios.';
+      'Camarão comensal e colorido que viaja sobre pepinos-do-mar e nudibrânquios.';
 
   @override
-  String get species_sexy_shrimp_name => 'CamarÃ£o-sensual';
+  String get species_sexy_shrimp_name => 'Camarão-sensual';
 
   @override
   String get species_sexy_shrimp_desc =>
-      'CamarÃ£o de anÃ©mona minÃºsculo, conhecido pela danÃ§a em que agita a cauda, muito popular na fotografia macro.';
+      'Camarão de anémona minúsculo, conhecido pela dança em que agita a cauda, muito popular na fotografia macro.';
 
   @override
-  String get species_marble_shrimp_name => 'CamarÃ£o-marmoreado';
+  String get species_marble_shrimp_name => 'Camarão-marmoreado';
 
   @override
   String get species_marble_shrimp_desc =>
-      'CamarÃ£o noturno e malhado, de patas plumosas, encontrado escondido nas fendas do recife durante o dia.';
+      'Camarão noturno e malhado, de patas plumosas, encontrado escondido nas fendas do recife durante o dia.';
 
   @override
-  String get species_spiny_lobster_name => 'Lagosta-das-CaraÃ­bas';
+  String get species_spiny_lobster_name => 'Lagosta-das-Caraíbas';
 
   @override
   String get species_spiny_lobster_desc =>
-      'Lagosta grande e sem pinÃ§as, de antenas compridas, encontrada abrigada sob as saliÃªncias do recife.';
+      'Lagosta grande e sem pinças, de antenas compridas, encontrada abrigada sob as saliências do recife.';
 
   @override
   String get species_painted_spiny_lobster_name => 'Lagosta-pintada';
 
   @override
   String get species_painted_spiny_lobster_desc =>
-      'Lagosta de cores vibrantes, com as patas listadas a azul, verde e branco, nos recifes do Indo-PacÃ­fico.';
+      'Lagosta de cores vibrantes, com as patas listadas a azul, verde e branco, nos recifes do Indo-Pacífico.';
 
   @override
   String get species_slipper_lobster_name => 'Cavaco';
@@ -33483,50 +33436,50 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_squat_lobster_desc =>
-      'CrustÃ¡ceo minÃºsculo rosa-arroxeado que vive nas grandes esponjas-barril, um dos preferidos da fotografia macro.';
+      'Crustáceo minúsculo rosa-arroxeado que vive nas grandes esponjas-barril, um dos preferidos da fotografia macro.';
 
   @override
   String get species_hermit_crab_name => 'Ermita-de-patas-azuis';
 
   @override
   String get species_hermit_crab_desc =>
-      'Pequeno caranguejo-ermita de patas azul-vivas, visto com frequÃªncia nos recifes das CaraÃ­bas.';
+      'Pequeno caranguejo-ermita de patas azul-vivas, visto com frequência nos recifes das Caraíbas.';
 
   @override
   String get species_orangutan_crab_name => 'Caranguejo-orangotango';
 
   @override
   String get species_orangutan_crab_desc =>
-      'Caranguejo minÃºsculo e peludo que vive no coral-bolha, batizado pela semelhanÃ§a com um orangotango.';
+      'Caranguejo minúsculo e peludo que vive no coral-bolha, batizado pela semelhança com um orangotango.';
 
   @override
   String get species_decorator_crab_name => 'Caranguejo-decorador';
 
   @override
   String get species_decorator_crab_desc =>
-      'Mestre do disfarce, que prende esponjas, algas e hidrozoÃ¡rios Ã  sua carapaÃ§a.';
+      'Mestre do disfarce, que prende esponjas, algas e hidrozoários à sua carapaça.';
 
   @override
-  String get species_porcelain_crab_name => 'Caranguejo-porcelana-de-anÃ©mona';
+  String get species_porcelain_crab_name => 'Caranguejo-porcelana-de-anémona';
 
   @override
   String get species_porcelain_crab_desc =>
-      'Caranguejo achatado e pintalgado que vive em anÃ©monas e filtra alimento com peÃ§as bucais plumosas.';
+      'Caranguejo achatado e pintalgado que vive em anémonas e filtra alimento com peças bucais plumosas.';
 
   @override
   String get species_arrow_crab_name => 'Caranguejo-flecha';
 
   @override
   String get species_arrow_crab_desc =>
-      'Caranguejo esguio das CaraÃ­bas, com um rostro longo e pontiagudo e patas listadas.';
+      'Caranguejo esguio das Caraíbas, com um rostro longo e pontiagudo e patas listadas.';
 
   @override
   String get species_channel_clinging_crab_name =>
-      'Caranguejo-aranha-das-CaraÃ­bas';
+      'Caranguejo-aranha-das-Caraíbas';
 
   @override
   String get species_channel_clinging_crab_desc =>
-      'Grande caranguejo de recife das CaraÃ­bas, de corpo escuro e pinÃ§as vermelho-alaranjadas, encontrado em fendas.';
+      'Grande caranguejo de recife das Caraíbas, de corpo escuro e pinças vermelho-alaranjadas, encontrado em fendas.';
 
   @override
   String get species_coral_crab_name => 'Caranguejo-guarda-do-coral';
@@ -33541,22 +33494,22 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_crown_of_thorns_starfish_desc =>
-      'Estrela-do-mar venenosa de muitos braÃ§os, que se alimenta de coral e pode devastar recifes durante as suas explosÃµes populacionais.';
+      'Estrela-do-mar venenosa de muitos braços, que se alimenta de coral e pode devastar recifes durante as suas explosões populacionais.';
 
   @override
-  String get species_blue_linckia_starfish_name => 'LÃ­ncia-azul';
+  String get species_blue_linckia_starfish_name => 'Líncia-azul';
 
   @override
   String get species_blue_linckia_starfish_desc =>
-      'Estrela-do-mar de azul vivo, vista com frequÃªncia nos planaltos e encostas de recife do Indo-PacÃ­fico.';
+      'Estrela-do-mar de azul vivo, vista com frequência nos planaltos e encostas de recife do Indo-Pacífico.';
 
   @override
   String get species_red_knob_starfish_name =>
-      'Estrela-do-mar-de-nÃ³dulos-vermelhos';
+      'Estrela-do-mar-de-nódulos-vermelhos';
 
   @override
   String get species_red_knob_starfish_desc =>
-      'Grande estrela-do-mar cinzenta, com espinhos de pontas vermelhas bem visÃ­veis, encontrada em zonas arenosas do recife.';
+      'Grande estrela-do-mar cinzenta, com espinhos de pontas vermelhas bem visíveis, encontrada em zonas arenosas do recife.';
 
   @override
   String get species_chocolate_chip_starfish_name =>
@@ -33564,88 +33517,87 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_chocolate_chip_starfish_desc =>
-      'Estrela-do-mar bege com nÃ³dulos escuros salientes que lembram pepitas de chocolate, sobre substratos arenosos.';
+      'Estrela-do-mar bege com nódulos escuros salientes que lembram pepitas de chocolate, sobre substratos arenosos.';
 
   @override
   String get species_cushion_star_name => 'Estrela-almofada';
 
   @override
   String get species_cushion_star_desc =>
-      'Estrela-do-mar pentagonal e roliÃ§a, de braÃ§os reduzidos, encontrada nos planaltos de recife do Indo-PacÃ­fico.';
+      'Estrela-do-mar pentagonal e roliça, de braços reduzidos, encontrada nos planaltos de recife do Indo-Pacífico.';
 
   @override
   String get species_fromia_starfish_name => 'Estrela-do-mar-elegante';
 
   @override
   String get species_fromia_starfish_desc =>
-      'Pequena estrela-do-mar laranja-avermelhada com as margens das placas claras, criando um padrÃ£o de mosaico.';
+      'Pequena estrela-do-mar laranja-avermelhada com as margens das placas claras, criando um padrão de mosaico.';
 
   @override
   String get species_basket_star_name => 'Estrela-cesto';
 
   @override
   String get species_basket_star_desc =>
-      'Os braÃ§os muito ramificados abrem-se Ã  noite para filtrar alimento na corrente.';
+      'Os braços muito ramificados abrem-se à noite para filtrar alimento na corrente.';
 
   @override
-  String get species_brittle_star_name => 'OfiÃºra-de-bandas';
+  String get species_brittle_star_name => 'Ofiúra-de-bandas';
 
   @override
   String get species_brittle_star_desc =>
-      'OfiÃºra listada encontrada sob pedras e em fendas, com braÃ§os Ã¡geis e serpenteantes.';
+      'Ofiúra listada encontrada sob pedras e em fendas, com braços ágeis e serpenteantes.';
 
   @override
   String get species_feather_star_name => 'Estrela-pena';
 
   @override
   String get species_feather_star_desc =>
-      'Crinoide de muitos braÃ§os, empoleirado nas saliÃªncias do recife, que filtra alimento com os braÃ§os plumosos.';
+      'Crinoide de muitos braços, empoleirado nas saliências do recife, que filtra alimento com os braços plumosos.';
 
   @override
   String get species_black_feather_star_name => 'Estrela-pena-negra';
 
   @override
   String get species_black_feather_star_desc =>
-      'Crinoide escuro capaz de nadar por breves instantes, agitando ritmadamente os seus muitos braÃ§os.';
+      'Crinoide escuro capaz de nadar por breves instantes, agitando ritmadamente os seus muitos braços.';
 
   @override
-  String get species_long_spined_sea_urchin_name =>
-      'OuriÃ§o-de-espinhos-longos';
+  String get species_long_spined_sea_urchin_name => 'Ouriço-de-espinhos-longos';
 
   @override
   String get species_long_spined_sea_urchin_desc =>
-      'OuriÃ§o negro de espinhos longos e venenosos, um pastador essencial dos recifes das CaraÃ­bas.';
+      'Ouriço negro de espinhos longos e venenosos, um pastador essencial dos recifes das Caraíbas.';
 
   @override
-  String get species_fire_urchin_name => 'OuriÃ§o-de-fogo';
+  String get species_fire_urchin_name => 'Ouriço-de-fogo';
 
   @override
   String get species_fire_urchin_desc =>
-      'OuriÃ§o de corpo mole com espinhos venenosos que provocam picadas dolorosas ao contacto.';
+      'Ouriço de corpo mole com espinhos venenosos que provocam picadas dolorosas ao contacto.';
 
   @override
-  String get species_pencil_urchin_name => 'OuriÃ§o-lÃ¡pis';
+  String get species_pencil_urchin_name => 'Ouriço-lápis';
 
   @override
   String get species_pencil_urchin_desc =>
-      'OuriÃ§o robusto, de espinhos grossos e rombos, encontrado encaixado nas fendas do recife.';
+      'Ouriço robusto, de espinhos grossos e rombos, encontrado encaixado nas fendas do recife.';
 
   @override
-  String get species_collector_urchin_name => 'OuriÃ§o-coletor';
+  String get species_collector_urchin_name => 'Ouriço-coletor';
 
   @override
   String get species_collector_urchin_desc =>
-      'OuriÃ§o que se cobre de detritos e fragmentos de algas para se camuflar.';
+      'Ouriço que se cobre de detritos e fragmentos de algas para se camuflar.';
 
   @override
-  String get species_sea_apple_name => 'MaÃ§Ã£-do-mar';
+  String get species_sea_apple_name => 'Maçã-do-mar';
 
   @override
   String get species_sea_apple_desc =>
-      'Pepino-do-mar de cores vivas, com tentÃ¡culos orais usados para filtrar alimento.';
+      'Pepino-do-mar de cores vivas, com tentáculos orais usados para filtrar alimento.';
 
   @override
-  String get species_pineapple_sea_cucumber_name => 'Pepino-do-mar-ananÃ¡s';
+  String get species_pineapple_sea_cucumber_name => 'Pepino-do-mar-ananás';
 
   @override
   String get species_pineapple_sea_cucumber_desc =>
@@ -33656,73 +33608,73 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_black_sea_cucumber_desc =>
-      'Pepino-do-mar negro e comum, encontrado nos planaltos arenosos de recife de todo o Indo-PacÃ­fico.';
+      'Pepino-do-mar negro e comum, encontrado nos planaltos arenosos de recife de todo o Indo-Pacífico.';
 
   @override
   String get species_leopard_sea_cucumber_name => 'Pepino-do-mar-leopardo';
 
   @override
   String get species_leopard_sea_cucumber_desc =>
-      'Pepino-do-mar pintalgado que expele tÃºbulos de Cuvier brancos e pegajosos quando incomodado.';
+      'Pepino-do-mar pintalgado que expele túbulos de Cuvier brancos e pegajosos quando incomodado.';
 
   @override
   String get species_sand_dollar_name => 'Bolacha-do-mar';
 
   @override
   String get species_sand_dollar_desc =>
-      'OuriÃ§o achatado em forma de disco, encontrado parcialmente enterrado em substratos arenosos.';
+      'Ouriço achatado em forma de disco, encontrado parcialmente enterrado em substratos arenosos.';
 
   @override
   String get species_moon_jellyfish_name => 'Alforreca-da-lua';
 
   @override
   String get species_moon_jellyfish_desc =>
-      'Alforreca translÃºcida em forma de sino, com quatro gÃ³nadas em ferradura visÃ­veis atravÃ©s do corpo.';
+      'Alforreca translúcida em forma de sino, com quatro gónadas em ferradura visíveis através do corpo.';
 
   @override
-  String get species_lions_mane_jellyfish_name => 'Alforreca-juba-de-leÃ£o';
+  String get species_lions_mane_jellyfish_name => 'Alforreca-juba-de-leão';
 
   @override
   String get species_lions_mane_jellyfish_desc =>
-      'Uma das maiores espÃ©cies de alforreca, com longos tentÃ¡culos a arrastar, presente em Ã¡guas frias.';
+      'Uma das maiores espécies de alforreca, com longos tentáculos a arrastar, presente em águas frias.';
 
   @override
   String get species_box_jellyfish_name => 'Alforreca-caixa';
 
   @override
   String get species_box_jellyfish_desc =>
-      'Alforreca extremamente perigosa, de veneno potente, presente nas Ã¡guas tropicais do Indo-PacÃ­fico.';
+      'Alforreca extremamente perigosa, de veneno potente, presente nas águas tropicais do Indo-Pacífico.';
 
   @override
   String get species_upside_down_jellyfish_name => 'Alforreca-invertida';
 
   @override
   String get species_upside_down_jellyfish_desc =>
-      'Alforreca invulgar que repousa com o sino virado para baixo em fundos arenosos, para que as suas algas faÃ§am fotossÃ­ntese.';
+      'Alforreca invulgar que repousa com o sino virado para baixo em fundos arenosos, para que as suas algas façam fotossíntese.';
 
   @override
   String get species_blue_blubber_jellyfish_name => 'Alforreca-azul';
 
   @override
   String get species_blue_blubber_jellyfish_desc =>
-      'Alforreca azul e branca, de sino firme e braÃ§os orais franjados, comum nas Ã¡guas australianas.';
+      'Alforreca azul e branca, de sino firme e braços orais franjados, comum nas águas australianas.';
 
   @override
   String get species_fried_egg_jellyfish_name => 'Alforreca-ovo-estrelado';
 
   @override
   String get species_fried_egg_jellyfish_desc =>
-      'Alforreca do MediterrÃ¢neo com uma cÃºpula amarela parecida com um ovo estrelado e picada ligeira.';
+      'Alforreca do Mediterrâneo com uma cúpula amarela parecida com um ovo estrelado e picada ligeira.';
 
   @override
-  String get species_pacific_sea_nettle_name => 'Urtiga-do-mar-do-PacÃ­fico';
+  String get species_pacific_sea_nettle_name => 'Urtiga-do-mar-do-Pacífico';
 
   @override
   String get species_pacific_sea_nettle_desc =>
-      'Alforreca castanho-dourada com longos tentÃ¡culos a arrastar, presente ao longo da costa do PacÃ­fico.';
+      'Alforreca castanho-dourada com longos tentáculos a arrastar, presente ao longo da costa do Pacífico.';
 
   @override
-  String get species_compass_jellyfish_name => 'Alforreca-bÃºssola';
+  String get species_compass_jellyfish_name => 'Alforreca-bússola';
 
   @override
   String get species_compass_jellyfish_desc =>
@@ -33733,35 +33685,35 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_spotted_jellyfish_desc =>
-      'Alforreca dourada com pintas brancas, cÃ©lebre por encher o Lago das Medusas, em Palau.';
+      'Alforreca dourada com pintas brancas, célebre por encher o Lago das Medusas, em Palau.';
 
   @override
   String get species_barrel_jellyfish_name => 'Alforreca-barril';
 
   @override
   String get species_barrel_jellyfish_desc =>
-      'Alforreca grande em forma de cÃºpula, com braÃ§os orais franjados e picada ligeira, comum no AtlÃ¢ntico.';
+      'Alforreca grande em forma de cúpula, com braços orais franjados e picada ligeira, comum no Atlântico.';
 
   @override
   String get species_persian_carpet_flatworm_name => 'Platelminte-tapete-persa';
 
   @override
   String get species_persian_carpet_flatworm_desc =>
-      'Platelminte negro e ornamentado, de margens amarelo-alaranjadas, muitas vezes confundido com um nudibrÃ¢nquio.';
+      'Platelminte negro e ornamentado, de margens amarelo-alaranjadas, muitas vezes confundido com um nudibrânquio.';
 
   @override
   String get species_leopard_flatworm_name => 'Platelminte-leopardo';
 
   @override
   String get species_leopard_flatworm_desc =>
-      'Platelminte translÃºcido com manchas de leopardo, que desliza sobre os substratos do recife.';
+      'Platelminte translúcido com manchas de leopardo, que desliza sobre os substratos do recife.';
 
   @override
   String get species_divided_flatworm_name => 'Platelminte-dividido';
 
   @override
   String get species_divided_flatworm_desc =>
-      'Platelminte marcante, negro e laranja, que imita nudibrÃ¢nquios tÃ³xicos como forma de proteÃ§Ã£o.';
+      'Platelminte marcante, negro e laranja, que imita nudibrânquios tóxicos como forma de proteção.';
 
   @override
   String get species_blue_pseudoceros_flatworm_name =>
@@ -33769,7 +33721,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_blue_pseudoceros_flatworm_desc =>
-      'Platelminte de azul profundo com margem laranja, visto a deslizar sobre as superfÃ­cies dos recifes do Indo-PacÃ­fico.';
+      'Platelminte de azul profundo com margem laranja, visto a deslizar sobre as superfícies dos recifes do Indo-Pacífico.';
 
   @override
   String get species_racing_stripe_flatworm_name =>
@@ -33780,60 +33732,60 @@ class AppLocalizationsPt extends AppLocalizations {
       'Platelminte cor de creme, com uma risca central escura bem definida e margem franzida.';
 
   @override
-  String get species_christmas_tree_worm_name => 'Verme-Ã¡rvore-de-Natal';
+  String get species_christmas_tree_worm_name => 'Verme-árvore-de-Natal';
 
   @override
   String get species_christmas_tree_worm_desc =>
-      'Verme colorido de coroas em espiral, embutido no coral, que se recolhe instantaneamente Ã  aproximaÃ§Ã£o.';
+      'Verme colorido de coroas em espiral, embutido no coral, que se recolhe instantaneamente à aproximação.';
 
   @override
   String get species_feather_duster_worm_name => 'Verme-espanador';
 
   @override
   String get species_feather_duster_worm_desc =>
-      'Verme tubÃ­cola com uma coroa em leque de radÃ­olos plumosos usada para filtrar alimento.';
+      'Verme tubícola com uma coroa em leque de radíolos plumosos usada para filtrar alimento.';
 
   @override
   String get species_fire_worm_name => 'Verme-de-fogo-barbudo';
 
   @override
   String get species_fire_worm_desc =>
-      'Poliqueta com cerdas urticantes brancas que provocam uma irritaÃ§Ã£o dolorosa ao contacto.';
+      'Poliqueta com cerdas urticantes brancas que provocam uma irritação dolorosa ao contacto.';
 
   @override
   String get species_bobbit_worm_name => 'Verme-bobbit';
 
   @override
   String get species_bobbit_worm_desc =>
-      'Predador de emboscada escondido na areia, com mandÃ­bulas potentes que atacam Ã  velocidade de um relÃ¢mpago.';
+      'Predador de emboscada escondido na areia, com mandíbulas potentes que atacam à velocidade de um relâmpago.';
 
   @override
   String get species_social_feather_duster_name => 'Verme-espanador-social';
 
   @override
   String get species_social_feather_duster_desc =>
-      'Verme tubÃ­cola colonial que forma agrupamentos de coroas delicadas e listadas nos recifes das CaraÃ­bas.';
+      'Verme tubícola colonial que forma agrupamentos de coroas delicadas e listadas nos recifes das Caraíbas.';
 
   @override
   String get species_giant_clam_name => 'Tridacna-gigante';
 
   @override
   String get species_giant_clam_desc =>
-      'O maior bivalve vivo, com tecido do manto iridescente que aloja algas simbiÃ³ticas.';
+      'O maior bivalve vivo, com tecido do manto iridescente que aloja algas simbióticas.';
 
   @override
   String get species_boring_clam_name => 'Tridacna-perfuradora';
 
   @override
   String get species_boring_clam_desc =>
-      'Pequeno bivalve colorido que perfura a rocha coralina, deixando Ã  vista apenas o seu manto vivo.';
+      'Pequeno bivalve colorido que perfura a rocha coralina, deixando à vista apenas o seu manto vivo.';
 
   @override
   String get species_maxima_clam_name => 'Tridacna-maxima';
 
   @override
   String get species_maxima_clam_desc =>
-      'Bivalve de cores brilhantes, embutido na rocha do recife, com mantos de azul e verde elÃ©tricos.';
+      'Bivalve de cores brilhantes, embutido na rocha do recife, com mantos de azul e verde elétricos.';
 
   @override
   String get species_flame_scallop_name => 'Vieira-de-chama';
@@ -33847,142 +33799,141 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_thorny_oyster_desc =>
-      'Bivalve de concha espinhosa cimentado Ã  rocha do recife, muitas vezes incrustado de esponjas e algas.';
+      'Bivalve de concha espinhosa cimentado à rocha do recife, muitas vezes incrustado de esponjas e algas.';
 
   @override
-  String get species_magnificent_sea_anemone_name => 'AnÃ©mona-magnÃ­fica';
+  String get species_magnificent_sea_anemone_name => 'Anémona-magnífica';
 
   @override
   String get species_magnificent_sea_anemone_desc =>
-      'Grande anÃ©mona colorida que acolhe peixes-palhaÃ§o, com uma coluna proeminente e tentÃ¡culos ondulantes.';
+      'Grande anémona colorida que acolhe peixes-palhaço, com uma coluna proeminente e tentáculos ondulantes.';
 
   @override
-  String get species_bubble_tip_anemone_name => 'AnÃ©mona-de-pontas-em-bolha';
+  String get species_bubble_tip_anemone_name => 'Anémona-de-pontas-em-bolha';
 
   @override
   String get species_bubble_tip_anemone_desc =>
-      'Hospedeira popular dos peixes-palhaÃ§o, com tentÃ¡culos de pontas bolbosas em verde, castanho ou rosa.';
+      'Hospedeira popular dos peixes-palhaço, com tentáculos de pontas bolbosas em verde, castanho ou rosa.';
 
   @override
-  String get species_giant_carpet_anemone_name => 'AnÃ©mona-tapete-gigante';
+  String get species_giant_carpet_anemone_name => 'Anémona-tapete-gigante';
 
   @override
   String get species_giant_carpet_anemone_desc =>
-      'AnÃ©mona enorme, de tentÃ¡culos curtos e pegajosos, que pode ultrapassar um metro de diÃ¢metro.';
+      'Anémona enorme, de tentáculos curtos e pegajosos, que pode ultrapassar um metro de diâmetro.';
 
   @override
-  String get species_haddon_carpet_anemone_name => 'AnÃ©mona-tapete-de-Haddon';
+  String get species_haddon_carpet_anemone_name => 'Anémona-tapete-de-Haddon';
 
   @override
   String get species_haddon_carpet_anemone_desc =>
-      'AnÃ©mona-tapete achatada, sobre substratos arenosos, que acolhe vÃ¡rios peixes-palhaÃ§o e caranguejos-porcelana.';
+      'Anémona-tapete achatada, sobre substratos arenosos, que acolhe vários peixes-palhaço e caranguejos-porcelana.';
 
   @override
   String get species_long_tentacle_anemone_name =>
-      'AnÃ©mona-de-tentÃ¡culos-longos';
+      'Anémona-de-tentáculos-longos';
 
   @override
   String get species_long_tentacle_anemone_desc =>
-      'AnÃ©mona de fundo arenoso, com tentÃ¡culos longos e ondulantes, muitas vezes a acolher peixes-palhaÃ§o.';
+      'Anémona de fundo arenoso, com tentáculos longos e ondulantes, muitas vezes a acolher peixes-palhaço.';
 
   @override
-  String get species_tube_anemone_name => 'AnÃ©mona-de-tubo';
+  String get species_tube_anemone_name => 'Anémona-de-tubo';
 
   @override
   String get species_tube_anemone_desc =>
-      'AnÃ©mona elegante que vive num tubo de pergaminho enterrado na areia, com duas coroas de tentÃ¡culos.';
+      'Anémona elegante que vive num tubo de pergaminho enterrado na areia, com duas coroas de tentáculos.';
 
   @override
-  String get species_hell_fire_anemone_name => 'AnÃ©mona-fogo-do-inferno';
+  String get species_hell_fire_anemone_name => 'Anémona-fogo-do-inferno';
 
   @override
   String get species_hell_fire_anemone_desc =>
-      'AnÃ©mona fortemente urticante, com tentÃ¡culos ramificados semelhantes a coral mole.';
+      'Anémona fortemente urticante, com tentáculos ramificados semelhantes a coral mole.';
 
   @override
-  String get species_beaded_sea_anemone_name => 'AnÃ©mona-de-contas';
+  String get species_beaded_sea_anemone_name => 'Anémona-de-contas';
 
   @override
   String get species_beaded_sea_anemone_desc =>
-      'AnÃ©mona com as pontas dos tentÃ¡culos dilatadas em forma de conta, encontrada em zonas arenosas de recife do Indo-PacÃ­fico.';
+      'Anémona com as pontas dos tentáculos dilatadas em forma de conta, encontrada em zonas arenosas de recife do Indo-Pacífico.';
 
   @override
-  String get species_condylactis_anemone_name =>
-      'AnÃ©mona-gigante-das-CaraÃ­bas';
+  String get species_condylactis_anemone_name => 'Anémona-gigante-das-Caraíbas';
 
   @override
   String get species_condylactis_anemone_desc =>
-      'Grande anÃ©mona das CaraÃ­bas, com tentÃ¡culos de pontas roxas, encontrada em substratos rochosos de recife.';
+      'Grande anémona das Caraíbas, com tentáculos de pontas roxas, encontrada em substratos rochosos de recife.';
 
   @override
-  String get species_sand_anemone_name => 'AnÃ©mona-da-areia';
+  String get species_sand_anemone_name => 'Anémona-da-areia';
 
   @override
   String get species_sand_anemone_desc =>
-      'AnÃ©mona delicada, parcialmente enterrada na areia, com tentÃ¡culos de pontas roxas.';
+      'Anémona delicada, parcialmente enterrada na areia, com tentáculos de pontas roxas.';
 
   @override
   String get species_barrel_sponge_name => 'Esponja-barril-gigante';
 
   @override
   String get species_barrel_sponge_desc =>
-      'Esponja enorme em forma de barril, capaz de viver sÃ©culos nas paredes de recife das CaraÃ­bas.';
+      'Esponja enorme em forma de barril, capaz de viver séculos nas paredes de recife das Caraíbas.';
 
   @override
   String get species_azure_vase_sponge_name => 'Esponja-vaso-azul';
 
   @override
   String get species_azure_vase_sponge_desc =>
-      'Esponja vibrante em forma de vaso, de azul-arroxeado, encontrada nas paredes de recife das CaraÃ­bas.';
+      'Esponja vibrante em forma de vaso, de azul-arroxeado, encontrada nas paredes de recife das Caraíbas.';
 
   @override
   String get species_yellow_tube_sponge_name => 'Esponja-tubo-amarela';
 
   @override
   String get species_yellow_tube_sponge_desc =>
-      'Esponja tubular amarelo-viva que cresce em grupos nas paredes de recife das CaraÃ­bas.';
+      'Esponja tubular amarelo-viva que cresce em grupos nas paredes de recife das Caraíbas.';
 
   @override
   String get species_elephant_ear_sponge_name => 'Esponja-orelha-de-elefante';
 
   @override
   String get species_elephant_ear_sponge_desc =>
-      'Grande esponja laranja em forma de leque, que cresce em paredes e abrigos nas CaraÃ­bas.';
+      'Grande esponja laranja em forma de leque, que cresce em paredes e abrigos nas Caraíbas.';
 
   @override
   String get species_rope_sponge_name => 'Esponja-corda';
 
   @override
   String get species_rope_sponge_desc =>
-      'Esponja vermelha ereta e ramificada, que cresce em formaÃ§Ãµes semelhantes a cordas nos recifes das CaraÃ­bas.';
+      'Esponja vermelha ereta e ramificada, que cresce em formações semelhantes a cordas nos recifes das Caraíbas.';
 
   @override
   String get species_portuguese_man_o_war_name => 'Caravela-portuguesa';
 
   @override
   String get species_portuguese_man_o_war_desc =>
-      'HidrozoÃ¡rio colonial com um flutuador cheio de gÃ¡s e tentÃ¡culos pendentes de picada extremamente dolorosa.';
+      'Hidrozoário colonial com um flutuador cheio de gás e tentáculos pendentes de picada extremamente dolorosa.';
 
   @override
   String get species_fire_coral_name => 'Coral-de-fogo';
 
   @override
   String get species_fire_coral_desc =>
-      'NÃ£o Ã© um coral verdadeiro mas um hidrozoÃ¡rio, que provoca picadas dolorosas nos mergulhadores ao contacto.';
+      'Não é um coral verdadeiro mas um hidrozoário, que provoca picadas dolorosas nos mergulhadores ao contacto.';
 
   @override
   String get species_by_the_wind_sailor_name => 'Veleiro-do-vento';
 
   @override
   String get species_by_the_wind_sailor_desc =>
-      'ColÃ³nia flutuante de hidrozoÃ¡rios azuis, com uma vela diagonal que apanha o vento.';
+      'Colónia flutuante de hidrozoários azuis, com uma vela diagonal que apanha o vento.';
 
   @override
-  String get species_blue_button_name => 'BotÃ£o-azul';
+  String get species_blue_button_name => 'Botão-azul';
 
   @override
   String get species_blue_button_desc =>
-      'HidrozoÃ¡rio colonial flutuante, com um disco achatado e hidroides azuis semelhantes a tentÃ¡culos.';
+      'Hidrozoário colonial flutuante, com um disco achatado e hidroides azuis semelhantes a tentáculos.';
 
   @override
   String get species_giant_sea_hare_name => 'Lebre-do-mar-gigante';
@@ -33999,11 +33950,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'Grande lebre-do-mar de pintas verdes que liberta tinta roxa quando incomodada.';
 
   @override
-  String get species_nudibranch_berghia_name => 'NudibrÃ¢nquio-bÃ©rghia';
+  String get species_nudibranch_berghia_name => 'Nudibrânquio-bérghia';
 
   @override
   String get species_nudibranch_berghia_desc =>
-      'NudibrÃ¢nquio eÃ³lido translÃºcido, com cerata de pontas brancas, que se alimenta de anÃ©monas.';
+      'Nudibrânquio eólido translúcido, com cerata de pontas brancas, que se alimenta de anémonas.';
 
   @override
   String get species_sea_pen_name => 'Pena-do-mar';
@@ -34017,28 +33968,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_blue_sea_star_desc =>
-      'Estrela-do-mar multicolor que se regenera a partir de fragmentos de um Ãºnico braÃ§o, nos recifes do Indo-PacÃ­fico.';
+      'Estrela-do-mar multicolor que se regenera a partir de fragmentos de um único braço, nos recifes do Indo-Pacífico.';
 
   @override
   String get species_reef_squid_name => 'Lula-de-recife';
 
   @override
   String get species_reef_squid_desc =>
-      'Lula de recife do sul, encontrada com frequÃªncia nas Ã¡guas temperadas da AustrÃ¡lia.';
+      'Lula de recife do sul, encontrada com frequência nas águas temperadas da Austrália.';
 
   @override
-  String get species_tiger_shrimp_name => 'CamarÃ£o-tigre';
+  String get species_tiger_shrimp_name => 'Camarão-tigre';
 
   @override
   String get species_tiger_shrimp_desc =>
-      'CamarÃ£o grande e listado, encontrado em fundos arenosos e pradarias marinhas do Indo-PacÃ­fico.';
+      'Camarão grande e listado, encontrado em fundos arenosos e pradarias marinhas do Indo-Pacífico.';
 
   @override
-  String get species_candy_crab_name => 'Caranguejo-rebuÃ§ado';
+  String get species_candy_crab_name => 'Caranguejo-rebuçado';
 
   @override
   String get species_candy_crab_desc =>
-      'Caranguejo minÃºsculo e colorido que iguala o coral mole onde vive, com projeÃ§Ãµes espinhosas rosa ou amarelas.';
+      'Caranguejo minúsculo e colorido que iguala o coral mole onde vive, com projeções espinhosas rosa ou amarelas.';
 
   @override
   String get species_spider_crab_name => 'Caranguejo-aranha-decorador';
@@ -34048,74 +33999,74 @@ class AppLocalizationsPt extends AppLocalizations {
       'Caranguejo de movimentos lentos, coberto de esponjas e algas que agarra ao corpo para se camuflar.';
 
   @override
-  String get species_anemone_shrimp_name => 'CamarÃ£o-de-anÃ©mona-magnÃ­fico';
+  String get species_anemone_shrimp_name => 'Camarão-de-anémona-magnífico';
 
   @override
   String get species_anemone_shrimp_desc =>
-      'CamarÃ£o transparente com marcas brancas e roxas, que vive entre os tentÃ¡culos das anÃ©monas.';
+      'Camarão transparente com marcas brancas e roxas, que vive entre os tentáculos das anémonas.';
 
   @override
-  String get species_snapping_shrimp_name => 'CamarÃ£o-de-estalo';
+  String get species_snapping_shrimp_name => 'Camarão-de-estalo';
 
   @override
   String get species_snapping_shrimp_desc =>
-      'Pequeno camarÃ£o que produz um estalo sonoro com a sua pinÃ§a sobredimensionada, muitas vezes emparelhado com gÃ³bios.';
+      'Pequeno camarão que produz um estalo sonoro com a sua pinça sobredimensionada, muitas vezes emparelhado com góbios.';
 
   @override
-  String get species_glass_sponge_name => 'Cesto-de-flores-de-VÃ©nus';
+  String get species_glass_sponge_name => 'Cesto-de-flores-de-Vénus';
 
   @override
   String get species_glass_sponge_desc =>
-      'Esponja de vidro delicada, com um esqueleto de sÃ­lica intrincado, encontrada em Ã¡gua profunda.';
+      'Esponja de vidro delicada, com um esqueleto de sílica intrincado, encontrada em água profunda.';
 
   @override
-  String get species_toxic_sea_urchin_name => 'OuriÃ§o-flor';
+  String get species_toxic_sea_urchin_name => 'Ouriço-flor';
 
   @override
   String get species_toxic_sea_urchin_desc =>
-      'OuriÃ§o enganadoramente belo, coberto de pedicelÃ¡rias em forma de flor com veneno potente.';
+      'Ouriço enganadoramente belo, coberto de pedicelárias em forma de flor com veneno potente.';
 
   @override
-  String get species_slate_pencil_urchin_name => 'OuriÃ§o-lÃ¡pis-de-ardÃ³sia';
+  String get species_slate_pencil_urchin_name => 'Ouriço-lápis-de-ardósia';
 
   @override
   String get species_slate_pencil_urchin_desc =>
-      'OuriÃ§o de espinhos grossos e arredondados, encontrado nos substratos de recife das CaraÃ­bas e do AtlÃ¢ntico.';
+      'Ouriço de espinhos grossos e arredondados, encontrado nos substratos de recife das Caraíbas e do Atlântico.';
 
   @override
   String get species_spiny_sea_star_name => 'Estrela-do-mar-espinhosa';
 
   @override
   String get species_spiny_sea_star_desc =>
-      'Grande estrela-do-mar temperada, de espinhos bem visÃ­veis, presente em Ã¡guas europeias e atlÃ¢nticas.';
+      'Grande estrela-do-mar temperada, de espinhos bem visíveis, presente em águas europeias e atlânticas.';
 
   @override
   String get species_bat_star_name => 'Estrela-morcego';
 
   @override
   String get species_bat_star_desc =>
-      'Estrela-do-mar do PacÃ­fico com braÃ§os membranosos, em laranja, vermelho ou roxo, encontrada nas florestas de kelp.';
+      'Estrela-do-mar do Pacífico com braços membranosos, em laranja, vermelho ou roxo, encontrada nas florestas de kelp.';
 
   @override
   String get species_sunflower_star_name => 'Estrela-girassol';
 
   @override
   String get species_sunflower_star_desc =>
-      'Estrela-do-mar enorme e veloz, com atÃ© 24 braÃ§os, encontrada nas florestas de kelp do PacÃ­fico.';
+      'Estrela-do-mar enorme e veloz, com até 24 braços, encontrada nas florestas de kelp do Pacífico.';
 
   @override
   String get species_blood_star_name => 'Estrela-sangue';
 
   @override
   String get species_blood_star_desc =>
-      'Estrela-do-mar de braÃ§os finos e vermelho-alaranjado vivo, presente em Ã¡guas temperadas do PacÃ­fico.';
+      'Estrela-do-mar de braços finos e vermelho-alaranjado vivo, presente em águas temperadas do Pacífico.';
 
   @override
   String get species_common_cuttlefish_name => 'Choco-comum';
 
   @override
   String get species_common_cuttlefish_desc =>
-      'Mestre da camuflagem, presente nas Ã¡guas europeias e do MediterrÃ¢neo, com pupilas em forma de W.';
+      'Mestre da camuflagem, presente nas águas europeias e do Mediterrâneo, com pupilas em forma de W.';
 
   @override
   String get species_blue_spotted_crab_name =>
@@ -34123,165 +34074,165 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_blue_spotted_crab_desc =>
-      'Caranguejo nadador ativo, com pintas azuis na carapaÃ§a, encontrado em substratos arenosos do Indo-PacÃ­fico.';
+      'Caranguejo nadador ativo, com pintas azuis na carapaça, encontrado em substratos arenosos do Indo-Pacífico.';
 
   @override
   String get species_sponge_crab_name => 'Caranguejo-esponja';
 
   @override
   String get species_sponge_crab_desc =>
-      'Caranguejo que recorta e transporta uma esponja viva Ã s costas para se camuflar.';
+      'Caranguejo que recorta e transporta uma esponja viva às costas para se camuflar.';
 
   @override
-  String get species_horseshoe_crab_name => 'LÃ­mulo';
+  String get species_horseshoe_crab_name => 'Límulo';
 
   @override
   String get species_horseshoe_crab_desc =>
-      'ArtrÃ³pode quelicerado ancestral, de carapaÃ§a em forma de capacete, encontrado em fundos arenosos do AtlÃ¢ntico.';
+      'Artrópode quelicerado ancestral, de carapaça em forma de capacete, encontrado em fundos arenosos do Atlântico.';
 
   @override
   String get species_sea_spider_name => 'Aranha-do-mar';
 
   @override
   String get species_sea_spider_desc =>
-      'ArtrÃ³pode marinho delicado, de patas compridas, encontrado a rastejar sobre hidroides e briozoÃ¡rios.';
+      'Artrópode marinho delicado, de patas compridas, encontrado a rastejar sobre hidroides e briozoários.';
 
   @override
-  String get species_sea_lily_name => 'LÃ­rio-do-mar';
+  String get species_sea_lily_name => 'Lírio-do-mar';
 
   @override
   String get species_sea_lily_desc =>
-      'Crinoide pedunculado, um fÃ³ssil vivo de Ã¡guas mais profundas, que filtra alimento com os braÃ§os plumosos.';
+      'Crinoide pedunculado, um fóssil vivo de águas mais profundas, que filtra alimento com os braços plumosos.';
 
   @override
   String get species_mantis_shrimp_lysiosquilla_name =>
-      'CamarÃ£o-louva-a-deus-arpoador';
+      'Camarão-louva-a-deus-arpoador';
 
   @override
   String get species_mantis_shrimp_lysiosquilla_desc =>
-      'Grande camarÃ£o-louva-a-deus cavador, com apÃªndices de arpoar, encontrado em substratos arenosos.';
+      'Grande camarão-louva-a-deus cavador, com apêndices de arpoar, encontrado em substratos arenosos.';
 
   @override
-  String get species_purple_sea_urchin_name => 'OuriÃ§o-do-mar-roxo';
+  String get species_purple_sea_urchin_name => 'Ouriço-do-mar-roxo';
 
   @override
   String get species_purple_sea_urchin_desc =>
-      'OuriÃ§o roxo e abundante, encontrado nas florestas de kelp e poÃ§as de marÃ© rochosas do PacÃ­fico.';
+      'Ouriço roxo e abundante, encontrado nas florestas de kelp e poças de maré rochosas do Pacífico.';
 
   @override
   String get species_crown_jellyfish_name => 'Alforreca-coroa';
 
   @override
   String get species_crown_jellyfish_desc =>
-      'Alforreca de roxo profundo, com um sino elevado em forma de coroa, presente no Indo-PacÃ­fico.';
+      'Alforreca de roxo profundo, com um sino elevado em forma de coroa, presente no Indo-Pacífico.';
 
   @override
   String get species_comb_jelly_name => 'Groselha-do-mar';
 
   @override
   String get species_comb_jelly_desc =>
-      'Pequeno ctenÃ³foro bioluminescente, com fileiras de pentes iridescentes e dois longos tentÃ¡culos.';
+      'Pequeno ctenóforo bioluminescente, com fileiras de pentes iridescentes e dois longos tentáculos.';
 
   @override
   String get species_warty_sea_slug_name => 'Lesma-do-mar-verrugosa';
 
   @override
   String get species_warty_sea_slug_desc =>
-      'NudibrÃ¢nquio azul e negro com tubÃ©rculos de topo amarelo, visto com frequÃªncia nos recifes do Indo-PacÃ­fico.';
+      'Nudibrânquio azul e negro com tubérculos de topo amarelo, visto com frequência nos recifes do Indo-Pacífico.';
 
   @override
-  String get species_doris_nudibranch_name => 'LimÃ£o-do-mar';
+  String get species_doris_nudibranch_name => 'Limão-do-mar';
 
   @override
   String get species_doris_nudibranch_desc =>
-      'NudibrÃ¢nquio dÃ³rido amarelo e pintalgado, presente em Ã¡guas temperadas do PacÃ­fico, onde se alimenta de esponjas.';
+      'Nudibrânquio dórido amarelo e pintalgado, presente em águas temperadas do Pacífico, onde se alimenta de esponjas.';
 
   @override
-  String get species_opalescent_nudibranch_name => 'NudibrÃ¢nquio-opalescente';
+  String get species_opalescent_nudibranch_name => 'Nudibrânquio-opalescente';
 
   @override
   String get species_opalescent_nudibranch_desc =>
-      'EÃ³lido translÃºcido, com cerata laranja vivos e linhas dorsais azuis, presente em Ã¡guas do PacÃ­fico.';
+      'Eólido translúcido, com cerata laranja vivos e linhas dorsais azuis, presente em águas do Pacífico.';
 
   @override
-  String get species_clown_nudibranch_name => 'NudibrÃ¢nquio-palhaÃ§o';
+  String get species_clown_nudibranch_name => 'Nudibrânquio-palhaço';
 
   @override
   String get species_clown_nudibranch_desc =>
-      'NudibrÃ¢nquio rosa-alaranjado com pintas azuis e brancas, presente em Ã¡guas temperadas da AustrÃ¡lia.';
+      'Nudibrânquio rosa-alaranjado com pintas azuis e brancas, presente em águas temperadas da Austrália.';
 
   @override
   String get species_bottlenose_dolphin_name => 'Golfinho-roaz';
 
   @override
   String get species_bottlenose_dolphin_desc =>
-      'Golfinho curioso e brincalhÃ£o, encontrado com frequÃªncia pelos mergulhadores em Ã¡guas tropicais e temperadas.';
+      'Golfinho curioso e brincalhão, encontrado com frequência pelos mergulhadores em águas tropicais e temperadas.';
 
   @override
   String get species_spinner_dolphin_name => 'Golfinho-rotador';
 
   @override
   String get species_spinner_dolphin_desc =>
-      'Golfinho acrobÃ¡tico, conhecido pelos saltos com rotaÃ§Ã£o, visto muitas vezes em grandes grupos junto aos recifes de coral.';
+      'Golfinho acrobático, conhecido pelos saltos com rotação, visto muitas vezes em grandes grupos junto aos recifes de coral.';
 
   @override
   String get species_common_dolphin_name => 'Golfinho-comum';
 
   @override
   String get species_common_dolphin_desc =>
-      'Golfinho veloz, com um padrÃ£o distintivo em ampulheta, presente em mar aberto e em Ã¡guas costeiras.';
+      'Golfinho veloz, com um padrão distintivo em ampulheta, presente em mar aberto e em águas costeiras.';
 
   @override
-  String get species_spotted_dolphin_name => 'Golfinho-pintado-do-AtlÃ¢ntico';
+  String get species_spotted_dolphin_name => 'Golfinho-pintado-do-Atlântico';
 
   @override
   String get species_spotted_dolphin_desc =>
-      'Golfinho pintado e sociÃ¡vel, que se aproxima com frequÃªncia dos mergulhadores nas Baamas e nas CaraÃ­bas.';
+      'Golfinho pintado e sociável, que se aproxima com frequência dos mergulhadores nas Baamas e nas Caraíbas.';
 
   @override
   String get species_rissos_dolphin_name => 'Golfinho-de-Risso';
 
   @override
   String get species_rissos_dolphin_desc =>
-      'Golfinho grande, de corpo cinzento coberto de cicatrizes, presente em Ã¡guas profundas ao largo em todo o mundo.';
+      'Golfinho grande, de corpo cinzento coberto de cicatrizes, presente em águas profundas ao largo em todo o mundo.';
 
   @override
   String get species_humpback_whale_name => 'Baleia-de-bossa';
 
   @override
   String get species_humpback_whale_desc =>
-      'Baleia majestosa, conhecida pelos saltos e pelos cantos complexos, avistada durante as migraÃ§Ãµes sazonais.';
+      'Baleia majestosa, conhecida pelos saltos e pelos cantos complexos, avistada durante as migrações sazonais.';
 
   @override
   String get species_grey_whale_name => 'Baleia-cinzenta';
 
   @override
   String get species_grey_whale_desc =>
-      'Baleia de barbas que se alimenta no fundo e migra ao longo da costa do PacÃ­fico, muitas vezes coberta de cracas.';
+      'Baleia de barbas que se alimenta no fundo e migra ao longo da costa do Pacífico, muitas vezes coberta de cracas.';
 
   @override
   String get species_blue_whale_name => 'Baleia-azul';
 
   @override
   String get species_blue_whale_desc =>
-      'O maior animal que alguma vez existiu, encontrado ocasionalmente pelos mergulhadores em Ã¡gua azul profunda.';
+      'O maior animal que alguma vez existiu, encontrado ocasionalmente pelos mergulhadores em água azul profunda.';
 
   @override
   String get species_sperm_whale_name => 'Cachalote';
 
   @override
   String get species_sperm_whale_desc =>
-      'Baleia de mergulho profundo, de cabeÃ§a enorme, por vezes vista a repousar Ã  superfÃ­cie entre mergulhos.';
+      'Baleia de mergulho profundo, de cabeça enorme, por vezes vista a repousar à superfície entre mergulhos.';
 
   @override
   String get species_orca_name => 'Orca';
 
   @override
   String get species_orca_desc =>
-      'Predador de topo com marcas pretas e brancas inconfundÃ­veis, presente em todas as bacias oceÃ¢nicas.';
+      'Predador de topo com marcas pretas e brancas inconfundíveis, presente em todas as bacias oceânicas.';
 
   @override
-  String get species_minke_whale_name => 'Baleia-anÃ£';
+  String get species_minke_whale_name => 'Baleia-anã';
 
   @override
   String get species_minke_whale_desc =>
@@ -34292,7 +34243,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_beluga_whale_desc =>
-      'Baleia branca do Ãrtico, conhecida pelas vocalizaÃ§Ãµes e pelo comportamento sociÃ¡vel em Ã¡guas frias.';
+      'Baleia branca do Ártico, conhecida pelas vocalizações e pelo comportamento sociável em águas frias.';
 
   @override
   String get species_pilot_whale_name => 'Baleia-piloto-de-barbatanas-curtas';
@@ -34306,112 +34257,112 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_false_killer_whale_desc =>
-      'Grande golfinho oceÃ¢nico que se aproxima ocasionalmente dos mergulhadores em mar aberto.';
+      'Grande golfinho oceânico que se aproxima ocasionalmente dos mergulhadores em mar aberto.';
 
   @override
   String get species_dugong_name => 'Dugongo';
 
   @override
   String get species_dugong_desc =>
-      'HerbÃ­voro pacÃ­fico que pasta nas pradarias marinhas do Indo-PacÃ­fico, parente prÃ³ximo dos peixes-boi.';
+      'Herbívoro pacífico que pasta nas pradarias marinhas do Indo-Pacífico, parente próximo dos peixes-boi.';
 
   @override
-  String get species_west_indian_manatee_name => 'Peixe-boi-das-CaraÃ­bas';
+  String get species_west_indian_manatee_name => 'Peixe-boi-das-Caraíbas';
 
   @override
   String get species_west_indian_manatee_desc =>
-      'HerbÃ­voro lento presente em Ã¡guas quentes pouco profundas, estuÃ¡rios e nascentes das CaraÃ­bas.';
+      'Herbívoro lento presente em águas quentes pouco profundas, estuários e nascentes das Caraíbas.';
 
   @override
   String get species_sea_otter_name => 'Lontra-marinha';
 
   @override
   String get species_sea_otter_desc =>
-      'MamÃ­fero marinho carismÃ¡tico, presente nas florestas de kelp ao longo da costa do PacÃ­fico Norte.';
+      'Mamífero marinho carismático, presente nas florestas de kelp ao longo da costa do Pacífico Norte.';
 
   @override
-  String get species_california_sea_lion_name => 'LeÃ£o-marinho-da-CalifÃ³rnia';
+  String get species_california_sea_lion_name => 'Leão-marinho-da-Califórnia';
 
   @override
   String get species_california_sea_lion_desc =>
-      'PinÃ­pede Ã¡gil e brincalhÃ£o, que interage muitas vezes com os mergulhadores ao longo da costa do PacÃ­fico.';
+      'Pinípede ágil e brincalhão, que interage muitas vezes com os mergulhadores ao longo da costa do Pacífico.';
 
   @override
-  String get species_steller_sea_lion_name => 'LeÃ£o-marinho-de-Steller';
+  String get species_steller_sea_lion_name => 'Leão-marinho-de-Steller';
 
   @override
   String get species_steller_sea_lion_desc =>
-      'A maior espÃ©cie de leÃ£o-marinho, presente nas Ã¡guas frias do PacÃ­fico Norte junto a costas rochosas.';
+      'A maior espécie de leão-marinho, presente nas águas frias do Pacífico Norte junto a costas rochosas.';
 
   @override
   String get species_harbor_seal_name => 'Foca-comum';
 
   @override
   String get species_harbor_seal_desc =>
-      'Foca curiosa, vista com frequÃªncia em Ã¡guas costeiras temperadas, muitas vezes a repousar em rochas junto aos locais de mergulho.';
+      'Foca curiosa, vista com frequência em águas costeiras temperadas, muitas vezes a repousar em rochas junto aos locais de mergulho.';
 
   @override
   String get species_grey_seal_name => 'Foca-cinzenta';
 
   @override
   String get species_grey_seal_desc =>
-      'Foca grande e brincalhona do AtlÃ¢ntico Norte, conhecida por se aproximar dos mergulhadores debaixo de Ã¡gua.';
+      'Foca grande e brincalhona do Atlântico Norte, conhecida por se aproximar dos mergulhadores debaixo de água.';
 
   @override
   String get species_northern_elephant_seal_name => 'Elefante-marinho-do-norte';
 
   @override
   String get species_northern_elephant_seal_desc =>
-      'Foca enorme e de mergulho profundo; os machos tÃªm uma grande probÃ³scide. Presente ao longo da costa oriental do PacÃ­fico.';
+      'Foca enorme e de mergulho profundo; os machos têm uma grande probóscide. Presente ao longo da costa oriental do Pacífico.';
 
   @override
   String get species_hawaiian_monk_seal_name => 'Foca-monge-do-Havai';
 
   @override
   String get species_hawaiian_monk_seal_desc =>
-      'Foca criticamente ameaÃ§ada e endÃ©mica do Havai, avistada ocasionalmente pelos mergulhadores nos recifes.';
+      'Foca criticamente ameaçada e endémica do Havai, avistada ocasionalmente pelos mergulhadores nos recifes.';
 
   @override
   String get species_leopard_seal_name => 'Foca-leopardo';
 
   @override
   String get species_leopard_seal_desc =>
-      'Predador poderoso da AntÃ¡rtida, de pelagem malhada, encontrado por mergulhadores de Ã¡guas frias.';
+      'Predador poderoso da Antártida, de pelagem malhada, encontrado por mergulhadores de águas frias.';
 
   @override
   String get species_narwhal_name => 'Narval';
 
   @override
   String get species_narwhal_desc =>
-      'Baleia do Ãrtico com uma longa presa em espiral, raramente vista mas icÃ³nica entre os mamÃ­feros marinhos.';
+      'Baleia do Ártico com uma longa presa em espiral, raramente vista mas icónica entre os mamíferos marinhos.';
 
   @override
   String get species_green_sea_turtle_name => 'Tartaruga-verde';
 
   @override
   String get species_green_sea_turtle_desc =>
-      'Grande tartaruga marinha, vista com frequÃªncia a pastar nas pradarias marinhas de Ã¡guas tropicais.';
+      'Grande tartaruga marinha, vista com frequência a pastar nas pradarias marinhas de águas tropicais.';
 
   @override
   String get species_hawksbill_sea_turtle_name => 'Tartaruga-de-pente';
 
   @override
   String get species_hawksbill_sea_turtle_desc =>
-      'Tartaruga de recife com um bico pontiagudo, que se alimenta de esponjas entre as formaÃ§Ãµes de coral.';
+      'Tartaruga de recife com um bico pontiagudo, que se alimenta de esponjas entre as formações de coral.';
 
   @override
   String get species_loggerhead_sea_turtle_name => 'Tartaruga-comum';
 
   @override
   String get species_loggerhead_sea_turtle_desc =>
-      'Tartaruga de cabeÃ§a grande, presente em mares temperados e tropicais, muitas vezes junto a recifes rochosos.';
+      'Tartaruga de cabeça grande, presente em mares temperados e tropicais, muitas vezes junto a recifes rochosos.';
 
   @override
   String get species_leatherback_sea_turtle_name => 'Tartaruga-de-couro';
 
   @override
   String get species_leatherback_sea_turtle_desc =>
-      'A maior tartaruga viva, com uma carapaÃ§a flexÃ­vel e coriÃ¡cea, capaz de mergulhos a profundidades extremas.';
+      'A maior tartaruga viva, com uma carapaça flexível e coriácea, capaz de mergulhos a profundidades extremas.';
 
   @override
   String get species_olive_ridley_sea_turtle_name => 'Tartaruga-oliva';
@@ -34425,98 +34376,98 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_kemps_ridley_sea_turtle_desc =>
-      'Tartaruga marinha criticamente ameaÃ§ada, presente sobretudo no golfo do MÃ©xico.';
+      'Tartaruga marinha criticamente ameaçada, presente sobretudo no golfo do México.';
 
   @override
   String get species_flatback_sea_turtle_name => 'Tartaruga-de-dorso-plano';
 
   @override
   String get species_flatback_sea_turtle_desc =>
-      'EndÃ©mica das Ã¡guas australianas, distingue-se pela carapaÃ§a achatada e pelo habitat costeiro.';
+      'Endémica das águas australianas, distingue-se pela carapaça achatada e pelo habitat costeiro.';
 
   @override
-  String get species_brain_coral_name => 'Coral-cÃ©rebro';
+  String get species_brain_coral_name => 'Coral-cérebro';
 
   @override
   String get species_brain_coral_desc =>
-      'Coral construtor de recife maciÃ§o, de superfÃ­cie sulcada semelhante a um cÃ©rebro, comum nos recifes das CaraÃ­bas.';
+      'Coral construtor de recife maciço, de superfície sulcada semelhante a um cérebro, comum nos recifes das Caraíbas.';
 
   @override
   String get species_staghorn_coral_name => 'Coral-chifre-de-veado';
 
   @override
   String get species_staghorn_coral_desc =>
-      'Coral ramificado de crescimento rÃ¡pido que forma matas densas, um habitat essencial para os peixes de recife.';
+      'Coral ramificado de crescimento rápido que forma matas densas, um habitat essencial para os peixes de recife.';
 
   @override
   String get species_elkhorn_coral_name => 'Coral-chifre-de-alce';
 
   @override
   String get species_elkhorn_coral_desc =>
-      'Grande coral ramificado, de ramos achatados e palmados, um construtor de recife fundamental nas CaraÃ­bas.';
+      'Grande coral ramificado, de ramos achatados e palmados, um construtor de recife fundamental nas Caraíbas.';
 
   @override
   String get species_table_coral_name => 'Coral-mesa';
 
   @override
   String get species_table_coral_desc =>
-      'Coral achatado em forma de placa, presente nos recifes do Indo-PacÃ­fico, que dÃ¡ abrigo a muitas espÃ©cies de peixes.';
+      'Coral achatado em forma de placa, presente nos recifes do Indo-Pacífico, que dá abrigo a muitas espécies de peixes.';
 
   @override
   String get species_mushroom_coral_name => 'Coral-cogumelo';
 
   @override
   String get species_mushroom_coral_desc =>
-      'Coral solitÃ¡rio e de vida livre, em forma de disco, encontrado em zonas arenosas junto aos recifes do Indo-PacÃ­fico.';
+      'Coral solitário e de vida livre, em forma de disco, encontrado em zonas arenosas junto aos recifes do Indo-Pacífico.';
 
   @override
   String get species_bubble_coral_name => 'Coral-bolha';
 
   @override
   String get species_bubble_coral_desc =>
-      'Coral inconfundÃ­vel, com vesÃ­culas semelhantes a bagos de uva que se insuflam de dia para captar luz.';
+      'Coral inconfundível, com vesículas semelhantes a bagos de uva que se insuflam de dia para captar luz.';
 
   @override
   String get species_plate_coral_name => 'Coral-prato';
 
   @override
   String get species_plate_coral_desc =>
-      'Coral de placas finas que forma prateleiras em espiral, comum nas encostas de recife do Indo-PacÃ­fico.';
+      'Coral de placas finas que forma prateleiras em espiral, comum nas encostas de recife do Indo-Pacífico.';
 
   @override
   String get species_pillar_coral_name => 'Coral-pilar';
 
   @override
   String get species_pillar_coral_desc =>
-      'Coral raro de crescimento vertical, que forma colunas altas, presente nas CaraÃ­bas.';
+      'Coral raro de crescimento vertical, que forma colunas altas, presente nas Caraíbas.';
 
   @override
   String get species_star_coral_name => 'Coral-estrela';
 
   @override
   String get species_star_coral_desc =>
-      'Grande construtor de recife das CaraÃ­bas, que forma colÃ³nias em forma de blocos com pÃ³lipos estrelados.';
+      'Grande construtor de recife das Caraíbas, que forma colónias em forma de blocos com pólipos estrelados.';
 
   @override
   String get species_lettuce_coral_name => 'Coral-alface';
 
   @override
   String get species_lettuce_coral_desc =>
-      'Coral de placas finas com dobras semelhantes a folhas, comum nas paredes e encostas de recife das CaraÃ­bas.';
+      'Coral de placas finas com dobras semelhantes a folhas, comum nas paredes e encostas de recife das Caraíbas.';
 
   @override
   String get species_finger_coral_name => 'Coral-dedo';
 
   @override
   String get species_finger_coral_desc =>
-      'Coral ramificado e robusto, com projeÃ§Ãµes grossas em forma de dedo, encontrado em recifes pouco profundos.';
+      'Coral ramificado e robusto, com projeções grossas em forma de dedo, encontrado em recifes pouco profundos.';
 
   @override
-  String get species_massive_porites_name => 'Coral-porites-maciÃ§o';
+  String get species_massive_porites_name => 'Coral-porites-maciço';
 
   @override
   String get species_massive_porites_desc =>
-      'Grande coral em bloco que pode crescer durante sÃ©culos, um construtor de recife dominante no Indo-PacÃ­fico.';
+      'Grande coral em bloco que pode crescer durante séculos, um construtor de recife dominante no Indo-Pacífico.';
 
   @override
   String get species_cauliflower_coral_name => 'Coral-couve-flor';
@@ -34530,21 +34481,21 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_flower_pot_coral_desc =>
-      'ColÃ³nia de pÃ³lipos de tentÃ¡culos longos que se estendem durante o dia, lembrando um ramo de flores.';
+      'Colónia de pólipos de tentáculos longos que se estendem durante o dia, lembrando um ramo de flores.';
 
   @override
-  String get species_cup_coral_name => 'Coral-taÃ§a-laranja';
+  String get species_cup_coral_name => 'Coral-taça-laranja';
 
   @override
   String get species_cup_coral_desc =>
-      'Coral laranja-vivo e nÃ£o fotossintÃ©tico, encontrado em paredes e abrigos de Ã¡guas tropicais.';
+      'Coral laranja-vivo e não fotossintético, encontrado em paredes e abrigos de águas tropicais.';
 
   @override
   String get species_scroll_coral_name => 'Coral-pergaminho';
 
   @override
   String get species_scroll_coral_desc =>
-      'Coral que forma grandes placas enroladas, comum nas encostas de recife e lagunas do Indo-PacÃ­fico.';
+      'Coral que forma grandes placas enroladas, comum nas encostas de recife e lagunas do Indo-Pacífico.';
 
   @override
   String get species_cabbage_coral_name => 'Coral-couve';
@@ -34558,220 +34509,220 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_hammer_coral_desc =>
-      'Coral de pÃ³lipos grandes, com pontas dos tentÃ¡culos em forma de Ã¢ncora ou martelo, muito apreciado nos recifes do Indo-PacÃ­fico.';
+      'Coral de pólipos grandes, com pontas dos tentáculos em forma de âncora ou martelo, muito apreciado nos recifes do Indo-Pacífico.';
 
   @override
   String get species_torch_coral_name => 'Coral-tocha';
 
   @override
   String get species_torch_coral_desc =>
-      'Coral ramificado com tentÃ¡culos longos e ondulantes rematados por bolbos luminosos.';
+      'Coral ramificado com tentáculos longos e ondulantes rematados por bolbos luminosos.';
 
   @override
-  String get species_frogspawn_coral_name => 'Coral-ovas-de-rÃ£';
+  String get species_frogspawn_coral_name => 'Coral-ovas-de-rã';
 
   @override
   String get species_frogspawn_coral_desc =>
-      'Coral de pÃ³lipos grandes, com pontas dos tentÃ¡culos ramificadas que lembram ovos de rÃ£.';
+      'Coral de pólipos grandes, com pontas dos tentáculos ramificadas que lembram ovos de rã.';
 
   @override
-  String get species_sea_fan_name => 'GorgÃ³nia-leque-comum';
+  String get species_sea_fan_name => 'Gorgónia-leque-comum';
 
   @override
   String get species_sea_fan_desc =>
-      'GorgÃ³nia achatada em forma de leque, orientada perpendicularmente Ã s correntes, um Ã­cone dos recifes das CaraÃ­bas.';
+      'Gorgónia achatada em forma de leque, orientada perpendicularmente às correntes, um ícone dos recifes das Caraíbas.';
 
   @override
-  String get species_venus_sea_fan_name => 'Leque-do-mar-de-VÃ©nus';
+  String get species_venus_sea_fan_name => 'Leque-do-mar-de-Vénus';
 
   @override
   String get species_venus_sea_fan_desc =>
-      'GorgÃ³nia delicada em forma de leque, presente em recifes pouco profundos das CaraÃ­bas com corrente moderada.';
+      'Gorgónia delicada em forma de leque, presente em recifes pouco profundos das Caraíbas com corrente moderada.';
 
   @override
-  String get species_deepwater_sea_fan_name => 'GorgÃ³nia-de-Ã¡guas-profundas';
+  String get species_deepwater_sea_fan_name => 'Gorgónia-de-águas-profundas';
 
   @override
   String get species_deepwater_sea_fan_desc =>
-      'GorgÃ³nia grande e ramosa, encontrada em paredes de recife profundas nas CaraÃ­bas.';
+      'Gorgónia grande e ramosa, encontrada em paredes de recife profundas nas Caraíbas.';
 
   @override
-  String get species_sea_whip_name => 'GorgÃ³nia-chicote';
+  String get species_sea_whip_name => 'Gorgónia-chicote';
 
   @override
   String get species_sea_whip_desc =>
-      'GorgÃ³nia esguia em forma de vara, encontrada a baloiÃ§ar nas correntes dos recifes do AtlÃ¢ntico e das CaraÃ­bas.';
+      'Gorgónia esguia em forma de vara, encontrada a baloiçar nas correntes dos recifes do Atlântico e das Caraíbas.';
 
   @override
-  String get species_sea_plume_name => 'GorgÃ³nia-pluma';
+  String get species_sea_plume_name => 'Gorgónia-pluma';
 
   @override
   String get species_sea_plume_desc =>
-      'GorgÃ³nia alta e plumosa, que forma colÃ³nias em forma de pluma nos topos dos recifes das CaraÃ­bas.';
+      'Gorgónia alta e plumosa, que forma colónias em forma de pluma nos topos dos recifes das Caraíbas.';
 
   @override
-  String get species_organ_pipe_coral_name => 'Coral-tubo-de-Ã³rgÃ£o';
+  String get species_organ_pipe_coral_name => 'Coral-tubo-de-órgão';
 
   @override
   String get species_organ_pipe_coral_desc =>
-      'Tubos esquelÃ©ticos vermelho-vivos com pÃ³lipos delicados, encontrados em recifes abrigados do Indo-PacÃ­fico.';
+      'Tubos esqueléticos vermelho-vivos com pólipos delicados, encontrados em recifes abrigados do Indo-Pacífico.';
 
   @override
   String get species_leather_coral_name => 'Coral-couro';
 
   @override
   String get species_leather_coral_desc =>
-      'Coral mole de superfÃ­cie lisa e coriÃ¡cea, que forma grandes colÃ³nias em forma de cogumelo.';
+      'Coral mole de superfície lisa e coriácea, que forma grandes colónias em forma de cogumelo.';
 
   @override
   String get species_toadstool_leather_coral_name => 'Coral-couro-cogumelo';
 
   @override
   String get species_toadstool_leather_coral_desc =>
-      'Coral mole com um pÃ© espesso e um chapÃ©u achatado, comum nos planaltos de recife do Indo-PacÃ­fico.';
+      'Coral mole com um pé espesso e um chapéu achatado, comum nos planaltos de recife do Indo-Pacífico.';
 
   @override
-  String get species_pulsing_xenia_name => 'XÃ©nia-pulsante';
+  String get species_pulsing_xenia_name => 'Xénia-pulsante';
 
   @override
   String get species_pulsing_xenia_desc =>
-      'Coral mole com pÃ³lipos que pulsam ritmadamente, presente em Ã¡guas abrigadas do Indo-PacÃ­fico.';
+      'Coral mole com pólipos que pulsam ritmadamente, presente em águas abrigadas do Indo-Pacífico.';
 
   @override
-  String get species_tree_coral_name => 'Coral-Ã¡rvore';
+  String get species_tree_coral_name => 'Coral-árvore';
 
   @override
   String get species_tree_coral_desc =>
-      'Coral mole vibrante que forma grupos em forma de Ã¡rvore em paredes e abrigos do mar Vermelho.';
+      'Coral mole vibrante que forma grupos em forma de árvore em paredes e abrigos do mar Vermelho.';
 
   @override
   String get species_blue_coral_name => 'Coral-azul';
 
   @override
   String get species_blue_coral_desc =>
-      'Octocoral singular, de esqueleto azul, encontrado nos planaltos de recife pouco profundos do Indo-PacÃ­fico.';
+      'Octocoral singular, de esqueleto azul, encontrado nos planaltos de recife pouco profundos do Indo-Pacífico.';
 
   @override
   String get species_black_coral_name => 'Coral-negro';
 
   @override
   String get species_black_coral_desc =>
-      'Coral de Ã¡gua profunda, de esqueleto escuro, encontrado em paredes e escarpas abaixo dos 30 metros.';
+      'Coral de água profunda, de esqueleto escuro, encontrado em paredes e escarpas abaixo dos 30 metros.';
 
   @override
   String get species_carnation_coral_name => 'Coral-cravo';
 
   @override
   String get species_carnation_coral_desc =>
-      'Coral mole de cores vivas, encontrado sob saliÃªncias e em paredes do Indo-PacÃ­fico.';
+      'Coral mole de cores vivas, encontrado sob saliências e em paredes do Indo-Pacífico.';
 
   @override
   String get species_wire_coral_name => 'Coral-arame';
 
   @override
   String get species_wire_coral_desc =>
-      'Coral negro comprido e espiralado, que forma chicotes enrolados, hospedeiro de gÃ³bios e camarÃµes.';
+      'Coral negro comprido e espiralado, que forma chicotes enrolados, hospedeiro de góbios e camarões.';
 
   @override
   String get species_dead_mans_fingers_name => 'Dedos-de-defunto';
 
   @override
   String get species_dead_mans_fingers_desc =>
-      'Coral mole e carnudo, de lobos em forma de dedo, comum nos recifes temperados do AtlÃ¢ntico Norte.';
+      'Coral mole e carnudo, de lobos em forma de dedo, comum nos recifes temperados do Atlântico Norte.';
 
   @override
   String get species_sun_coral_name => 'Coral-sol';
 
   @override
   String get species_sun_coral_desc =>
-      'Coral amarelo-alaranjado e nÃ£o fotossintÃ©tico, que abre os pÃ³lipos Ã  noite nas paredes do Indo-PacÃ­fico.';
+      'Coral amarelo-alaranjado e não fotossintético, que abre os pólipos à noite nas paredes do Indo-Pacífico.';
 
   @override
   String get species_lace_coral_name => 'Coral-renda';
 
   @override
   String get species_lace_coral_desc =>
-      'Hidrocoral rosa delicado, de ramos rendilhados, encontrado em fendas e sob saliÃªncias.';
+      'Hidrocoral rosa delicado, de ramos rendilhados, encontrado em fendas e sob saliências.';
 
   @override
-  String get species_kenya_tree_coral_name => 'Coral-Ã¡rvore-do-QuÃ©nia';
+  String get species_kenya_tree_coral_name => 'Coral-árvore-do-Quénia';
 
   @override
   String get species_kenya_tree_coral_desc =>
-      'Coral mole resistente, de ramos em forma de Ã¡rvore, comum no Indo-PacÃ­fico.';
+      'Coral mole resistente, de ramos em forma de árvore, comum no Indo-Pacífico.';
 
   @override
   String get species_colt_coral_name => 'Coral-colt';
 
   @override
   String get species_colt_coral_desc =>
-      'Coral mole de ramos espessos e emborrachados, cobertos de pequenos pÃ³lipos, nos recifes do Indo-PacÃ­fico.';
+      'Coral mole de ramos espessos e emborrachados, cobertos de pequenos pólipos, nos recifes do Indo-Pacífico.';
 
   @override
   String get species_turtle_grass_name => 'Erva-de-tartaruga';
 
   @override
   String get species_turtle_grass_desc =>
-      'Erva marinha dominante nas CaraÃ­bas, de lÃ¢minas largas e achatadas, alimento vital para as tartarugas marinhas.';
+      'Erva marinha dominante nas Caraíbas, de lâminas largas e achatadas, alimento vital para as tartarugas marinhas.';
 
   @override
   String get species_eelgrass_name => 'Zostera';
 
   @override
   String get species_eelgrass_desc =>
-      'Erva marinha temperada que forma pradarias submersas densas, servindo de habitat de berÃ§Ã¡rio.';
+      'Erva marinha temperada que forma pradarias submersas densas, servindo de habitat de berçário.';
 
   @override
   String get species_manatee_grass_name => 'Erva-de-peixe-boi';
 
   @override
   String get species_manatee_grass_desc =>
-      'Erva marinha de lÃ¢minas cilÃ­ndricas, presente em zonas arenosas das CaraÃ­bas, muitas vezes junto a pradarias de erva-de-tartaruga.';
+      'Erva marinha de lâminas cilíndricas, presente em zonas arenosas das Caraíbas, muitas vezes junto a pradarias de erva-de-tartaruga.';
 
   @override
   String get species_shoal_grass_name => 'Erva-de-baixio';
 
   @override
   String get species_shoal_grass_desc =>
-      'Erva marinha pioneira, de lÃ¢minas estreitas, que coloniza zonas arenosas perturbadas nas CaraÃ­bas.';
+      'Erva marinha pioneira, de lâminas estreitas, que coloniza zonas arenosas perturbadas nas Caraíbas.';
 
   @override
   String get species_paddle_grass_name => 'Erva-remo';
 
   @override
   String get species_paddle_grass_desc =>
-      'Erva marinha pequena e delicada, de folhas ovais, encontrada em Ã¡guas mais profundas de todos os trÃ³picos.';
+      'Erva marinha pequena e delicada, de folhas ovais, encontrada em águas mais profundas de todos os trópicos.';
 
   @override
-  String get species_neptune_grass_name => 'PosidÃ³nia';
+  String get species_neptune_grass_name => 'Posidónia';
 
   @override
   String get species_neptune_grass_desc =>
-      'Erva marinha do MediterrÃ¢neo que forma vastas pradarias essenciais para os ecossistemas marinhos costeiros.';
+      'Erva marinha do Mediterrâneo que forma vastas pradarias essenciais para os ecossistemas marinhos costeiros.';
 
   @override
   String get species_giant_kelp_name => 'Kelp-gigante';
 
   @override
   String get species_giant_kelp_desc =>
-      'EspÃ©cie que forma florestas submersas imponentes, com atÃ© 60 metros de altura, um Ã­cone do mergulho na CalifÃ³rnia.';
+      'Espécie que forma florestas submersas imponentes, com até 60 metros de altura, um ícone do mergulho na Califórnia.';
 
   @override
   String get species_bull_kelp_name => 'Kelp-touro';
 
   @override
   String get species_bull_kelp_desc =>
-      'Kelp do PacÃ­fico com um Ãºnico estipe comprido e um flutuador bolboso, que forma florestas de copado denso.';
+      'Kelp do Pacífico com um único estipe comprido e um flutuador bolboso, que forma florestas de copado denso.';
 
   @override
   String get species_bladder_wrack_name => 'Bodelha';
 
   @override
   String get species_bladder_wrack_desc =>
-      'Alga castanha comum, com vesÃ­culas de ar aos pares, encontrada nas zonas intertidais do AtlÃ¢ntico Norte.';
+      'Alga castanha comum, com vesículas de ar aos pares, encontrada nas zonas intertidais do Atlântico Norte.';
 
   @override
-  String get species_sargassum_name => 'SargaÃ§o';
+  String get species_sargassum_name => 'Sargaço';
 
   @override
   String get species_sargassum_desc =>
@@ -34782,42 +34733,42 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_kelp_forest_ecklonia_desc =>
-      'Kelp dominante nas Ã¡guas do hemisfÃ©rio sul, onde forma florestas submersas importantes.';
+      'Kelp dominante nas águas do hemisfério sul, onde forma florestas submersas importantes.';
 
   @override
   String get species_coralline_algae_name => 'Algas-coralinas';
 
   @override
   String get species_coralline_algae_desc =>
-      'Alga vermelha incrustante e dura que cimenta as estruturas do recife e lhe dÃ¡ um tom rosado.';
+      'Alga vermelha incrustante e dura que cimenta as estruturas do recife e lhe dá um tom rosado.';
 
   @override
   String get species_irish_moss_name => 'Musgo-da-Irlanda';
 
   @override
   String get species_irish_moss_desc =>
-      'Alga vermelha em forma de leque, encontrada nas costas rochosas da zona intertidal do AtlÃ¢ntico Norte.';
+      'Alga vermelha em forma de leque, encontrada nas costas rochosas da zona intertidal do Atlântico Norte.';
 
   @override
   String get species_dulse_name => 'Dulse';
 
   @override
   String get species_dulse_desc =>
-      'Alga achatada de tom vermelho-arroxeado, que cresce sobre rochas e estipes de kelp em Ã¡guas frias do norte.';
+      'Alga achatada de tom vermelho-arroxeado, que cresce sobre rochas e estipes de kelp em águas frias do norte.';
 
   @override
   String get species_halimeda_name => 'Halimeda';
 
   @override
   String get species_halimeda_desc =>
-      'Alga verde calcificada, de segmentos em forma de disco, grande responsÃ¡vel pela areia dos recifes.';
+      'Alga verde calcificada, de segmentos em forma de disco, grande responsável pela areia dos recifes.';
 
   @override
   String get species_sea_lettuce_name => 'Alface-do-mar';
 
   @override
   String get species_sea_lettuce_desc =>
-      'Alga verde-viva em lÃ¢minas finas, encontrada em Ã¡guas costeiras pouco profundas de todo o mundo.';
+      'Alga verde-viva em lâminas finas, encontrada em águas costeiras pouco profundas de todo o mundo.';
 
   @override
   String get species_caulerpa_name => 'Alga-uva-verde';
@@ -34831,28 +34782,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_mermaid_fan_desc =>
-      'Alga verde calcificada com a forma de um pequeno leque, comum nos fundos arenosos das CaraÃ­bas.';
+      'Alga verde calcificada com a forma de um pequeno leque, comum nos fundos arenosos das Caraíbas.';
 
   @override
   String get species_shaving_brush_algae_name => 'Alga-pincel-de-barba';
 
   @override
   String get species_shaving_brush_algae_desc =>
-      'Alga verde calcificada, com um tufo em forma de pincel sobre um pÃ©, encontrada nos fundos arenosos das CaraÃ­bas.';
+      'Alga verde calcificada, com um tufo em forma de pincel sobre um pé, encontrada nos fundos arenosos das Caraíbas.';
 
   @override
-  String get species_finger_kelp_name => 'LaminÃ¡ria-digitada';
+  String get species_finger_kelp_name => 'Laminária-digitada';
 
   @override
   String get species_finger_kelp_desc =>
-      'Alga castanha de frondes em forma de dedos, que forma bosques de kelp nas Ã¡guas costeiras do AtlÃ¢ntico Norte.';
+      'Alga castanha de frondes em forma de dedos, que forma bosques de kelp nas águas costeiras do Atlântico Norte.';
 
   @override
   String get species_banded_sea_krait_name => 'Serpente-marinha-de-bandas';
 
   @override
   String get species_banded_sea_krait_desc =>
-      'Serpente marinha venenosa, com bandas azul-acinzentadas e negras, dÃ³cil e vista com frequÃªncia nos recifes do Indo-PacÃ­fico.';
+      'Serpente marinha venenosa, com bandas azul-acinzentadas e negras, dócil e vista com frequência nos recifes do Indo-Pacífico.';
 
   @override
   String get species_olive_sea_snake_name => 'Serpente-marinha-oliva';
@@ -34867,49 +34818,49 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_yellow_bellied_sea_snake_desc =>
-      'Serpente marinha pelÃ¡gica de ventre amarelo, a espÃ©cie de serpente com maior distribuiÃ§Ã£o no planeta.';
+      'Serpente marinha pelágica de ventre amarelo, a espécie de serpente com maior distribuição no planeta.';
 
   @override
   String get species_marine_iguana_name => 'Iguana-marinha';
 
   @override
   String get species_marine_iguana_desc =>
-      'EndÃ©mica dos GalÃ¡pagos, Ã© o Ãºnico lagarto que se alimenta de algas debaixo de Ã¡gua.';
+      'Endémica dos Galápagos, é o único lagarto que se alimenta de algas debaixo de água.';
 
   @override
-  String get species_saltwater_crocodile_name => 'Crocodilo-de-Ã¡gua-salgada';
+  String get species_saltwater_crocodile_name => 'Crocodilo-de-água-salgada';
 
   @override
   String get species_saltwater_crocodile_desc =>
-      'O maior rÃ©ptil vivo, presente em Ã¡guas costeiras e estuarinas do Indo-PacÃ­fico.';
+      'O maior réptil vivo, presente em águas costeiras e estuarinas do Indo-Pacífico.';
 
   @override
-  String get species_northern_pike_name => 'LÃºcio';
+  String get species_northern_pike_name => 'Lúcio';
 
   @override
   String get species_northern_pike_desc =>
-      'Predador alongado de focinho em bico de pato, imÃ³vel Ã  espreita entre as plantas das margens dos lagos.';
+      'Predador alongado de focinho em bico de pato, imóvel à espreita entre as plantas das margens dos lagos.';
 
   @override
   String get species_muskellunge_name => 'Muskellunge';
 
   @override
   String get species_muskellunge_desc =>
-      'O maior dos lÃºcios, um gigante listrado ou pintado dos lagos lÃ­mpidos do norte, raro de ver e inesquecÃ­vel.';
+      'O maior dos lúcios, um gigante listrado ou pintado dos lagos límpidos do norte, raro de ver e inesquecível.';
 
   @override
-  String get species_chain_pickerel_name => 'LÃºcio-corrente';
+  String get species_chain_pickerel_name => 'Lúcio-corrente';
 
   @override
   String get species_chain_pickerel_desc =>
-      'LÃºcio esguio dos lagos com vegetaÃ§Ã£o do leste da AmÃ©rica do Norte, nomeado pelo padrÃ£o em cadeia dos flancos.';
+      'Lúcio esguio dos lagos com vegetação do leste da América do Norte, nomeado pelo padrão em cadeia dos flancos.';
 
   @override
   String get species_walleye_name => 'Sander-dourado';
 
   @override
   String get species_walleye_desc =>
-      'Parente da perca de tom oliva dourado com grandes olhos refletores, caÃ§a ao anoitecer sobre fundos rochosos e arenosos.';
+      'Parente da perca de tom oliva dourado com grandes olhos refletores, caça ao anoitecer sobre fundos rochosos e arenosos.';
 
   @override
   String get species_sauger_name => 'Sander-canadense';
@@ -34923,7 +34874,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_yellow_perch_desc =>
-      'Perca dourada de cardume com barras verticais escuras, comum junto a cais e leitos de plantas na AmÃ©rica do Norte.';
+      'Perca dourada de cardume com barras verticais escuras, comum junto a cais e leitos de plantas na América do Norte.';
 
   @override
   String get species_european_perch_name => 'Perca';
@@ -34933,35 +34884,35 @@ class AppLocalizationsPt extends AppLocalizations {
       'Perca listrada de barbatanas espinhosas e barbatanas inferiores vermelho alaranjadas, presente em quase todos os lagos e rios lentos da Europa.';
 
   @override
-  String get species_zander_name => 'LÃºcioperca';
+  String get species_zander_name => 'Lúcioperca';
 
   @override
   String get species_zander_desc =>
-      'Grande predador pÃ¡lido de olhos vÃ­treos e mandÃ­bulas com presas, patrulha lagos e rios turvos da Europa Ã  noite.';
+      'Grande predador pálido de olhos vítreos e mandíbulas com presas, patrulha lagos e rios turvos da Europa à noite.';
 
   @override
   String get species_ruffe_name => 'Perca-porco-espinho';
 
   @override
   String get species_ruffe_desc =>
-      'Pequena perca mosqueada com barbatana dorsal espinhosa contÃ­nua, abundante em fundos moles de lagos europeus.';
+      'Pequena perca mosqueada com barbatana dorsal espinhosa contínua, abundante em fundos moles de lagos europeus.';
 
   @override
-  String get species_largemouth_bass_name => 'AchigÃ£';
+  String get species_largemouth_bass_name => 'Achigã';
 
   @override
   String get species_largemouth_bass_desc =>
-      'AchigÃ£ de dorso verde, faixa lateral escura e boca enorme, Ã  espreita junto a troncos e bordas de vegetaÃ§Ã£o em lagos quentes.';
+      'Achigã de dorso verde, faixa lateral escura e boca enorme, à espreita junto a troncos e bordas de vegetação em lagos quentes.';
 
   @override
-  String get species_smallmouth_bass_name => 'AchigÃ£-boca-pequena';
+  String get species_smallmouth_bass_name => 'Achigã-boca-pequena';
 
   @override
   String get species_smallmouth_bass_desc =>
-      'AchigÃ£ bronzeado com barras verticais tÃ©nues, mantÃ©m-se sobre rocha e cascalho em lagos e rios claros e frescos.';
+      'Achigã bronzeado com barras verticais ténues, mantém-se sobre rocha e cascalho em lagos e rios claros e frescos.';
 
   @override
-  String get species_rock_bass_name => 'AchigÃ£-da-rocha';
+  String get species_rock_bass_name => 'Achigã-da-rocha';
 
   @override
   String get species_rock_bass_desc =>
@@ -34972,42 +34923,42 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_bluegill_desc =>
-      'Peixe-sol discoide com opÃ©rculo azul-escuro e peito laranja, nidifica em colÃ³nias em fundos arenosos rasos.';
+      'Peixe-sol discoide com opérculo azul-escuro e peito laranja, nidifica em colónias em fundos arenosos rasos.';
 
   @override
   String get species_pumpkinseed_name => 'Perca-sol';
 
   @override
   String get species_pumpkinseed_desc =>
-      'Peixe-sol vivamente salpicado com opÃ©rculo de ponta vermelha e linhas azuis onduladas nas bochechas, comum em Ã¡guas rasas com vegetaÃ§Ã£o.';
+      'Peixe-sol vivamente salpicado com opérculo de ponta vermelha e linhas azuis onduladas nas bochechas, comum em águas rasas com vegetação.';
 
   @override
-  String get species_black_crappie_name => 'AchigÃ£-nebuloso';
+  String get species_black_crappie_name => 'Achigã-nebuloso';
 
   @override
   String get species_black_crappie_desc =>
       'Peixe prateado de corpo alto salpicado de preto, em cardumes junto a ramos submersos e estacas.';
 
   @override
-  String get species_white_crappie_name => 'AchigÃ£-preteado';
+  String get species_white_crappie_name => 'Achigã-preteado';
 
   @override
   String get species_white_crappie_desc =>
-      'Crappie mais pÃ¡lido com faixas verticais tÃ©nues, prefere represas turvas e rios lentos.';
+      'Crappie mais pálido com faixas verticais ténues, prefere represas turvas e rios lentos.';
 
   @override
   String get species_brown_trout_name => 'Truta';
 
   @override
   String get species_brown_trout_desc =>
-      'Truta castanho dourada com pintas vermelhas e pretas, mantÃ©m-se na corrente de rios e lagos frescos e claros.';
+      'Truta castanho dourada com pintas vermelhas e pretas, mantém-se na corrente de rios e lagos frescos e claros.';
 
   @override
-  String get species_rainbow_trout_name => 'Truta-arco-Ã­ris';
+  String get species_rainbow_trout_name => 'Truta-arco-íris';
 
   @override
   String get species_rainbow_trout_desc =>
-      'Truta prateada com faixa lateral rosada e fino salpicado preto, repovoada e selvagem em Ã¡guas frias de todo o mundo.';
+      'Truta prateada com faixa lateral rosada e fino salpicado preto, repovoada e selvagem em águas frias de todo o mundo.';
 
   @override
   String get species_brook_trout_name => 'Truta das fontes';
@@ -35021,42 +34972,42 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_lake_trout_desc =>
-      'Grande truta-de-lago cinzenta coberta de manchas claras e cauda bifurcada, percorre as Ã¡guas frias e profundas dos lagos do norte.';
+      'Grande truta-de-lago cinzenta coberta de manchas claras e cauda bifurcada, percorre as águas frias e profundas dos lagos do norte.';
 
   @override
-  String get species_arctic_char_name => 'Salvelino-Ã¡rctico';
+  String get species_arctic_char_name => 'Salvelino-árctico';
 
   @override
   String get species_arctic_char_desc =>
-      'O peixe de Ã¡gua doce mais setentrional, uma truta esguia cujo ventre se tinge de vermelho alaranjado nas cores de desova outonais.';
+      'O peixe de água doce mais setentrional, uma truta esguia cujo ventre se tinge de vermelho alaranjado nas cores de desova outonais.';
 
   @override
-  String get species_atlantic_salmon_name => 'SalmÃ£o-do-AtlÃ¢ntico';
+  String get species_atlantic_salmon_name => 'Salmão-do-Atlântico';
 
   @override
   String get species_atlantic_salmon_desc =>
-      'SalmÃ£o prateado migrador com pintas pretas em forma de X, salta quedas de Ã¡gua ao regressar aos rios natais para desovar.';
+      'Salmão prateado migrador com pintas pretas em forma de X, salta quedas de água ao regressar aos rios natais para desovar.';
 
   @override
-  String get species_chinook_salmon_name => 'SalmÃ£o-real';
+  String get species_chinook_salmon_name => 'Salmão-real';
 
   @override
   String get species_chinook_salmon_desc =>
-      'O maior salmÃ£o do PacÃ­fico, de dorso azul-esverdeado e gengivas pretas, sobe os grandes rios ocidentais para desovar.';
+      'O maior salmão do Pacífico, de dorso azul-esverdeado e gengivas pretas, sobe os grandes rios ocidentais para desovar.';
 
   @override
-  String get species_sockeye_salmon_name => 'SalmÃ£o-vermelho';
+  String get species_sockeye_salmon_name => 'Salmão-vermelho';
 
   @override
   String get species_sockeye_salmon_desc =>
-      'SalmÃ£o que fica vermelho vivo com cabeÃ§a verde na desova, enchendo os leitos de cascalho de rios alimentados por lagos.';
+      'Salmão que fica vermelho vivo com cabeça verde na desova, enchendo os leitos de cascalho de rios alimentados por lagos.';
 
   @override
-  String get species_coho_salmon_name => 'SalmÃ£o-prateado';
+  String get species_coho_salmon_name => 'Salmão-prateado';
 
   @override
   String get species_coho_salmon_desc =>
-      'SalmÃ£o prateado de gengivas brancas e pintas apenas na parte superior da cauda, desova em pequenos riachos costeiros.';
+      'Salmão prateado de gengivas brancas e pintas apenas na parte superior da cauda, desova em pequenos riachos costeiros.';
 
   @override
   String get species_lake_whitefish_name => 'Peixe-branco-de-lago';
@@ -35070,14 +35021,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_cisco_desc =>
-      'Peixe-branco esguio semelhante a um arenque que forma cardumes em Ã¡guas abertas de lagos frios do norte, presa da truta-de-lago.';
+      'Peixe-branco esguio semelhante a um arenque que forma cardumes em águas abertas de lagos frios do norte, presa da truta-de-lago.';
 
   @override
   String get species_european_grayling_name => 'Peixe-sombra';
 
   @override
   String get species_european_grayling_desc =>
-      'Peixe de rio cinzento prateado com barbatana dorsal alta em forma de vela orlada de pÃºrpura, mantÃ©m-se em correntes rÃ¡pidas sobre cascalho limpo.';
+      'Peixe de rio cinzento prateado com barbatana dorsal alta em forma de vela orlada de púrpura, mantém-se em correntes rápidas sobre cascalho limpo.';
 
   @override
   String get species_common_carp_name => 'Carpa';
@@ -35091,183 +35042,183 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_grass_carp_desc =>
-      'Carpa asiÃ¡tica fusiforme introduzida em todo o mundo para consumir plantas aquÃ¡ticas, frequente em lagos de pedreira lÃ­mpidos.';
+      'Carpa asiática fusiforme introduzida em todo o mundo para consumir plantas aquáticas, frequente em lagos de pedreira límpidos.';
 
   @override
   String get species_tench_name => 'Tenca';
 
   @override
   String get species_tench_desc =>
-      'Peixe verde-oliva de escamas minÃºsculas, olhos vermelhos e barbatanas arredondadas, desliza pela lama e pelos caniÃ§os de Ã¡guas paradas.';
+      'Peixe verde-oliva de escamas minúsculas, olhos vermelhos e barbatanas arredondadas, desliza pela lama e pelos caniços de águas paradas.';
 
   @override
   String get species_common_bream_name => 'Brema';
 
   @override
   String get species_common_bream_desc =>
-      'Peixe bronzeado de corpo alto e comprimido que se alimenta de cabeÃ§a para baixo em cardumes sobre fundos lodosos, comum nas planÃ­cies europeias.';
+      'Peixe bronzeado de corpo alto e comprimido que se alimenta de cabeça para baixo em cardumes sobre fundos lodosos, comum nas planícies europeias.';
 
   @override
   String get species_roach_name => 'Gardon';
 
   @override
   String get species_roach_desc =>
-      'Peixe prateado de cardume com barbatanas vermelhas e Ã­ris vermelha, o mais abundante em muitos lagos e canais europeus.';
+      'Peixe prateado de cardume com barbatanas vermelhas e íris vermelha, o mais abundante em muitos lagos e canais europeus.';
 
   @override
   String get species_rudd_name => 'Olho-vermelho';
 
   @override
   String get species_rudd_desc =>
-      'Parente da ruivaca de flancos dourados com barbatanas vermelho vivo e boca virada para cima, alimenta-se logo abaixo da superfÃ­cie.';
+      'Parente da ruivaca de flancos dourados com barbatanas vermelho vivo e boca virada para cima, alimenta-se logo abaixo da superfície.';
 
   @override
   String get species_chub_name => 'Chub';
 
   @override
   String get species_chub_desc =>
-      'Peixe de rio robusto de cabeÃ§a larga, escamas grandes de bordo escuro e boca grande, mantÃ©m-se sob Ã¡rvores debruÃ§adas sobre a Ã¡gua.';
+      'Peixe de rio robusto de cabeça larga, escamas grandes de bordo escuro e boca grande, mantém-se sob árvores debruçadas sobre a água.';
 
   @override
   String get species_barbel_name => 'Barbo';
 
   @override
   String get species_barbel_desc =>
-      'Peixe de fundo hidrodinÃ¢mico com quatro barbilhos e boca ventral, colado ao cascalho dos rios rÃ¡pidos europeus.';
+      'Peixe de fundo hidrodinâmico com quatro barbilhos e boca ventral, colado ao cascalho dos rios rápidos europeus.';
 
   @override
   String get species_european_eel_name => 'Enguia-comum';
 
   @override
   String get species_european_eel_desc =>
-      'Peixe serpentiforme que passa dÃ©cadas em rios e lagos antes de migrar para o Mar dos SargaÃ§os para desovar uma Ãºnica vez.';
+      'Peixe serpentiforme que passa décadas em rios e lagos antes de migrar para o Mar dos Sargaços para desovar uma única vez.';
 
   @override
   String get species_american_eel_name => 'Enguia-americana';
 
   @override
   String get species_american_eel_desc =>
-      'Enguia norte-americana que de dia se esconde sob as rochas em rios e lagos e regressa ao Mar dos SargaÃ§os para se reproduzir.';
+      'Enguia norte-americana que de dia se esconde sob as rochas em rios e lagos e regressa ao Mar dos Sargaços para se reproduzir.';
 
   @override
-  String get species_burbot_name => 'Lota-de-Ã¡gua-doce';
+  String get species_burbot_name => 'Lota-de-água-doce';
 
   @override
   String get species_burbot_desc =>
-      'O Ãºnico bacalhau de Ã¡gua doce, peixe mosqueado semelhante a uma enguia com um Ãºnico barbilho no queixo, escondido de dia em Ã¡guas frias e profundas.';
+      'O único bacalhau de água doce, peixe mosqueado semelhante a uma enguia com um único barbilho no queixo, escondido de dia em águas frias e profundas.';
 
   @override
   String get species_channel_catfish_name => 'Bagre-de-canal';
 
   @override
   String get species_channel_catfish_desc =>
-      'Bagre cinzento com pintas escuras dispersas, cauda bifurcada e oito barbilhos, comum em rios e represas da AmÃ©rica do Norte.';
+      'Bagre cinzento com pintas escuras dispersas, cauda bifurcada e oito barbilhos, comum em rios e represas da América do Norte.';
 
   @override
-  String get species_flathead_catfish_name => 'Bagre-cabeÃ§a-chata';
+  String get species_flathead_catfish_name => 'Bagre-cabeça-chata';
 
   @override
   String get species_flathead_catfish_desc =>
-      'Enorme bagre castanho mosqueado de cabeÃ§a achatada e maxilar inferior saliente, repousa em poÃ§os profundos dos rios.';
+      'Enorme bagre castanho mosqueado de cabeça achatada e maxilar inferior saliente, repousa em poços profundos dos rios.';
 
   @override
   String get species_brown_bullhead_name => 'Bagre-touro-castanho';
 
   @override
   String get species_brown_bullhead_desc =>
-      'Pequeno bagre atarracado de barbilhos escuros e cauda reta, tolera lagoas lodosas, quentes e pobres em oxigÃ©nio.';
+      'Pequeno bagre atarracado de barbilhos escuros e cauda reta, tolera lagoas lodosas, quentes e pobres em oxigénio.';
 
   @override
   String get species_wels_catfish_name => 'Peixe-gato-europeu';
 
   @override
   String get species_wels_catfish_desc =>
-      'O maior peixe de Ã¡gua doce da Europa, um gigante sem escamas de cabeÃ§a larga e achatada e longos bigodes, repousa em poÃ§os fundos dos rios.';
+      'O maior peixe de água doce da Europa, um gigante sem escamas de cabeça larga e achatada e longos bigodes, repousa em poços fundos dos rios.';
 
   @override
-  String get species_white_sturgeon_name => 'EsturjÃ£o-branco';
+  String get species_white_sturgeon_name => 'Esturjão-branco';
 
   @override
   String get species_white_sturgeon_desc =>
-      'O maior peixe de Ã¡gua doce da AmÃ©rica do Norte, um gigante cinzento couraÃ§ado com cauda de tubarÃ£o que percorre os grandes rios ocidentais.';
+      'O maior peixe de água doce da América do Norte, um gigante cinzento couraçado com cauda de tubarão que percorre os grandes rios ocidentais.';
 
   @override
-  String get species_lake_sturgeon_name => 'EsturjÃ£o-de-lago';
+  String get species_lake_sturgeon_name => 'Esturjão-de-lago';
 
   @override
   String get species_lake_sturgeon_desc =>
-      'EsturjÃ£o couraÃ§ado de crescimento lento dos Grandes Lagos e da bacia do MississÃ­pi, aspira o fundo com a boca tubular.';
+      'Esturjão couraçado de crescimento lento dos Grandes Lagos e da bacia do Mississípi, aspira o fundo com a boca tubular.';
 
   @override
-  String get species_european_sturgeon_name => 'EsturjÃ£o';
+  String get species_european_sturgeon_name => 'Esturjão';
 
   @override
   String get species_european_sturgeon_desc =>
-      'EsturjÃ£o couraÃ§ado criticamente ameaÃ§ado dos rios atlÃ¢nticos, hoje criado e libertado no Garona e no Elba.';
+      'Esturjão couraçado criticamente ameaçado dos rios atlânticos, hoje criado e libertado no Garona e no Elba.';
 
   @override
-  String get species_alligator_gar_name => 'Peixe-jacarÃ©';
+  String get species_alligator_gar_name => 'Peixe-jacaré';
 
   @override
   String get species_alligator_gar_desc =>
-      'Gigante prÃ©-histÃ³rico de focinho largo e dentado com escamas couraÃ§adas em losango, sobe para engolir ar em rios do sul.';
+      'Gigante pré-histórico de focinho largo e dentado com escamas couraçadas em losango, sobe para engolir ar em rios do sul.';
 
   @override
   String get species_longnose_gar_name => 'Gar-agulha';
 
   @override
   String get species_longnose_gar_desc =>
-      'Peixe couraÃ§ado esguio de focinho em agulha, suspenso imÃ³vel logo abaixo da superfÃ­cie de rios quentes.';
+      'Peixe couraçado esguio de focinho em agulha, suspenso imóvel logo abaixo da superfície de rios quentes.';
 
   @override
   String get species_bowfin_name => 'Alcaraz';
 
   @override
   String get species_bowfin_desc =>
-      'FÃ³ssil vivo com longa barbatana dorsal ondulante e cabeÃ§a Ã³ssea, guarda os alevins em remansos com vegetaÃ§Ã£o.';
+      'Fóssil vivo com longa barbatana dorsal ondulante e cabeça óssea, guarda os alevins em remansos com vegetação.';
 
   @override
-  String get species_american_paddlefish_name => 'Peixe-espÃ¡tula-americano';
+  String get species_american_paddlefish_name => 'Peixe-espátula-americano';
 
   @override
   String get species_american_paddlefish_desc =>
-      'Gigante filtrador com focinho em forma de remo que ocupa um terÃ§o do comprimento, nada de boca aberta pelos grandes rios.';
+      'Gigante filtrador com focinho em forma de remo que ocupa um terço do comprimento, nada de boca aberta pelos grandes rios.';
 
   @override
   String get species_sea_lamprey_name => 'Lampreia-marinha';
 
   @override
   String get species_sea_lamprey_desc =>
-      'Parasita sem mandÃ­bulas semelhante a uma enguia com boca em ventosa rodeada de dentes, desova em riachos de cascalho apÃ³s se alimentar no mar ou em lagos.';
+      'Parasita sem mandíbulas semelhante a uma enguia com boca em ventosa rodeada de dentes, desova em riachos de cascalho após se alimentar no mar ou em lagos.';
 
   @override
   String get species_freshwater_drum_name =>
-      'Corvina-de-Ã¡gua-doce-norte-americana';
+      'Corvina-de-água-doce-norte-americana';
 
   @override
   String get species_freshwater_drum_desc =>
-      'Peixe prateado de dorso corcunda que grunhe audivelmente e tritura mexilhÃµes com dentes farÃ­ngeos, comum em grandes rios e lagos.';
+      'Peixe prateado de dorso corcunda que grunhe audivelmente e tritura mexilhões com dentes faríngeos, comum em grandes rios e lagos.';
 
   @override
   String get species_white_sucker_name => 'Sugador-branco';
 
   @override
   String get species_white_sucker_desc =>
-      'Peixe de fundo cilÃ­ndrico de boca carnuda virada para baixo, sobe os riachos na primavera em multidÃµes de desova.';
+      'Peixe de fundo cilíndrico de boca carnuda virada para baixo, sobe os riachos na primavera em multidões de desova.';
 
   @override
-  String get species_common_minnow_name => 'VairÃ£o';
+  String get species_common_minnow_name => 'Vairão';
 
   @override
   String get species_common_minnow_desc =>
-      'MinÃºsculo peixe listrado de cardume de riachos e lagos claros e frescos, os machos ficam vermelhos e verdes na primavera.';
+      'Minúsculo peixe listrado de cardume de riachos e lagos claros e frescos, os machos ficam vermelhos e verdes na primavera.';
 
   @override
   String get species_three_spined_stickleback_name => 'Esganagata';
 
   @override
   String get species_three_spined_stickleback_desc =>
-      'MinÃºsculo peixe couraÃ§ado com trÃªs espinhos dorsais cujos machos de garganta vermelha constroem e guardam ninhos de fibras vegetais.';
+      'Minúsculo peixe couraçado com três espinhos dorsais cujos machos de garganta vermelha constroem e guardam ninhos de fibras vegetais.';
 
   @override
   String get species_alewife_name => 'Alosa-cinzenta';
@@ -35281,92 +35232,92 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_nile_perch_desc =>
-      'Enorme predador prateado de olho orlado de preto, introduzido no lago VitÃ³ria onde domina as Ã¡guas abertas.';
+      'Enorme predador prateado de olho orlado de preto, introduzido no lago Vitória onde domina as águas abertas.';
 
   @override
-  String get species_nile_tilapia_name => 'TilÃ¡pia-do-Nilo';
+  String get species_nile_tilapia_name => 'Tilápia-do-Nilo';
 
   @override
   String get species_nile_tilapia_desc =>
-      'CiclÃ­deo cinzento com barras verticais na cauda que incuba as crias na boca, criado e asselvajado em Ã¡guas quentes de todo o mundo.';
+      'Ciclídeo cinzento com barras verticais na cauda que incuba as crias na boca, criado e asselvajado em águas quentes de todo o mundo.';
 
   @override
   String get species_african_tigerfish_name => 'Peixe-tigre-africano';
 
   @override
   String get species_african_tigerfish_desc =>
-      'Predador prateado listrado com dentes em punhal entrelaÃ§ados, caÃ§a em rios africanos rÃ¡pidos como o Zambeze.';
+      'Predador prateado listrado com dentes em punhal entrelaçados, caça em rios africanos rápidos como o Zambeze.';
 
   @override
   String get species_marbled_lungfish_name => 'Peixe-pulmonado-marmorado';
 
   @override
   String get species_marbled_lungfish_desc =>
-      'Peixe anguiliforme que respira ar com barbatanas filiformes e sobrevive Ã s secas fechado num casulo de lama.';
+      'Peixe anguiliforme que respira ar com barbatanas filiformes e sobrevive às secas fechado num casulo de lama.';
 
   @override
-  String get species_electric_catfish_name => 'Bagre-elÃ©trico';
+  String get species_electric_catfish_name => 'Bagre-elétrico';
 
   @override
   String get species_electric_catfish_desc =>
-      'Bagre cinzento rechonchudo do Nilo e do Congo que atordoa as presas com descargas de vÃ¡rias centenas de volts.';
+      'Bagre cinzento rechonchudo do Nilo e do Congo que atordoa as presas com descargas de várias centenas de volts.';
 
   @override
   String get species_zebra_mbuna_name => 'Mbuna-zebra';
 
   @override
   String get species_zebra_mbuna_desc =>
-      'CiclÃ­deo de rocha com barras azuis do lago Malawi, raspa algas dos pedregulhos em densas multidÃµes territoriais.';
+      'Ciclídeo de rocha com barras azuis do lago Malawi, raspa algas dos pedregulhos em densas multidões territoriais.';
 
   @override
   String get species_malawi_butterfly_peacock_name =>
-      'CiclÃ­deo pavÃ£o borboleta';
+      'Ciclídeo pavão borboleta';
 
   @override
   String get species_malawi_butterfly_peacock_desc =>
-      'CiclÃ­deo pavÃ£o azul iridescente das grutas do lago Malawi, os machos brilham com barbatanas orladas de branco.';
+      'Ciclídeo pavão azul iridescente das grutas do lago Malawi, os machos brilham com barbatanas orladas de branco.';
 
   @override
   String get species_fuelleborn_cichlid_name => 'Mbuna-azul';
 
   @override
   String get species_fuelleborn_cichlid_desc =>
-      'Mbuna do lago Malawi de focinho rombo e carnudo saliente para raspar algas na zona de rebentaÃ§Ã£o.';
+      'Mbuna do lago Malawi de focinho rombo e carnudo saliente para raspar algas na zona de rebentação.';
 
   @override
   String get species_princess_of_burundi_name => 'Princesa do Burundi';
 
   @override
   String get species_princess_of_burundi_desc =>
-      'Elegante ciclÃ­deo do lago Tanganica com barbatanas em lira, vive em famÃ­lias alargadas que partilham os cuidados do ninho.';
+      'Elegante ciclídeo do lago Tanganica com barbatanas em lira, vive em famílias alargadas que partilham os cuidados do ninho.';
 
   @override
-  String get species_frontosa_name => 'CiclÃ­deo-cabeÃ§udo';
+  String get species_frontosa_name => 'Ciclídeo-cabeçudo';
 
   @override
   String get species_frontosa_desc =>
-      'CiclÃ­deo de Ã¡guas profundas do Tanganica com faixas azul-branco marcadas e testa corcunda, move-se devagar em grupos sobre as rochas.';
+      'Ciclídeo de águas profundas do Tanganica com faixas azul-branco marcadas e testa corcunda, move-se devagar em grupos sobre as rochas.';
 
   @override
   String get species_tropheus_moorii_name => 'Tropheus moorii';
 
   @override
   String get species_tropheus_moorii_desc =>
-      'CiclÃ­deo de rocha atarracado do Tanganica em dezenas de formas de cor, cada uma confinada ao seu prÃ³prio troÃ§o de margem.';
+      'Ciclídeo de rocha atarracado do Tanganica em dezenas de formas de cor, cada uma confinada ao seu próprio troço de margem.';
 
   @override
   String get species_arapaima_name => 'Pirarucu';
 
   @override
   String get species_arapaima_desc =>
-      'Um dos maiores peixes de Ã¡gua doce, um gigante couraÃ§ado do Amazonas de cauda salpicada de vermelho que sobe para engolir ar.';
+      'Um dos maiores peixes de água doce, um gigante couraçado do Amazonas de cauda salpicada de vermelho que sobe para engolir ar.';
 
   @override
-  String get species_silver_arowana_name => 'AruanÃ£';
+  String get species_silver_arowana_name => 'Aruanã';
 
   @override
   String get species_silver_arowana_desc =>
-      'Peixe prateado em forma de fita do Amazonas com dois barbilhos no queixo que salta fora de Ã¡gua para apanhar insetos nos ramos.';
+      'Peixe prateado em forma de fita do Amazonas com dois barbilhos no queixo que salta fora de água para apanhar insetos nos ramos.';
 
   @override
   String get species_red_bellied_piranha_name => 'Piranha caju';
@@ -35380,231 +35331,231 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_black_piranha_desc =>
-      'Grande piranha solitÃ¡ria de olhos vermelhos e corpo escuro em losango, Ã  espreita em afluentes claros e rochosos do Amazonas.';
+      'Grande piranha solitária de olhos vermelhos e corpo escuro em losango, à espreita em afluentes claros e rochosos do Amazonas.';
 
   @override
   String get species_red_bellied_pacu_name => 'Pacu';
 
   @override
   String get species_red_bellied_pacu_desc =>
-      'FrugÃ­voro semelhante a uma piranha com dentes achatados trituradores e ventre vermelho, reÃºne-se sob as Ã¡rvores da floresta inundada.';
+      'Frugívoro semelhante a uma piranha com dentes achatados trituradores e ventre vermelho, reúne-se sob as árvores da floresta inundada.';
 
   @override
   String get species_tambaqui_name => 'Tambaqui';
 
   @override
   String get species_tambaqui_desc =>
-      'Enorme pacu escuro do Amazonas que tritura nozes e sementes caÃ­das sob a copa da floresta inundada.';
+      'Enorme pacu escuro do Amazonas que tritura nozes e sementes caídas sob a copa da floresta inundada.';
 
   @override
-  String get species_electric_eel_name => 'PoraquÃª';
+  String get species_electric_eel_name => 'Poraquê';
 
   @override
   String get species_electric_eel_desc =>
-      'NÃ£o Ã© uma enguia mas um peixe-faca, um longo respirador de ar escuro que atordoa as presas com descargas de atÃ© 600 volts.';
+      'Não é uma enguia mas um peixe-faca, um longo respirador de ar escuro que atordoa as presas com descargas de até 600 volts.';
 
   @override
   String get species_redtail_catfish_name => 'Cajaro';
 
   @override
   String get species_redtail_catfish_desc =>
-      'Grande bagre do Amazonas de dorso escuro, ventre branco e cauda vermelho alaranjada viva, repousa em poÃ§os fundos dos rios.';
+      'Grande bagre do Amazonas de dorso escuro, ventre branco e cauda vermelho alaranjada viva, repousa em poços fundos dos rios.';
 
   @override
   String get species_tiger_shovelnose_catfish_name => 'Cachara';
 
   @override
   String get species_tiger_shovelnose_catfish_desc =>
-      'Bagre listrado e esguio de focinho longo e achatado, caÃ§a Ã  noite ao longo dos canais arenosos dos rios sul-americanos.';
+      'Bagre listrado e esguio de focinho longo e achatado, caça à noite ao longo dos canais arenosos dos rios sul-americanos.';
 
   @override
-  String get species_peacock_bass_name => 'TucunarÃ©';
+  String get species_peacock_bass_name => 'Tucunaré';
 
   @override
   String get species_peacock_bass_desc =>
-      'CiclÃ­deo agressivo do Amazonas com trÃªs barras escuras e um ocelo na cauda, embosca peixes junto a troncos submersos.';
+      'Ciclídeo agressivo do Amazonas com três barras escuras e um ocelo na cauda, embosca peixes junto a troncos submersos.';
 
   @override
-  String get species_oscar_name => 'AcarÃ¡-grande';
+  String get species_oscar_name => 'Acará-grande';
 
   @override
   String get species_oscar_desc =>
-      'CiclÃ­deo robusto e escuro com marmoreado laranja e um ocelo na cauda, patrulha Ã¡guas lentas do Amazonas e margens inundadas.';
+      'Ciclídeo robusto e escuro com marmoreado laranja e um ocelo na cauda, patrulha águas lentas do Amazonas e margens inundadas.';
 
   @override
-  String get species_freshwater_angelfish_name => 'AcarÃ¡-bandeira';
+  String get species_freshwater_angelfish_name => 'Acará-bandeira';
 
   @override
   String get species_freshwater_angelfish_desc =>
-      'CiclÃ­deo amazÃ³nico alto e discoide com barbatanas alongadas e riscas verticais, flutua entre raÃ­zes submersas.';
+      'Ciclídeo amazónico alto e discoide com barbatanas alongadas e riscas verticais, flutua entre raízes submersas.';
 
   @override
-  String get species_discus_name => 'AcarÃ¡ disco';
+  String get species_discus_name => 'Acará disco';
 
   @override
   String get species_discus_desc =>
-      'CiclÃ­deo redondo e comprimido com linhas azuis onduladas que alimenta as crias com o muco da prÃ³pria pele.';
+      'Ciclídeo redondo e comprimido com linhas azuis onduladas que alimenta as crias com o muco da própria pele.';
 
   @override
-  String get species_sailfin_pleco_name => 'Cascudo-pintado-amazÃ´nico';
+  String get species_sailfin_pleco_name => 'Cascudo-pintado-amazônico';
 
   @override
   String get species_sailfin_pleco_desc =>
-      'Bagre couraÃ§ado de boca em ventosa com barbatana dorsal alta e manchas de leopardo, raspa algas da madeira e da rocha.';
+      'Bagre couraçado de boca em ventosa com barbatana dorsal alta e manchas de leopardo, raspa algas da madeira e da rocha.';
 
   @override
   String get species_cardinal_tetra_name => 'Tetra cardinal';
 
   @override
   String get species_cardinal_tetra_desc =>
-      'MinÃºsculo tetra com uma risca azul nÃ©on sobre uma faixa vermelha a todo o comprimento, forma cardumes nas Ã¡guas escuras do Rio Negro.';
+      'Minúsculo tetra com uma risca azul néon sobre uma faixa vermelha a todo o comprimento, forma cardumes nas águas escuras do Rio Negro.';
 
   @override
   String get species_mexican_tetra_name => 'Lambari-cego';
 
   @override
   String get species_mexican_tetra_desc =>
-      'Tetra prateado dos rios mexicanos cujas populaÃ§Ãµes de gruta sÃ£o cegas e pÃ¡lidas, um favorito dos mergulhadores de cenotes.';
+      'Tetra prateado dos rios mexicanos cujas populações de gruta são cegas e pálidas, um favorito dos mergulhadores de cenotes.';
 
   @override
   String get species_mekong_giant_catfish_name => 'Bagre-gigante-do-Mekong';
 
   @override
   String get species_mekong_giant_catfish_desc =>
-      'Gigante desdentado do Mekong criticamente ameaÃ§ado, cinzento e sem barbilhos, que outrora atingia trÃªs metros.';
+      'Gigante desdentado do Mekong criticamente ameaçado, cinzento e sem barbilhos, que outrora atingia três metros.';
 
   @override
   String get species_giant_barb_name => 'Barbo-gigante';
 
   @override
   String get species_giant_barb_desc =>
-      'A maior carpa do mundo, um gigante do Mekong de escamas grandes e cabeÃ§a enorme, hoje raro em poÃ§os fundos do rio.';
+      'A maior carpa do mundo, um gigante do Mekong de escamas grandes e cabeça enorme, hoje raro em poços fundos do rio.';
 
   @override
-  String get species_asian_arowana_name => 'AruanÃ£-dourado';
+  String get species_asian_arowana_name => 'Aruanã-dourado';
 
   @override
   String get species_asian_arowana_desc =>
-      'Peixe-dragÃ£o vermelho ou dourado metÃ¡lico dos rios de Ã¡guas negras do Sudeste AsiÃ¡tico, desliza logo abaixo da superfÃ­cie.';
+      'Peixe-dragão vermelho ou dourado metálico dos rios de águas negras do Sudeste Asiático, desliza logo abaixo da superfície.';
 
   @override
-  String get species_striped_snakehead_name => 'CabeÃ§a-de-cobra-asiÃ¡tico';
+  String get species_striped_snakehead_name => 'Cabeça-de-cobra-asiático';
 
   @override
   String get species_striped_snakehead_desc =>
-      'Predador fusiforme que respira ar com cabeÃ§a achatada de serpente, guarda as crias em lagoas asiÃ¡ticas com vegetaÃ§Ã£o.';
+      'Predador fusiforme que respira ar com cabeça achatada de serpente, guarda as crias em lagoas asiáticas com vegetação.';
 
   @override
-  String get species_giant_snakehead_name => 'CabeÃ§a-de-cobra-gigante';
+  String get species_giant_snakehead_name => 'Cabeça-de-cobra-gigante';
 
   @override
   String get species_giant_snakehead_desc =>
-      'Grande e feroz cabeÃ§a-de-cobra, listrado em jovem e escuro em adulto, defende as crias vermelho vivo em lagos do Sudeste AsiÃ¡tico.';
+      'Grande e feroz cabeça-de-cobra, listrado em jovem e escuro em adulto, defende as crias vermelho vivo em lagos do Sudeste Asiático.';
 
   @override
   String get species_climbing_perch_name => 'Perca-trepadora';
 
   @override
   String get species_climbing_perch_desc =>
-      'Peixe oliva resistente que respira ar e rasteja por terra sobre os opÃ©rculos espinhosos entre charcos que secam.';
+      'Peixe oliva resistente que respira ar e rasteja por terra sobre os opérculos espinhosos entre charcos que secam.';
 
   @override
   String get species_golden_mahseer_name => 'Barbeso';
 
   @override
   String get species_golden_mahseer_desc =>
-      'Carpa de escamas douradas dos rios dos Himalaias, nadadora poderosa que se mantÃ©m em poÃ§os claros e rÃ¡pidos abaixo das corredeiras.';
+      'Carpa de escamas douradas dos rios dos Himalaias, nadadora poderosa que se mantém em poços claros e rápidos abaixo das corredeiras.';
 
   @override
   String get species_koi_name => 'Koi';
 
   @override
   String get species_koi_desc =>
-      'Carpa ornamental criada no JapÃ£o em padrÃµes brancos, vermelhos, pretos e dourados, Ã  vontade em tanques e lagos quentes e claros.';
+      'Carpa ornamental criada no Japão em padrões brancos, vermelhos, pretos e dourados, à vontade em tanques e lagos quentes e claros.';
 
   @override
   String get species_goldfish_name => 'Peixinho-vermelho';
 
   @override
   String get species_goldfish_desc =>
-      'Carpa asiÃ¡tica domesticada que reverte para oliva bronze na natureza, formando grandes cardumes asselvajados em lagos quentes.';
+      'Carpa asiática domesticada que reverte para oliva bronze na natureza, formando grandes cardumes asselvajados em lagos quentes.';
 
   @override
   String get species_giant_gourami_name => 'Gourami-gigante';
 
   @override
   String get species_giant_gourami_desc =>
-      'Peixe largo e corcunda do Sudeste AsiÃ¡tico com barbatanas pÃ©lvicas filiformes que constrÃ³i ninhos de bolhas em Ã¡gua lenta com vegetaÃ§Ã£o.';
+      'Peixe largo e corcunda do Sudeste Asiático com barbatanas pélvicas filiformes que constrói ninhos de bolhas em água lenta com vegetação.';
 
   @override
-  String get species_clown_knifefish_name => 'Peixe-faca-palhaÃ§o';
+  String get species_clown_knifefish_name => 'Peixe-faca-palhaço';
 
   @override
   String get species_clown_knifefish_desc =>
-      'Peixe prateado em forma de lÃ¢mina com ocelos ao longo de uma longa barbatana anal ondulante, paira sob troncos de rios asiÃ¡ticos.';
+      'Peixe prateado em forma de lâmina com ocelos ao longo de uma longa barbatana anal ondulante, paira sob troncos de rios asiáticos.';
 
   @override
   String get species_walking_catfish_name => 'Peixe-gato-andador';
 
   @override
   String get species_walking_catfish_desc =>
-      'Bagre esguio que respira ar e serpenteia sobre solo hÃºmido entre lagoas, hoje asselvajado na Florida.';
+      'Bagre esguio que respira ar e serpenteia sobre solo húmido entre lagoas, hoje asselvajado na Florida.';
 
   @override
   String get species_japanese_eel_name => 'Enguia-japonesa';
 
   @override
   String get species_japanese_eel_desc =>
-      'Enguia da Ãsia Oriental que cresce em rios e lagos e migra para o PacÃ­fico ocidental para desovar.';
+      'Enguia da Ásia Oriental que cresce em rios e lagos e migra para o Pacífico ocidental para desovar.';
 
   @override
   String get species_ayu_name => 'Ayu';
 
   @override
   String get species_ayu_desc =>
-      'Esguio peixe prateado japonÃªs que raspa algas das pedras em rios claros e defende um territÃ³rio de alimentaÃ§Ã£o.';
+      'Esguio peixe prateado japonês que raspa algas das pedras em rios claros e defende um território de alimentação.';
 
   @override
   String get species_baikal_omul_name => 'Omul-do-Baikal';
 
   @override
   String get species_baikal_omul_desc =>
-      'Peixe-branco prateado exclusivo do lago Baikal, forma cardumes nas Ã¡guas frias abertas e sobe os rios para desovar.';
+      'Peixe-branco prateado exclusivo do lago Baikal, forma cardumes nas águas frias abertas e sobe os rios para desovar.';
 
   @override
   String get species_baikal_oilfish_name => 'Golomianka';
 
   @override
   String get species_baikal_oilfish_desc =>
-      'Peixe translÃºcido sem escamas das profundezas do Baikal, tÃ£o rico em Ã³leo que Ã© quase transparente, e vivÃ­paro.';
+      'Peixe translúcido sem escamas das profundezas do Baikal, tão rico em óleo que é quase transparente, e vivíparo.';
 
   @override
   String get species_murray_cod_name => 'Bacalhau-do-Murray';
 
   @override
   String get species_murray_cod_desc =>
-      'O maior peixe de Ã¡gua doce da AustrÃ¡lia, um gigante verde mosqueado de ventre branco, mantÃ©m-se junto a troncos no Murray-Darling.';
+      'O maior peixe de água doce da Austrália, um gigante verde mosqueado de ventre branco, mantém-se junto a troncos no Murray-Darling.';
 
   @override
   String get species_golden_perch_name => 'Perca-dourada';
 
   @override
   String get species_golden_perch_desc =>
-      'Perca de corpo alto de tom oliva dourado dos rios interiores da AustrÃ¡lia, abriga-se junto a Ã¡rvores caÃ­das e saliÃªncias rochosas.';
+      'Perca de corpo alto de tom oliva dourado dos rios interiores da Austrália, abriga-se junto a árvores caídas e saliências rochosas.';
 
   @override
   String get species_australian_bass_name => 'Perca-australiana';
 
   @override
   String get species_australian_bass_desc =>
-      'Perca verde bronze dos rios costeiros do leste da AustrÃ¡lia que migra rio abaixo para desovar em estuÃ¡rios salobros.';
+      'Perca verde bronze dos rios costeiros do leste da Austrália que migra rio abaixo para desovar em estuários salobros.';
 
   @override
   String get species_barramundi_name => 'Barramunda';
 
   @override
   String get species_barramundi_desc =>
-      'Perca prateada de dorso corcunda dos rios e estuÃ¡rios do norte da AustrÃ¡lia, que muda de macho para fÃªmea com a idade.';
+      'Perca prateada de dorso corcunda dos rios e estuários do norte da Austrália, que muda de macho para fêmea com a idade.';
 
   @override
   String get species_silver_perch_name => 'Perca-prateada';
@@ -35614,7 +35565,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Peixe cinzento prateado do Murray-Darling de boca pequena e cauda bifurcada, outrora em cardumes enormes.';
 
   @override
-  String get species_gulf_saratoga_name => 'aruanÃ£-pÃ©rola';
+  String get species_gulf_saratoga_name => 'aruanã-pérola';
 
   @override
   String get species_gulf_saratoga_desc =>
@@ -35625,35 +35576,35 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_sooty_grunter_desc =>
-      'Peixe escuro e atarracado dos rios do norte da AustrÃ¡lia, alimenta-se de algas e frutos junto a rochas e corredeiras.';
+      'Peixe escuro e atarracado dos rios do norte da Austrália, alimenta-se de algas e frutos junto a rochas e corredeiras.';
 
   @override
   String get species_eel_tailed_catfish_name => 'Bagre-enguia-kenaru';
 
   @override
   String get species_eel_tailed_catfish_desc =>
-      'Bagre australiano de cauda afilada semelhante Ã  de uma enguia que constrÃ³i e guarda um ninho de cascalho em Ã¡guas rasas e claras.';
+      'Bagre australiano de cauda afilada semelhante à de uma enguia que constrói e guarda um ninho de cascalho em águas rasas e claras.';
 
   @override
   String get species_spangled_perch_name => 'Perca-lantejoula';
 
   @override
   String get species_spangled_perch_desc =>
-      'Pequeno peixe salpicado de prata presente em todo o interior da AustrÃ¡lia, coloniza qualquer poÃ§a que uma cheia ligue.';
+      'Pequeno peixe salpicado de prata presente em todo o interior da Austrália, coloniza qualquer poça que uma cheia ligue.';
 
   @override
   String get species_eastern_rainbowfish_name => 'Pelangia-do-deserto';
 
   @override
   String get species_eastern_rainbowfish_desc =>
-      'Pequeno peixe iridescente dos ribeiros do leste da AustrÃ¡lia, os machos exibem ao sol riscas vermelhas e azuis.';
+      'Pequeno peixe iridescente dos ribeiros do leste da Austrália, os machos exibem ao sol riscas vermelhas e azuis.';
 
   @override
   String get species_signal_crayfish_name => 'Lagostim-Sinal';
 
   @override
   String get species_signal_crayfish_desc =>
-      'Lagostim castanho e grande com uma mancha branca na articulaÃ§Ã£o da pinÃ§a, espÃ©cie invasora norte-americana em expansÃ£o pelos rios europeus.';
+      'Lagostim castanho e grande com uma mancha branca na articulação da pinça, espécie invasora norte-americana em expansão pelos rios europeus.';
 
   @override
   String get species_red_swamp_crayfish_name =>
@@ -35661,156 +35612,156 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_red_swamp_crayfish_desc =>
-      'Lagostim vermelho-escuro de pinÃ§as rugosas dos pÃ¢ntanos do Luisiana, hoje escava em zonas hÃºmidas quentes de todos os continentes.';
+      'Lagostim vermelho-escuro de pinças rugosas dos pântanos do Luisiana, hoje escava em zonas húmidas quentes de todos os continentes.';
 
   @override
   String get species_noble_crayfish_name => 'Lagostim-europeu';
 
   @override
   String get species_noble_crayfish_desc =>
-      'Lagostim nativo da Europa, castanho-escuro com pinÃ§as vermelhas por baixo, esconde-se em tocas nas margens de riachos e lagos limpos e frescos.';
+      'Lagostim nativo da Europa, castanho-escuro com pinças vermelhas por baixo, esconde-se em tocas nas margens de riachos e lagos limpos e frescos.';
 
   @override
   String get species_white_clawed_crayfish_name => 'Lagostim-de-patas-brancas';
 
   @override
   String get species_white_clawed_crayfish_desc =>
-      'Pequeno lagostim oliva com pinÃ§as pÃ¡lidas por baixo, espÃ©cie ameaÃ§ada de riachos calcÃ¡rios limpos da Europa ocidental.';
+      'Pequeno lagostim oliva com pinças pálidas por baixo, espécie ameaçada de riachos calcários limpos da Europa ocidental.';
 
   @override
   String get species_tasmanian_giant_freshwater_crayfish_name =>
-      'Lagostim-gigante-da-TasmÃ¢nia';
+      'Lagostim-gigante-da-Tasmânia';
 
   @override
   String get species_tasmanian_giant_freshwater_crayfish_desc =>
-      'O maior invertebrado de Ã¡gua doce do mundo, um lagostim azul-acastanhado de crescimento lento dos rios sombreados da TasmÃ¢nia.';
+      'O maior invertebrado de água doce do mundo, um lagostim azul-acastanhado de crescimento lento dos rios sombreados da Tasmânia.';
 
   @override
-  String get species_zebra_mussel_name => 'MexilhÃ£o-zebra';
+  String get species_zebra_mussel_name => 'Mexilhão-zebra';
 
   @override
   String get species_zebra_mussel_desc =>
-      'MexilhÃ£o listrado do tamanho de uma unha que reveste rochas, naufrÃ¡gios e tubagens aos milhares, clarificando a Ã¡gua Ã  medida que se espalha.';
+      'Mexilhão listrado do tamanho de uma unha que reveste rochas, naufrágios e tubagens aos milhares, clarificando a água à medida que se espalha.';
 
   @override
-  String get species_quagga_mussel_name => 'MexilhÃ£o-quagga';
+  String get species_quagga_mussel_name => 'Mexilhão-quagga';
 
   @override
   String get species_quagga_mussel_desc =>
-      'Parente mais arredondado e pÃ¡lido do mexilhÃ£o-zebra que coloniza fundos moles e Ã¡guas frias e profundas onde aquele nÃ£o consegue.';
+      'Parente mais arredondado e pálido do mexilhão-zebra que coloniza fundos moles e águas frias e profundas onde aquele não consegue.';
 
   @override
   String get species_freshwater_pearl_mussel_name => 'Peroleiro-de-rio';
 
   @override
   String get species_freshwater_pearl_mussel_desc =>
-      'MexilhÃ£o escuro e alongado que pode viver mais de um sÃ©culo meio enterrado no cascalho limpo de rios rÃ¡pidos de salmÃ£o.';
+      'Mexilhão escuro e alongado que pode viver mais de um século meio enterrado no cascalho limpo de rios rápidos de salmão.';
 
   @override
-  String get species_swan_mussel_name => 'AmeijÃ£o-grande';
+  String get species_swan_mussel_name => 'Ameijão-grande';
 
   @override
   String get species_swan_mussel_desc =>
-      'Grande mexilhÃ£o de concha fina de lagos e canais lodosos, filtra a Ã¡gua com os sifÃµes logo acima do lodo.';
+      'Grande mexilhão de concha fina de lagos e canais lodosos, filtra a água com os sifões logo acima do lodo.';
 
   @override
-  String get species_chinese_pond_mussel_name => 'MexilhÃ£o-chinÃªs';
+  String get species_chinese_pond_mussel_name => 'Mexilhão-chinês';
 
   @override
   String get species_chinese_pond_mussel_desc =>
-      'MexilhÃ£o asiÃ¡tico invasor muito grande de concha castanha brilhante, chegado com peixes de aquicultura e espalhado por lagos quentes.';
+      'Mexilhão asiático invasor muito grande de concha castanha brilhante, chegado com peixes de aquicultura e espalhado por lagos quentes.';
 
   @override
-  String get species_freshwater_sponge_name => 'Esponja-de-Ã¡gua-doce';
+  String get species_freshwater_sponge_name => 'Esponja-de-água-doce';
 
   @override
   String get species_freshwater_sponge_desc =>
       'Esponja ramificada verde ou cinzenta que reveste ramos e pedras em lagos claros, colorida pelas algas que vivem no seu interior.';
 
   @override
-  String get species_freshwater_jellyfish_name => 'Ãgua-viva-de-Ã¡gua-doce';
+  String get species_freshwater_jellyfish_name => 'Água-viva-de-água-doce';
 
   @override
   String get species_freshwater_jellyfish_desc =>
-      'Medusa transparente do tamanho de uma moeda que surge em enxames em lagos de pedreira quentes e represas no fim do verÃ£o.';
+      'Medusa transparente do tamanho de uma moeda que surge em enxames em lagos de pedreira quentes e represas no fim do verão.';
 
   @override
   String get species_great_pond_snail_name => 'caramujo-dos-Pauis';
 
   @override
   String get species_great_pond_snail_desc =>
-      'Grande caracol de concha pontiaguda que desliza sobre plantas em Ã¡guas paradas europeias e respira ar Ã  superfÃ­cie.';
+      'Grande caracol de concha pontiaguda que desliza sobre plantas em águas paradas europeias e respira ar à superfície.';
 
   @override
-  String get species_great_ramshorn_snail_name => 'PlanÃ³rbia-Maior';
+  String get species_great_ramshorn_snail_name => 'Planórbia-Maior';
 
   @override
   String get species_great_ramshorn_snail_desc =>
-      'Caracol achatado e enrolado como um minÃºsculo corno de carneiro, raspa algas de folhas e pedras em lagoas com vegetaÃ§Ã£o.';
+      'Caracol achatado e enrolado como um minúsculo corno de carneiro, raspa algas de folhas e pedras em lagoas com vegetação.';
 
   @override
-  String get species_channeled_apple_snail_name => 'AruÃ¡';
+  String get species_channeled_apple_snail_name => 'Aruá';
 
   @override
   String get species_channeled_apple_snail_desc =>
-      'Grande caracol castanho-dourado que deposita cachos de ovos rosa vivo acima da linha de Ã¡gua, invasor em zonas hÃºmidas quentes e arrozais.';
+      'Grande caracol castanho-dourado que deposita cachos de ovos rosa vivo acima da linha de água, invasor em zonas húmidas quentes e arrozais.';
 
   @override
-  String get species_magnificent_bryozoan_name => 'BriozoÃ¡rio-magnÃ­fico';
+  String get species_magnificent_bryozoan_name => 'Briozoário-magnífico';
 
   @override
   String get species_magnificent_bryozoan_desc =>
-      'ColÃ³nia gelatinosa do tamanho de uma bola, cravejada de minÃºsculos animais, agarrada a ramos e cordas em Ã¡gua quente e parada.';
+      'Colónia gelatinosa do tamanho de uma bola, cravejada de minúsculos animais, agarrada a ramos e cordas em água quente e parada.';
 
   @override
   String get species_chinese_mitten_crab_name => 'Caranguejo-de-Shanghai';
 
   @override
   String get species_chinese_mitten_crab_desc =>
-      'Caranguejo escavador de pinÃ§as peludas que passa anos nos rios antes de descer para se reproduzir nos estuÃ¡rios.';
+      'Caranguejo escavador de pinças peludas que passa anos nos rios antes de descer para se reproduzir nos estuários.';
 
   @override
   String get species_giant_freshwater_prawn_name =>
-      'CamarÃ£o-gigante-da-MalÃ¡sia';
+      'Camarão-gigante-da-Malásia';
 
   @override
   String get species_giant_freshwater_prawn_desc =>
-      'Grande camarÃ£o de pinÃ§as azuis dos rios da Ãsia e da AustrÃ¡lia, com pinÃ§as mais compridas do que o corpo nos machos velhos.';
+      'Grande camarão de pinças azuis dos rios da Ásia e da Austrália, com pinças mais compridas do que o corpo nos machos velhos.';
 
   @override
   String get species_common_snapping_turtle_name => 'Tartaruga-mordedora';
 
   @override
   String get species_common_snapping_turtle_desc =>
-      'Tartaruga pesada de carapaÃ§a rugosa e longa cauda serrilhada, repousa na lama de lagoas e rios lentos com a cabeÃ§a de fora.';
+      'Tartaruga pesada de carapaça rugosa e longa cauda serrilhada, repousa na lama de lagoas e rios lentos com a cabeça de fora.';
 
   @override
-  String get species_alligator_snapping_turtle_name => 'Tartaruga-aligÃ¡tor';
+  String get species_alligator_snapping_turtle_name => 'Tartaruga-aligátor';
 
   @override
   String get species_alligator_snapping_turtle_desc =>
-      'Gigante de aspeto prÃ©-histÃ³rico com trÃªs quilhas cristadas e um isco lingual em forma de verme, espera de boca aberta no fundo dos rios do sul.';
+      'Gigante de aspeto pré-histórico com três quilhas cristadas e um isco lingual em forma de verme, espera de boca aberta no fundo dos rios do sul.';
 
   @override
   String get species_painted_turtle_name => 'Tartaruga-pintada';
 
   @override
   String get species_painted_turtle_desc =>
-      'Tartaruga lisa e escura com riscas vermelhas e amarelas no pescoÃ§o e na orla da carapaÃ§a, apanha sol em fila sobre troncos por toda a AmÃ©rica do Norte.';
+      'Tartaruga lisa e escura com riscas vermelhas e amarelas no pescoço e na orla da carapaça, apanha sol em fila sobre troncos por toda a América do Norte.';
 
   @override
   String get species_red_eared_slider_name => 'Tartaruga-de-orelhas-vermelhas';
 
   @override
   String get species_red_eared_slider_desc =>
-      'Tartaruga de lagoa de riscas verdes com uma faixa vermelha atrÃ¡s de cada olho, a tartaruga de estimaÃ§Ã£o hoje asselvajada em Ã¡guas quentes de todo o mundo.';
+      'Tartaruga de lagoa de riscas verdes com uma faixa vermelha atrás de cada olho, a tartaruga de estimação hoje asselvajada em águas quentes de todo o mundo.';
 
   @override
-  String get species_northern_map_turtle_name => 'Tartaruga-geogrÃ¡fica';
+  String get species_northern_map_turtle_name => 'Tartaruga-geográfica';
 
   @override
   String get species_northern_map_turtle_desc =>
-      'Tartaruga oliva com linhas amarelas em forma de mapa na carapaÃ§a e uma quilha baixa, apanha sol nas rochas de rios claros e grandes lagos.';
+      'Tartaruga oliva com linhas amarelas em forma de mapa na carapaça e uma quilha baixa, apanha sol nas rochas de rios claros e grandes lagos.';
 
   @override
   String get species_spiny_softshell_turtle_name =>
@@ -35818,7 +35769,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_spiny_softshell_turtle_desc =>
-      'Tartaruga achatada e coriÃ¡cea como uma panqueca com focinho de snorkel, enterrada na areia de rios rasos com apenas a cabeÃ§a de fora.';
+      'Tartaruga achatada e coriácea como uma panqueca com focinho de snorkel, enterrada na areia de rios rasos com apenas a cabeça de fora.';
 
   @override
   String get species_florida_softshell_turtle_name =>
@@ -35826,100 +35777,99 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_florida_softshell_turtle_desc =>
-      'Grande tartaruga de carapaÃ§a mole e escura com longo focinho tubular, comum nas nascentes, canais e lagos da Florida.';
+      'Grande tartaruga de carapaça mole e escura com longo focinho tubular, comum nas nascentes, canais e lagos da Florida.';
 
   @override
   String get species_pig_nosed_turtle_name => 'Tartaruga-nariz-de-porco';
 
   @override
   String get species_pig_nosed_turtle_desc =>
-      'Tartaruga de rio Ãºnica da Nova GuinÃ© e do norte da AustrÃ¡lia com barbatanas de tartaruga marinha e focinho carnudo de porco.';
+      'Tartaruga de rio única da Nova Guiné e do norte da Austrália com barbatanas de tartaruga marinha e focinho carnudo de porco.';
 
   @override
   String get species_mary_river_turtle_name => 'Tartaruga-do-rio-Mary';
 
   @override
   String get species_mary_river_turtle_desc =>
-      'Rara tartaruga australiana que respira pela cloaca e ostenta uma crista de algas verdes, encontrada num Ãºnico rio de Queensland.';
+      'Rara tartaruga australiana que respira pela cloaca e ostenta uma crista de algas verdes, encontrada num único rio de Queensland.';
 
   @override
-  String get species_yellow_spotted_river_turtle_name => 'TracajÃ¡';
+  String get species_yellow_spotted_river_turtle_name => 'Tracajá';
 
   @override
   String get species_yellow_spotted_river_turtle_desc =>
-      'Tartaruga de pescoÃ§o lateral do Amazonas com manchas amarelas na cabeÃ§a, apanha sol em grupos sobre troncos e bancos de areia de grandes rios.';
+      'Tartaruga de pescoço lateral do Amazonas com manchas amarelas na cabeça, apanha sol em grupos sobre troncos e bancos de areia de grandes rios.';
 
   @override
-  String get species_european_pond_turtle_name =>
-      'CÃ¡gado-de-carapaÃ§a-estriada';
+  String get species_european_pond_turtle_name => 'Cágado-de-carapaça-estriada';
 
   @override
   String get species_european_pond_turtle_desc =>
-      'Tartaruga escura salpicada de pontos amarelos, a tartaruga de Ã¡gua doce nativa da Europa, escorrega das margens soalheiras para lagoas com vegetaÃ§Ã£o.';
+      'Tartaruga escura salpicada de pontos amarelos, a tartaruga de água doce nativa da Europa, escorrega das margens soalheiras para lagoas com vegetação.';
 
   @override
-  String get species_american_alligator_name => 'AligÃ¡tor-americano';
+  String get species_american_alligator_name => 'Aligátor-americano';
 
   @override
   String get species_american_alligator_desc =>
-      'RÃ©ptil couraÃ§ado de focinho largo dos pÃ¢ntanos, nascentes e rios do sudeste dos EUA, flutua mostrando apenas os olhos e as narinas.';
+      'Réptil couraçado de focinho largo dos pântanos, nascentes e rios do sudeste dos EUA, flutua mostrando apenas os olhos e as narinas.';
 
   @override
   String get species_spectacled_caiman_name => 'Jacaretinga';
 
   @override
   String get species_spectacled_caiman_desc =>
-      'Pequeno jacarÃ© oliva com uma crista Ã³ssea entre os olhos, abundante em rios lentos e lagoas da AmÃ©rica Central e do Sul.';
+      'Pequeno jacaré oliva com uma crista óssea entre os olhos, abundante em rios lentos e lagoas da América Central e do Sul.';
 
   @override
-  String get species_black_caiman_name => 'JacarÃ©-aÃ§u';
+  String get species_black_caiman_name => 'Jacaré-açu';
 
   @override
   String get species_black_caiman_desc =>
-      'O maior predador do Amazonas, um jacarÃ© negro couraÃ§ado de atÃ© cinco metros, caÃ§a Ã  noite em lagos e floresta inundada.';
+      'O maior predador do Amazonas, um jacaré negro couraçado de até cinco metros, caça à noite em lagos e floresta inundada.';
 
   @override
   String get species_freshwater_crocodile_name =>
-      'Crocodilo-de-Ã¡gua-doce-australiano';
+      'Crocodilo-de-água-doce-australiano';
 
   @override
   String get species_freshwater_crocodile_desc =>
-      'Crocodilo australiano de focinho estreito dos rios e desfiladeiros do norte, tÃ­mido e muito menor do que o crocodilo-de-Ã¡gua-salgada.';
+      'Crocodilo australiano de focinho estreito dos rios e desfiladeiros do norte, tímido e muito menor do que o crocodilo-de-água-salgada.';
 
   @override
-  String get species_northern_water_snake_name => 'Cobra-d\'Ã¡gua-do-norte';
+  String get species_northern_water_snake_name => 'Cobra-d\'água-do-norte';
 
   @override
   String get species_northern_water_snake_desc =>
-      'Serpente castanha robusta com bandas que apanha sol em rochas e ramos sobre riachos do leste da AmÃ©rica do Norte, inofensiva mas pronta a morder.';
+      'Serpente castanha robusta com bandas que apanha sol em rochas e ramos sobre riachos do leste da América do Norte, inofensiva mas pronta a morder.';
 
   @override
   String get species_green_anaconda_name => 'Sucuri';
 
   @override
   String get species_green_anaconda_desc =>
-      'A serpente mais pesada do mundo, um gigante oliva com manchas pretas, jaz submersa em pÃ¢ntanos e rios lentos do Amazonas.';
+      'A serpente mais pesada do mundo, um gigante oliva com manchas pretas, jaz submersa em pântanos e rios lentos do Amazonas.';
 
   @override
   String get species_hellbender_name => 'Salamandra-gigante-americana';
 
   @override
   String get species_hellbender_desc =>
-      'Salamandra gigante de cabeÃ§a achatada com pregas de pele enrugada, esconde-se sob grandes rochas em rios frios e claros dos Apalaches.';
+      'Salamandra gigante de cabeça achatada com pregas de pele enrugada, esconde-se sob grandes rochas em rios frios e claros dos Apalaches.';
 
   @override
   String get species_mudpuppy_name => 'Mudpuppy';
 
   @override
   String get species_mudpuppy_desc =>
-      'Salamandra castanha manchada que mantÃ©m as brÃ¢nquias vermelhas plumosas toda a vida, rasteja Ã  noite pelos fundos de lagos e rios.';
+      'Salamandra castanha manchada que mantém as brânquias vermelhas plumosas toda a vida, rasteja à noite pelos fundos de lagos e rios.';
 
   @override
   String get species_axolotl_name => 'Axolote';
 
   @override
   String get species_axolotl_desc =>
-      'Salamandra com brÃ¢nquias e ar sorridente que nunca sai da Ã¡gua, criticamente ameaÃ§ada nos canais de Xochimilco perto da Cidade do MÃ©xico.';
+      'Salamandra com brânquias e ar sorridente que nunca sai da água, criticamente ameaçada nos canais de Xochimilco perto da Cidade do México.';
 
   @override
   String get species_chinese_giant_salamander_name =>
@@ -35927,49 +35877,49 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_chinese_giant_salamander_desc =>
-      'O maior anfÃ­bio vivo, um gigante castanho enrugado com quase dois metros, escondido em riachos de montanha frescos e rochosos.';
+      'O maior anfíbio vivo, um gigante castanho enrugado com quase dois metros, escondido em riachos de montanha frescos e rochosos.';
 
   @override
-  String get species_smooth_newt_name => 'TritÃ£o-comum';
+  String get species_smooth_newt_name => 'Tritão-comum';
 
   @override
   String get species_smooth_newt_desc =>
-      'Pequeno tritÃ£o oliva que regressa Ã s charcas a cada primavera, os machos desenvolvem uma crista ondulada e um ventre laranja manchado.';
+      'Pequeno tritão oliva que regressa às charcas a cada primavera, os machos desenvolvem uma crista ondulada e um ventre laranja manchado.';
 
   @override
-  String get species_great_crested_newt_name => 'TritÃ£o-de-crista';
+  String get species_great_crested_newt_name => 'Tritão-de-crista';
 
   @override
   String get species_great_crested_newt_desc =>
-      'Grande tritÃ£o preto verrugoso de ventre laranja vivo, os machos reprodutores ostentam uma crista dentada de dragÃ£o.';
+      'Grande tritão preto verrugoso de ventre laranja vivo, os machos reprodutores ostentam uma crista dentada de dragão.';
 
   @override
-  String get species_american_bullfrog_name => 'RÃ£-touro';
+  String get species_american_bullfrog_name => 'Rã-touro';
 
   @override
   String get species_american_bullfrog_desc =>
-      'Enorme rÃ£ verde de coaxar grave, pousada entre nenÃºfares em lagoas quentes e hoje invasora em vÃ¡rios continentes.';
+      'Enorme rã verde de coaxar grave, pousada entre nenúfares em lagoas quentes e hoje invasora em vários continentes.';
 
   @override
-  String get species_common_frog_name => 'RÃ£-europeia';
+  String get species_common_frog_name => 'Rã-europeia';
 
   @override
   String get species_common_frog_desc =>
-      'RÃ£ castanha com mÃ¡scara ocular escura que se reÃºne em ruidosas multidÃµes primaveris para desovar em lagoas e valas da Europa.';
+      'Rã castanha com máscara ocular escura que se reúne em ruidosas multidões primaveris para desovar em lagoas e valas da Europa.';
 
   @override
   String get species_north_american_river_otter_name => 'Lontra-canadense';
 
   @override
   String get species_north_american_river_otter_desc =>
-      'Lontra esguia e brincalhona que caÃ§a peixes e lagostins em rios e lagos da AmÃ©rica do Norte, deixando escorregas de lama nas margens.';
+      'Lontra esguia e brincalhona que caça peixes e lagostins em rios e lagos da América do Norte, deixando escorregas de lama nas margens.';
 
   @override
   String get species_eurasian_otter_name => 'Lontra-europeia';
 
   @override
   String get species_eurasian_otter_desc =>
-      'Lontra castanha esquiva de rios, lagos e costas da Europa, em recuperaÃ§Ã£o em toda a sua Ã¡rea apÃ³s dÃ©cadas de declÃ­nio.';
+      'Lontra castanha esquiva de rios, lagos e costas da Europa, em recuperação em toda a sua área após décadas de declínio.';
 
   @override
   String get species_giant_otter_name => 'Ariranha';
@@ -35990,143 +35940,143 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get species_eurasian_beaver_desc =>
-      'O maior roedor da Europa, reintroduzido por todo o continente, derruba Ã¡rvores ribeirinhas e constrÃ³i barragens e tocas.';
+      'O maior roedor da Europa, reintroduzido por todo o continente, derruba árvores ribeirinhas e constrói barragens e tocas.';
 
   @override
   String get species_muskrat_name => 'Rato-almiscarado';
 
   @override
   String get species_muskrat_desc =>
-      'Roedor castanho do tamanho de um rato com cauda escamosa achatada, nada por pÃ¢ntanos de tabuas e constrÃ³i tocas abobadadas de caniÃ§o.';
+      'Roedor castanho do tamanho de um rato com cauda escamosa achatada, nada por pântanos de tabuas e constrói tocas abobadadas de caniço.';
 
   @override
   String get species_platypus_name => 'Ornitorrinco';
 
   @override
   String get species_platypus_desc =>
-      'MamÃ­fero ovÃ­paro com bico de pato e patas palmadas, procura alimento de olhos fechados ao longo dos ribeiros do leste da AustrÃ¡lia ao amanhecer e ao anoitecer.';
+      'Mamífero ovíparo com bico de pato e patas palmadas, procura alimento de olhos fechados ao longo dos ribeiros do leste da Austrália ao amanhecer e ao anoitecer.';
 
   @override
-  String get species_amazonian_manatee_name => 'Peixe-boi-da-amazÃ´nia';
+  String get species_amazonian_manatee_name => 'Peixe-boi-da-amazônia';
 
   @override
   String get species_amazonian_manatee_desc =>
-      'O mais pequeno dos peixes-boi, um herbÃ­voro liso e escuro com uma mancha branca no peito, pasta plantas aquÃ¡ticas em lagos e rios do Amazonas.';
+      'O mais pequeno dos peixes-boi, um herbívoro liso e escuro com uma mancha branca no peito, pasta plantas aquáticas em lagos e rios do Amazonas.';
 
   @override
   String get species_amazon_river_dolphin_name => 'Boto-cor-de-rosa';
 
   @override
   String get species_amazon_river_dolphin_desc =>
-      'Golfinho cor-de-rosa de bico longo e pescoÃ§o flexÃ­vel, serpenteia entre os troncos da floresta inundada no Amazonas e no Orinoco.';
+      'Golfinho cor-de-rosa de bico longo e pescoço flexível, serpenteia entre os troncos da floresta inundada no Amazonas e no Orinoco.';
 
   @override
   String get species_baikal_seal_name => 'Foca-do-Baikal';
 
   @override
   String get species_baikal_seal_desc =>
-      'A Ãºnica foca de Ã¡gua doce do mundo, uma pequena foca cinzento-prateada que descansa no gelo e nas margens rochosas do lago Baikal.';
+      'A única foca de água doce do mundo, uma pequena foca cinzento-prateada que descansa no gelo e nas margens rochosas do lago Baikal.';
 
   @override
   String get species_capybara_name => 'Capivara';
 
   @override
   String get species_capybara_desc =>
-      'O maior roedor, um herbÃ­voro em forma de barril que vadeia e nada em rios e zonas hÃºmidas sul-americanas em manadas tranquilas.';
+      'O maior roedor, um herbívoro em forma de barril que vadeia e nada em rios e zonas húmidas sul-americanas em manadas tranquilas.';
 
   @override
-  String get species_hippopotamus_name => 'HipopÃ³tamo';
+  String get species_hippopotamus_name => 'Hipopótamo';
 
   @override
   String get species_hippopotamus_desc =>
       'Enorme gigante dos rios africanos que passa o dia submerso em grupos e caminha no fundo em vez de nadar; perigoso de abordar.';
 
   @override
-  String get species_white_water_lily_name => 'NenÃºfar-branco';
+  String get species_white_water_lily_name => 'Nenúfar-branco';
 
   @override
   String get species_white_water_lily_desc =>
-      'Folhas redondas flutuantes e grandes flores brancas que emergem de rizomas espessos enraizados na lama de Ã¡guas paradas europeias.';
+      'Folhas redondas flutuantes e grandes flores brancas que emergem de rizomas espessos enraizados na lama de águas paradas europeias.';
 
   @override
-  String get species_yellow_pond_lily_name => 'GolfÃ£o-amarelo';
+  String get species_yellow_pond_lily_name => 'Golfão-amarelo';
 
   @override
   String get species_yellow_pond_lily_desc =>
-      'Folhas flutuantes em forma de coraÃ§Ã£o e flores amarelas em taÃ§a, com grandes folhas submersas translÃºcidas visÃ­veis aos mergulhadores.';
+      'Folhas flutuantes em forma de coração e flores amarelas em taça, com grandes folhas submersas translúcidas visíveis aos mergulhadores.';
 
   @override
-  String get species_american_eelgrass_name => 'ValisnÃ©ria-americana';
+  String get species_american_eelgrass_name => 'Valisnéria-americana';
 
   @override
   String get species_american_eelgrass_desc =>
-      'Folhas em fita com atÃ© dois metros que ondulam na corrente de rios e nascentes claros, favoritas dos peixes-boi.';
+      'Folhas em fita com até dois metros que ondulam na corrente de rios e nascentes claros, favoritas dos peixes-boi.';
 
   @override
   String get species_coontail_name => 'erva-do-peixe-dourado';
 
   @override
   String get species_coontail_desc =>
-      'Planta submersa sem raÃ­zes com verticilos de folhas rÃ­gidas e bifurcadas como a cauda de um guaxinim, flutua em massas densas em Ã¡gua parada.';
+      'Planta submersa sem raízes com verticilos de folhas rígidas e bifurcadas como a cauda de um guaxinim, flutua em massas densas em água parada.';
 
   @override
-  String get species_eurasian_watermilfoil_name => 'MilefÃ³lio-de-espiga';
+  String get species_eurasian_watermilfoil_name => 'Milefólio-de-espiga';
 
   @override
   String get species_eurasian_watermilfoil_desc =>
-      'Planta submersa plumosa com verticilos de folhas finamente divididas que forma densos tapetes perto da superfÃ­cie, invasora em muitos lagos.';
+      'Planta submersa plumosa com verticilos de folhas finamente divididas que forma densos tapetes perto da superfície, invasora em muitos lagos.';
 
   @override
   String get species_muskgrass_name => 'Chara';
 
   @override
   String get species_muskgrass_desc =>
-      'Alga verde quebradiÃ§a de cheiro almiscarado com ramos verticilados, muitas vezes incrustada de cal, que atapeta o fundo de lagos claros de Ã¡gua dura.';
+      'Alga verde quebradiça de cheiro almiscarado com ramos verticilados, muitas vezes incrustada de cal, que atapeta o fundo de lagos claros de água dura.';
 
   @override
-  String get species_canadian_waterweed_name => 'ElÃ³dea';
+  String get species_canadian_waterweed_name => 'Elódea';
 
   @override
   String get species_canadian_waterweed_desc =>
-      'Planta submersa densa com verticilos de trÃªs pequenas folhas verde-escuras, propaga-se por fragmentos em lagos e canais frescos de todo o mundo.';
+      'Planta submersa densa com verticilos de três pequenas folhas verde-escuras, propaga-se por fragmentos em lagos e canais frescos de todo o mundo.';
 
   @override
   String get species_curly_leaf_pondweed_name => 'Colher-de-folha-crespa';
 
   @override
   String get species_curly_leaf_pondweed_desc =>
-      'Planta submersa com folhas verde-avermelhadas de bordos ondulados como lasanha enrugada, cresce no inÃ­cio da primavera antes das outras plantas.';
+      'Planta submersa com folhas verde-avermelhadas de bordos ondulados como lasanha enrugada, cresce no início da primavera antes das outras plantas.';
 
   @override
-  String get species_water_hyacinth_name => 'Jacinto-d\'Ã¡gua';
+  String get species_water_hyacinth_name => 'Jacinto-d\'água';
 
   @override
   String get species_water_hyacinth_desc =>
-      'Planta flutuante de folhas brilhantes sobre pecÃ­olos cheios de ar e espigas de flores lilÃ¡s, que sufoca cursos de Ã¡gua quentes em todo o mundo.';
+      'Planta flutuante de folhas brilhantes sobre pecíolos cheios de ar e espigas de flores lilás, que sufoca cursos de água quentes em todo o mundo.';
 
   @override
-  String get species_common_reed_name => 'CaniÃ§o';
+  String get species_common_reed_name => 'Caniço';
 
   @override
   String get species_common_reed_desc =>
-      'GramÃ­nea alta de panÃ­culas plumosas que forma densos caniÃ§ais nas margens dos lagos; os seus caules submersos abrigam alevins e larvas de libÃ©lula.';
+      'Gramínea alta de panículas plumosas que forma densos caniçais nas margens dos lagos; os seus caules submersos abrigam alevins e larvas de libélula.';
 
   @override
-  String get common_action_done => 'ConcluÃ­do';
+  String get common_action_done => 'Concluído';
 
   @override
   String get common_action_more => 'Mais';
 
   @override
-  String get common_label_displayName => 'Nome de exibiÃ§Ã£o';
+  String get common_label_displayName => 'Nome de exibição';
 
   @override
   String common_relativeTime_daysAgo(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '${count}d atrÃ¡s',
-      one: '${count}d atrÃ¡s',
+      other: '${count}d atrás',
+      one: '${count}d atrás',
     );
     return '$_temp0';
   }
@@ -36136,8 +36086,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '${count}h atrÃ¡s',
-      one: '${count}h atrÃ¡s',
+      other: '${count}h atrás',
+      one: '${count}h atrás',
     );
     return '$_temp0';
   }
@@ -36186,8 +36136,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '${count}min atrÃ¡s',
-      one: '${count}min atrÃ¡s',
+      other: '${count}min atrás',
+      one: '${count}min atrás',
     );
     return '$_temp0';
   }
@@ -36197,8 +36147,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count meses atrÃ¡s',
-      one: '$count mÃªs atrÃ¡s',
+      other: '$count meses atrás',
+      one: '$count mês atrás',
     );
     return '$_temp0';
   }
@@ -36207,7 +36157,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get common_relativeTime_overdue => 'atrasado';
 
   @override
-  String get media_cache_calculating => 'Calculando o tamanho do cacheâ€¦';
+  String get media_cache_calculating => 'Calculando o tamanho do cache…';
 
   @override
   String get media_cache_cardTitle => 'Gerenciamento de cache';
@@ -36217,7 +36167,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_cache_clearBody =>
-      'Remove miniaturas e imagens de rede em tamanho completo jÃ¡ baixadas. As mÃ­dias vinculadas sÃ£o mantidas; as imagens serÃ£o baixadas novamente na prÃ³xima visualizaÃ§Ã£o.';
+      'Remove miniaturas e imagens de rede em tamanho completo já baixadas. As mídias vinculadas são mantidas; as imagens serão baixadas novamente na próxima visualização.';
 
   @override
   String get media_cache_clearConfirm => 'Limpar';
@@ -36246,12 +36196,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String media_credentials_authLabel(String authType) {
-    return 'AutenticaÃ§Ã£o: $authType';
+    return 'Autenticação: $authType';
   }
 
   @override
   String get media_credentials_deleteBody =>
-      'Remove as credenciais salvas. Os itens vinculados por meio deste host passarÃ£o a exibir \"Requer login\" atÃ© que vocÃª os adicione novamente.';
+      'Remove as credenciais salvas. Os itens vinculados por meio deste host passarão a exibir \"Requer login\" até que você os adicione novamente.';
 
   @override
   String media_credentials_deleteError(String error) {
@@ -36265,7 +36215,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String media_credentials_deleted(String host) {
-    return '$host excluÃ­do';
+    return '$host excluído';
   }
 
   @override
@@ -36275,19 +36225,19 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_credentials_emptySubtitle =>
-      'As credenciais por host adicionadas durante importaÃ§Ãµes por URL ou manifesto aparecem aqui.';
+      'As credenciais por host adicionadas durante importações por URL ou manifesto aparecem aqui.';
 
   @override
   String get media_credentials_emptyTitle => 'Nenhuma credencial salva';
 
   @override
   String media_credentials_lastUsed(String when) {
-    return 'Ãšltimo uso $when';
+    return 'Último uso $when';
   }
 
   @override
   String get media_credentials_loadError =>
-      'NÃ£o foi possÃ­vel carregar os hosts salvos';
+      'Não foi possível carregar os hosts salvos';
 
   @override
   String get media_credentials_loading => 'Carregando hosts salvos...';
@@ -36323,7 +36273,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_manifest_deleteBody =>
-      'Remove a assinatura. As entradas jÃ¡ importadas permanecerÃ£o (vocÃª pode limpÃ¡-las pela fila de Ã³rfÃ£os).';
+      'Remove a assinatura. As entradas já importadas permanecerão (você pode limpá-las pela fila de órfãos).';
 
   @override
   String media_manifest_deleteError(String error) {
@@ -36347,17 +36297,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String media_manifest_lastError(String error) {
-    return 'Ãšltimo erro: $error';
+    return 'Último erro: $error';
   }
 
   @override
   String media_manifest_lastPolled(String when) {
-    return 'Ãšltima consulta $when';
+    return 'Última consulta $when';
   }
 
   @override
   String get media_manifest_loadError =>
-      'NÃ£o foi possÃ­vel carregar as assinaturas';
+      'Não foi possível carregar as assinaturas';
 
   @override
   String get media_manifest_loading => 'Carregando assinaturas...';
@@ -36367,11 +36317,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String media_manifest_nextPoll(String when) {
-    return 'PrÃ³xima $when';
+    return 'Próxima $when';
   }
 
   @override
-  String get media_manifest_notFound => 'Assinatura nÃ£o encontrada';
+  String get media_manifest_notFound => 'Assinatura não encontrada';
 
   @override
   String media_manifest_pollError(String error) {
@@ -36395,7 +36345,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String media_manifest_updateError(String error) {
-    return 'NÃ£o foi possÃ­vel atualizar: $error';
+    return 'Não foi possível atualizar: $error';
   }
 
   @override
@@ -36403,7 +36353,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String media_scan_failed(String error) {
-    return 'Falha na verificaÃ§Ã£o: $error';
+    return 'Falha na verificação: $error';
   }
 
   @override
@@ -36413,7 +36363,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String media_scan_progressReachability(int available, int unreachable) {
-    return '$available acessÃ­veis  Â·  $unreachable inacessÃ­veis';
+    return '$available acessíveis  ·  $unreachable inacessíveis';
   }
 
   @override
@@ -36427,9 +36377,9 @@ class AppLocalizationsPt extends AppLocalizations {
       total,
       locale: localeName,
       other:
-          '$total itens verificados em ${seconds}s: $available acessÃ­veis, $unreachable inacessÃ­veis',
+          '$total itens verificados em ${seconds}s: $available acessíveis, $unreachable inacessíveis',
       one:
-          '$total item verificado em ${seconds}s: $available acessÃ­vel, $unreachable inacessÃ­vel',
+          '$total item verificado em ${seconds}s: $available acessível, $unreachable inacessível',
     );
     return '$_temp0';
   }
@@ -36446,11 +36396,11 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get media_scan_title => 'Verificar todas as mÃ­dias de rede';
+  String get media_scan_title => 'Verificar todas as mídias de rede';
 
   @override
   String get settings_mediaSources_androidUriTitle =>
-      'PermissÃµes de URI do Android';
+      'Permissões de URI do Android';
 
   @override
   String settings_mediaSources_androidUriUsage(int used, int limit) {
@@ -36458,7 +36408,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get settings_mediaSources_counting => 'Contandoâ€¦';
+  String get settings_mediaSources_counting => 'Contando…';
 
   @override
   String settings_mediaSources_error(String error) {
@@ -36466,14 +36416,14 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get settings_mediaSources_loading => 'Carregandoâ€¦';
+  String get settings_mediaSources_loading => 'Carregando…';
 
   @override
   String settings_mediaSources_localFilesCounts(
     int available,
     int unavailable,
   ) {
-    return '$available disponÃ­veis, $unavailable indisponÃ­veis';
+    return '$available disponíveis, $unavailable indisponíveis';
   }
 
   @override
@@ -36486,7 +36436,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String settings_mediaSources_reverifyFailed(String error) {
-    return 'Falha na reverificaÃ§Ã£o: $error';
+    return 'Falha na reverificação: $error';
   }
 
   @override
@@ -36501,7 +36451,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get settings_mediaSources_checkAll => 'Verificar todas as mÃ­dias';
+  String get settings_mediaSources_checkAll => 'Verificar todas as mídias';
 
   @override
   String settings_mediaSources_checkAllResult(int count) {
@@ -36520,40 +36470,40 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          'NÃ£o foi possÃ­vel verificar nenhum dos $count itens. As origens deles nÃ£o estÃ£o acessÃ­veis no momento.',
+          'Não foi possível verificar nenhum dos $count itens. As origens deles não estão acessíveis no momento.',
       one:
-          'NÃ£o foi possÃ­vel verificar o item. A origem dele nÃ£o estÃ¡ acessÃ­vel no momento.',
+          'Não foi possível verificar o item. A origem dele não está acessível no momento.',
     );
     return '$_temp0';
   }
 
   @override
-  String get settings_mediaSources_title => 'Fontes de mÃ­dia';
+  String get settings_mediaSources_title => 'Fontes de mídia';
 
   @override
   String get settings_networkSources_scanDescription =>
-      'Verifica novamente cada foto importada por URL ou manifesto junto ao seu host. Marca os itens inacessÃ­veis para que apareÃ§am como \"ausentes\" na sua biblioteca e possam ser removidos.';
+      'Verifica novamente cada foto importada por URL ou manifesto junto ao seu host. Marca os itens inacessíveis para que apareçam como \"ausentes\" na sua biblioteca e possam ser removidos.';
 
   @override
   String statistics_conditions_entryMethod_semanticLabel(String description) {
-    return 'GrÃ¡fico de barras. MÃ©todos de entrada. $description';
+    return 'Gráfico de barras. Métodos de entrada. $description';
   }
 
   @override
   String statistics_conditions_visibility_semanticLabel(String description) {
-    return 'GrÃ¡fico de pizza. DistribuiÃ§Ã£o de visibilidade. $description';
+    return 'Gráfico de pizza. Distribuição de visibilidade. $description';
   }
 
   @override
   String statistics_conditions_waterType_semanticLabel(String description) {
-    return 'GrÃ¡fico de pizza. DistribuiÃ§Ã£o de tipo de Ã¡gua. $description';
+    return 'Gráfico de pizza. Distribuição de tipo de água. $description';
   }
 
   @override
   String statistics_progression_divesBySuitThickness_semanticLabel(
     String description,
   ) {
-    return 'GrÃ¡fico de barras. Mergulhos por espessura da roupa. $description';
+    return 'Gráfico de barras. Mergulhos por espessura da roupa. $description';
   }
 
   @override
@@ -36572,11 +36522,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String statistics_progression_divesPerYear_semanticLabel(String description) {
-    return 'GrÃ¡fico de barras. Mergulhos por ano. $description';
+    return 'Gráfico de barras. Mergulhos por ano. $description';
   }
 
   @override
-  String get statistics_records_unavailable => 'Recordes indisponÃ­veis';
+  String get statistics_records_unavailable => 'Recordes indisponíveis';
 
   @override
   String statistics_summary_depthBucket_over(String min, String unit) {
@@ -36593,29 +36543,29 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get statistics_summary_distributions_title => 'DistribuiÃ§Ãµes';
+  String get statistics_summary_distributions_title => 'Distribuições';
 
   @override
   String get statistics_summary_diveTypes_error =>
-      'NÃ£o foi possÃ­vel carregar os dados de tipo de mergulho';
+      'Não foi possível carregar os dados de tipo de mergulho';
 
   @override
   String get statistics_summary_diveTypes_unknown => 'Desconhecido';
 
   @override
-  String get statistics_summary_divesPerMonth => 'Mergulhos / MÃªs';
+  String get statistics_summary_divesPerMonth => 'Mergulhos / Mês';
 
   @override
   String get statistics_summary_divesPerYear => 'Mergulhos / Ano';
 
   @override
   String statistics_timePatterns_dayOfWeek_semanticLabel(String description) {
-    return 'GrÃ¡fico de barras. Mergulhos por dia da semana. $description';
+    return 'Gráfico de barras. Mergulhos por dia da semana. $description';
   }
 
   @override
   String statistics_timePatterns_seasonal_semanticLabel(String description) {
-    return 'GrÃ¡fico de barras. Mergulhos por mÃªs. $description';
+    return 'Gráfico de barras. Mergulhos por mês. $description';
   }
 
   @override
@@ -36623,7 +36573,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String label,
     String value,
   ) {
-    return 'Intervalo de superfÃ­cie $label: $value';
+    return 'Intervalo de superfície $label: $value';
   }
 
   @override
@@ -36633,66 +36583,65 @@ class AppLocalizationsPt extends AppLocalizations {
   String get statistics_timePatterns_timeOfDay_evening => 'Noite';
 
   @override
-  String get statistics_timePatterns_timeOfDay_morning => 'ManhÃ£';
+  String get statistics_timePatterns_timeOfDay_morning => 'Manhã';
 
   @override
   String get statistics_timePatterns_timeOfDay_night => 'Madrugada';
 
   @override
   String statistics_timePatterns_timeOfDay_semanticLabel(String description) {
-    return 'GrÃ¡fico de pizza. Mergulhos por hora do dia. $description';
+    return 'Gráfico de pizza. Mergulhos por hora do dia. $description';
   }
 
   @override
-  String get columnConfig_displayOptions => 'OpÃ§Ãµes de exibiÃ§Ã£o';
+  String get columnConfig_displayOptions => 'Opções de exibição';
 
   @override
   String get columnConfig_noExtraFields =>
       'Nenhum campo extra configurado. Adicione campos abaixo.';
 
   @override
-  String get columnConfig_savePresetTitle => 'Salvar predefiniÃ§Ã£o';
+  String get columnConfig_savePresetTitle => 'Salvar predefinição';
 
   @override
-  String get columnConfig_section => 'SeÃ§Ã£o';
+  String get columnConfig_section => 'Seção';
 
   @override
   String get columnConfig_showTags => 'Mostrar tags';
 
   @override
   String get columnConfig_showTags_subtitle =>
-      'Exibir chips de tags nos cartÃµes de mergulho detalhados';
+      'Exibir chips de tags nos cartões de mergulho detalhados';
 
   @override
-  String get columnConfig_slot_date => 'Data / SubtÃ­tulo';
+  String get columnConfig_slot_date => 'Data / Subtítulo';
 
   @override
-  String get columnConfig_slot_slot1 => 'PosiÃ§Ã£o 1';
+  String get columnConfig_slot_slot1 => 'Posição 1';
 
   @override
-  String get columnConfig_slot_slot2 => 'PosiÃ§Ã£o 2';
+  String get columnConfig_slot_slot2 => 'Posição 2';
 
   @override
-  String get columnConfig_slot_slot3 => 'PosiÃ§Ã£o 3';
+  String get columnConfig_slot_slot3 => 'Posição 3';
 
   @override
-  String get columnConfig_slot_slot4 => 'PosiÃ§Ã£o 4';
+  String get columnConfig_slot_slot4 => 'Posição 4';
 
   @override
-  String get columnConfig_slot_stat1 => 'EstatÃ­stica 1';
+  String get columnConfig_slot_stat1 => 'Estatística 1';
 
   @override
-  String get columnConfig_slot_stat2 => 'EstatÃ­stica 2';
+  String get columnConfig_slot_stat2 => 'Estatística 2';
 
   @override
-  String get columnConfig_slot_subtitle => 'SubtÃ­tulo';
+  String get columnConfig_slot_subtitle => 'Subtítulo';
 
   @override
-  String get columnConfig_slot_title => 'TÃ­tulo';
+  String get columnConfig_slot_title => 'Título';
 
   @override
-  String get columnConfig_tooltip_columnSettings =>
-      'ConfiguraÃ§Ãµes de colunas';
+  String get columnConfig_tooltip_columnSettings => 'Configurações de colunas';
 
   @override
   String get common_action_add => 'Adicionar';
@@ -36721,14 +36670,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_documents_removeContent =>
-      'Deixa de estar anexado a este equipamento. O seu ficheiro original nunca Ã© alterado.';
+      'Deixa de estar anexado a este equipamento. O seu ficheiro original nunca é alterado.';
 
   @override
   String get equipment_documents_removed => 'Documento removido';
 
   @override
   String equipment_documents_loadError(String error) {
-    return 'NÃ£o foi possÃ­vel carregar os documentos: $error';
+    return 'Não foi possível carregar os documentos: $error';
   }
 
   @override
@@ -36789,21 +36738,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_sortField_bottomTime => 'Tempo de Fundo';
 
   @override
-  String get enum_sortField_serviceDue => 'ManutenÃ§Ã£o Pendente';
+  String get enum_sortField_serviceDue => 'Manutenção Pendente';
 
   @override
-  String get listViewMode_tooltip => 'Modo de visualizaÃ§Ã£o';
+  String get listViewMode_tooltip => 'Modo de visualização';
 
   @override
   String marineLife_speciesManage_errorLoading(Object error) {
-    return 'Erro ao carregar espÃ©cies: $error';
+    return 'Erro ao carregar espécies: $error';
   }
 
   @override
-  String get settings_appearance_header_cards => 'CartÃµes';
+  String get settings_appearance_header_cards => 'Cartões';
 
   @override
-  String get settings_appearance_header_listView => 'VisualizaÃ§Ã£o em lista';
+  String get settings_appearance_header_listView => 'Visualização em lista';
 
   @override
   String get settings_appearance_header_tableMode => 'Modo tabela';
@@ -36814,7 +36763,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_appearance_listFields_certifications =>
-      'Campos da lista de certificaÃ§Ãµes';
+      'Campos da lista de certificações';
 
   @override
   String get settings_appearance_listFields_courses =>
@@ -36838,7 +36787,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_appearance_listFields_subtitle =>
-      'Personalize os campos exibidos nas visualizaÃ§Ãµes em lista';
+      'Personalize os campos exibidos nas visualizações em lista';
 
   @override
   String get settings_appearance_listFields_trips =>
@@ -36846,67 +36795,67 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_appearance_listView_buddies =>
-      'VisualizaÃ§Ã£o da lista de companheiros';
+      'Visualização da lista de companheiros';
 
   @override
   String get settings_appearance_listView_buddies_subtitle =>
-      'Layout padrÃ£o para a lista de companheiros';
+      'Layout padrão para a lista de companheiros';
 
   @override
   String get settings_appearance_listView_certifications =>
-      'VisualizaÃ§Ã£o da lista de certificaÃ§Ãµes';
+      'Visualização da lista de certificações';
 
   @override
   String get settings_appearance_listView_certifications_subtitle =>
-      'Layout padrÃ£o para a lista de certificaÃ§Ãµes';
+      'Layout padrão para a lista de certificações';
 
   @override
   String get settings_appearance_listView_courses =>
-      'VisualizaÃ§Ã£o da lista de cursos';
+      'Visualização da lista de cursos';
 
   @override
   String get settings_appearance_listView_courses_subtitle =>
-      'Layout padrÃ£o para a lista de cursos';
+      'Layout padrão para a lista de cursos';
 
   @override
   String get settings_appearance_listView_diveCenters =>
-      'VisualizaÃ§Ã£o da lista de centros de mergulho';
+      'Visualização da lista de centros de mergulho';
 
   @override
   String get settings_appearance_listView_diveCenters_subtitle =>
-      'Layout padrÃ£o para a lista de centros de mergulho';
+      'Layout padrão para a lista de centros de mergulho';
 
   @override
   String get settings_appearance_listView_dives =>
-      'VisualizaÃ§Ã£o da lista de mergulhos';
+      'Visualização da lista de mergulhos';
 
   @override
   String get settings_appearance_listView_dives_subtitle =>
-      'Layout padrÃ£o para a lista de mergulhos';
+      'Layout padrão para a lista de mergulhos';
 
   @override
   String get settings_appearance_listView_equipment =>
-      'VisualizaÃ§Ã£o da lista de equipamentos';
+      'Visualização da lista de equipamentos';
 
   @override
   String get settings_appearance_listView_equipment_subtitle =>
-      'Layout padrÃ£o para a lista de equipamentos';
+      'Layout padrão para a lista de equipamentos';
 
   @override
   String get settings_appearance_listView_sites =>
-      'VisualizaÃ§Ã£o da lista de pontos de mergulho';
+      'Visualização da lista de pontos de mergulho';
 
   @override
   String get settings_appearance_listView_sites_subtitle =>
-      'Layout padrÃ£o para a lista de pontos de mergulho';
+      'Layout padrão para a lista de pontos de mergulho';
 
   @override
   String get settings_appearance_listView_trips =>
-      'VisualizaÃ§Ã£o da lista de viagens';
+      'Visualização da lista de viagens';
 
   @override
   String get settings_appearance_listView_trips_subtitle =>
-      'Layout padrÃ£o para a lista de viagens';
+      'Layout padrão para a lista de viagens';
 
   @override
   String get settings_appearance_showDataSourceBadges =>
@@ -36914,39 +36863,39 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_appearance_showDataSourceBadges_subtitle =>
-      'Exibir a atribuiÃ§Ã£o de fonte nas mÃ©tricas de mergulho';
+      'Exibir a atribuição de fonte nas métricas de mergulho';
 
   @override
-  String get settings_appearance_title_buddies => 'AparÃªncia dos companheiros';
+  String get settings_appearance_title_buddies => 'Aparência dos companheiros';
 
   @override
   String get settings_appearance_title_certifications =>
-      'AparÃªncia das certificaÃ§Ãµes';
+      'Aparência das certificações';
 
   @override
-  String get settings_appearance_title_courses => 'AparÃªncia dos cursos';
+  String get settings_appearance_title_courses => 'Aparência dos cursos';
 
   @override
   String get settings_appearance_title_diveCenters =>
-      'AparÃªncia dos centros de mergulho';
+      'Aparência dos centros de mergulho';
 
   @override
-  String get settings_appearance_title_dives => 'AparÃªncia dos mergulhos';
+  String get settings_appearance_title_dives => 'Aparência dos mergulhos';
 
   @override
   String get settings_appearance_title_equipment =>
-      'AparÃªncia dos equipamentos';
+      'Aparência dos equipamentos';
 
   @override
   String get settings_appearance_title_sites =>
-      'AparÃªncia dos pontos de mergulho';
+      'Aparência dos pontos de mergulho';
 
   @override
-  String get settings_appearance_title_trips => 'AparÃªncia das viagens';
+  String get settings_appearance_title_trips => 'Aparência das viagens';
 
   @override
   String get settings_cloudSync_troubleshoot_tileSubtitle =>
-      'Corrija uma sincronizaÃ§Ã£o travada ou libere espaÃ§o na nuvem';
+      'Corrija uma sincronização travada ou libere espaço na nuvem';
 
   @override
   String get settings_data_header_dataTools => 'Ferramentas de dados';
@@ -36960,7 +36909,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_decompression_ascentGas_decoStage =>
-      'Deco/estÃ¡gio + gÃ¡s de fundo';
+      'Deco/estágio + gás de fundo';
 
   @override
   String get settings_decompression_cnsSource => 'Fonte do CNS';
@@ -36974,15 +36923,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_decompression_header_ascent_subtitle =>
-      'Quais cilindros transportados a subida simulada (TTS, teto e paradas) pode usar em cada profundidade. Somente os gases registrados no mergulho sÃ£o considerados.';
+      'Quais cilindros transportados a subida simulada (TTS, teto e paradas) pode usar em cada profundidade. Somente os gases registrados no mergulho são considerados.';
 
   @override
   String get settings_decompression_header_dataSources =>
-      'PreferÃªncias de fonte de dados';
+      'Preferências de fonte de dados';
 
   @override
   String get settings_decompression_header_dataSources_subtitle =>
-      'Quando definido como Computador de Mergulho, o aplicativo usa os dados informados pelo computador de mergulho quando disponÃ­veis. Recorre aos valores calculados quando nÃ£o hÃ¡ dados do computador.';
+      'Quando definido como Computador de Mergulho, o aplicativo usa os dados informados pelo computador de mergulho quando disponíveis. Recorre aos valores calculados quando não há dados do computador.';
 
   @override
   String get settings_decompression_ndlSource => 'Fonte do NDL';
@@ -37000,11 +36949,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_decompression_gtrSource => 'Fonte do GTR';
 
   @override
-  String get settings_decompression_gtrReserve => 'PressÃ£o de reserva do GTR';
+  String get settings_decompression_gtrReserve => 'Pressão de reserva do GTR';
 
   @override
   String get settings_decompression_gtrReserve_subtitle =>
-      'PressÃ£o do cilindro atÃ© Ã  qual o tempo de gÃ¡s restante faz a contagem decrescente. O GTR calculado assume uma subida direta a 10 m/min sem paragens.';
+      'Pressão do cilindro até à qual o tempo de gás restante faz a contagem decrescente. O GTR calculado assume uma subida direta a 10 m/min sem paragens.';
 
   @override
   String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
@@ -37058,12 +37007,12 @@ class AppLocalizationsPt extends AppLocalizations {
       other: 'horas',
       one: 'hora',
     );
-    return 'Isto vai deslocar $count $_temp0 em $hours $_temp1. Isto nÃ£o pode ser desfeito automaticamente.';
+    return 'Isto vai deslocar $count $_temp0 em $hours $_temp1. Isto não pode ser desfeito automaticamente.';
   }
 
   @override
   String get settings_fixDiveTimes_confirmTitle =>
-      'Aplicar deslocamento de horÃ¡rio';
+      'Aplicar deslocamento de horário';
 
   @override
   String get settings_fixDiveTimes_dateRangeFilter =>
@@ -37077,7 +37026,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String settings_fixDiveTimes_diveNumber(int number) {
-    return 'Mergulho nÂº $number';
+    return 'Mergulho nº $number';
   }
 
   @override
@@ -37111,15 +37060,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_fixDiveTimes_offsetHint =>
-      'Informe um nÃºmero inteiro positivo ou negativo para deslocar os horÃ¡rios dos mergulhos.';
+      'Informe um número inteiro positivo ou negativo para deslocar os horários dos mergulhos.';
 
   @override
   String settings_fixDiveTimes_preview(int count, String hours, int hoursAbs) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'mergulhos serÃ£o deslocados',
-      one: 'mergulho serÃ¡ deslocado',
+      other: 'mergulhos serão deslocados',
+      one: 'mergulho será deslocado',
     );
     String _temp1 = intl.Intl.pluralLogic(
       hoursAbs,
@@ -37127,7 +37076,7 @@ class AppLocalizationsPt extends AppLocalizations {
       other: 'horas',
       one: 'hora',
     );
-    return 'PrÃ©via: $count $_temp0 em $hours $_temp1.';
+    return 'Prévia: $count $_temp0 em $hours $_temp1.';
   }
 
   @override
@@ -37139,17 +37088,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_fixDiveTimes_subtitle =>
-      'Ajuste os horÃ¡rios de mergulhos importados';
+      'Ajuste os horários de mergulhos importados';
 
   @override
-  String get settings_fixDiveTimes_title => 'Corrigir horÃ¡rios de mergulho';
+  String get settings_fixDiveTimes_title => 'Corrigir horários de mergulho';
 
   @override
-  String get settings_fixDiveTimes_to => 'AtÃ©';
+  String get settings_fixDiveTimes_to => 'Até';
 
   @override
   String get settings_fixDiveTimes_zeroOffset =>
-      'O deslocamento de horas Ã© 0, nada a alterar.';
+      'O deslocamento de horas é 0, nada a alterar.';
 
   @override
   String get settings_syncDevices_appBar_refreshTooltip => 'Atualizar';
@@ -37159,20 +37108,20 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_syncDevices_empty =>
-      'Nenhum arquivo de sincronizaÃ§Ã£o neste provedor.';
+      'Nenhum arquivo de sincronização neste provedor.';
 
   @override
   String settings_syncDevices_readError(String error) {
-    return 'NÃ£o foi possÃ­vel ler o provedor.\n$error';
+    return 'Não foi possível ler o provedor.\n$error';
   }
 
   @override
   String get settings_syncDevices_removal_noBackend =>
-      'Nenhum provedor de nuvem estÃ¡ configurado';
+      'Nenhum provedor de nuvem está configurado';
 
   @override
   String get settings_syncDevices_removal_unreachable =>
-      'NÃ£o foi possÃ­vel acessar o provedor. Nada foi removido.';
+      'Não foi possível acessar o provedor. Nada foi removido.';
 
   @override
   String settings_syncDevices_removeDialog_bodyRisky(
@@ -37184,9 +37133,9 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          'Isto exclui $count arquivos ($size) pertencentes a $name.\n\nEsse dispositivo ainda faz parte desta sincronizaÃ§Ã£o. Se voltar a ficar online, ele serÃ¡ reconstruÃ­do a partir do provedor em vez de ressuscitar dados antigos, mas quaisquer alteraÃ§Ãµes que ele ainda nÃ£o tenha publicado serÃ£o perdidas. Seus dados de mergulho NESTE dispositivo nÃ£o sÃ£o afetados.',
+          'Isto exclui $count arquivos ($size) pertencentes a $name.\n\nEsse dispositivo ainda faz parte desta sincronização. Se voltar a ficar online, ele será reconstruído a partir do provedor em vez de ressuscitar dados antigos, mas quaisquer alterações que ele ainda não tenha publicado serão perdidas. Seus dados de mergulho NESTE dispositivo não são afetados.',
       one:
-          'Isto exclui 1 arquivo ($size) pertencentes a $name.\n\nEsse dispositivo ainda faz parte desta sincronizaÃ§Ã£o. Se voltar a ficar online, ele serÃ¡ reconstruÃ­do a partir do provedor em vez de ressuscitar dados antigos, mas quaisquer alteraÃ§Ãµes que ele ainda nÃ£o tenha publicado serÃ£o perdidas. Seus dados de mergulho NESTE dispositivo nÃ£o sÃ£o afetados.',
+          'Isto exclui 1 arquivo ($size) pertencentes a $name.\n\nEsse dispositivo ainda faz parte desta sincronização. Se voltar a ficar online, ele será reconstruído a partir do provedor em vez de ressuscitar dados antigos, mas quaisquer alterações que ele ainda não tenha publicado serão perdidas. Seus dados de mergulho NESTE dispositivo não são afetados.',
     );
     return '$_temp0';
   }
@@ -37201,9 +37150,9 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          'Isto exclui $count arquivos ($size) pertencentes a $name. SÃ£o restos de uma biblioteca da qual nenhum dispositivo sincroniza mais. Seus dados de mergulho nÃ£o sÃ£o afetados.',
+          'Isto exclui $count arquivos ($size) pertencentes a $name. São restos de uma biblioteca da qual nenhum dispositivo sincroniza mais. Seus dados de mergulho não são afetados.',
       one:
-          'Isto exclui 1 arquivo ($size) pertencentes a $name. SÃ£o restos de uma biblioteca da qual nenhum dispositivo sincroniza mais. Seus dados de mergulho nÃ£o sÃ£o afetados.',
+          'Isto exclui 1 arquivo ($size) pertencentes a $name. São restos de uma biblioteca da qual nenhum dispositivo sincroniza mais. Seus dados de mergulho não são afetados.',
     );
     return '$_temp0';
   }
@@ -37230,14 +37179,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_syncDevices_state_staleEpoch =>
-      'Resto de uma biblioteca anterior; nenhum dispositivo lÃª isto';
+      'Resto de uma biblioteca anterior; nenhum dispositivo lê isto';
 
   @override
   String get settings_syncDevices_state_thisDevice => 'Este dispositivo';
 
   @override
   String get settings_syncDevices_state_unreadable =>
-      'Sem manifesto legÃ­vel; um envio incompleto ou criptografado';
+      'Sem manifesto legível; um envio incompleto ou criptografado';
 
   @override
   String settings_syncDevices_summary(
@@ -37266,9 +37215,9 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '$count restantes de uma biblioteca substituÃ­da ou aposentada, ocupando $size.',
+          '$count restantes de uma biblioteca substituída ou aposentada, ocupando $size.',
       one:
-          '1 restante de uma biblioteca substituÃ­da ou aposentada, ocupando $size.',
+          '1 restante de uma biblioteca substituída ou aposentada, ocupando $size.',
     );
     return '$_temp0';
   }
@@ -37296,7 +37245,7 @@ class AppLocalizationsPt extends AppLocalizations {
       other: '$count arquivos',
       one: '1 arquivo',
     );
-    return '$_temp0, $size Â· $when';
+    return '$_temp0, $size · $when';
   }
 
   @override
@@ -37306,7 +37255,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_syncMaintenance_keepAppOpen =>
-      'Mantenha o aplicativo aberto atÃ© que isto termine. FechÃ¡-lo agora deixa o provedor parcialmente limpo, e a prÃ³xima sincronizaÃ§Ã£o terÃ¡ que comeÃ§ar do zero.';
+      'Mantenha o aplicativo aberto até que isto termine. Fechá-lo agora deixa o provedor parcialmente limpo, e a próxima sincronização terá que começar do zero.';
 
   @override
   String get settings_syncMaintenance_phase_clearingOldFiles =>
@@ -37342,11 +37291,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_syncMaintenance_phase_repairing =>
-      'Limpando o estado de sincronizaÃ§Ã£o local';
+      'Limpando o estado de sincronização local';
 
   @override
   String get settings_troubleshootSync_repair_progressTitle =>
-      'Reparando a sincronizaÃ§Ã£o';
+      'Reparando a sincronização';
 
   @override
   String get settings_syncMaintenance_phase_working => 'Trabalhando...';
@@ -37394,15 +37343,15 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count nÃ£o puderam ser excluÃ­dos',
-      one: '1 nÃ£o pÃ´de ser excluÃ­do',
+      other: '$count não puderam ser excluídos',
+      one: '1 não pôde ser excluído',
     );
     return '$_temp0';
   }
 
   @override
   String get settings_syncMaintenance_trouble_listIncomplete =>
-      'nÃ£o foi possÃ­vel listar alguns arquivos';
+      'não foi possível listar alguns arquivos';
 
   @override
   String settings_syncMaintenance_wipedFiles(int count) {
@@ -37430,18 +37379,18 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_troubleshootSync_appBar_title =>
-      'Solucionar problemas de sincronizaÃ§Ã£o';
+      'Solucionar problemas de sincronização';
 
   @override
   String get settings_troubleshootSync_devices_subtitle =>
-      'Veja todos os dispositivos que mantÃªm arquivos aqui, quanto espaÃ§o cada um usa, e remova os restos de bibliotecas das quais nenhum dispositivo sincroniza mais. Seus dados de mergulho nÃ£o sÃ£o afetados.';
+      'Veja todos os dispositivos que mantêm arquivos aqui, quanto espaço cada um usa, e remova os restos de bibliotecas das quais nenhum dispositivo sincroniza mais. Seus dados de mergulho não são afetados.';
 
   @override
   String get settings_troubleshootSync_rebuild_confirm => 'Reconstruir';
 
   @override
   String get settings_troubleshootSync_rebuild_confirmBody =>
-      'Isto torna a biblioteca deste dispositivo a atual no provedor e a publica novamente, para que os outros dispositivos sincronizem a partir de vocÃª. Use quando uma substituiÃ§Ã£o vinda de outro dispositivo estiver travada. Seus dados de mergulho nÃ£o sÃ£o afetados.';
+      'Isto torna a biblioteca deste dispositivo a atual no provedor e a publica novamente, para que os outros dispositivos sincronizem a partir de você. Use quando uma substituição vinda de outro dispositivo estiver travada. Seus dados de mergulho não são afetados.';
 
   @override
   String get settings_troubleshootSync_rebuild_confirmTitle =>
@@ -37449,11 +37398,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_troubleshootSync_rebuild_doneSnack =>
-      'Provedor reconstruÃ­do a partir deste dispositivo';
+      'Provedor reconstruído a partir deste dispositivo';
 
   @override
   String get settings_troubleshootSync_rebuild_failedSnack =>
-      'Falha na reconstruÃ§Ã£o';
+      'Falha na reconstrução';
 
   @override
   String get settings_troubleshootSync_rebuild_progressTitle =>
@@ -37461,7 +37410,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_troubleshootSync_rebuild_subtitle =>
-      'Use se a sincronizaÃ§Ã£o estiver travada esperando por uma biblioteca que outro dispositivo substituiu mas nunca terminou de enviar (esse dispositivo pode estar offline). Publica a biblioteca deste dispositivo como a atual.';
+      'Use se a sincronização estiver travada esperando por uma biblioteca que outro dispositivo substituiu mas nunca terminou de enviar (esse dispositivo pode estar offline). Publica a biblioteca deste dispositivo como a atual.';
 
   @override
   String get settings_troubleshootSync_rebuild_title =>
@@ -37469,7 +37418,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_troubleshootSync_removeThisDevice_confirmBody =>
-      'Isto exclui do provedor apenas os arquivos de sincronizaÃ§Ã£o deste dispositivo. Os outros dispositivos continuam sincronizando, e seus dados de mergulho nÃ£o sÃ£o afetados.';
+      'Isto exclui do provedor apenas os arquivos de sincronização deste dispositivo. Os outros dispositivos continuam sincronizando, e seus dados de mergulho não são afetados.';
 
   @override
   String get settings_troubleshootSync_removeThisDevice_confirmTitle =>
@@ -37481,7 +37430,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_troubleshootSync_removeThisDevice_subtitle =>
-      'Libere o espaÃ§o deste dispositivo no provedor. Os outros dispositivos continuam sincronizando. Seus dados de mergulho nÃ£o sÃ£o afetados.';
+      'Libere o espaço deste dispositivo no provedor. Os outros dispositivos continuam sincronizando. Seus dados de mergulho não são afetados.';
 
   @override
   String get settings_troubleshootSync_removeThisDevice_title =>
@@ -37492,47 +37441,46 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_troubleshootSync_repair_confirmBody =>
-      'Isto limpa todo o estado local de sincronizaÃ§Ã£o e dÃ¡ a este dispositivo uma nova identidade de sincronizaÃ§Ã£o, reconectando do zero na prÃ³xima sincronizaÃ§Ã£o. Seus dados de mergulho estÃ£o seguros e nÃ£o sÃ£o excluÃ­dos.';
+      'Isto limpa todo o estado local de sincronização e dá a este dispositivo uma nova identidade de sincronização, reconectando do zero na próxima sincronização. Seus dados de mergulho estão seguros e não são excluídos.';
 
   @override
   String get settings_troubleshootSync_repair_confirmTitle =>
-      'Reparar a sincronizaÃ§Ã£o?';
+      'Reparar a sincronização?';
 
   @override
   String get settings_troubleshootSync_repair_doneSnack =>
-      'SincronizaÃ§Ã£o reparada';
+      'Sincronização reparada';
 
   @override
   String get settings_troubleshootSync_repair_subtitle =>
-      'Corrija uma sincronizaÃ§Ã£o travada. Limpa o estado de sincronizaÃ§Ã£o deste dispositivo e lhe dÃ¡ uma nova identidade de sincronizaÃ§Ã£o, reconectando na prÃ³xima sincronizaÃ§Ã£o. Seus dados de mergulho nÃ£o sÃ£o afetados.';
+      'Corrija uma sincronização travada. Limpa o estado de sincronização deste dispositivo e lhe dá uma nova identidade de sincronização, reconectando na próxima sincronização. Seus dados de mergulho não são afetados.';
 
   @override
-  String get settings_troubleshootSync_repair_title =>
-      'Reparar sincronizaÃ§Ã£o';
+  String get settings_troubleshootSync_repair_title => 'Reparar sincronização';
 
   @override
   String get settings_troubleshootSync_wipeAll_confirm => 'Apagar tudo';
 
   @override
   String settings_troubleshootSync_wipeAll_confirmBody(String word) {
-    return 'Isto exclui os dados de sincronizaÃ§Ã£o de TODOS os dispositivos deste provedor, incluindo os marcadores de biblioteca. Todos os dispositivos terÃ£o que restabelecer a sincronizaÃ§Ã£o do zero. Seus dados de mergulho nÃ£o sÃ£o afetados.\n\nDigite exatamente $word para confirmar.';
+    return 'Isto exclui os dados de sincronização de TODOS os dispositivos deste provedor, incluindo os marcadores de biblioteca. Todos os dispositivos terão que restabelecer a sincronização do zero. Seus dados de mergulho não são afetados.\n\nDigite exatamente $word para confirmar.';
   }
 
   @override
   String get settings_troubleshootSync_wipeAll_confirmTitle =>
-      'Apagar todos os dados de sincronizaÃ§Ã£o?';
+      'Apagar todos os dados de sincronização?';
 
   @override
   String get settings_troubleshootSync_wipeAll_progressTitle =>
-      'Apagando os dados de sincronizaÃ§Ã£o';
+      'Apagando os dados de sincronização';
 
   @override
   String get settings_troubleshootSync_wipeAll_subtitle =>
-      'Exclua os dados de sincronizaÃ§Ã£o de todos os dispositivos deste provedor, incluindo os marcadores de biblioteca. Todos os dispositivos restabelecem a sincronizaÃ§Ã£o do zero. Seus dados de mergulho nÃ£o sÃ£o afetados.';
+      'Exclua os dados de sincronização de todos os dispositivos deste provedor, incluindo os marcadores de biblioteca. Todos os dispositivos restabelecem a sincronização do zero. Seus dados de mergulho não são afetados.';
 
   @override
   String get settings_troubleshootSync_wipeAll_title =>
-      'Apagar todos os dados de sincronizaÃ§Ã£o neste provedor';
+      'Apagar todos os dados de sincronização neste provedor';
 
   @override
   String get tableMode_tooltip_toggleDetailPane =>
@@ -37543,20 +37491,20 @@ class AppLocalizationsPt extends AppLocalizations {
       'Alternar painel do perfil';
 
   @override
-  String get maps_regionDownload_title => 'Baixar RegiÃ£o';
+  String get maps_regionDownload_title => 'Baixar Região';
 
   @override
   String get maps_regionDownload_nameRequired =>
-      'Insira um nome para esta regiÃ£o';
+      'Insira um nome para esta região';
 
   @override
-  String get maps_regionDownload_nameLabel => 'Nome da RegiÃ£o';
+  String get maps_regionDownload_nameLabel => 'Nome da Região';
 
   @override
-  String get maps_regionDownload_nameHint => 'ex.: Cozumel, MÃ©xico';
+  String get maps_regionDownload_nameHint => 'ex.: Cozumel, México';
 
   @override
-  String get maps_regionDownload_zoomLevels => 'NÃ­veis de Zoom';
+  String get maps_regionDownload_zoomLevels => 'Níveis de Zoom';
 
   @override
   String get maps_regionDownload_zoomHint =>
@@ -37564,22 +37512,22 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String maps_regionDownload_minZoom(int zoom) {
-    return 'MÃ­n: $zoom';
+    return 'Mín: $zoom';
   }
 
   @override
   String maps_regionDownload_minZoomSemantics(int zoom) {
-    return 'Zoom mÃ­nimo: $zoom';
+    return 'Zoom mínimo: $zoom';
   }
 
   @override
   String maps_regionDownload_maxZoom(int zoom) {
-    return 'MÃ¡x: $zoom';
+    return 'Máx: $zoom';
   }
 
   @override
   String maps_regionDownload_maxZoomSemantics(int zoom) {
-    return 'Zoom mÃ¡ximo: $zoom';
+    return 'Zoom máximo: $zoom';
   }
 
   @override
@@ -37593,7 +37541,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get maps_regionDownload_estimateUnavailableSemantics =>
-      'NÃ£o foi possÃ­vel estimar o tamanho do download';
+      'Não foi possível estimar o tamanho do download';
 
   @override
   String get maps_regionDownload_estimating => 'Estimando...';
@@ -37605,15 +37553,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get maps_regionDownload_estimateUnavailable =>
-      'NÃ£o foi possÃ­vel estimar';
+      'Não foi possível estimar';
 
   @override
   String get maps_regionDownload_largeWarningSemantics =>
-      'Aviso: download grande. Considere reduzir os nÃ­veis de zoom ou selecionar uma regiÃ£o menor.';
+      'Aviso: download grande. Considere reduzir os níveis de zoom ou selecionar uma região menor.';
 
   @override
   String get maps_regionDownload_largeWarning =>
-      'Download grande. Considere reduzir os nÃ­veis de zoom ou selecionar uma regiÃ£o menor.';
+      'Download grande. Considere reduzir os níveis de zoom ou selecionar uma região menor.';
 
   @override
   String get maps_regionDownload_downloadButton => 'Baixar';
@@ -37641,7 +37589,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get trips_gallery_thumbnail_video =>
-      'Miniatura de vÃ­deo. Toque para ver em tela cheia';
+      'Miniatura de vídeo. Toque para ver em tela cheia';
 
   @override
   String get trips_photos_thumbnail_photo =>
@@ -37649,7 +37597,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get trips_photos_thumbnail_video =>
-      'Miniatura de vÃ­deo. Toque para abrir a galeria';
+      'Miniatura de vídeo. Toque para abrir a galeria';
 
   @override
   String trips_picker_suggestedSemantics(Object name) {
@@ -37702,15 +37650,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String divePlanner_quickPlan_previewSemantics(Object depth, int minutes) {
-    return 'PrÃ©via do plano: descida atÃ© $depth, tempo de fundo de $minutes minutos, subida com parada de seguranÃ§a';
+    return 'Prévia do plano: descida até $depth, tempo de fundo de $minutes minutos, subida com parada de segurança';
   }
 
   @override
-  String get divePlanner_quickPlan_previewTitle => 'PrÃ©via do Plano:';
+  String get divePlanner_quickPlan_previewTitle => 'Prévia do Plano:';
 
   @override
   String divePlanner_quickPlan_previewDescent(Object depth) {
-    return 'Descida atÃ© $depth';
+    return 'Descida até $depth';
   }
 
   @override
@@ -37720,7 +37668,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get divePlanner_quickPlan_previewAscent =>
-      'Subida com parada de seguranÃ§a';
+      'Subida com parada de segurança';
 
   @override
   String get divePlanner_quickPlan_create => 'Criar';
@@ -37732,7 +37680,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String divePlanner_semantics_reservePressure(Object pressureSymbol) {
-    return 'PressÃ£o de reserva em $pressureSymbol';
+    return 'Pressão de reserva em $pressureSymbol';
   }
 
   @override
@@ -37742,7 +37690,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveSites_import_detail_maxDepth(Object depth) {
-    return 'MÃ¡x $depth';
+    return 'Máx $depth';
   }
 
   @override
@@ -37761,11 +37709,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_debugLog_search_hint => 'Buscar nos logs...';
 
   @override
-  String get settings_debugLog_appBar_title => 'Logs de DepuraÃ§Ã£o';
+  String get settings_debugLog_appBar_title => 'Logs de Depuração';
 
   @override
   String get settings_debugLog_disableDebugMode =>
-      'Desativar Modo de DepuraÃ§Ã£o';
+      'Desativar Modo de Depuração';
 
   @override
   String get settings_debugLog_clearLogs => 'Limpar Logs';
@@ -37781,7 +37729,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_debugLog_copiedSnack =>
-      'Logs filtrados copiados para a Ã¡rea de transferÃªncia';
+      'Logs filtrados copiados para a área de transferência';
 
   @override
   String settings_debugLog_savedSnack(String path) {
@@ -37796,7 +37744,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Gradiente Personalizado';
 
   @override
-  String get settings_appearance_customGradient_start => 'InÃ­cio';
+  String get settings_appearance_customGradient_start => 'Início';
 
   @override
   String get settings_appearance_customGradient_end => 'Fim';
@@ -37805,20 +37753,20 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_appearance_customGradient_hue => 'Matiz';
 
   @override
-  String get settings_appearance_customGradient_saturation => 'SaturaÃ§Ã£o';
+  String get settings_appearance_customGradient_saturation => 'Saturação';
 
   @override
   String get settings_appearance_customGradient_brightness => 'Brilho';
 
   @override
-  String get settings_appearance_customGradient_preview => 'PrÃ©via';
+  String get settings_appearance_customGradient_preview => 'Prévia';
 
   @override
   String get common_action_apply => 'Aplicar';
 
   @override
   String settings_cloudSync_message_loadStateFailed(Object error) {
-    return 'Falha ao carregar o estado de sincronizaÃ§Ã£o: $error';
+    return 'Falha ao carregar o estado de sincronização: $error';
   }
 
   @override
@@ -37835,91 +37783,90 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_message_firstSyncNeedsConfirm =>
-      'A primeira sincronizaÃ§Ã£o precisa de confirmaÃ§Ã£o. Toque em Sincronizar Agora para revisar.';
+      'A primeira sincronização precisa de confirmação. Toque em Sincronizar Agora para revisar.';
 
   @override
   String get settings_cloudSync_message_startingSync =>
-      'Iniciando sincronizaÃ§Ã£o...';
+      'Iniciando sincronização...';
 
   @override
   String get settings_cloudSync_message_replacePaused =>
-      'SincronizaÃ§Ã£o pausada: a biblioteca foi substituÃ­da a partir de um backup. Toque em Sincronizar Agora para revisar.';
+      'Sincronização pausada: a biblioteca foi substituída a partir de um backup. Toque em Sincronizar Agora para revisar.';
 
   @override
   String get settings_cloudSync_message_encryptedPaused =>
-      'SincronizaÃ§Ã£o pausada: esta biblioteca estÃ¡ criptografada. Digite a frase-senha para continuar.';
+      'Sincronização pausada: esta biblioteca está criptografada. Digite a frase-senha para continuar.';
 
   @override
   String get settings_cloudSync_message_completedWithConflicts =>
-      'SincronizaÃ§Ã£o concluÃ­da com conflitos';
+      'Sincronização concluída com conflitos';
 
   @override
   String get settings_cloudSync_message_completedSuccessfully =>
-      'SincronizaÃ§Ã£o concluÃ­da com sucesso';
+      'Sincronização concluída com sucesso';
 
   @override
-  String get settings_cloudSync_message_syncFailed =>
-      'Falha na sincronizaÃ§Ã£o';
+  String get settings_cloudSync_message_syncFailed => 'Falha na sincronização';
 
   @override
-  String get settings_cloudSync_message_phaseDefault => 'sincronizaÃ§Ã£o';
+  String get settings_cloudSync_message_phaseDefault => 'sincronização';
 
   @override
   String settings_cloudSync_message_syncErrorDuring(
     String phase,
     Object error,
   ) {
-    return 'Erro de sincronizaÃ§Ã£o durante $phase: $error';
+    return 'Erro de sincronização durante $phase: $error';
   }
 
   @override
-  String get settings_section_debug_title => 'DepuraÃ§Ã£o';
+  String get settings_section_debug_title => 'Depuração';
 
   @override
-  String get settings_section_debug_subtitle => 'Logs e diagnÃ³sticos';
+  String get settings_section_debug_subtitle => 'Logs e diagnósticos';
 
   @override
-  String get settings_debugLog_minSeverityLabel => 'Severidade mÃ­n.:';
+  String get settings_debugLog_minSeverityLabel => 'Severidade mín.:';
 
   @override
   String get settings_debugLog_shareSubject =>
-      'Logs de DepuraÃ§Ã£o do Submersion';
+      'Logs de Depuração do Submersion';
 
   @override
-  String get settings_debugLog_saveDialogTitle => 'Salvar Logs de DepuraÃ§Ã£o';
+  String get settings_debugLog_saveDialogTitle => 'Salvar Logs de Depuração';
 
   @override
-  String get settings_diagnostics_header => 'DiagnÃ³stico';
+  String get settings_diagnostics_header => 'Diagnóstico';
 
   @override
   String get settings_diagnostics_viewLog => 'Ver log';
 
   @override
   String get settings_diagnostics_viewLogSubtitle =>
-      'Avisos e erros sÃ£o registrados automaticamente';
+      'Avisos e erros são registrados automaticamente';
 
   @override
-  String get settings_diagnostics_copy => 'Copiar diagnÃ³stico';
+  String get settings_diagnostics_copy => 'Copiar diagnóstico';
 
   @override
   String get settings_diagnostics_copySubtitle =>
-      'VersÃ£o do app, dispositivo e linhas recentes do log para um relatÃ³rio de erro';
+      'Versão do app, dispositivo e linhas recentes do log para um relatório de erro';
 
   @override
   String get settings_diagnostics_copiedSnack =>
-      'DiagnÃ³stico copiado para a Ã¡rea de transferÃªncia';
+      'Diagnóstico copiado para a área de transferência';
 
   @override
   String get settings_diagnostics_openFolder => 'Abrir pasta de logs';
 
   @override
   String settings_diagnostics_openFolderFailed(String path) {
-    return 'NÃ£o foi possÃ­vel abrir a pasta de logs. Ela estÃ¡ em: $path';
+    return 'Não foi possível abrir a pasta de logs. Ela está em: $path';
   }
 
   @override
   String settings_diagnostics_copyFailed(Object error) {
-    return 'NÃ£o foi possÃ­vel copiar o diagnÃ³stico: $error';
+    return 'Não foi possível copiar o diagnóstico: $error';
   }
 
   @override
@@ -37933,7 +37880,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'ex.: CSV do Meu Registro de Mergulho';
 
   @override
-  String get universalImport_preset_nameRequired => 'O nome Ã© obrigatÃ³rio';
+  String get universalImport_preset_nameRequired => 'O nome é obrigatório';
 
   @override
   String get universalImport_preset_sourceAppLabel => 'Aplicativo de Origem';
@@ -37946,19 +37893,19 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_preset_matchThresholdLabel =>
-      'Limiar de CorrespondÃªncia';
+      'Limiar de Correspondência';
 
   @override
   String get universalImport_preset_matchThresholdHelp =>
-      'QuÃ£o parecidos os cabeÃ§alhos CSV devem ser para a detecÃ§Ã£o automÃ¡tica';
+      'Quão parecidos os cabeçalhos CSV devem ser para a detecção automática';
 
   @override
   String universalImport_preset_signatureHeaders(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count cabeÃ§alhos de assinatura do arquivo atual',
-      one: '1 cabeÃ§alho de assinatura do arquivo atual',
+      other: '$count cabeçalhos de assinatura do arquivo atual',
+      one: '1 cabeçalho de assinatura do arquivo atual',
     );
     return '$_temp0';
   }
@@ -37982,7 +37929,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String universalImport_preset_deleteConfirm(String name) {
-    return 'Excluir \"$name\"? Isso nÃ£o pode ser desfeito.';
+    return 'Excluir \"$name\"? Isso não pode ser desfeito.';
   }
 
   @override
@@ -37991,12 +37938,12 @@ class AppLocalizationsPt extends AppLocalizations {
     int total,
     int percent,
   ) {
-    return '$matched/$total cabeÃ§alhos correspondentes ($percent%)';
+    return '$matched/$total cabeçalhos correspondentes ($percent%)';
   }
 
   @override
   String get universalImport_preset_noSignatureHeaders =>
-      'Nenhum cabeÃ§alho de assinatura';
+      'Nenhum cabeçalho de assinatura';
 
   @override
   String get universalImport_preset_deleteTooltip => 'Excluir preset';
@@ -38010,43 +37957,43 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get universalImport_step_done => 'ConcluÃ­do';
+  String get universalImport_step_done => 'Concluído';
 
   @override
   String get universalImport_cancel_inProgressTitle => 'Cancelando';
 
   @override
   String get universalImport_cancel_inProgressBody =>
-      'Finalizando o mergulho atual antes de parar. Os mergulhos jÃ¡ importados serÃ£o mantidos.';
+      'Finalizando o mergulho atual antes de parar. Os mergulhos já importados serão mantidos.';
 
   @override
-  String get universalImport_cancel_confirmTitle => 'Cancelar importaÃ§Ã£o?';
+  String get universalImport_cancel_confirmTitle => 'Cancelar importação?';
 
   @override
   String get universalImport_cancel_confirmBody =>
-      'Parar depois que o mergulho atual terminar. Os mergulhos jÃ¡ importados serÃ£o mantidos.';
+      'Parar depois que o mergulho atual terminar. Os mergulhos já importados serão mantidos.';
 
   @override
   String get universalImport_cancel_keepImporting => 'Continuar importando';
 
   @override
-  String get universalImport_cancel_confirmAction => 'Cancelar importaÃ§Ã£o';
+  String get universalImport_cancel_confirmAction => 'Cancelar importação';
 
   @override
   String get universalImport_cancel_discardSelections =>
-      'Descartar seleÃ§Ãµes e cancelar?';
+      'Descartar seleções e cancelar?';
 
   @override
   String get universalImport_action_importSelected => 'Importar Selecionados';
 
   @override
-  String get universalImport_action_next => 'AvanÃ§ar';
+  String get universalImport_action_next => 'Avançar';
 
   @override
   String get common_action_yes => 'Sim';
 
   @override
-  String get common_action_no => 'NÃ£o';
+  String get common_action_no => 'Não';
 
   @override
   String universalImport_counts_new(int count) {
@@ -38099,7 +38046,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_section_possibleDuplicates =>
-      'Duplicatas PossÃ­veis';
+      'Duplicatas Possíveis';
 
   @override
   String universalImport_count_duplicates(int count) {
@@ -38136,17 +38083,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_accessGrantedBody =>
-      'VocÃª pode prosseguir para a prÃ³xima etapa.';
+      'Você pode prosseguir para a próxima etapa.';
 
   @override
   String get diveImport_healthkit_requesting => 'Solicitando...';
 
   @override
-  String get diveImport_healthkit_selectDateRange => 'Selecionar PerÃ­odo';
+  String get diveImport_healthkit_selectDateRange => 'Selecionar Período';
 
   @override
   String get diveImport_healthkit_selectDateRangeBody =>
-      'Escolha o perÃ­odo para buscar mergulhos no Apple Health.';
+      'Escolha o período para buscar mergulhos no Apple Health.';
 
   @override
   String get diveImport_healthkit_fetchingDives =>
@@ -38173,14 +38120,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_proceedingToReview =>
-      'Prosseguindo para a revisÃ£o...';
+      'Prosseguindo para a revisão...';
 
   @override
   String get importWizard_dc_knownComputer => 'Computador Conhecido';
 
   @override
   String importWizard_dc_knownComputerBody(String name) {
-    return 'Salvo como \"$name\". Somente mergulhos novos serÃ£o baixados.';
+    return 'Salvo como \"$name\". Somente mergulhos novos serão baixados.';
   }
 
   @override
@@ -38188,11 +38135,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get importWizard_dc_noNewDivesBody =>
-      'Todos os mergulhos deste computador jÃ¡ foram importados.';
+      'Todos os mergulhos deste computador já foram importados.';
 
   @override
   String get universalImport_compare_noDiveData =>
-      'Dados do mergulho nÃ£o disponÃ­veis para comparaÃ§Ã£o.';
+      'Dados do mergulho não disponíveis para comparação.';
 
   @override
   String get universalImport_entityAction_consolidateBadge => 'CONSOLIDAR';
@@ -38201,42 +38148,42 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveCenters_import_quickSearch_egypt => 'Egito';
 
   @override
-  String get diveCenters_import_quickSearch_mexico => 'MÃ©xico';
+  String get diveCenters_import_quickSearch_mexico => 'México';
 
   @override
   String get accessibility_shortcut_switchDiver => 'Trocar de mergulhador';
 
   @override
-  String get lock_recoveryCode_title => 'Usar cÃ³digo de recuperaÃ§Ã£o';
+  String get lock_recoveryCode_title => 'Usar código de recuperação';
 
   @override
   String get lock_recoveryCode_body =>
-      'Digite o cÃ³digo de recuperaÃ§Ã£o de 8 palavras que vocÃª salvou ao definir a senha do app.';
+      'Digite o código de recuperação de 8 palavras que você salvou ao definir a senha do app.';
 
   @override
-  String get lock_recoveryCode_error => 'CÃ³digo de recuperaÃ§Ã£o incorreto.';
+  String get lock_recoveryCode_error => 'Código de recuperação incorreto.';
 
   @override
   String get lock_forcedReset_title => 'Defina uma nova senha';
 
   @override
   String get lock_forcedReset_body =>
-      'VocÃª desbloqueou com o cÃ³digo de recuperaÃ§Ã£o, portanto sua senha antiga nÃ£o Ã© mais confiÃ¡vel. Escolha uma nova agora.';
+      'Você desbloqueou com o código de recuperação, portanto sua senha antiga não é mais confiável. Escolha uma nova agora.';
 
   @override
   String get lock_forcedReset_submit => 'Definir senha';
 
   @override
   String get lock_forcedReset_error =>
-      'NÃ£o foi possÃ­vel definir a nova senha. Tente novamente.';
+      'Não foi possível definir a nova senha. Tente novamente.';
 
   @override
   String get lock_sidecarRepair_title =>
-      'Reparar arquivo de chave de seguranÃ§a';
+      'Reparar arquivo de chave de segurança';
 
   @override
   String get lock_sidecarRepair_body =>
-      'Seu arquivo de chave de seguranÃ§a estava faltando e o chaveiro deste dispositivo ainda contÃ©m a chave. Confirme sua senha para gravar um novo arquivo de chave. ObservaÃ§Ã£o: a senha que vocÃª digitar aqui passa a ser a senha do app daqui em diante, e vocÃª receberÃ¡ um novo cÃ³digo de recuperaÃ§Ã£o.';
+      'Seu arquivo de chave de segurança estava faltando e o chaveiro deste dispositivo ainda contém a chave. Confirme sua senha para gravar um novo arquivo de chave. Observação: a senha que você digitar aqui passa a ser a senha do app daqui em diante, e você receberá um novo código de recuperação.';
 
   @override
   String get lock_sidecarRepair_submit => 'Reparar';
@@ -38245,18 +38192,18 @@ class AppLocalizationsPt extends AppLocalizations {
   String get lock_sidecarRepair_error => 'Falha no reparo. Tente novamente.';
 
   @override
-  String get lock_newRecoveryCode_title => 'Seu novo cÃ³digo de recuperaÃ§Ã£o';
+  String get lock_newRecoveryCode_title => 'Seu novo código de recuperação';
 
   @override
   String get lock_startFresh_title => 'Abrir outro banco de dados';
 
   @override
   String lock_startFresh_body(Object token) {
-    return 'Seu banco de dados atual permanece no disco, renomeado com o sufixo .locked; nada Ã© excluÃ­do. VocÃª pode recuperÃ¡-lo depois com sua senha ou entrando em contato com o suporte. A sincronizaÃ§Ã£o na nuvem serÃ¡ desativada para que o novo banco de dados nÃ£o se misture com o antigo.\n\nO app comeÃ§arÃ¡ com um banco de dados novo e vazio. VocÃª pode restaurar a partir de um backup no assistente de configuraÃ§Ã£o.\n\nDigite $token para confirmar.';
+    return 'Seu banco de dados atual permanece no disco, renomeado com o sufixo .locked; nada é excluído. Você pode recuperá-lo depois com sua senha ou entrando em contato com o suporte. A sincronização na nuvem será desativada para que o novo banco de dados não se misture com o antigo.\n\nO app começará com um banco de dados novo e vazio. Você pode restaurar a partir de um backup no assistente de configuração.\n\nDigite $token para confirmar.';
   }
 
   @override
-  String get lock_startFresh_confirm => 'Deixar de lado e comeÃ§ar do zero';
+  String get lock_startFresh_confirm => 'Deixar de lado e começar do zero';
 
   @override
   String get lock_biometric_reason => 'Desbloquear seu log de mergulhos';
@@ -38267,54 +38214,54 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title => 'O Submersion nÃ£o conseguiu iniciar';
+  String get startup_error_title => 'O Submersion não conseguiu iniciar';
 
   @override
   String get startup_error_body =>
-      'Algo correu mal antes de o seu diÃ¡rio de mergulho acabar de abrir. Os seus dados continuam no disco e nÃ£o Ã© necessÃ¡ria uma reinstalaÃ§Ã£o. Tente reiniciar a aplicaÃ§Ã£o; se o problema persistir, contacte o suporte.';
+      'Algo correu mal antes de o seu diário de mergulho acabar de abrir. Os seus dados continuam no disco e não é necessária uma reinstalação. Tente reiniciar a aplicação; se o problema persistir, contacte o suporte.';
 
   @override
   String get startup_engineUnavailable_title =>
-      'Esta compilaÃ§Ã£o nÃ£o consegue abrir uma base de dados';
+      'Esta compilação não consegue abrir uma base de dados';
 
   @override
   String get startup_engineUnavailable_body =>
-      'Falta o motor de base de dados do Submersion nesta compilaÃ§Ã£o, por isso o seu diÃ¡rio de mergulho nunca chegou a ser aberto. Nada mudou no disco e nenhum dado estÃ¡ em risco.';
+      'Falta o motor de base de dados do Submersion nesta compilação, por isso o seu diário de mergulho nunca chegou a ser aberto. Nada mudou no disco e nenhum dado está em risco.';
 
   @override
   String get startup_engineUnavailable_guidance =>
-      'Reinstalar ou restaurar uma cÃ³pia de seguranÃ§a nÃ£o vai ajudar. Instale uma compilaÃ§Ã£o funcional do Submersion e comunique-nos isto: Ã© uma falha no pacote da aplicaÃ§Ã£o, nÃ£o nos seus dados.';
+      'Reinstalar ou restaurar uma cópia de segurança não vai ajudar. Instale uma compilação funcional do Submersion e comunique-nos isto: é uma falha no pacote da aplicação, não nos seus dados.';
 
   @override
   String get startup_migrationFailed_title =>
-      'Falha na atualizaÃ§Ã£o da base de dados';
+      'Falha na atualização da base de dados';
 
   @override
   String get startup_migrationFailed_body =>
-      'NÃ£o foi possÃ­vel atualizar o seu diÃ¡rio de mergulho para o formato de que esta versÃ£o precisa. Foi criada uma cÃ³pia de seguranÃ§a antes de a atualizaÃ§Ã£o comeÃ§ar, por isso nada se perdeu.';
+      'Não foi possível atualizar o seu diário de mergulho para o formato de que esta versão precisa. Foi criada uma cópia de segurança antes de a atualização começar, por isso nada se perdeu.';
 
   @override
   String get startup_dataUnreadable_title =>
-      'NÃ£o foi possÃ­vel ler o seu diÃ¡rio de mergulho';
+      'Não foi possível ler o seu diário de mergulho';
 
   @override
   String get startup_dataUnreadable_body =>
-      'O ficheiro da base de dados estÃ¡ lÃ¡, mas o Submersion nÃ£o consegue lÃª-lo. Normalmente isto significa que o ficheiro estÃ¡ danificado. Restaurar uma cÃ³pia de seguranÃ§a Ã© a forma mais rÃ¡pida de recomeÃ§ar.';
+      'O ficheiro da base de dados está lá, mas o Submersion não consegue lê-lo. Normalmente isto significa que o ficheiro está danificado. Restaurar uma cópia de segurança é a forma mais rápida de recomeçar.';
 
   @override
   String get startup_databaseBusy_title =>
-      'O seu diÃ¡rio de mergulho estava ocupado';
+      'O seu diário de mergulho estava ocupado';
 
   @override
   String get startup_databaseBusy_body =>
-      'Algo ainda estava a usar o ficheiro da base de dados, por isso o Submersion parou em vez de escrever nele. Nada foi alterado e nada estÃ¡ danificado. Feche o Submersion por completo e volte a abri-lo.';
+      'Algo ainda estava a usar o ficheiro da base de dados, por isso o Submersion parou em vez de escrever nele. Nada foi alterado e nada está danificado. Feche o Submersion por completo e volte a abri-lo.';
 
   @override
-  String get startup_failure_technicalDetails => 'Detalhes tÃ©cnicos';
+  String get startup_failure_technicalDetails => 'Detalhes técnicos';
 
   @override
   String get startup_failure_backupAvailable_title =>
-      'EstÃ¡ disponÃ­vel uma cÃ³pia de seguranÃ§a';
+      'Está disponível uma cópia de segurança';
 
   @override
   String startup_failure_backupAvailable_taken(Object timestamp) {
@@ -38326,64 +38273,63 @@ class AppLocalizationsPt extends AppLocalizations {
     Object fromVersion,
     Object toVersion,
   ) {
-    return 'CÃ³pia de seguranÃ§a criada antes da atualizaÃ§Ã£o do esquema v$fromVersion para v$toVersion.';
+    return 'Cópia de segurança criada antes da atualização do esquema v$fromVersion para v$toVersion.';
   }
 
   @override
   String get startup_failure_restoreAction =>
-      'Restaurar esta cÃ³pia de seguranÃ§a';
+      'Restaurar esta cópia de segurança';
 
   @override
   String get startup_failure_restoring =>
-      'A restaurar o seu diÃ¡rio de mergulho...';
+      'A restaurar o seu diário de mergulho...';
 
   @override
   String get startup_failure_restoreFailed =>
-      'NÃ£o foi possÃ­vel restaurar a cÃ³pia de seguranÃ§a. O seu diÃ¡rio de mergulho ficou exatamente como estava.';
+      'Não foi possível restaurar a cópia de segurança. O seu diário de mergulho ficou exatamente como estava.';
 
   @override
   String get startup_failure_backupsFolder =>
-      'As suas cÃ³pias de seguranÃ§a estÃ£o em:';
+      'As suas cópias de segurança estão em:';
 
   @override
-  String get startup_failure_showBackupsFolder => 'Mostrar pasta das cÃ³pias';
+  String get startup_failure_showBackupsFolder => 'Mostrar pasta das cópias';
 
   @override
-  String get startup_failure_downgrade_title => 'Voltar Ã  versÃ£o anterior';
+  String get startup_failure_downgrade_title => 'Voltar à versão anterior';
 
   @override
   String get startup_failure_downgrade_body =>
-      'Se a atualizaÃ§Ã£o continuar a falhar, instale a versÃ£o do Submersion que usava antes e restaure a cÃ³pia de seguranÃ§a a partir dessa versÃ£o. RestaurÃ¡-la aqui apenas voltaria a executar a mesma atualizaÃ§Ã£o. O Submersion nunca regride sozinho: passÃ¡-lo automaticamente para compilaÃ§Ãµes antigas mantÃª-lo-ia em silÃªncio em versÃµes com problemas conhecidos.';
+      'Se a atualização continuar a falhar, instale a versão do Submersion que usava antes e restaure a cópia de segurança a partir dessa versão. Restaurá-la aqui apenas voltaria a executar a mesma atualização. O Submersion nunca regride sozinho: passá-lo automaticamente para compilações antigas mantê-lo-ia em silêncio em versões com problemas conhecidos.';
 
   @override
-  String get startup_failure_downgrade_action => 'Ver versÃµes anteriores';
+  String get startup_failure_downgrade_action => 'Ver versões anteriores';
 
   @override
   String get startup_recovering_title => 'Recuperando o banco de dados...';
 
   @override
   String get startup_recovering_body =>
-      'Revertendo a transaÃ§Ã£o interrompida. Isso normalmente leva alguns segundos.';
+      'Revertendo a transação interrompida. Isso normalmente leva alguns segundos.';
 
   @override
-  String get startup_recoveryFailed_title =>
-      'A recuperaÃ§Ã£o nÃ£o foi concluÃ­da';
+  String get startup_recoveryFailed_title => 'A recuperação não foi concluída';
 
   @override
   String get startup_recoveryFailed_body =>
-      'NÃ£o foi possÃ­vel reverter o banco de dados automaticamente. Seus dados continuam no disco; entre em contato com o suporte antes de reinstalar para que possamos ajudar a recuperÃ¡-los.';
+      'Não foi possível reverter o banco de dados automaticamente. Seus dados continuam no disco; entre em contato com o suporte antes de reinstalar para que possamos ajudar a recuperá-los.';
 
   @override
   String get startup_recoveryRequired_title =>
-      'O banco de dados precisa de recuperaÃ§Ã£o';
+      'O banco de dados precisa de recuperação';
 
   @override
   String get startup_recoveryRequired_body =>
-      'Uma sessÃ£o anterior foi interrompida enquanto gravava no banco de dados. Seus dados continuam no disco; sÃ³ precisamos terminar de reverter a alteraÃ§Ã£o cancelada antes que o app possa abrir.';
+      'Uma sessão anterior foi interrompida enquanto gravava no banco de dados. Seus dados continuam no disco; só precisamos terminar de reverter a alteração cancelada antes que o app possa abrir.';
 
   @override
   String startup_recovery_sqliteCode(Object code) {
-    return 'CÃ³digo SQLite $code';
+    return 'Código SQLite $code';
   }
 
   @override
@@ -38396,7 +38342,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get common_action_tryAgain => 'Tentar novamente';
 
   @override
-  String get lock_screen_title => 'O Submersion estÃ¡ bloqueado';
+  String get lock_screen_title => 'O Submersion está bloqueado';
 
   @override
   String get lock_screen_forgotPassword => 'Esqueceu a senha?';
@@ -38412,63 +38358,63 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get startup_backup_body =>
-      'Estamos salvando uma cÃ³pia do seu log de mergulhos antes de atualizar seu banco de dados.';
+      'Estamos salvando uma cópia do seu log de mergulhos antes de atualizar seu banco de dados.';
 
   @override
   String get startup_backupFailed_title =>
-      'NÃ£o foi possÃ­vel fazer backup dos seus dados';
+      'Não foi possível fazer backup dos seus dados';
 
   @override
   String get startup_backupFailed_body =>
-      'Seu log de mergulhos nÃ£o foi alterado; nÃ£o o atualizamos. Libere espaÃ§o (ou resolva o problema) e tente novamente.';
+      'Seu log de mergulhos não foi alterado; não o atualizamos. Libere espaço (ou resolva o problema) e tente novamente.';
 
   @override
   String get startup_backupFailed_quit => 'Sair';
 
   @override
-  String get startup_backupFailed_technicalDetails => 'Detalhes tÃ©cnicos';
+  String get startup_backupFailed_technicalDetails => 'Detalhes técnicos';
 
   @override
   String get common_action_retry => 'Tentar novamente';
 
   @override
   String get startup_versionMismatch_title =>
-      'Seus dados sÃ£o mais recentes que este app';
+      'Seus dados são mais recentes que este app';
 
   @override
   String startup_versionMismatch_body(
     Object databaseVersion,
     Object appVersion,
   ) {
-    return 'Seus dados de mergulho foram salvos por uma versÃ£o mais recente do Submersion (esquema v$databaseVersion). Esta versÃ£o suporta apenas atÃ© o esquema v$appVersion.';
+    return 'Seus dados de mergulho foram salvos por uma versão mais recente do Submersion (esquema v$databaseVersion). Esta versão suporta apenas até o esquema v$appVersion.';
   }
 
   @override
   String get startup_versionMismatch_causes =>
-      'Isso geralmente significa que uma versÃ£o beta atualizou seus dados, que um backup de uma versÃ£o mais recente foi restaurado, ou que o arquivo Ã© compartilhado com um dispositivo em outro canal de atualizaÃ§Ã£o. Pode ser que ainda nÃ£o exista uma versÃ£o estÃ¡vel mais recente.';
+      'Isso geralmente significa que uma versão beta atualizou seus dados, que um backup de uma versão mais recente foi restaurado, ou que o arquivo é compartilhado com um dispositivo em outro canal de atualização. Pode ser que ainda não exista uma versão estável mais recente.';
 
   @override
   String get startup_versionMismatch_instructions =>
-      'Seus dados estÃ£o seguros e nÃ£o foram modificados. Abra-os com a versÃ£o que os gravou, ou com qualquer versÃ£o posterior. Se um backup foi feito antes da atualizaÃ§Ã£o, ele estÃ¡ na sua pasta Backups e pode ser restaurado assim que vocÃª estiver usando uma versÃ£o que consiga abrir o arquivo.';
+      'Seus dados estão seguros e não foram modificados. Abra-os com a versão que os gravou, ou com qualquer versão posterior. Se um backup foi feito antes da atualização, ele está na sua pasta Backups e pode ser restaurado assim que você estiver usando uma versão que consiga abrir o arquivo.';
 
   @override
   String get startup_versionMismatch_storeInstructions =>
-      'Esta app foi instalada a partir de uma loja de aplicaÃ§Ãµes e Ã© mais antiga do que a versÃ£o que criou os seus dados. Os seus dados estÃ£o seguros e nÃ£o foram modificados. Atualize o Submersion quando a nova versÃ£o aparecer na loja e volte a abri-lo.';
+      'Esta app foi instalada a partir de uma loja de aplicações e é mais antiga do que a versão que criou os seus dados. Os seus dados estão seguros e não foram modificados. Atualize o Submersion quando a nova versão aparecer na loja e volte a abri-lo.';
 
   @override
   String get startup_versionMismatch_download =>
-      'Procurar uma versÃ£o estÃ¡vel mais recente';
+      'Procurar uma versão estável mais recente';
 
   @override
-  String get startup_versionMismatch_betaAction => 'Baixar a versÃ£o beta';
+  String get startup_versionMismatch_betaAction => 'Baixar a versão beta';
 
   @override
   String get startup_versionMismatch_betaNote =>
-      'VersÃµes beta sÃ£o de prÃ©-lanÃ§amento. Escolha esta opÃ§Ã£o apenas se uma versÃ£o beta gravou seus dados.';
+      'Versões beta são de pré-lançamento. Escolha esta opção apenas se uma versão beta gravou seus dados.';
 
   @override
   String get startup_versionMismatch_manualLink =>
-      'Se esses botÃµes nÃ£o abrirem um navegador, acesse:';
+      'Se esses botões não abrirem um navegador, acesse:';
 
   @override
   String get universalImport_compare_downloaded => 'Baixado';
@@ -38479,7 +38425,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_compare_diveNotFound =>
-      'Mergulho existente nÃ£o encontrado';
+      'Mergulho existente não encontrado';
 
   @override
   String universalImport_compare_sameFields(Object fields) {
@@ -38487,10 +38433,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get universalImport_compare_differences => 'DIFERENÃ‡AS';
+  String get universalImport_compare_differences => 'DIFERENÇAS';
 
   @override
-  String get universalImport_compare_notRecorded => 'nÃ£o registrado';
+  String get universalImport_compare_notRecorded => 'não registrado';
 
   @override
   String universalImport_compare_serial(Object serial) {
@@ -38506,7 +38452,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_compare_consolidateSubtitle =>
-      'Adicionar como leitura do 2Âº computador';
+      'Adicionar como leitura do 2º computador';
 
   @override
   String get diveLog_tooltip_ndlOverMax => '>60 min';
@@ -38526,12 +38472,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_profileMetric_otu_short => 'OTU';
 
   @override
-  String get diveLog_profileEditor_rangeOperations =>
-      'OperaÃ§Ãµes de intervalo';
+  String get diveLog_profileEditor_rangeOperations => 'Operações de intervalo';
 
   @override
   String get diveLog_profileEditor_selectRangeHint =>
-      'Selecione um intervalo no grÃ¡fico para habilitar as operaÃ§Ãµes';
+      'Selecione um intervalo no gráfico para habilitar as operações';
 
   @override
   String get diveLog_profileEditor_depthPlusOneMeter => 'Profundidade +1m';
@@ -38546,13 +38491,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_profileEditor_timeMinusFiveSeconds => 'Tempo -5s';
 
   @override
-  String get diveLog_profileEditor_smoothing => 'SuavizaÃ§Ã£o';
+  String get diveLog_profileEditor_smoothing => 'Suavização';
 
   @override
   String get diveLog_profileEditor_smoothLight => 'Leve';
 
   @override
-  String get diveLog_profileEditor_smoothMedium => 'MÃ©dia';
+  String get diveLog_profileEditor_smoothMedium => 'Média';
 
   @override
   String get diveLog_profileEditor_smoothHeavy => 'Forte';
@@ -38561,11 +38506,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_profileEditor_applyToAll => 'Aplicar a tudo';
 
   @override
-  String get diveLog_profileEditor_applyToSelection => 'Aplicar Ã  seleÃ§Ã£o';
+  String get diveLog_profileEditor_applyToSelection => 'Aplicar à seleção';
 
   @override
-  String get diveLog_profileEditor_outlierDetection =>
-      'DetecÃ§Ã£o de anomalias';
+  String get diveLog_profileEditor_outlierDetection => 'Detecção de anomalias';
 
   @override
   String get diveLog_profileEditor_detect => 'Detectar';
@@ -38578,8 +38522,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count possÃ­veis anomalias detectadas',
-      one: '$count possÃ­vel anomalia detectada',
+      other: '$count possíveis anomalias detectadas',
+      one: '$count possível anomalia detectada',
     );
     return '$_temp0';
   }
@@ -38589,7 +38533,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_profileEditor_drawHint =>
-      'Toque no grÃ¡fico para posicionar os pontos';
+      'Toque no gráfico para posicionar os pontos';
 
   @override
   String get diveLog_profileEditor_clearWaypoints => 'Limpar';
@@ -38615,14 +38559,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_profileEditor_discardBody =>
-      'VocÃª tem alteraÃ§Ãµes nÃ£o salvas neste perfil de mergulho. Tem certeza de que deseja descartÃ¡-las?';
+      'Você tem alterações não salvas neste perfil de mergulho. Tem certeza de que deseja descartá-las?';
 
   @override
   String get diveLog_profileEditor_saveTitle => 'Salvar perfil?';
 
   @override
   String get diveLog_profileEditor_saveBody =>
-      'Isso salvarÃ¡ o perfil editado como o perfil principal deste mergulho. O perfil original serÃ¡ preservado e poderÃ¡ ser restaurado depois.';
+      'Isso salvará o perfil editado como o perfil principal deste mergulho. O perfil original será preservado e poderá ser restaurado depois.';
 
   @override
   String diveLog_profileEditor_saveFailed(String error) {
@@ -38636,7 +38580,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_profileEditor_noProfileData =>
-      'Nenhum dado de perfil disponÃ­vel';
+      'Nenhum dado de perfil disponível';
 
   @override
   String get diveLog_profileEditor_undo => 'Desfazer';
@@ -38671,7 +38615,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_sources_badge_viewing => 'Visualizando';
 
   @override
-  String get diveLog_sources_badge_secondary => 'SecundÃ¡ria';
+  String get diveLog_sources_badge_secondary => 'Secundária';
 
   @override
   String diveLog_sources_created(String date) {
@@ -38679,7 +38623,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get diveLog_sources_detail_serial => 'NÃºmero de sÃ©rie';
+  String get diveLog_sources_detail_serial => 'Número de série';
 
   @override
   String get diveLog_sources_detail_format => 'Formato';
@@ -38704,7 +38648,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_detail_semantics_viewSpecies(String name) {
-    return 'Ver espÃ©cie $name';
+    return 'Ver espécie $name';
   }
 
   @override
@@ -38744,11 +38688,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_export_progress_observationsCsv =>
-      'A exportar verificaÃ§Ãµes de equipamento para CSV...';
+      'A exportar verificações de equipamento para CSV...';
 
   @override
   String get settings_export_progress_pdf =>
-      'Gerando diÃ¡rio de mergulho em PDF...';
+      'Gerando diário de mergulho em PDF...';
 
   @override
   String get settings_export_progress_loadingSignatures =>
@@ -38760,7 +38704,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_export_progress_loadingCertifications =>
-      'Carregando certificaÃ§Ãµes...';
+      'Carregando certificações...';
 
   @override
   String get settings_export_progress_loadingFonts => 'Carregando fontes...';
@@ -38817,7 +38761,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_export_progress_preparingObservationsCsv =>
-      'A preparar CSV de verificaÃ§Ãµes de equipamento...';
+      'A preparar CSV de verificações de equipamento...';
 
   @override
   String get settings_export_progress_preparingUddf =>
@@ -38838,7 +38782,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_export_empty_observations =>
-      'Sem verificaÃ§Ãµes de equipamento para exportar';
+      'Sem verificações de equipamento para exportar';
 
   @override
   String get settings_export_empty_data => 'Nenhum dado para exportar';
@@ -38865,11 +38809,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_export_success_observations =>
-      'VerificaÃ§Ãµes de equipamento exportadas';
+      'Verificações de equipamento exportadas';
 
   @override
   String get settings_export_success_pdf =>
-      'DiÃ¡rio de mergulho em PDF gerado com sucesso';
+      'Diário de mergulho em PDF gerado com sucesso';
 
   @override
   String get settings_export_success_uddf => 'Arquivo UDDF gerado com sucesso';
@@ -38922,7 +38866,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_export_saved_observationsCsv =>
-      'CSV de verificaÃ§Ãµes de equipamento guardado';
+      'CSV de verificações de equipamento guardado';
 
   @override
   String get settings_export_saved_uddf => 'Arquivo UDDF salvo com sucesso';
@@ -38934,7 +38878,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_export_cancelled_save => 'Salvamento cancelado';
 
   @override
-  String get settings_export_pdfDocumentTitle => 'DiÃ¡rio de Mergulho';
+  String get settings_export_pdfDocumentTitle => 'Diário de Mergulho';
 
   @override
   String get settings_export_saveDivesCsvDialogTitle =>
@@ -38949,7 +38893,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_export_saveObservationsCsvDialogTitle =>
-      'Salvar CSV de verificaÃ§Ãµes de equipamento';
+      'Salvar CSV de verificações de equipamento';
 
   @override
   String backup_operation_created(String size) {
@@ -38966,18 +38910,18 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String backup_operation_restoreFailed(String error) {
-    return 'Falha na restauraÃ§Ã£o: $error';
+    return 'Falha na restauração: $error';
   }
 
   @override
   String get backup_operation_restoreSourceMissing =>
-      'Nada foi restaurado: o arquivo de backup nÃ£o foi encontrado. Seus dados atuais permanecem inalterados.';
+      'Nada foi restaurado: o arquivo de backup não foi encontrado. Seus dados atuais permanecem inalterados.';
 
   @override
   String get backup_operation_deleting => 'Excluindo backup...';
 
   @override
-  String get backup_operation_deleted => 'Backup excluÃ­do';
+  String get backup_operation_deleted => 'Backup excluído';
 
   @override
   String backup_operation_deleteFailed(String error) {
@@ -38994,7 +38938,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String backup_operation_exportFailed(String error) {
-    return 'Falha na exportaÃ§Ã£o: $error';
+    return 'Falha na exportação: $error';
   }
 
   @override
@@ -39028,11 +38972,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get backup_restore_preMigration_title =>
-      'Restaurar backup prÃ©-migraÃ§Ã£o';
+      'Restaurar backup pré-migração';
 
   @override
   String get backup_restore_preMigration_unknownVersion =>
-      'versÃ£o desconhecida';
+      'versão desconhecida';
 
   @override
   String get backup_restore_preMigration_restoreAnyway =>
@@ -39043,7 +38987,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String timestamp,
     String appVersion,
   ) {
-    return 'Este backup foi feito em $timestamp pelo app $appVersion, mas os metadados de migraÃ§Ã£o do banco de dados dele estÃ£o incompletos.\n\nO app nÃ£o consegue verificar se restaurar este backup Ã© seguro, portanto a restauraÃ§Ã£o estÃ¡ desativada.';
+    return 'Este backup foi feito em $timestamp pelo app $appVersion, mas os metadados de migração do banco de dados dele estão incompletos.\n\nO app não consegue verificar se restaurar este backup é seguro, portanto a restauração está desativada.';
   }
 
   @override
@@ -39052,7 +38996,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String appVersion,
     int fromVersion,
   ) {
-    return 'Este backup Ã© mais recente que o seu app. Instale uma versÃ£o mais nova do app para restaurÃ¡-lo.\n\nBackup feito em $timestamp pelo app $appVersion (banco de dados v$fromVersion).';
+    return 'Este backup é mais recente que o seu app. Instale uma versão mais nova do app para restaurá-lo.\n\nBackup feito em $timestamp pelo app $appVersion (banco de dados v$fromVersion).';
   }
 
   @override
@@ -39062,7 +39006,7 @@ class AppLocalizationsPt extends AppLocalizations {
     int fromVersion,
     int toVersion,
   ) {
-    return 'Este backup foi feito em $timestamp pelo app $appVersion, logo antes de atualizar o banco de dados da v$fromVersion para a v$toVersion.\n\nO esquema do banco de dados do seu app corresponde a este backup, portanto a restauraÃ§Ã£o Ã© segura.';
+    return 'Este backup foi feito em $timestamp pelo app $appVersion, logo antes de atualizar o banco de dados da v$fromVersion para a v$toVersion.\n\nO esquema do banco de dados do seu app corresponde a este backup, portanto a restauração é segura.';
   }
 
   @override
@@ -39073,19 +39017,19 @@ class AppLocalizationsPt extends AppLocalizations {
     int toVersion,
     int currentVersion,
   ) {
-    return 'Este backup foi feito em $timestamp pelo app $appVersion, logo antes de atualizar o banco de dados da v$fromVersion para a v$toVersion.\n\nVocÃª estÃ¡ usando um app mais recente (banco de dados v$currentVersion).\n\nRestaurar agora executarÃ¡ de novo a atualizaÃ§Ã£o de banco de dados v$fromVersion â†’ v$toVersion sobre os dados restaurados: exatamente a mesma atualizaÃ§Ã£o que estava prestes a ser executada originalmente. Se foi essa atualizaÃ§Ã£o que causou o problema, vocÃª terÃ¡ o mesmo problema outra vez.\n\nPara restaurar com seguranÃ§a: instale o app $appVersion ou anterior e restaure este backup a partir desse app mais antigo.';
+    return 'Este backup foi feito em $timestamp pelo app $appVersion, logo antes de atualizar o banco de dados da v$fromVersion para a v$toVersion.\n\nVocê está usando um app mais recente (banco de dados v$currentVersion).\n\nRestaurar agora executará de novo a atualização de banco de dados v$fromVersion → v$toVersion sobre os dados restaurados: exatamente a mesma atualização que estava prestes a ser executada originalmente. Se foi essa atualização que causou o problema, você terá o mesmo problema outra vez.\n\nPara restaurar com segurança: instale o app $appVersion ou anterior e restaure este backup a partir desse app mais antigo.';
   }
 
   @override
   String get settings_cloudSync_progress_preparing =>
-      'Preparando a sincronizaÃ§Ã£o...';
+      'Preparando a sincronização...';
 
   @override
-  String get settings_cloudSync_progress_pulling => 'Baixando alteraÃ§Ãµes...';
+  String get settings_cloudSync_progress_pulling => 'Baixando alterações...';
 
   @override
   String get settings_cloudSync_progress_publishing =>
-      'Publicando alteraÃ§Ãµes...';
+      'Publicando alterações...';
 
   @override
   String settings_cloudSync_progress_uploadingLibrary(int uploaded, int total) {
@@ -39111,40 +39055,40 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_result_notAuthenticated =>
-      'Sem autenticaÃ§Ã£o no provedor de nuvem';
+      'Sem autenticação no provedor de nuvem';
 
   @override
   String get settings_cloudSync_result_timedOut =>
-      'Tempo esgotado na sincronizaÃ§Ã£o';
+      'Tempo esgotado na sincronização';
 
   @override
   String get settings_cloudSync_result_epochMarkerUnreadable =>
-      'NÃ£o foi possÃ­vel ler o marcador de Ã©poca da biblioteca';
+      'Não foi possível ler o marcador de época da biblioteca';
 
   @override
   String get settings_cloudSync_result_epochMarkerEncrypted =>
-      'O marcador de Ã©poca da biblioteca estÃ¡ criptografado';
+      'O marcador de época da biblioteca está criptografado';
 
   @override
   String get settings_cloudSync_result_libraryReplacedRemotely =>
-      'A biblioteca na nuvem foi substituÃ­da a partir de um backup';
+      'A biblioteca na nuvem foi substituída a partir de um backup';
 
   @override
   String get settings_cloudSync_result_noReplacementToRebuild =>
-      'Nenhuma substituiÃ§Ã£o de biblioteca a partir da qual reconstruir';
+      'Nenhuma substituição de biblioteca a partir da qual reconstruir';
 
   @override
   String get settings_cloudSync_result_rebuiltFromThisDevice =>
-      'Este provedor foi reconstruÃ­do a partir da biblioteca deste dispositivo';
+      'Este provedor foi reconstruído a partir da biblioteca deste dispositivo';
 
   @override
   String settings_cloudSync_result_rebuildFailed(String error) {
-    return 'Falha na reconstruÃ§Ã£o: $error';
+    return 'Falha na reconstrução: $error';
   }
 
   @override
   String get settings_cloudSync_result_libraryReplaced =>
-      'Biblioteca substituÃ­da';
+      'Biblioteca substituída';
 
   @override
   String settings_cloudSync_result_libraryReplaceFailed(String error) {
@@ -39153,7 +39097,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_result_noReplacementMarker =>
-      'Nenhum marcador de substituiÃ§Ã£o de biblioteca encontrado';
+      'Nenhum marcador de substituição de biblioteca encontrado';
 
   @override
   String get settings_cloudSync_result_adoptedRestoredLibrary =>
@@ -39166,23 +39110,23 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_cloudSync_result_previousLibraryUnreadable =>
-      'NÃ£o foi possÃ­vel ler a biblioteca anterior; este provedor foi restabelecido a partir da biblioteca deste dispositivo.';
+      'Não foi possível ler a biblioteca anterior; este provedor foi restabelecido a partir da biblioteca deste dispositivo.';
 
   @override
   String get settings_cloudSync_result_replacementStillUploading =>
-      'A biblioteca substituÃ­da ainda estÃ¡ sendo enviada. Tente novamente em instantes.';
+      'A biblioteca substituída ainda está sendo enviada. Tente novamente em instantes.';
 
   @override
   String get settings_cloudSync_result_cloudLibraryNewerSchema =>
-      'A biblioteca na nuvem foi publicada por uma versÃ£o mais recente do Submersion. Atualize este dispositivo e tente novamente.';
+      'A biblioteca na nuvem foi publicada por uma versão mais recente do Submersion. Atualize este dispositivo e tente novamente.';
 
   @override
   String settings_cloudSync_result_recordsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count registros nÃ£o puderam ser aplicados',
-      one: '1 registro nÃ£o pÃ´de ser aplicado',
+      other: '$count registros não puderam ser aplicados',
+      one: '1 registro não pôde ser aplicado',
     );
     return '$_temp0';
   }
@@ -39193,7 +39137,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String settings_cloudSync_launchCheck_unavailable(String provider) {
-    return '$provider nÃ£o estÃ¡ disponÃ­vel neste dispositivo';
+    return '$provider não está disponível neste dispositivo';
   }
 
   @override
@@ -39206,30 +39150,30 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count alteraÃ§Ãµes locais para enviar',
-      one: '1 alteraÃ§Ã£o local para enviar',
+      other: '$count alterações locais para enviar',
+      one: '1 alteração local para enviar',
     );
     return '$_temp0';
   }
 
   @override
   String get settings_cloudSync_launchCheck_noRemoteData =>
-      'Nenhum dado de sincronizaÃ§Ã£o encontrado na nuvem';
+      'Nenhum dado de sincronização encontrado na nuvem';
 
   @override
   String get settings_cloudSync_launchCheck_cloudDataAvailable =>
-      'Dados da nuvem disponÃ­veis';
+      'Dados da nuvem disponíveis';
 
   @override
   String get settings_cloudSync_launchCheck_updatesAvailable =>
-      'AtualizaÃ§Ãµes disponÃ­veis na nuvem';
+      'Atualizações disponíveis na nuvem';
 
   @override
-  String get settings_cloudSync_launchCheck_upToDate => 'Tudo estÃ¡ atualizado';
+  String get settings_cloudSync_launchCheck_upToDate => 'Tudo está atualizado';
 
   @override
   String settings_cloudSync_launchCheck_failed(String error) {
-    return 'Falha na verificaÃ§Ã£o de sincronizaÃ§Ã£o: $error';
+    return 'Falha na verificação de sincronização: $error';
   }
 
   @override
@@ -39240,29 +39184,29 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get setup_sync_icloudUnavailable =>
-      'O iCloud nÃ£o estÃ¡ disponÃ­vel neste dispositivo';
+      'O iCloud não está disponível neste dispositivo';
 
   @override
-  String get media_info_title => 'InformaÃ§Ãµes da mÃ­dia';
+  String get media_info_title => 'Informações da mídia';
 
   @override
-  String get media_species_actionTooltip => 'EspÃ©cies';
+  String get media_species_actionTooltip => 'Espécies';
 
   @override
-  String get media_species_sheetTitle => 'EspÃ©cies nesta foto';
+  String get media_species_sheetTitle => 'Espécies nesta foto';
 
   @override
   String get media_species_sightedOnDive => 'Avistadas neste mergulho';
 
   @override
-  String get media_species_otherSpecies => 'Outras espÃ©cies...';
+  String get media_species_otherSpecies => 'Outras espécies...';
 
   @override
   String get media_species_noDiveHint =>
-      'Esta foto nÃ£o estÃ¡ vinculada a um mergulho. Pesquise uma espÃ©cie para marcÃ¡-la.';
+      'Esta foto não está vinculada a um mergulho. Pesquise uma espécie para marcá-la.';
 
   @override
-  String get media_species_chipsLabel => 'MarcaÃ§Ãµes de espÃ©cies';
+  String get media_species_chipsLabel => 'Marcações de espécies';
 
   @override
   String get media_info_fileSection => 'Arquivo';
@@ -39274,7 +39218,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_info_type => 'Tipo';
 
   @override
-  String get media_info_dimensions => 'DimensÃµes';
+  String get media_info_dimensions => 'Dimensões';
 
   @override
   String get media_info_size => 'Tamanho';
@@ -39295,7 +39239,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_info_source => 'Fonte';
 
   @override
-  String get media_info_reference => 'ReferÃªncia';
+  String get media_info_reference => 'Referência';
 
   @override
   String get media_info_linkedOn => 'Vinculada em';
@@ -39316,11 +39260,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_info_statusMissing => 'Ausente neste dispositivo';
 
   @override
-  String get media_info_statusUnchecked => 'Ainda nÃ£o verificada';
+  String get media_info_statusUnchecked => 'Ainda não verificada';
 
   @override
   String media_info_lastChecked(String date) {
-    return 'Ãšltima verificaÃ§Ã£o $date';
+    return 'Última verificação $date';
   }
 
   @override
@@ -39338,7 +39282,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get media_timeInDive_fieldLabel => 'Tempo desde o inÃ­cio do mergulho';
+  String get media_timeInDive_fieldLabel => 'Tempo desde o início do mergulho';
 
   @override
   String get media_timeInDive_fieldHint => 'mm:ss';
@@ -39360,7 +39304,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_timeInDive_cancel => 'Cancelar';
 
   @override
-  String get media_timeInDive_reset => 'Redefinir para automÃ¡tico';
+  String get media_timeInDive_reset => 'Redefinir para automático';
 
   @override
   String get media_info_backupSection => 'Backup';
@@ -39373,17 +39317,17 @@ class AppLocalizationsPt extends AppLocalizations {
       'Nenhum armazenamento na nuvem conectado';
 
   @override
-  String get media_info_notEligible => 'Esta fonte nÃ£o pode ser copiada';
+  String get media_info_notEligible => 'Esta fonte não pode ser copiada';
 
   @override
   String get media_info_backupFull => 'Original enviado';
 
   @override
   String get media_info_backupThumbOnly =>
-      'Apenas miniatura, original nÃ£o enviado';
+      'Apenas miniatura, original não enviado';
 
   @override
-  String get media_info_backupRenditionOnly => 'VersÃ£o comprimida enviada';
+  String get media_info_backupRenditionOnly => 'Versão comprimida enviada';
 
   @override
   String get media_info_backupNone => 'Sem backup';
@@ -39408,10 +39352,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_info_servingSection => 'Servindo agora';
 
   @override
-  String get media_info_servingUnobserved => 'Ainda nÃ£o carregada';
+  String get media_info_servingUnobserved => 'Ainda não carregada';
 
   @override
-  String get media_info_servingFailed => 'NÃ£o foi possÃ­vel carregar';
+  String get media_info_servingFailed => 'Não foi possível carregar';
 
   @override
   String get media_info_servedLocalDisk => 'Arquivo local neste dispositivo';
@@ -39432,30 +39376,30 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_info_servedConnectorCache =>
-      'Cache local, do serviÃ§o conectado';
+      'Cache local, do serviço conectado';
 
   @override
   String get media_info_servedConnectorNetwork =>
-      'Baixada do serviÃ§o conectado';
+      'Baixada do serviço conectado';
 
   @override
-  String get media_info_servedEmbedded => 'Armazenada neste diÃ¡rio';
+  String get media_info_servedEmbedded => 'Armazenada neste diário';
 
   @override
   String get media_info_servingFallbackNote =>
-      'A fonte original nÃ£o pÃ´de ser acessada, entÃ£o o armazenamento na nuvem forneceu isto.';
+      'A fonte original não pôde ser acessada, então o armazenamento na nuvem forneceu isto.';
 
   @override
   String get media_info_servingTierThumbnail => 'Miniatura';
 
   @override
-  String get media_info_servingTierRendition => 'VersÃ£o comprimida';
+  String get media_info_servingTierRendition => 'Versão comprimida';
 
   @override
   String get media_info_typePhoto => 'Foto';
 
   @override
-  String get media_info_typeVideo => 'VÃ­deo';
+  String get media_info_typeVideo => 'Vídeo';
 
   @override
   String get media_info_typeDocument => 'Documento';
@@ -39479,32 +39423,31 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_info_actionReveal => 'Mostrar no gerenciador de arquivos';
 
   @override
-  String get media_info_actionCopyPath => 'Copiar referÃªncia';
+  String get media_info_actionCopyPath => 'Copiar referência';
 
   @override
-  String get media_info_referenceCopied => 'ReferÃªncia copiada';
+  String get media_info_referenceCopied => 'Referência copiada';
 
   @override
   String get media_info_checkFound => 'Fonte encontrada';
 
   @override
-  String get media_info_checkMissing => 'A fonte estÃ¡ ausente';
+  String get media_info_checkMissing => 'A fonte está ausente';
 
   @override
-  String get media_info_checkUnavailable =>
-      'NÃ£o foi possÃ­vel verificar agora';
+  String get media_info_checkUnavailable => 'Não foi possível verificar agora';
 
   @override
   String get media_info_backupQueued => 'Na fila para envio';
 
   @override
-  String get enum_profileMetric_o2CellMv => 'CÃ©lulas O2';
+  String get enum_profileMetric_o2CellMv => 'Células O2';
 
   @override
-  String get enum_profileMetric_o2CellMv_short => 'CÃ©lulas';
+  String get enum_profileMetric_o2CellMv_short => 'Células';
 
   @override
-  String get diveLog_o2CellSpread_label => 'DispersÃ£o das cÃ©lulas O2';
+  String get diveLog_o2CellSpread_label => 'Dispersão das células O2';
 
   @override
   String get media_status_broken => 'Ausente e sem backup';
@@ -39527,13 +39470,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_servedFrom_connectorCache =>
-      'ServiÃ§o conectado, em cache aqui';
+      'Serviço conectado, em cache aqui';
 
   @override
-  String get media_servedFrom_connectorNetwork => 'ServiÃ§o conectado';
+  String get media_servedFrom_connectorNetwork => 'Serviço conectado';
 
   @override
-  String get media_servedFrom_embedded => 'Salvo neste diÃ¡rio';
+  String get media_servedFrom_embedded => 'Salvo neste diário';
 
   @override
   String get settings_media_provenanceBadges =>
@@ -39541,7 +39484,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_media_provenanceBadgesSubtitle =>
-      'Um pequeno Ã­cone que mostra de onde cada item vem. Os selos de problema sempre aparecem.';
+      'Um pequeno ícone que mostra de onde cada item vem. Os selos de problema sempre aparecem.';
 
   @override
   String get media_status_transferFailed => 'Falha no envio';
@@ -39559,54 +39502,54 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_status_notBackedUp => 'Sem backup';
 
   @override
-  String get media_tile_infoMenuItem => 'InformaÃ§Ãµes da mÃ­dia';
+  String get media_tile_infoMenuItem => 'Informações da mídia';
 
   @override
   String get diveImport_healthkit_accessGrantedHint =>
-      'O Apple SaÃºde nunca informa Ã s apps se o acesso de leitura foi concedido. Se nenhum mergulho aparecer, abra SaÃºde, depois Partilha, Apps, Submersion, e ative Treinos, Profundidade subaquÃ¡tica, Temperatura da Ã¡gua e FrequÃªncia cardÃ­aca.';
+      'O Apple Saúde nunca informa às apps se o acesso de leitura foi concedido. Se nenhum mergulho aparecer, abra Saúde, depois Partilha, Apps, Submersion, e ative Treinos, Profundidade subaquática, Temperatura da água e Frequência cardíaca.';
 
   @override
   String get diveImport_healthkit_foundNoDivesHint =>
-      'Sem treinos de mergulho neste intervalo. Confirme que as datas cobrem o mergulho e que em SaÃºde, Partilha, Apps, Submersion estÃ£o ativos Treinos e Profundidade subaquÃ¡tica.';
+      'Sem treinos de mergulho neste intervalo. Confirme que as datas cobrem o mergulho e que em Saúde, Partilha, Apps, Submersion estão ativos Treinos e Profundidade subaquática.';
 
   @override
   String get settings_dataSources_appleHealth_dataTypeDepth =>
-      'Profundidade subaquÃ¡tica - amostras de profundidade registadas durante os mergulhos';
+      'Profundidade subaquática - amostras de profundidade registadas durante os mergulhos';
 
   @override
   String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
-      'Temperatura da Ã¡gua - amostras de temperatura registadas durante os mergulhos';
+      'Temperatura da água - amostras de temperatura registadas durante os mergulhos';
 
   @override
   String get settings_dataSources_appleHealth_permissionManagedInHealth =>
-      'O acesso ao HealthKit Ã© gerido na app SaÃºde';
+      'O acesso ao HealthKit é gerido na app Saúde';
 
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
-      'O HealthKit nÃ£o estÃ¡ disponÃ­vel neste dispositivo';
+      'O HealthKit não está disponível neste dispositivo';
 
   @override
-  String get statistics_trend_aggregation_monthly => 'MÃ©dia mensal';
+  String get statistics_trend_aggregation_monthly => 'Média mensal';
 
   @override
   String get statistics_trend_aggregation_perDive => 'Cada mergulho';
 
   @override
   String get statistics_trend_aggregation_tooltip =>
-      'Como os mergulhos sÃ£o agrupados';
+      'Como os mergulhos são agrupados';
 
   @override
-  String get statistics_trend_aggregation_weekly => 'MÃ©dia semanal';
+  String get statistics_trend_aggregation_weekly => 'Média semanal';
 
   @override
   String get statistics_trend_band_semanticLabel =>
       'A faixa sombreada abrange o valor mais baixo e mais alto de cada grupo';
 
   @override
-  String get statistics_trend_legend_rate => 'TendÃªncia geral';
+  String get statistics_trend_legend_rate => 'Tendência geral';
 
   @override
-  String get statistics_trend_legend_rollingAverage => 'MÃ©dia mÃ³vel';
+  String get statistics_trend_legend_rollingAverage => 'Média móvel';
 
   @override
   String statistics_trend_rate_perYear(String value) {
@@ -39615,41 +39558,41 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_conditions_tempTrend_title =>
-      'EvoluÃ§Ã£o da temperatura da Ã¡gua';
+      'Evolução da temperatura da água';
 
   @override
   String get statistics_conditions_tempTrend_subtitle =>
-      'Cada mergulho no perÃ­odo';
+      'Cada mergulho no período';
 
   @override
   String get statistics_conditions_tempTrend_empty =>
-      'Sem dados de temperatura disponÃ­veis';
+      'Sem dados de temperatura disponíveis';
 
   @override
   String get statistics_conditions_tempTrend_error =>
-      'Falha ao carregar a evoluÃ§Ã£o da temperatura';
+      'Falha ao carregar a evolução da temperatura';
 
   @override
   String get statistics_conditions_waterTempBands_title =>
-      'Mergulhos por temperatura da Ã¡gua';
+      'Mergulhos por temperatura da água';
 
   @override
   String get statistics_conditions_waterTempBands_subtitle =>
-      'Como seus mergulhos se distribuem entre faixas de temperatura da Ã¡gua';
+      'Como seus mergulhos se distribuem entre faixas de temperatura da água';
 
   @override
   String get statistics_conditions_waterTempBands_empty =>
-      'Nenhum dado de temperatura da Ã¡gua disponÃ­vel';
+      'Nenhum dado de temperatura da água disponível';
 
   @override
   String get statistics_conditions_waterTempBands_error =>
-      'NÃ£o foi possÃ­vel carregar as faixas de temperatura da Ã¡gua';
+      'Não foi possível carregar as faixas de temperatura da água';
 
   @override
   String statistics_conditions_waterTempBands_semanticLabel(
     String description,
   ) {
-    return 'GrÃ¡fico de barras. Mergulhos por temperatura da Ã¡gua. $description';
+    return 'Gráfico de barras. Mergulhos por temperatura da água. $description';
   }
 
   @override
@@ -39659,18 +39602,18 @@ class AppLocalizationsPt extends AppLocalizations {
   String get statistics_conditions_waterTempBands_table_dives => 'Mergulhos';
 
   @override
-  String get statistics_conditions_waterTempBands_table_avgSac => 'SAC mÃ©dio';
+  String get statistics_conditions_waterTempBands_table_avgSac => 'SAC médio';
 
   @override
-  String get statistics_conditions_waterTempBands_table_avgRmv => 'RMV mÃ©dio';
+  String get statistics_conditions_waterTempBands_table_avgRmv => 'RMV médio';
 
   @override
   String get statistics_conditions_waterTempBands_table_avgBottomTime =>
-      'Tempo de fundo mÃ©dio';
+      'Tempo de fundo médio';
 
   @override
   String get statistics_conditions_waterTempBands_table_error =>
-      'Falha ao carregar as mÃ©dias por faixa';
+      'Falha ao carregar as médias por faixa';
 
   @override
   String statistics_conditions_waterTempBands_table_averageOver(
@@ -39691,133 +39634,133 @@ class AppLocalizationsPt extends AppLocalizations {
     String consumption,
     String bottomTime,
   ) {
-    return '$band: $dives. $lane mÃ©dio: $consumption. Tempo de fundo mÃ©dio: $bottomTime.';
+    return '$band: $dives. $lane médio: $consumption. Tempo de fundo médio: $bottomTime.';
   }
 
   @override
-  String get diveLog_filter_presetLast5Years => 'Ãšltimos 5 anos';
+  String get diveLog_filter_presetLast5Years => 'Últimos 5 anos';
 
   @override
-  String get diveLog_filter_presetLast10Years => 'Ãšltimos 10 anos';
+  String get diveLog_filter_presetLast10Years => 'Últimos 10 anos';
 
   @override
-  String get statistics_trend_tooltip_lowest => 'MÃ­nimo';
+  String get statistics_trend_tooltip_lowest => 'Mínimo';
 
   @override
-  String get statistics_trend_tooltip_highest => 'MÃ¡ximo';
+  String get statistics_trend_tooltip_highest => 'Máximo';
 
   @override
-  String get diveLog_edit_excludeFromStats => 'Excluir das estatÃ­sticas';
+  String get diveLog_edit_excludeFromStats => 'Excluir das estatísticas';
 
   @override
   String get diveLog_edit_excludeFromStatsHelp =>
-      'Mantenha este mergulho no seu registo, mas deixe-o fora de todas as estatÃ­sticas, incluindo a sua contagem de mergulhos.';
+      'Mantenha este mergulho no seu registo, mas deixe-o fora de todas as estatísticas, incluindo a sua contagem de mergulhos.';
 
   @override
   String get diveLog_edit_excludeFromGasStats =>
-      'Excluir das estatÃ­sticas de gÃ¡s';
+      'Excluir das estatísticas de gás';
 
   @override
   String get diveLog_edit_excludeFromGasStatsHelp =>
-      'Deixe este mergulho fora apenas das estatÃ­sticas de SAC, RMV e mistura de gÃ¡s. Ãštil quando o valor de gÃ¡s nÃ£o Ã© representativo.';
+      'Deixe este mergulho fora apenas das estatísticas de SAC, RMV e mistura de gás. Útil quando o valor de gás não é representativo.';
 
   @override
-  String get diveLog_badge_excludedFromStats => 'ExcluÃ­do das estatÃ­sticas';
+  String get diveLog_badge_excludedFromStats => 'Excluído das estatísticas';
 
   @override
   String get diveLog_badge_excludedFromGasStats =>
-      'ExcluÃ­do das estatÃ­sticas de gÃ¡s';
+      'Excluído das estatísticas de gás';
 
   @override
   String get diveLog_bulkEdit_fieldExcludeFromStats =>
-      'Excluir das estatÃ­sticas';
+      'Excluir das estatísticas';
 
   @override
   String get diveLog_bulkEdit_fieldExcludeFromGasStats =>
-      'Excluir das estatÃ­sticas de gÃ¡s';
+      'Excluir das estatísticas de gás';
 
   @override
   String get diveLog_filter_excludedOnly =>
-      'Apenas os excluÃ­dos das estatÃ­sticas';
+      'Apenas os excluídos das estatísticas';
 
   @override
-  String get diveLog_edit_summary_excluded => 'ExcluÃ­do';
+  String get diveLog_edit_summary_excluded => 'Excluído';
 
   @override
   String statistics_excludedDivesFootnote(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count mergulhos excluÃ­dos das estatÃ­sticas',
-      one: '1 mergulho excluÃ­do das estatÃ­sticas',
+      other: '$count mergulhos excluídos das estatísticas',
+      one: '1 mergulho excluído das estatísticas',
     );
     return '$_temp0';
   }
 
   @override
-  String get diveLog_edit_group_statistics => 'EstatÃ­sticas';
+  String get diveLog_edit_group_statistics => 'Estatísticas';
 
   @override
-  String get diveLog_edit_summary_gasExcluded => 'GÃ¡s excluÃ­do';
+  String get diveLog_edit_summary_gasExcluded => 'Gás excluído';
 
   @override
   String get diveLog_edit_statisticsIncludedHint =>
-      'IncluÃ­do em todas as estatÃ­sticas';
+      'Incluído em todas as estatísticas';
 
   @override
   String get suuntoCloud_signIn_title => 'Entrar na Suunto';
 
   @override
   String get suuntoCloud_signIn_description =>
-      'Entre com a sua conta app.suunto.com para importar os seus mergulhos diretamente. A sua palavra-passe nunca Ã© guardada, apenas a sessÃ£o resultante.';
+      'Entre com a sua conta app.suunto.com para importar os seus mergulhos diretamente. A sua palavra-passe nunca é guardada, apenas a sessão resultante.';
 
   @override
   String get suuntoCloud_signIn_emailLabel => 'E-mail';
 
   @override
-  String get suuntoCloud_signIn_emailRequired => 'O e-mail Ã© obrigatÃ³rio';
+  String get suuntoCloud_signIn_emailRequired => 'O e-mail é obrigatório';
 
   @override
   String get suuntoCloud_signIn_passwordLabel => 'Palavra-passe';
 
   @override
   String get suuntoCloud_signIn_passwordRequired =>
-      'A palavra-passe Ã© obrigatÃ³ria';
+      'A palavra-passe é obrigatória';
 
   @override
   String get suuntoCloud_signIn_button => 'Entrar';
 
   @override
-  String get suuntoCloud_signIn_signingIn => 'A entrarâ€¦';
+  String get suuntoCloud_signIn_signingIn => 'A entrar…';
 
   @override
   String suuntoCloud_signIn_signedInAs(String email) {
-    return 'SessÃ£o iniciada como $email';
+    return 'Sessão iniciada como $email';
   }
 
   @override
-  String get suuntoCloud_fetch_listing => 'A listar mergulhosâ€¦';
+  String get suuntoCloud_fetch_listing => 'A listar mergulhos…';
 
   @override
   String suuntoCloud_fetch_listingFound(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'A listar mergulhosâ€¦ ($count encontrados atÃ© agora)',
-      one: 'A listar mergulhosâ€¦ (1 encontrado atÃ© agora)',
-      zero: 'A listar mergulhosâ€¦',
+      other: 'A listar mergulhos… ($count encontrados até agora)',
+      one: 'A listar mergulhos… (1 encontrado até agora)',
+      zero: 'A listar mergulhos…',
     );
     return '$_temp0';
   }
 
   @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
-    return 'A obter o mergulho $current de $totalâ€¦';
+    return 'A obter o mergulho $current de $total…';
   }
 
   @override
   String get suuntoCloud_fetch_failedTitle =>
-      'NÃ£o foi possÃ­vel obter os mergulhos';
+      'Não foi possível obter os mergulhos';
 
   @override
   String get suuntoCloud_fetch_retry => 'Tentar novamente';
@@ -39845,8 +39788,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count mergulhos nÃ£o puderam ser convertidos e foram ignorados.',
-      one: '1 mergulho nÃ£o pÃ´de ser convertido e foi ignorado.',
+      other: '$count mergulhos não puderam ser convertidos e foram ignorados.',
+      one: '1 mergulho não pôde ser convertido e foi ignorado.',
     );
     return '$_temp0';
   }
@@ -39856,76 +39799,76 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get garminConnect_signIn_description =>
-      'Entre com a sua conta Garmin Connect para importar os seus mergulhos diretamente. A sua palavra-passe nunca Ã© guardada, apenas a sessÃ£o resultante.';
+      'Entre com a sua conta Garmin Connect para importar os seus mergulhos diretamente. A sua palavra-passe nunca é guardada, apenas a sessão resultante.';
 
   @override
   String get garminConnect_signIn_emailLabel => 'E-mail';
 
   @override
-  String get garminConnect_signIn_emailRequired => 'O e-mail Ã© obrigatÃ³rio';
+  String get garminConnect_signIn_emailRequired => 'O e-mail é obrigatório';
 
   @override
   String get garminConnect_signIn_passwordLabel => 'Palavra-passe';
 
   @override
   String get garminConnect_signIn_passwordRequired =>
-      'A palavra-passe Ã© obrigatÃ³ria';
+      'A palavra-passe é obrigatória';
 
   @override
   String get garminConnect_signIn_button => 'Entrar';
 
   @override
-  String get garminConnect_signIn_signingIn => 'A entrarâ€¦';
+  String get garminConnect_signIn_signingIn => 'A entrar…';
 
   @override
   String garminConnect_signIn_signedInAs(String email) {
-    return 'SessÃ£o iniciada como $email';
+    return 'Sessão iniciada como $email';
   }
 
   @override
-  String get garminConnect_mfa_title => 'VerificaÃ§Ã£o necessÃ¡ria';
+  String get garminConnect_mfa_title => 'Verificação necessária';
 
   @override
   String garminConnect_mfa_description(String method) {
-    return 'Introduza o cÃ³digo de verificaÃ§Ã£o enviado para $method.';
+    return 'Introduza o código de verificação enviado para $method.';
   }
 
   @override
-  String get garminConnect_mfa_codeLabel => 'CÃ³digo de verificaÃ§Ã£o';
+  String get garminConnect_mfa_codeLabel => 'Código de verificação';
 
   @override
   String get garminConnect_mfa_codeRequired =>
-      'O cÃ³digo de verificaÃ§Ã£o Ã© obrigatÃ³rio';
+      'O código de verificação é obrigatório';
 
   @override
   String get garminConnect_mfa_button => 'Verificar';
 
   @override
-  String get garminConnect_mfa_submitting => 'A verificarâ€¦';
+  String get garminConnect_mfa_submitting => 'A verificar…';
 
   @override
-  String get garminConnect_fetch_listing => 'A listar mergulhosâ€¦';
+  String get garminConnect_fetch_listing => 'A listar mergulhos…';
 
   @override
   String garminConnect_fetch_listingFound(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'A listar mergulhosâ€¦ ($count encontrados atÃ© agora)',
-      one: 'A listar mergulhosâ€¦ (1 encontrado atÃ© agora)',
-      zero: 'A listar mergulhosâ€¦',
+      other: 'A listar mergulhos… ($count encontrados até agora)',
+      one: 'A listar mergulhos… (1 encontrado até agora)',
+      zero: 'A listar mergulhos…',
     );
     return '$_temp0';
   }
 
   @override
   String garminConnect_fetch_fetchingDiveOf(int current, int total) {
-    return 'A obter o mergulho $current de $totalâ€¦';
+    return 'A obter o mergulho $current de $total…';
   }
 
   @override
   String get garminConnect_fetch_failedTitle =>
-      'NÃ£o foi possÃ­vel obter os mergulhos';
+      'Não foi possível obter os mergulhos';
 
   @override
   String get garminConnect_fetch_retry => 'Tentar novamente';
@@ -39950,8 +39893,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count mergulhos nÃ£o puderam ser convertidos e foram ignorados.',
-      one: '1 mergulho nÃ£o pÃ´de ser convertido e foi ignorado.',
+      other: '$count mergulhos não puderam ser convertidos e foram ignorados.',
+      one: '1 mergulho não pôde ser convertido e foi ignorado.',
     );
     return '$_temp0';
   }
@@ -39993,45 +39936,44 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_storageUsage_appBar_title =>
-      'UtilizaÃ§Ã£o de armazenamento';
+      'Utilização de armazenamento';
 
   @override
-  String get settings_storageUsage_tile_title =>
-      'UtilizaÃ§Ã£o de armazenamento';
+  String get settings_storageUsage_tile_title => 'Utilização de armazenamento';
 
   @override
   String get settings_storageUsage_tile_subtitle =>
-      'Veja o que estÃ¡ a ocupar espaÃ§o neste dispositivo';
+      'Veja o que está a ocupar espaço neste dispositivo';
 
   @override
   String get settings_storageUsage_total => 'Total';
 
   @override
-  String get settings_storageUsage_totalPartial => 'Total atÃ© agora';
+  String get settings_storageUsage_totalPartial => 'Total até agora';
 
   @override
   String get settings_storageUsage_refresh_tooltip => 'Recalcular';
 
   @override
-  String get settings_storageUsage_unavailable => 'NÃ£o disponÃ­vel';
+  String get settings_storageUsage_unavailable => 'Não disponível';
 
   @override
-  String get settings_storageUsage_measureFailed => 'NÃ£o foi possÃ­vel medir';
+  String get settings_storageUsage_measureFailed => 'Não foi possível medir';
 
   @override
-  String get settings_storageUsage_group_appData => 'Dados da aplicaÃ§Ã£o';
+  String get settings_storageUsage_group_appData => 'Dados da aplicação';
 
   @override
-  String get settings_storageUsage_group_mediaCache => 'Cache de multimÃ©dia';
+  String get settings_storageUsage_group_mediaCache => 'Cache de multimédia';
 
   @override
   String get settings_storageUsage_group_caches => 'Caches';
 
   @override
-  String get settings_storageUsage_group_backups => 'CÃ³pias de seguranÃ§a';
+  String get settings_storageUsage_group_backups => 'Cópias de segurança';
 
   @override
-  String get settings_storageUsage_group_temporary => 'Ficheiros temporÃ¡rios';
+  String get settings_storageUsage_group_temporary => 'Ficheiros temporários';
 
   @override
   String get settings_storageUsage_group_exports => 'Ficheiros exportados';
@@ -40050,22 +39992,22 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_mediaCacheOriginals =>
-      'Fotos e vÃ­deos originais';
+      'Fotos e vídeos originais';
 
   @override
   String get settings_storageUsage_category_mediaCacheThumbs => 'Miniaturas';
 
   @override
   String get settings_storageUsage_category_mediaCacheRenditions =>
-      'VersÃµes de vÃ­deo';
+      'Versões de vídeo';
 
   @override
   String get settings_storageUsage_category_mediaCacheStaging =>
-      'TransferÃªncias preparadas';
+      'Transferências preparadas';
 
   @override
   String get settings_storageUsage_category_mediaCacheTranscode =>
-      'VÃ­deo transcodificado';
+      'Vídeo transcodificado';
 
   @override
   String get settings_storageUsage_category_mapTiles => 'Mosaicos de mapa';
@@ -40075,7 +40017,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_videoThumbnails =>
-      'Miniaturas de vÃ­deo';
+      'Miniaturas de vídeo';
 
   @override
   String get settings_storageUsage_category_pdfThumbnails =>
@@ -40083,18 +40025,18 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_backups =>
-      'Ficheiros de cÃ³pia de seguranÃ§a';
+      'Ficheiros de cópia de segurança';
 
   @override
   String get settings_storageUsage_category_temporary =>
-      'Ficheiros temporÃ¡rios';
+      'Ficheiros temporários';
 
   @override
   String get settings_storageUsage_category_exports => 'Ficheiros exportados';
 
   @override
   String get settings_storageUsage_category_importedFiles =>
-      'Ficheiros de importaÃ§Ã£o originais';
+      'Ficheiros de importação originais';
 
   @override
   String get profilePhoto_sheet_title => 'Foto do perfil';
@@ -40123,26 +40065,25 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get profilePhoto_error_tooLarge =>
-      'Essa imagem Ã© demasiado grande. Tente uma mais pequena.';
+      'Essa imagem é demasiado grande. Tente uma mais pequena.';
 
   @override
   String get profilePhoto_error_undecodable =>
-      'NÃ£o foi possÃ­vel ler esse ficheiro como imagem.';
+      'Não foi possível ler esse ficheiro como imagem.';
 
   @override
-  String get profilePhoto_error_contactNoPhoto =>
-      'Esse contacto nÃ£o tem foto.';
+  String get profilePhoto_error_contactNoPhoto => 'Esse contacto não tem foto.';
 
   @override
   String get profilePhoto_error_contactPermission =>
-      'Ã‰ necessÃ¡ria permissÃ£o de contactos para escolher uma foto.';
+      'É necessária permissão de contactos para escolher uma foto.';
 
   @override
   String get diveComputer_merge_title => 'Mesclar computadores de mergulho';
 
   @override
   String diveComputer_merge_intro(int count) {
-    return '$count registros se tornarÃ£o um. Mergulhos, perfis e histÃ³rico de download passam para o registro que vocÃª mantiver. Os outros registros sÃ£o excluÃ­dos.';
+    return '$count registros se tornarão um. Mergulhos, perfis e histórico de download passam para o registro que você mantiver. Os outros registros são excluídos.';
   }
 
   @override
@@ -40150,27 +40091,27 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveComputer_merge_serialLabel(String serial) {
-    return 'NÃºmero de sÃ©rie $serial';
+    return 'Número de série $serial';
   }
 
   @override
-  String get diveComputer_merge_noSerial => 'Sem nÃºmero de sÃ©rie';
+  String get diveComputer_merge_noSerial => 'Sem número de série';
 
   @override
   String diveComputer_merge_affectedDives(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count mergulhos passarÃ£o para o registro mantido.',
-      one: '1 mergulho passarÃ¡ para o registro mantido.',
-      zero: 'Nenhum mergulho estÃ¡ vinculado aos outros registros.',
+      other: '$count mergulhos passarão para o registro mantido.',
+      one: '1 mergulho passará para o registro mantido.',
+      zero: 'Nenhum mergulho está vinculado aos outros registros.',
     );
     return '$_temp0';
   }
 
   @override
   String get diveComputer_merge_serialMismatchWarning =>
-      'Estes registros informam nÃºmeros de sÃ©rie diferentes. Podem ser computadores fÃ­sicos diferentes.';
+      'Estes registros informam números de série diferentes. Podem ser computadores físicos diferentes.';
 
   @override
   String get diveComputer_merge_action => 'Mesclar';
@@ -40188,7 +40129,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveComputer_merge_failed(String error) {
-    return 'NÃ£o foi possÃ­vel mesclar os computadores: $error';
+    return 'Não foi possível mesclar os computadores: $error';
   }
 
   @override
@@ -40202,20 +40143,20 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveComputer_detail_mergePickerEmpty =>
-      'NÃ£o hÃ¡ outros computadores para mesclar.';
+      'Não há outros computadores para mesclar.';
 
   @override
   String get diveComputer_detail_mergePickerSameSerial =>
-      'Mesmo nÃºmero de sÃ©rie';
+      'Mesmo número de série';
 
   @override
   String diveComputer_detail_duplicateBanner(String name) {
-    return '$name informa o mesmo nÃºmero de sÃ©rie. Pode ser este computador salvo duas vezes.';
+    return '$name informa o mesmo número de série. Pode ser este computador salvo duas vezes.';
   }
 
   @override
   String diveComputer_detail_duplicateBannerMultiple(int count) {
-    return 'Outros $count registros salvos informam o mesmo nÃºmero de sÃ©rie. Pode ser este computador salvo mais de uma vez.';
+    return 'Outros $count registros salvos informam o mesmo número de série. Pode ser este computador salvo mais de uma vez.';
   }
 
   @override
@@ -40223,47 +40164,46 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get startup_versionMismatch_restore_title =>
-      'Restaurar a cÃ³pia anterior Ã  atualizaÃ§Ã£o';
+      'Restaurar a cópia anterior à atualização';
 
   @override
   String get startup_versionMismatch_restore_body =>
-      'Existe neste dispositivo uma cÃ³pia de seguranÃ§a do teu registo de mergulhos feita antes da atualizaÃ§Ã£o, e esta versÃ£o consegue abri-la.';
+      'Existe neste dispositivo uma cópia de segurança do teu registo de mergulhos feita antes da atualização, e esta versão consegue abri-la.';
 
   @override
   String get startup_versionMismatch_restore_warning =>
-      'Tudo o que registaste depois da atualizaÃ§Ã£o existe apenas no ficheiro mais recente. Esse ficheiro fica guardado como cÃ³pia fixada, por isso instalar de novo a versÃ£o mais recente recupera-o.';
+      'Tudo o que registaste depois da atualização existe apenas no ficheiro mais recente. Esse ficheiro fica guardado como cópia fixada, por isso instalar de novo a versão mais recente recupera-o.';
 
   @override
-  String get startup_interruptedRestore_title => 'Um restauro nÃ£o terminou';
+  String get startup_interruptedRestore_title => 'Um restauro não terminou';
 
   @override
   String startup_interruptedRestore_bodyWithDate(String date) {
-    return 'O Submersion estava a restaurar uma cÃ³pia de seguranÃ§a em $date quando parou. O seu diÃ¡rio de mergulho de antes desse restauro continua neste dispositivo e esta versÃ£o consegue abri-lo.';
+    return 'O Submersion estava a restaurar uma cópia de segurança em $date quando parou. O seu diário de mergulho de antes desse restauro continua neste dispositivo e esta versão consegue abri-lo.';
   }
 
   @override
   String get startup_interruptedRestore_body =>
-      'O Submersion estava a restaurar uma cÃ³pia de seguranÃ§a quando parou. O seu diÃ¡rio de mergulho de antes desse restauro continua neste dispositivo e esta versÃ£o consegue abri-lo.';
+      'O Submersion estava a restaurar uma cópia de segurança quando parou. O seu diário de mergulho de antes desse restauro continua neste dispositivo e esta versão consegue abri-lo.';
 
   @override
   String get startup_interruptedRestore_recoverAction =>
-      'Recuperar o meu diÃ¡rio de mergulho anterior';
+      'Recuperar o meu diário de mergulho anterior';
 
   @override
   String get startup_interruptedRestore_recoverNote =>
-      'O ficheiro que estÃ¡ agora no seu lugar Ã© guardado ao lado, nÃ£o eliminado.';
+      'O ficheiro que está agora no seu lugar é guardado ao lado, não eliminado.';
 
   @override
-  String get startup_interruptedRestore_keepAction =>
-      'Manter o que estÃ¡ agora';
+  String get startup_interruptedRestore_keepAction => 'Manter o que está agora';
 
   @override
   String get startup_interruptedRestore_keepNote =>
-      'O seu diÃ¡rio de mergulho anterior fica guardado como ficheiro na pasta da base de dados.';
+      'O seu diário de mergulho anterior fica guardado como ficheiro na pasta da base de dados.';
 
   @override
   String get startup_interruptedRestore_failed =>
-      'A recuperaÃ§Ã£o nÃ£o foi concluÃ­da. Nada foi eliminado; ambos os ficheiros continuam neste dispositivo.';
+      'A recuperação não foi concluída. Nada foi eliminado; ambos os ficheiros continuam neste dispositivo.';
 
   @override
   String backup_history_preDowngradeSubtitle(String size) {
@@ -40309,7 +40249,7 @@ class AppLocalizationsPt extends AppLocalizations {
       other: '$siteCount locais',
       one: '1 local',
     );
-    return '$_temp0, $_temp1 - $size (automÃ¡tico)';
+    return '$_temp0, $_temp1 - $size (automático)';
   }
 
   @override
@@ -40317,7 +40257,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_manage_transmitters_subtitle =>
-      'Associar transmissores de pressÃ£o a cilindros';
+      'Associar transmissores de pressão a cilindros';
 
   @override
   String get transmitters_title => 'Transmissores';
@@ -40326,15 +40266,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get transmitters_add => 'Adicionar transmissor';
 
   @override
-  String get transmitters_header_assigned => 'Transmissores atribuÃ­dos';
+  String get transmitters_header_assigned => 'Transmissores atribuídos';
 
   @override
   String get transmitters_header_unassigned =>
-      'Vistos em downloads, nÃ£o atribuÃ­dos';
+      'Vistos em downloads, não atribuídos';
 
   @override
   String get transmitters_empty =>
-      'Ainda nÃ£o hÃ¡ transmissores. Adicione um ou atribua um nÃºmero de sÃ©rie apÃ³s o prÃ³ximo download.';
+      'Ainda não há transmissores. Adicione um ou atribua um número de série após o próximo download.';
 
   @override
   String get transmitters_action_assign => 'Atribuir';
@@ -40353,7 +40293,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String transmitters_apply_content(int tanks, int dives) {
-    return '$tanks cilindros em $dives mergulhos carregam este transmissor. Campos vazios de tamanho, material, nome e equipamento serÃ£o preenchidos, e uma funÃ§Ã£o ainda definida como GÃ¡s de fundo serÃ¡ substituÃ­da.';
+    return '$tanks cilindros em $dives mergulhos carregam este transmissor. Campos vazios de tamanho, material, nome e equipamento serão preenchidos, e uma função ainda definida como Gás de fundo será substituída.';
   }
 
   @override
@@ -40370,7 +40310,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String transmitters_delete_content(String label) {
-    return 'Os prÃ³ximos downloads de $label voltarÃ£o a usar a predefiniÃ§Ã£o padrÃ£o.';
+    return 'Os próximos downloads de $label voltarão a usar a predefinição padrão.';
   }
 
   @override
@@ -40401,20 +40341,20 @@ class AppLocalizationsPt extends AppLocalizations {
   String get transmitters_new_title => 'Novo transmissor';
 
   @override
-  String get transmitters_field_label => 'RÃ³tulo';
+  String get transmitters_field_label => 'Rótulo';
 
   @override
-  String get transmitters_field_serial => 'NÃºmero de sÃ©rie do transmissor';
+  String get transmitters_field_serial => 'Número de série do transmissor';
 
   @override
   String get transmitters_field_computer =>
-      'Computador de mergulho (quando nenhum nÃºmero de sÃ©rie Ã© informado)';
+      'Computador de mergulho (quando nenhum número de série é informado)';
 
   @override
   String get transmitters_field_channel => 'Canal';
 
   @override
-  String get transmitters_field_role => 'FunÃ§Ã£o';
+  String get transmitters_field_role => 'Função';
 
   @override
   String get transmitters_field_gear => 'Cilindro do equipamento';
@@ -40430,7 +40370,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get transmitters_validation_key =>
-      'Informe um nÃºmero de sÃ©rie ou escolha um computador e um canal';
+      'Informe um número de série ou escolha um computador e um canal';
 
   @override
   String get transmitters_validation_positive =>
@@ -40438,7 +40378,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String transmitters_validation_duplicate(String label) {
-    return 'JÃ¡ atribuÃ­do a $label';
+    return 'Já atribuído a $label';
   }
 
   @override
@@ -40449,17 +40389,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveComputer_detail_transmittersSummary(int known, int unassigned) {
-    return '$known conhecidos, $unassigned nÃ£o atribuÃ­dos';
+    return '$known conhecidos, $unassigned não atribuídos';
   }
 
   @override
   String get diveLog_tank_assignTransmitter => 'Atribuir transmissor';
 
   @override
-  String get diveLog_tank_reassignSeries => 'Reatribuir sÃ©rie de pressÃ£o';
+  String get diveLog_tank_reassignSeries => 'Reatribuir série de pressão';
 
   @override
-  String get diveLog_reassignSheet_title => 'SÃ©ries de pressÃ£o';
+  String get diveLog_reassignSheet_title => 'Séries de pressão';
 
   @override
   String get diveLog_reassignSheet_swap => 'Trocar';
@@ -40479,18 +40419,18 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get diveLog_reassignSheet_noSeries => 'Sem sÃ©rie de pressÃ£o';
+  String get diveLog_reassignSheet_noSeries => 'Sem série de pressão';
 
   @override
-  String get diveLog_reassignSheet_applied => 'SÃ©rie de pressÃ£o reatribuÃ­da';
+  String get diveLog_reassignSheet_applied => 'Série de pressão reatribuída';
 
   @override
   String get universalImport_summary_noticeUnknownTransmitterTitle =>
-      'Transmissores nÃ£o atribuÃ­dos';
+      'Transmissores não atribuídos';
 
   @override
   String get universalImport_summary_noticeUnknownTransmitterBody =>
-      'Um ou mais transmissores deste download nÃ£o estÃ£o atribuÃ­dos a um cilindro. Atribua-os para que os prÃ³ximos downloads tenham o tamanho e a funÃ§Ã£o corretos.';
+      'Um ou mais transmissores deste download não estão atribuídos a um cilindro. Atribua-os para que os próximos downloads tenham o tamanho e a função corretos.';
 
   @override
   String get universalImport_summary_noticeAssignTransmitters =>
@@ -40498,19 +40438,19 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_summary_noticeDiveNumberConflictTitle =>
-      'NÃºmeros de mergulho jÃ¡ em uso';
+      'Números de mergulho já em uso';
 
   @override
   String get universalImport_summary_noticeDiveNumberConflictBody =>
-      'Estes mergulhos mantiveram o nÃºmero da sua origem, mas outros mergulhos do seu registo jÃ¡ usam os mesmos nÃºmeros. Abra NumeraÃ§Ã£o de Mergulhos no menu da lista de mergulhos para os renumerar.';
+      'Estes mergulhos mantiveram o número da sua origem, mas outros mergulhos do seu registo já usam os mesmos números. Abra Numeração de Mergulhos no menu da lista de mergulhos para os renumerar.';
 
   @override
   String get dataQuality_detector_unknown_transmitter =>
-      'Transmissor nÃ£o atribuÃ­do';
+      'Transmissor não atribuído';
 
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
-    return 'O transmissor $serial nÃ£o estÃ¡ atribuÃ­do a nenhum cilindro';
+    return 'O transmissor $serial não está atribuído a nenhum cilindro';
   }
 
   @override
@@ -40519,23 +40459,23 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get backup_unrecognized_appBar_title =>
-      'CÃ³pias de seguranÃ§a nÃ£o reconhecidas';
+      'Cópias de segurança não reconhecidas';
 
   @override
   String get backup_unrecognized_explanation =>
-      'Estes ficheiros estÃ£o na sua pasta de cÃ³pias de seguranÃ§a mas nÃ£o no histÃ³rico deste dispositivo. SÃ³ pode ser excluÃ­do aqui um ficheiro escrito por este dispositivo: qualquer outro pode ser a Ãºnica cÃ³pia de outro dispositivo.';
+      'Estes ficheiros estão na sua pasta de cópias de segurança mas não no histórico deste dispositivo. Só pode ser excluído aqui um ficheiro escrito por este dispositivo: qualquer outro pode ser a única cópia de outro dispositivo.';
 
   @override
   String get backup_unrecognized_empty =>
-      'NÃ£o hÃ¡ ficheiros de cÃ³pia de seguranÃ§a nÃ£o reconhecidos.';
+      'Não há ficheiros de cópia de segurança não reconhecidos.';
 
   @override
   String get backup_unrecognized_loadFailed =>
-      'NÃ£o foi possÃ­vel ler a pasta de cÃ³pias de seguranÃ§a.';
+      'Não foi possível ler a pasta de cópias de segurança.';
 
   @override
   String get backup_unrecognized_unavailable =>
-      'Este dispositivo nÃ£o consegue listar a pasta de cÃ³pias de seguranÃ§a que escolheu, por isso nÃ£o Ã© possÃ­vel encontrar ficheiros nÃ£o reconhecidos.';
+      'Este dispositivo não consegue listar a pasta de cópias de segurança que escolheu, por isso não é possível encontrar ficheiros não reconhecidos.';
 
   @override
   String get backup_unrecognized_ownership_otherDevice => 'Outro dispositivo';
@@ -40546,7 +40486,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String backup_unrecognized_fileDetail(String size, String date) {
-    return '$size â€¢ $date';
+    return '$size • $date';
   }
 
   @override
@@ -40562,7 +40502,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get backup_unrecognized_confirm_title =>
-      'Excluir estes ficheiros de cÃ³pia de seguranÃ§a?';
+      'Excluir estes ficheiros de cópia de segurança?';
 
   @override
   String backup_unrecognized_confirm_message(int count) {
@@ -40570,16 +40510,16 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '$count ficheiros de cÃ³pia de seguranÃ§a serÃ£o excluÃ­dos permanentemente. NÃ£o Ã© possÃ­vel anular.',
+          '$count ficheiros de cópia de segurança serão excluídos permanentemente. Não é possível anular.',
       one:
-          '1 ficheiro de cÃ³pia de seguranÃ§a serÃ¡ excluÃ­do permanentemente. NÃ£o Ã© possÃ­vel anular.',
+          '1 ficheiro de cópia de segurança será excluído permanentemente. Não é possível anular.',
     );
     return '$_temp0';
   }
 
   @override
   String get backup_unrecognized_deleteFailed =>
-      'NÃ£o foi possÃ­vel excluir os ficheiros selecionados.';
+      'Não foi possível excluir os ficheiros selecionados.';
 
   @override
   String backup_unrecognized_freed(String size) {
@@ -40592,9 +40532,8 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '$count ficheiros que nÃ£o estÃ£o no seu histÃ³rico de cÃ³pias de seguranÃ§a',
-      one:
-          '1 ficheiro que nÃ£o estÃ¡ no seu histÃ³rico de cÃ³pias de seguranÃ§a',
+          '$count ficheiros que não estão no seu histórico de cópias de segurança',
+      one: '1 ficheiro que não está no seu histórico de cópias de segurança',
     );
     return '$_temp0';
   }
@@ -40603,19 +40542,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_storageUsage_unrecognized_action => 'Rever';
 
   @override
-  String get enum_equipmentTypeOrder_none => 'NÃ£o ordenar por tipo';
+  String get enum_equipmentTypeOrder_none => 'Não ordenar por tipo';
 
   @override
-  String get enum_equipmentTypeOrder_alphabetical => 'AlfabÃ©tica';
+  String get enum_equipmentTypeOrder_alphabetical => 'Alfabética';
 
   @override
-  String get enum_equipmentTypeOrder_headToToe => 'Da cabeÃ§a aos pÃ©s';
+  String get enum_equipmentTypeOrder_headToToe => 'Da cabeça aos pés';
 
   @override
   String get enum_equipmentTypeOrder_dressingOrder => 'Ordem de equipamento';
 
   @override
-  String get enum_equipmentTypeOrder_canonical => 'Por funÃ§Ã£o';
+  String get enum_equipmentTypeOrder_canonical => 'Por função';
 
   @override
   String get enum_equipmentItemSortField_name => 'Nome';
@@ -40624,17 +40563,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_equipmentItemSortField_purchaseDate => 'Data de compra';
 
   @override
-  String get enum_equipmentItemSortField_dateAdded => 'Data de adiÃ§Ã£o';
+  String get enum_equipmentItemSortField_dateAdded => 'Data de adição';
 
   @override
-  String get enum_equipmentItemSortField_lastServiceDate => 'Ãšltima revisÃ£o';
+  String get enum_equipmentItemSortField_lastServiceDate => 'Última revisão';
 
   @override
   String get equipment_arrange_groupByType => 'Agrupar por tipo';
 
   @override
   String get equipment_arrange_groupByTypeSubtitle =>
-      'Mostrar um cabeÃ§alho para cada tipo de equipamento';
+      'Mostrar um cabeçalho para cada tipo de equipamento';
 
   @override
   String get equipment_arrange_typeOrderLabel => 'Ordenar tipos por';
@@ -40646,26 +40585,26 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_arrange_itemOrderLabelFlat => 'Ordenar por';
 
   @override
-  String get equipment_arrange_reset => 'Repor predefiniÃ§Ãµes';
+  String get equipment_arrange_reset => 'Repor predefinições';
 
   @override
   String get equipment_arrange_saveFailed =>
-      'NÃ£o foi possÃ­vel guardar a organizaÃ§Ã£o';
+      'Não foi possível guardar a organização';
 
   @override
   String get settings_appearance_gearArrangement =>
-      'OrganizaÃ§Ã£o do equipamento';
+      'Organização do equipamento';
 
   @override
   String get settings_appearance_gearArrangementSubtitle =>
-      'Como o equipamento Ã© agrupado e ordenado num mergulho';
+      'Como o equipamento é agrupado e ordenado num mergulho';
 
   @override
   String get navTrack_common_loadError =>
-      'NÃ£o foi possÃ­vel carregar esta rota.';
+      'Não foi possível carregar esta rota.';
 
   @override
-  String get navTrack_common_notFound => 'Rota nÃ£o encontrada.';
+  String get navTrack_common_notFound => 'Rota não encontrada.';
 
   @override
   String get navTrack_common_cancel => 'Cancelar';
@@ -40684,7 +40623,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String navTrack_common_diveNumber(String number) {
-    return 'Mergulho nÂº $number';
+    return 'Mergulho nº $number';
   }
 
   @override
@@ -40693,22 +40632,22 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get navTrack_common_unlinked => 'sem vÃ­nculo';
+  String get navTrack_common_unlinked => 'sem vínculo';
 
   @override
   String get navTrack_align_title => 'Alinhar no mapa';
 
   @override
-  String get navTrack_align_resetTooltip => 'Redefinir correÃ§Ã£o';
+  String get navTrack_align_resetTooltip => 'Redefinir correção';
 
   @override
-  String get navTrack_align_setStartHere => 'Definir inÃ­cio aqui';
+  String get navTrack_align_setStartHere => 'Definir início aqui';
 
   @override
   String get navTrack_align_setEndHere => 'Definir fim aqui';
 
   @override
-  String get navTrack_align_setStartOnMap => 'Definir inÃ­cio no mapa';
+  String get navTrack_align_setStartOnMap => 'Definir início no mapa';
 
   @override
   String get navTrack_align_fromDiveEntry => 'Da entrada do mergulho';
@@ -40720,7 +40659,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get navTrack_align_fromGps => 'Do GPS';
 
   @override
-  String get navTrack_align_startLabel => 'InÃ­cio: ';
+  String get navTrack_align_startLabel => 'Início: ';
 
   @override
   String get navTrack_align_endLabel => 'Fim: ';
@@ -40729,7 +40668,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get navTrack_align_endMode_none => 'Nenhum';
 
   @override
-  String get navTrack_align_endMode_sameAsStart => 'Igual ao inÃ­cio';
+  String get navTrack_align_endMode_sameAsStart => 'Igual ao início';
 
   @override
   String get navTrack_align_endMode_point => 'Colocar no mapa';
@@ -40739,15 +40678,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String navTrack_align_trustSummary(String distanceMeters, int minutes) {
-    return 'ConfianÃ§a: confiÃ¡vel atÃ© $distanceMeters m, $minutes min';
+    return 'Confiança: confiável até $distanceMeters m, $minutes min';
   }
 
   @override
-  String get navTrack_align_rotationLabel => 'RotaÃ§Ã£o:';
+  String get navTrack_align_rotationLabel => 'Rotação:';
 
   @override
   String navTrack_align_rotationDegrees(String degrees) {
-    return '$degreesÂ°';
+    return '$degrees°';
   }
 
   @override
@@ -40764,12 +40703,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String navTrack_terrain_maxPart(String meters) {
-    return ' (mÃ¡x. $meters m)';
+    return ' (máx. $meters m)';
   }
 
   @override
   String get navTrack_terrain_coarsePart =>
-      ' (batimetria de baixa resoluÃ§Ã£o: sÃ³ conflitos em terra foram verificados)';
+      ' (batimetria de baixa resolução: só conflitos em terra foram verificados)';
 
   @override
   String get navTrack_detail_renameTitle => 'Renomear rota';
@@ -40778,7 +40717,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get navTrack_detail_deleteTitle => 'Excluir rota?';
 
   @override
-  String get navTrack_detail_deleteMessage => 'Isso nÃ£o pode ser desfeito.';
+  String get navTrack_detail_deleteMessage => 'Isso não pode ser desfeito.';
 
   @override
   String get navTrack_detail_defaultTitle => 'Rota';
@@ -40791,15 +40730,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get navTrack_detail_noMapYet =>
-      'Defina o ponto de inÃ­cio para ver isso em um mapa.';
+      'Defina o ponto de início para ver isso em um mapa.';
 
   @override
   String get navTrack_detail_correctionStatus_none =>
-      'Nenhuma correÃ§Ã£o aplicada ainda.';
+      'Nenhuma correção aplicada ainda.';
 
   @override
   String get navTrack_detail_correctionStatus_sameAsStart =>
-      'Fim definido como igual ao inÃ­cio.';
+      'Fim definido como igual ao início.';
 
   @override
   String get navTrack_detail_correctionStatus_point =>
@@ -40807,7 +40746,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get navTrack_detail_correctionStatus_gpsFix =>
-      'Fim definido a partir do fix de GPS da gravaÃ§Ã£o.';
+      'Fim definido a partir do fix de GPS da gravação.';
 
   @override
   String navTrack_detail_device(String name) {
@@ -40821,27 +40760,27 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String navTrack_detail_distance(String value) {
-    return 'DistÃ¢ncia: $value';
+    return 'Distância: $value';
   }
 
   @override
   String navTrack_detail_maxDepth(String value) {
-    return 'Profundidade mÃ¡x.: $value';
+    return 'Profundidade máx.: $value';
   }
 
   @override
   String navTrack_detail_maxSpeed(String value) {
-    return 'Velocidade mÃ¡x.: $value';
+    return 'Velocidade máx.: $value';
   }
 
   @override
   String navTrack_detail_avgSpeed(String value) {
-    return 'Velocidade mÃ©dia: $value';
+    return 'Velocidade média: $value';
   }
 
   @override
   String navTrack_detail_duration(int hours, int minutes) {
-    return 'DuraÃ§Ã£o: ${hours}h ${minutes}min';
+    return 'Duração: ${hours}h ${minutes}min';
   }
 
   @override
@@ -40862,11 +40801,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get navTrack_detail_chooseSite => 'Escolher ponto de mergulho';
 
   @override
-  String get navTrack_review_title => 'Importar rota subaquÃ¡tica';
+  String get navTrack_review_title => 'Importar rota subaquática';
 
   @override
   String navTrack_review_segmentSummaryNoFix(int underwater) {
-    return '$underwater amostras subaquÃ¡ticas, nenhum fix de GPS nesta gravaÃ§Ã£o.';
+    return '$underwater amostras subaquáticas, nenhum fix de GPS nesta gravação.';
   }
 
   @override
@@ -40875,17 +40814,17 @@ class AppLocalizationsPt extends AppLocalizations {
     int surface,
     int vector,
   ) {
-    return '$underwater amostras subaquÃ¡ticas, $surface amostras de superfÃ­cie, fix de GPS a $vector m do fim estimado.';
+    return '$underwater amostras subaquáticas, $surface amostras de superfície, fix de GPS a $vector m do fim estimado.';
   }
 
   @override
   String navTrack_review_saveError(String error) {
-    return 'NÃ£o foi possÃ­vel salvar esta rota: $error';
+    return 'Não foi possível salvar esta rota: $error';
   }
 
   @override
   String navTrack_review_importError(String error) {
-    return 'NÃ£o foi possÃ­vel importar este arquivo: $error';
+    return 'Não foi possível importar este arquivo: $error';
   }
 
   @override
@@ -40896,11 +40835,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get navTrack_review_warningNoMovement =>
-      'Nenhum movimento registrado: distÃ¢ncia e velocidade permanecem em zero durante todo o arquivo.';
+      'Nenhum movimento registrado: distância e velocidade permanecem em zero durante todo o arquivo.';
 
   @override
   String get navTrack_review_warningDuplicate =>
-      'Isso parece uma rota jÃ¡ importada do mesmo arquivo.';
+      'Isso parece uma rota já importada do mesmo arquivo.';
 
   @override
   String get navTrack_review_replaceLabel => 'Substituir';
@@ -40922,25 +40861,25 @@ class AppLocalizationsPt extends AppLocalizations {
       'Nenhum ponto de mergulho escolhido';
 
   @override
-  String get navTrack_review_row_start => 'InÃ­cio';
+  String get navTrack_review_row_start => 'Início';
 
   @override
   String get navTrack_review_row_end => 'Fim';
 
   @override
-  String get navTrack_review_row_duration => 'DuraÃ§Ã£o';
+  String get navTrack_review_row_duration => 'Duração';
 
   @override
-  String get navTrack_review_row_distance => 'DistÃ¢ncia';
+  String get navTrack_review_row_distance => 'Distância';
 
   @override
-  String get navTrack_review_row_maxDepth => 'Profundidade mÃ¡x.';
+  String get navTrack_review_row_maxDepth => 'Profundidade máx.';
 
   @override
-  String get navTrack_review_row_maxSpeed => 'Velocidade mÃ¡x.';
+  String get navTrack_review_row_maxSpeed => 'Velocidade máx.';
 
   @override
-  String get navTrack_review_leaveUnlinked => 'Deixar sem vÃ­nculo';
+  String get navTrack_review_leaveUnlinked => 'Deixar sem vínculo';
 
   @override
   String navTrack_list_importFailed(String error) {
@@ -40948,8 +40887,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get navTrack_list_matchError =>
-      'NÃ£o foi possÃ­vel associar as rotas.';
+  String get navTrack_list_matchError => 'Não foi possível associar as rotas.';
 
   @override
   String get navTrack_list_matchSuccess => 'Rotas associadas aos mergulhos.';
@@ -40966,35 +40904,35 @@ class AppLocalizationsPt extends AppLocalizations {
   String get navTrack_list_matchTooltip => 'Associar agora';
 
   @override
-  String get navTrack_list_title => 'Rotas subaquÃ¡ticas';
+  String get navTrack_list_title => 'Rotas subaquáticas';
 
   @override
   String get navTrack_list_noMapRoutes =>
       'Nenhuma rota colocada no mapa ainda.';
 
   @override
-  String get navTrack_list_empty => 'Nenhuma rota subaquÃ¡tica ainda.';
+  String get navTrack_list_empty => 'Nenhuma rota subaquática ainda.';
 
   @override
-  String get navTrack_seascape_title => 'Paisagem subaquÃ¡tica da rota';
+  String get navTrack_seascape_title => 'Paisagem subaquática da rota';
 
   @override
   String get navTrack_seascape_noScene =>
-      'Esta rota nÃ£o tem uma paisagem subaquÃ¡tica utilizÃ¡vel.';
+      'Esta rota não tem uma paisagem subaquática utilizável.';
 
   @override
   String get navTrack_handoff_recognized =>
-      'Registro de navegaÃ§Ã£o Seacraft ENC reconhecido';
+      'Registro de navegação Seacraft ENC reconhecido';
 
   @override
   String get navTrack_handoff_description =>
-      'Esta Ã© uma rota subaquÃ¡tica, nÃ£o um registro de mergulho. Ela tem seu prÃ³prio lugar no Submersion, separado da sua importaÃ§Ã£o de mergulhos.';
+      'Esta é uma rota subaquática, não um registro de mergulho. Ela tem seu próprio lugar no Submersion, separado da sua importação de mergulhos.';
 
   @override
   String get navTrack_handoff_reviewButton => 'Revisar rota';
 
   @override
-  String get navTrack_section_title => 'Rota subaquÃ¡tica';
+  String get navTrack_section_title => 'Rota subaquática';
 
   @override
   String navTrack_section_routeCount(num count) {
@@ -41030,33 +40968,33 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get navTrack_importError_unsupportedFormat =>
-      'Este arquivo nÃ£o Ã© um registro de navegaÃ§Ã£o Seacraft ENC.';
+      'Este arquivo não é um registro de navegação Seacraft ENC.';
 
   @override
   String get navTrack_importError_unreadable =>
-      'NÃ£o foi possÃ­vel ler este arquivo como um registro de navegaÃ§Ã£o Seacraft ENC.';
+      'Não foi possível ler este arquivo como um registro de navegação Seacraft ENC.';
 
   @override
   String get navTrack_importError_tooShort =>
-      'Esta gravaÃ§Ã£o tem amostras insuficientes para ser uma rota utilizÃ¡vel.';
+      'Esta gravação tem amostras insuficientes para ser uma rota utilizável.';
 
   @override
   String get navTrack_importError_badData =>
-      'Este arquivo tem dados que o Submersion nÃ£o conseguiu interpretar.';
+      'Este arquivo tem dados que o Submersion não conseguiu interpretar.';
 
   @override
   String get navTrack_importError_tooLarge =>
-      'Esta gravaÃ§Ã£o tem mais amostras do que uma rota pode armazenar.';
+      'Esta gravação tem mais amostras do que uma rota pode armazenar.';
 
   @override
-  String get diveDetailSection_navTrack_name => 'Rota subaquÃ¡tica';
+  String get diveDetailSection_navTrack_name => 'Rota subaquática';
 
   @override
   String get diveDetailSection_navTrack_description =>
-      'Rota subaquÃ¡tica medida a partir de um console de navegaÃ§Ã£o';
+      'Rota subaquática medida a partir de um console de navegação';
 
   @override
-  String get dashboard_quickActions_navRoutes => 'Rotas subaquÃ¡ticas';
+  String get dashboard_quickActions_navRoutes => 'Rotas subaquáticas';
 
   @override
   String navTrack_list_durationHours(int hours, int minutes) {
