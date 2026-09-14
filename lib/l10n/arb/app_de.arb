@@ -100,7 +100,7 @@
   "gasCalculators_blender_modelZFactor": "Reales Gas (Z-Faktor)",
   "gasCalculators_blender_modelRecommended": "Empfohlen",
   "gasCalculators_blender_modelHelp": "Reales Gas (Z-Faktor) ist bei Flaschendrücken am genauesten. Ideales Gas entspricht den meisten veröffentlichten Mischtabellen. Van der Waals dient dem Vergleich mit anderer Mischsoftware und weicht bei Fülldruck um mehrere Prozent ab.",
-  "gasCalculators_blender_stepAdd": "{gas} +",
+  "gasCalculators_blender_stepAdd": "+ {gas}",
   "gasCalculators_blender_stepStartLabel": "Start",
   "gasCalculators_blender_stepColumnAction": "Aktion",
   "gasCalculators_blender_stepColumnAdded": "Hinzufügen",

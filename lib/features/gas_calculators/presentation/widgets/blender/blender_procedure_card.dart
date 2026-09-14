@@ -107,24 +107,36 @@ class BlenderProcedureCard extends ConsumerWidget {
   /// procedure it conditions (issue #44 follow-up); both temperatures show
   /// unconditionally now, since a fill station cares what the cylinder settles
   /// to even when it happens to match the fill temperature today.
+  ///
+  /// Wraps onto two lines with [Wrap] rather than one `Text` with
+  /// `overflow: ellipsis`: a phone-width card cannot fit both readings on
+  /// one line, and the single-line version clipped "Ruhetemperatur" off
+  /// entirely instead of just losing the middot separator (issue #1876
+  /// follow-up).
   Widget _temperatureSummary(
     BuildContext context,
     UnitFormatter units,
     double fillTemp,
     double settledTemp,
   ) {
-    final label =
-        '${context.l10n.gasCalculators_blender_fillTemp}: '
-        '${units.formatTemperature(fillTemp, decimals: 0)}'
-        '  ·  ${context.l10n.gasCalculators_blender_settledTemp}: '
-        '${units.formatTemperature(settledTemp, decimals: 0)}';
-    return Text(
-      label,
+    final style = Theme.of(context).textTheme.bodySmall?.copyWith(
+      color: Theme.of(context).colorScheme.onPrimaryContainer,
+    );
+    return Wrap(
       key: const Key('blender-temperature-summary'),
-      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-        color: Theme.of(context).colorScheme.onPrimaryContainer,
-      ),
-      overflow: TextOverflow.ellipsis,
+      children: [
+        Text(
+          '${context.l10n.gasCalculators_blender_fillTemp}: '
+          '${units.formatTemperature(fillTemp, decimals: 0)}',
+          style: style,
+        ),
+        Text('  ·  ', style: style),
+        Text(
+          '${context.l10n.gasCalculators_blender_settledTemp}: '
+          '${units.formatTemperature(settledTemp, decimals: 0)}',
+          style: style,
+        ),
+      ],
     );
   }
 
@@ -238,7 +250,16 @@ class BlenderProcedureCard extends ConsumerWidget {
           Expanded(
             flex: _flex[3],
             child: Text(
-              formatPreciseMix(context, step.resultingMix),
+              // Spaced around the '/' -- "Tx 14.7 / 55.9" rather than
+              // "Tx 14.7/55.9" -- so this narrow column wraps at the spaces
+              // instead of needing to fit the whole mix on one line (issue
+              // #1876 follow-up). Scoped to this column rather than
+              // formatPreciseMix itself, which other call sites (the
+              // invoice's fill title, the cost card) still want compact.
+              formatPreciseMix(
+                context,
+                step.resultingMix,
+              ).replaceAll('/', ' / '),
               style: style,
               textAlign: TextAlign.end,
             ),

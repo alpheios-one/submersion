@@ -100,7 +100,7 @@
   "gasCalculators_blender_modelZFactor": "Gaz réel (facteur Z)",
   "gasCalculators_blender_modelRecommended": "Recommandé",
   "gasCalculators_blender_modelHelp": "Le gaz réel (facteur Z) est le plus précis aux pressions de bloc. Le gaz parfait correspond à la plupart des tables de mélange publiées. Van der Waals est proposé pour comparaison avec d'autres logiciels de mélange et s'écarte de plusieurs pour cent à la pression de remplissage.",
-  "gasCalculators_blender_stepAdd": "Ajouter {gas}",
+  "gasCalculators_blender_stepAdd": "+ {gas}",
   "gasCalculators_blender_stepStartLabel": "Départ",
   "gasCalculators_blender_settlesTo": "Se stabilise à {pressure} à {temperature}",
   "gasCalculators_blender_templates": "Modèles",

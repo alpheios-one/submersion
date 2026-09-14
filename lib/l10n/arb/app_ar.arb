@@ -100,7 +100,7 @@
   "gasCalculators_blender_modelZFactor": "غاز حقيقي (معامل Z)",
   "gasCalculators_blender_modelRecommended": "موصى به",
   "gasCalculators_blender_modelHelp": "الغاز الحقيقي (معامل Z) هو الأدق عند ضغوط الأسطوانات. الغاز المثالي يطابق معظم جداول الخلط المنشورة. أما فان دير فالس فيُتاح للمقارنة مع برامج الخلط الأخرى، ويحيد بعدة نقاط مئوية عند ضغط التعبئة.",
-  "gasCalculators_blender_stepAdd": "أضف {gas}",
+  "gasCalculators_blender_stepAdd": "+ {gas}",
   "gasCalculators_blender_stepStartLabel": "البداية",
   "gasCalculators_blender_settlesTo": "يستقر عند {pressure} في {temperature}",
   "gasCalculators_blender_templates": "القوالب",

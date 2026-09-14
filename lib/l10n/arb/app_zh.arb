@@ -100,7 +100,7 @@
   "gasCalculators_blender_modelZFactor": "真实气体（Z 因子）",
   "gasCalculators_blender_modelRecommended": "推荐",
   "gasCalculators_blender_modelHelp": "真实气体（Z 因子）在气瓶压力下最为准确。理想气体与大多数已发布的配气表一致。范德华模型用于与其他配气软件对比，在充填压力下有百分之几的偏差。",
-  "gasCalculators_blender_stepAdd": "充入 {gas}",
+  "gasCalculators_blender_stepAdd": "+ {gas}",
   "gasCalculators_blender_stepStartLabel": "起始",
   "gasCalculators_blender_settlesTo": "在 {temperature} 下静置后为 {pressure}",
   "gasCalculators_blender_templates": "模板",

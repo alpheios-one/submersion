@@ -13232,7 +13232,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String gasCalculators_blender_stepAdd(String gas) {
-    return 'Añadir $gas';
+    return '+ $gas';
   }
 
   @override

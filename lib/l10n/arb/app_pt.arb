@@ -100,7 +100,7 @@
   "gasCalculators_blender_modelZFactor": "Gás real (fator Z)",
   "gasCalculators_blender_modelRecommended": "Recomendado",
   "gasCalculators_blender_modelHelp": "O gás real (fator Z) é o mais rigoroso às pressões de cilindro. O gás ideal corresponde à maioria das tabelas de mistura publicadas. Van der Waals é oferecido para comparação com outro software de mistura e desvia-se vários por cento à pressão de enchimento.",
-  "gasCalculators_blender_stepAdd": "Adicionar {gas}",
+  "gasCalculators_blender_stepAdd": "+ {gas}",
   "gasCalculators_blender_stepStartLabel": "Início",
   "gasCalculators_blender_settlesTo": "Estabiliza em {pressure} a {temperature}",
   "gasCalculators_blender_templates": "Modelos",

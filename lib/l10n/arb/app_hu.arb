@@ -100,7 +100,7 @@
   "gasCalculators_blender_modelZFactor": "Valós gáz (Z-tényező)",
   "gasCalculators_blender_modelRecommended": "Ajánlott",
   "gasCalculators_blender_modelHelp": "A valós gáz (Z-tényező) a legpontosabb palacknyomásokon. Az ideális gáz a legtöbb közzétett keverési táblázattal egyezik. A Van der Waals más keverőprogramokkal való összehasonlításhoz érhető el, és töltési nyomáson több százalékkal eltér.",
-  "gasCalculators_blender_stepAdd": "{gas} hozzáadása",
+  "gasCalculators_blender_stepAdd": "+ {gas}",
   "gasCalculators_blender_stepStartLabel": "Kezdés",
   "gasCalculators_blender_settlesTo": "{temperature} hőmérsékleten {pressure} lesz",
   "gasCalculators_blender_templates": "Sablonok",

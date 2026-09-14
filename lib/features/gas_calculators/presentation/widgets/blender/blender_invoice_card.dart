@@ -194,8 +194,14 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
                 ],
                 if (fills.any((f) => f.lines.isNotEmpty))
                   BlenderBilledLineHeader(units: units, currency: currency),
-                for (final f in fills)
-                  _fillLine(context, f, currency, units, decimals),
+                // A thin divider between fills, not after the last one, so
+                // it is clear at a glance where one fill ends and the next
+                // begins (issue #1876 follow-up) without visually competing
+                // with the header/total divider below the whole list.
+                for (var i = 0; i < fills.length; i++) ...[
+                  if (i > 0) const Divider(height: 12),
+                  _fillLine(context, fills[i], currency, units, decimals),
+                ],
               ],
               const SizedBox(height: 8),
               TextButton.icon(
@@ -721,6 +727,11 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
                 child: PopupMenuButton<_FillLineAction>(
                   key: Key('blender-fill-line-menu-${fill.id}'),
                   icon: const Icon(Icons.more_vert, size: 18),
+                  // PopupMenuButton's own default padding (8 on every side)
+                  // otherwise kept the icon short of the card's right edge
+                  // even though its reserved SizedBox already reached it
+                  // (issue #1876 follow-up).
+                  padding: EdgeInsets.zero,
                   tooltip: context.l10n.gasCalculators_blender_lineActions(
                     fill.label,
                   ),

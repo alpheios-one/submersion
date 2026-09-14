@@ -13206,7 +13206,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String gasCalculators_blender_stepAdd(String gas) {
-    return '$gas hozzáadása';
+    return '+ $gas';
   }
 
   @override

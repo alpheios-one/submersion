@@ -13007,7 +13007,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String gasCalculators_blender_stepAdd(String gas) {
-    return 'أضف $gas';
+    return '+ $gas';
   }
 
   @override

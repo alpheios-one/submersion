@@ -12624,7 +12624,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String gasCalculators_blender_stepAdd(String gas) {
-    return '充入 $gas';
+    return '+ $gas';
   }
 
   @override

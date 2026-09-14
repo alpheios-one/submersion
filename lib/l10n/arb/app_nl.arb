@@ -100,7 +100,7 @@
   "gasCalculators_blender_modelZFactor": "Reëel gas (Z-factor)",
   "gasCalculators_blender_modelRecommended": "Aanbevolen",
   "gasCalculators_blender_modelHelp": "Reëel gas (Z-factor) is het nauwkeurigst bij flesdrukken. Ideaal gas komt overeen met de meeste gepubliceerde mengtabellen. Van der Waals is bedoeld voor vergelijking met andere mengsoftware en wijkt bij vuldruk enkele procenten af.",
-  "gasCalculators_blender_stepAdd": "{gas} toevoegen",
+  "gasCalculators_blender_stepAdd": "+ {gas}",
   "gasCalculators_blender_stepStartLabel": "Start",
   "gasCalculators_blender_settlesTo": "Stabiliseert op {pressure} bij {temperature}",
   "gasCalculators_blender_templates": "Sjablonen",

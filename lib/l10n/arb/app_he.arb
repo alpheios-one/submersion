@@ -100,7 +100,7 @@
   "gasCalculators_blender_modelZFactor": "גז ממשי (מקדם Z)",
   "gasCalculators_blender_modelRecommended": "מומלץ",
   "gasCalculators_blender_modelHelp": "גז ממשי (מקדם Z) הוא המדויק ביותר בלחצי בלון. גז אידיאלי תואם את רוב טבלאות הערבוב המפורסמות. ואן דר ואלס מוצע להשוואה מול תוכנות ערבוב אחרות וסוטה באחוזים בודדים בלחץ המילוי.",
-  "gasCalculators_blender_stepAdd": "הוסף {gas}",
+  "gasCalculators_blender_stepAdd": "+ {gas}",
   "gasCalculators_blender_stepStartLabel": "התחלה",
   "gasCalculators_blender_settlesTo": "מתייצב על {pressure} ב-{temperature}",
   "gasCalculators_blender_templates": "תבניות",

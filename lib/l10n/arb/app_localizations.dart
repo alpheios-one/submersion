@@ -22242,7 +22242,7 @@ abstract class AppLocalizations {
   /// No description provided for @gasCalculators_blender_stepAdd.
   ///
   /// In en, this message translates to:
-  /// **'Add {gas}'**
+  /// **'+ {gas}'**
   String gasCalculators_blender_stepAdd(String gas);
 
   /// No description provided for @gasCalculators_blender_stepStartLabel.

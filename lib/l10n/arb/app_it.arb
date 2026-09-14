@@ -100,7 +100,7 @@
   "gasCalculators_blender_modelZFactor": "Gas reale (fattore Z)",
   "gasCalculators_blender_modelRecommended": "Consigliato",
   "gasCalculators_blender_modelHelp": "Il gas reale (fattore Z) è il più accurato alle pressioni di bombola. Il gas ideale corrisponde alla maggior parte delle tabelle di miscelazione pubblicate. Van der Waals è offerto per il confronto con altri software di miscelazione e si discosta di alcuni punti percentuali alla pressione di riempimento.",
-  "gasCalculators_blender_stepAdd": "Aggiungi {gas}",
+  "gasCalculators_blender_stepAdd": "+ {gas}",
   "gasCalculators_blender_stepStartLabel": "Inizio",
   "gasCalculators_blender_settlesTo": "Si stabilizza a {pressure} a {temperature}",
   "gasCalculators_blender_templates": "Modelli",
