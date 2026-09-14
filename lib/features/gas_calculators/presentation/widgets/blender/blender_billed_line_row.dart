@@ -9,13 +9,12 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// so the header's units line up over the values they label.
 const List<int> kBilledLineFlex = [3, 3, 3, 3, 3];
 
-/// The width a fill's title row reserves for its edit/delete icons, so the
-/// label and total before it occupy the same width [kBilledLineFlex]'s
-/// columns fill in the header and data rows below -- otherwise the total
-/// lands to the left of where the "cost" column above it actually sits
-/// (issue #1876 follow-up). Two compact `IconButton`s at their effective 40px
-/// width apiece (the 32px `minWidth` constraint plus the button's own
-/// default padding), no gap between them.
+/// The width a fill's overflow menu button occupies in its title row.
+/// Deliberately unrelated to [kBilledLineFlex] now: the title row (mix name,
+/// total, menu) is its own simple layout rather than forced onto the same
+/// grid as the gas-line columns below it, which only made both harder to
+/// size well (issue #1876 follow-up). Two compact `IconButton`-equivalent
+/// widths' worth of room for the single `PopupMenuButton` that replaced them.
 const double kBilledLineTrailingWidth = 80;
 
 /// The column header for a block of [BlenderBilledLineRow]s, units included
@@ -37,7 +36,7 @@ class BlenderBilledLineHeader extends StatelessWidget {
     final style = blenderTableHeaderStyle(context);
     final l10n = context.l10n;
     return Padding(
-      padding: const EdgeInsets.only(left: 16, top: 2, bottom: 2),
+      padding: const EdgeInsets.only(top: 2, bottom: 2),
       child: Row(
         children: [
           Expanded(
@@ -59,9 +58,11 @@ class BlenderBilledLineHeader extends StatelessWidget {
           Expanded(
             flex: kBilledLineFlex[2],
             child: Text(
-              units.volumeSymbol,
+              '${l10n.gasCalculators_blender_volumeColumn} '
+              '(${units.volumeSymbol})',
               style: style,
               textAlign: TextAlign.end,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           Expanded(
@@ -78,7 +79,6 @@ class BlenderBilledLineHeader extends StatelessWidget {
             flex: kBilledLineFlex[4],
             child: Text(currency, style: style, textAlign: TextAlign.end),
           ),
-          const SizedBox(width: kBilledLineTrailingWidth),
         ],
       ),
     );
@@ -108,7 +108,7 @@ class BlenderBilledLineRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = blenderTableValueStyle(context);
     return Padding(
-      padding: const EdgeInsets.only(left: 16, top: 2),
+      padding: const EdgeInsets.only(top: 2),
       child: Row(
         children: [
           Expanded(
@@ -155,7 +155,6 @@ class BlenderBilledLineRow extends StatelessWidget {
               textAlign: TextAlign.end,
             ),
           ),
-          const SizedBox(width: kBilledLineTrailingWidth),
         ],
       ),
     );

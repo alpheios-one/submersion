@@ -13227,7 +13227,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String gasCalculators_blender_stepAdd(String gas) {
-    return '$gas zugeben';
+    return '$gas +';
   }
 
   @override
@@ -13365,6 +13365,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_cylinderColumnShort => 'Flasche';
+
+  @override
+  String get gasCalculators_blender_volumeColumn => 'Volumen';
 
   @override
   String gasCalculators_blender_flushFeeLine(String gas) {

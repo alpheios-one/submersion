@@ -13145,6 +13145,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_cylinderColumnShort => 'Cylinder';
 
   @override
+  String get gasCalculators_blender_volumeColumn => 'Volume';
+
+  @override
   String gasCalculators_blender_flushFeeLine(String gas) {
     return 'تنظيف خرطوم $gas';
   }

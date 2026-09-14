@@ -22467,6 +22467,12 @@ abstract class AppLocalizations {
   /// **'Cylinder'**
   String get gasCalculators_blender_cylinderColumnShort;
 
+  /// No description provided for @gasCalculators_blender_volumeColumn.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get gasCalculators_blender_volumeColumn;
+
   /// No description provided for @gasCalculators_blender_flushFeeLine.
   ///
   /// In en, this message translates to:

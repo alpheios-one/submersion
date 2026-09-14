@@ -691,25 +691,21 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
         children: [
           Row(
             children: [
-              // The label spans the first four data columns (Gas, Hinzufügen,
-              // Menge, Flaschengrösse) and the total sits under the Preis
-              // column, so this title row lines up with the header and the
-              // gas lines below it instead of floating independently
-              // (issue #1876 follow-up).
+              // Deliberately its own simple layout rather than aligned to
+              // the gas-line grid below it (kBilledLineFlex): the title
+              // needs to fit a mix name, an amount and a menu button, which
+              // has nothing to do with how the data columns divide up their
+              // width, and forcing the two to share one grid made both
+              // harder to size well (issue #1876 follow-up).
               Expanded(
-                flex:
-                    kBilledLineFlex[0] +
-                    kBilledLineFlex[1] +
-                    kBilledLineFlex[2] +
-                    kBilledLineFlex[3],
+                flex: 2,
                 child: Text(
                   fill.label,
                   style: titleStyle,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Expanded(
-                flex: kBilledLineFlex[4],
+              Flexible(
                 child: Text(
                   fill.total == null ? '' : formatMoney(fill.total!, currency),
                   style: titleStyle,
