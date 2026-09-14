@@ -292,6 +292,20 @@ format_check() {
     if [ "${#changed_dart[@]}" -eq 0 ]; then
         return 0
     fi
+    # A large merge can list enough paths to overflow the Windows command-line
+    # length limit when dart.bat re-exec's the real dart.exe (observed failing
+    # around 100+ files as "Argument list too long"). Falling back to the
+    # whole-project check keeps that case correct instead of erroring out on
+    # a change that would otherwise format cleanly.
+    local total_len=0
+    for f in "${changed_dart[@]}"; do
+        total_len=$((total_len + ${#f} + 1))
+    done
+    if [ "$total_len" -gt 4000 ]; then
+        echo "(changed file list too long for the command line; formatting the whole project)"
+        dart format --set-exit-if-changed .
+        return
+    fi
     dart format --set-exit-if-changed "${changed_dart[@]}"
 }
 
