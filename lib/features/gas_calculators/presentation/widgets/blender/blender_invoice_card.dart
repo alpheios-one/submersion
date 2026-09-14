@@ -470,6 +470,9 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
                   volume: line.freeGasLiters != null
                       ? units.formatVolume(line.freeGasLiters)
                       : units.formatPressure(line.addedBar, decimals: decimals),
+                  cylinder: line.cylinderLiters != null
+                      ? units.formatTankVolume(line.cylinderLiters, null)
+                      : '',
                   cost: line.cost == null
                       ? ''
                       : formatMoney(line.cost!, currency),

@@ -170,7 +170,11 @@ class BlenderFillGasesCard extends ConsumerWidget {
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-          const BlenderDecimalDigitsFormatter(),
+          // 5 digits, not the 3-digit default: a metric price per 100 L
+          // converts to roughly 28x itself per 100 cuft (issue #1876
+          // Copilot review), so a perfectly ordinary 50/100L becomes
+          // ~1416/100cuft -- 3 digits would make that unreadable.
+          const BlenderDecimalDigitsFormatter(maxIntDigits: 5),
         ],
         decoration: InputDecoration(
           labelText: context.l10n.gasCalculators_blender_unitPrice(

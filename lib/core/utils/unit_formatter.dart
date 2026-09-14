@@ -217,7 +217,25 @@ class UnitFormatter {
     int cuftDecimals = 0,
   }) {
     if (volumeLiters == null) return '--';
+    return '${_formatTankVolumeValue(volumeLiters, workingPressureBar, ratedCapacityCuft: ratedCapacityCuft, cuftDecimals: cuftDecimals)} ${settings.volumeUnit.symbol}';
+  }
 
+  /// [formatTankVolume] without the trailing unit symbol or the leading "~"
+  /// that marks an estimate, for a table cell whose column header already
+  /// carries the unit (issue #1876 follow-up: a saved fill line only ever
+  /// has a bare cylinder size, never a rated capacity or working pressure to
+  /// pair it with).
+  String formatTankVolumeValue(double? volumeLiters) {
+    if (volumeLiters == null) return '--';
+    return _formatTankVolumeValue(volumeLiters, null).replaceFirst('~', '');
+  }
+
+  String _formatTankVolumeValue(
+    double volumeLiters,
+    double? workingPressureBar, {
+    double? ratedCapacityCuft,
+    int cuftDecimals = 0,
+  }) {
     if (settings.volumeUnit == VolumeUnit.cubicFeet) {
       // Try to use manufacturer's rated cuft, either passed directly
       // or by matching volume/pressure against known tank presets
@@ -232,24 +250,23 @@ class UnitFormatter {
         cuft = match?.ratedCapacityCuft;
       }
       if (cuft != null) {
-        return '${formatFixedForDisplay(cuft, cuftDecimals)} ${settings.volumeUnit.symbol}';
+        return formatFixedForDisplay(cuft, cuftDecimals);
       }
       if (workingPressureBar != null && workingPressureBar > 0) {
         // Ideal gas approximation for non-standard tanks
         final calcCuft = (volumeLiters * workingPressureBar) / 28.3168;
-        return '${formatFixedForDisplay(calcCuft, cuftDecimals)} ${settings.volumeUnit.symbol}';
+        return formatFixedForDisplay(calcCuft, cuftDecimals);
       } else {
         // No working pressure - approximate assuming 200 bar
         final calcCuft = (volumeLiters * 200) / 28.3168;
-        return '~${formatFixedForDisplay(calcCuft, cuftDecimals)} ${settings.volumeUnit.symbol}';
+        return '~${formatFixedForDisplay(calcCuft, cuftDecimals)}';
       }
     }
 
     // For liters, show the physical volume the cylinder is named by
-    final liters = localiseDecimalText(
+    return localiseDecimalText(
       _trimTrailingZeros(volumeLiters.toStringAsFixed(1)),
     );
-    return '$liters ${settings.volumeUnit.symbol}';
   }
 
   /// Get volume unit symbol

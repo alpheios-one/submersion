@@ -37,7 +37,16 @@ class BlenderDecimalDigitsFormatter extends TextInputFormatter {
     }
     final intDigits = sepIndex;
     final fractionDigits = text.length - sepIndex - 1;
-    if (intDigits > maxIntDigits || fractionDigits > maxFractionDigits) {
+    if (intDigits > maxIntDigits) return oldValue;
+    // Exactly three digits after the separator is also the shape of a
+    // locale-valid grouped integer (a comma-decimal locale's "4.350" meaning
+    // 4350, e.g. a psi pressure) -- smartParseUserDecimal already treats
+    // that shape specially (parsing it directly under a locale where it is
+    // grouping, and reporting it as genuinely unreadable otherwise), so it
+    // is let through here rather than this locale-agnostic formatter
+    // rejecting a keystroke the parser would have accepted (issue #1876
+    // Copilot review).
+    if (fractionDigits > maxFractionDigits && fractionDigits != 3) {
       return oldValue;
     }
     return newValue;

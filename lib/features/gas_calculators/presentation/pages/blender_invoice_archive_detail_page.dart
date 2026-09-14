@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart'
+    show GasMix;
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_archived_invoice_tile.dart';
@@ -93,7 +95,7 @@ class BlenderInvoiceArchiveDetailPage extends ConsumerWidget {
           if (invoice.fills.any((f) => f.lines.isNotEmpty))
             BlenderBilledLineHeader(units: units, currency: currency),
           for (final fill in invoice.fills)
-            _fillSection(theme, fill, currency, units, decimals),
+            _fillSection(context, theme, fill, currency, units, decimals),
           const Divider(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -120,6 +122,7 @@ class BlenderInvoiceArchiveDetailPage extends ConsumerWidget {
   }
 
   Widget _fillSection(
+    BuildContext context,
     ThemeData theme,
     BilledFill fill,
     String currency,
@@ -133,10 +136,11 @@ class BlenderInvoiceArchiveDetailPage extends ConsumerWidget {
         children: [
           Row(
             children: [
-              // Its own simple layout, matching the running invoice's title
-              // row -- not aligned to the gas-line grid below it, which only
-              // made both harder to size well (issue #1876 follow-up).
+              // Aligned to the gas-line grid below it, matching the running
+              // invoice's title row: label spans columns 1+2, total spans
+              // the rest (Copilot review, issue #1876 follow-up).
               Expanded(
+                flex: kBilledLineFlex[0] + kBilledLineFlex[1],
                 child: Text(
                   fill.label,
                   style: theme.textTheme.titleSmall?.copyWith(
@@ -145,10 +149,17 @@ class BlenderInvoiceArchiveDetailPage extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Text(
-                fill.total == null ? '' : formatMoney(fill.total!, currency),
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                flex:
+                    kBilledLineFlex[2] +
+                    kBilledLineFlex[3] +
+                    kBilledLineFlex[4],
+                child: Text(
+                  fill.total == null ? '' : formatMoney(fill.total!, currency),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.end,
                 ),
               ),
             ],
@@ -159,6 +170,21 @@ class BlenderInvoiceArchiveDetailPage extends ConsumerWidget {
               currency: currency,
               units: units,
               decimals: decimals,
+            ),
+          // A manual (lump-sum) fill has no gas lines, only the mix and
+          // cylinder it was filled to -- the running invoice shows that same
+          // row after its gas lines, and the archive lost it entirely
+          // (Copilot review, issue #1876 follow-up).
+          if (fill.customMix case final mix?)
+            Padding(
+              padding: const EdgeInsets.only(left: 16, top: 2),
+              child: Text(
+                '${units.formatVolume(mix.cylinderLiters)} · '
+                '${formatPreciseMix(context, GasMix(o2: mix.o2, he: mix.he))}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
             ),
         ],
       ),

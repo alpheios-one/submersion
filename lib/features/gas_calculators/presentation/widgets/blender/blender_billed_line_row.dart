@@ -133,7 +133,7 @@ class BlenderBilledLineRow extends StatelessWidget {
             flex: kBilledLineFlex[3],
             child: Text(
               line.cylinderLiters != null
-                  ? units.formatVolumeValue(line.cylinderLiters!)
+                  ? units.formatTankVolumeValue(line.cylinderLiters)
                   : '—',
               style: style,
               textAlign: TextAlign.end,

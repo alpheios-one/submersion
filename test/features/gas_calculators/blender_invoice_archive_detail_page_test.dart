@@ -70,6 +70,7 @@ void main() {
                       addedBar: 10,
                       cost: 10,
                       freeGasLiters: 30,
+                      cylinderLiters: 12,
                     ),
                     BilledGasLine(gas: 'He', addedBar: 80, cost: 20),
                   ],
@@ -85,11 +86,17 @@ void main() {
         expect(find.textContaining('Mar 5, 2026'), findsOneWidget);
         expect(find.textContaining('Billed to: Ada'), findsOneWidget);
         expect(find.text('Tx 18/45'), findsOneWidget);
-        // The line saved with a volume shows litres, unit in the column
-        // header rather than repeated per cell...
+        // The line saved with a volume and a cylinder size shows both,
+        // units in the column header rather than repeated per cell...
         expect(find.text('30'), findsOneWidget);
-        // ...while the line saved before #1335 falls back to pressure.
-        expect(find.textContaining('bar'), findsWidgets);
+        expect(find.text('12'), findsOneWidget);
+        // ...while the He line saved before #1335, with neither
+        // freeGasLiters nor cylinderLiters, falls back to a dash in both
+        // columns (see BlenderBilledLineRow). A bare
+        // `find.textContaining('bar')` would pass regardless of either
+        // fallback, since the "Hinzufügen (bar)" column header itself
+        // contains that substring.
+        expect(find.text('—'), findsNWidgets(2));
         expect(find.text('Total'), findsOneWidget);
       },
     );

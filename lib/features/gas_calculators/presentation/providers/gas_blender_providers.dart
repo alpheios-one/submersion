@@ -243,7 +243,13 @@ final blenderPreferencesLoaderProvider = FutureProvider<void>((ref) async {
       .read(appSettingsRepositoryProvider)
       .getBlenderPreferences();
   if (stored == null) return;
-  ref.read(blenderTemplatesProvider.notifier).state = stored.templates;
+  // Sorted on load too, not just on every mutation path (mix_template_manager
+  // and mix_template_menu): otherwise an install with an older, unsorted
+  // saved list stayed unsorted until the next add/edit (Copilot review,
+  // issue #1876 follow-up).
+  ref.read(blenderTemplatesProvider.notifier).state = MixTemplate.sorted(
+    stored.templates,
+  );
   ref.read(blenderGasPricesProvider.notifier).state = stored.gasPrices;
   ref.read(blenderFillTempProvider.notifier).state = stored.fillTempC;
   ref.read(blenderSettledTempProvider.notifier).state = stored.settledTempC;
