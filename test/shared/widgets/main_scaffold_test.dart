@@ -193,6 +193,17 @@ class _FakeRepo implements AppSettingsRepository {
   Future<String?> getRawSetting(String key) async => null;
   @override
   Future<void> setRawSetting(String key, String value) async {}
+
+  /// Label-visibility setting (#1424), defaulting to today's behavior.
+  bool showLabels = true;
+
+  @override
+  Future<bool> getNavShowLabels() async => showLabels;
+  @override
+  Future<void> setNavShowLabels(bool value) async {
+    showLabels = value;
+  }
+
   @override
   Future<BlenderPreferences?> getBlenderPreferences() async => null;
   @override
@@ -441,6 +452,117 @@ void main() {
       );
       return result.app;
     }
+
+    group('label visibility (#1424)', () {
+      testWidgets('the bottom bar always shows labels by default', (
+        tester,
+      ) async {
+        tester.view.physicalSize = const Size(400, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.reset);
+
+        final repo = _FakeRepo();
+        await tester.pumpWidget(await buildHarness(repo: repo));
+        await tester.pumpAndSettle();
+
+        final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
+        expect(
+          bar.labelBehavior,
+          NavigationDestinationLabelBehavior.alwaysShow,
+        );
+      });
+
+      testWidgets('turning the setting off hides the bottom bar labels', (
+        tester,
+      ) async {
+        tester.view.physicalSize = const Size(400, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.reset);
+
+        final repo = _FakeRepo()..showLabels = false;
+        await tester.pumpWidget(await buildHarness(repo: repo));
+        await tester.pumpAndSettle();
+
+        final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
+        expect(
+          bar.labelBehavior,
+          NavigationDestinationLabelBehavior.alwaysHide,
+        );
+      });
+
+      testWidgets('the desktop rail starts extended when the setting is on', (
+        tester,
+      ) async {
+        tester.view.physicalSize = const Size(1400, 900);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.reset);
+
+        final repo = _FakeRepo();
+        await tester.pumpWidget(await buildHarness(repo: repo));
+        await tester.pumpAndSettle();
+
+        final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
+        expect(rail.extended, isTrue);
+      });
+
+      testWidgets('the desktop rail starts collapsed when the setting is off', (
+        tester,
+      ) async {
+        tester.view.physicalSize = const Size(1400, 900);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.reset);
+
+        final repo = _FakeRepo()..showLabels = false;
+        await tester.pumpWidget(await buildHarness(repo: repo));
+        await tester.pumpAndSettle();
+
+        final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
+        expect(rail.extended, isFalse);
+      });
+
+      testWidgets(
+        'the manual collapse arrow still overrides the setting for the session',
+        (tester) async {
+          tester.view.physicalSize = const Size(1400, 900);
+          tester.view.devicePixelRatio = 1.0;
+          addTearDown(tester.view.reset);
+
+          final repo = _FakeRepo();
+          await tester.pumpWidget(await buildHarness(repo: repo));
+          await tester.pumpAndSettle();
+
+          expect(
+            tester.widget<NavigationRail>(find.byType(NavigationRail)).extended,
+            isTrue,
+          );
+
+          await tester.tap(find.byIcon(Icons.keyboard_double_arrow_left));
+          await tester.pumpAndSettle();
+
+          expect(
+            tester.widget<NavigationRail>(find.byType(NavigationRail)).extended,
+            isFalse,
+          );
+        },
+      );
+
+      testWidgets('a wider phone shows more than the minimum primary slots', (
+        tester,
+      ) async {
+        // 700 base width, labels shown: (700 - 2*80) / 80 = 6.75 -> 6 slots,
+        // well above the 3-slot minimum.
+        tester.view.physicalSize = const Size(700, 1400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.reset);
+
+        final repo = _FakeRepo();
+        await tester.pumpWidget(await buildHarness(repo: repo));
+        await tester.pumpAndSettle();
+
+        // [Home, 6 middle, More] = 8 destinations, not the old fixed 5.
+        expect(find.byType(NavigationDestination), findsNWidgets(8));
+      });
+    });
 
     testWidgets('default primary ids render default nav labels', (
       tester,

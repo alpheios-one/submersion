@@ -22,7 +22,11 @@ class NavCustomizationTile extends ConsumerWidget {
     // same 800px switch MainScaffold uses to choose rail over bottom bar.
     final destinations = ResponsiveBreakpoints.isDesktop(context)
         ? ref.watch(navRailDestinationsProvider)
-        : ref.watch(navPrimaryDestinationsProvider);
+        : ref.watch(
+            navPrimaryDestinationsProvider(
+              currentPhonePrimarySlotCount(ref, MediaQuery.sizeOf(context)),
+            ),
+          );
 
     // Skip pinned Home, and the trailing More sentinel the phone list carries.
     final labels = destinations
