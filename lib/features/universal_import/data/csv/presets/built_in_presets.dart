@@ -58,7 +58,11 @@ const _myssi = CsvPreset(
       ],
     ),
   },
-  supportedEntities: {ImportEntityType.dives},
+  supportedEntities: {
+    ImportEntityType.dives,
+    ImportEntityType.sites,
+    ImportEntityType.buddies,
+  },
 );
 
 // ======================== 1. Subsurface (multi-file) ========================
@@ -280,6 +284,8 @@ const _subsurface = CsvPreset(
     ImportEntityType.sites,
     ImportEntityType.tags,
     ImportEntityType.buddies,
+    // The suit column becomes gear linked to each dive (#1824).
+    ImportEntityType.equipment,
   },
 );
 
@@ -631,6 +637,11 @@ const _submersionNative = CsvPreset(
         ),
         ColumnMapping(
           sourceColumn: DiveCsvColumns.diveType,
+          targetField: 'diveTypeNames',
+        ),
+        // Pairs with the names above; absent from exports before #1834.
+        ColumnMapping(
+          sourceColumn: DiveCsvColumns.diveTypeIds,
           targetField: 'diveTypeIds',
         ),
         ColumnMapping(sourceColumn: DiveCsvColumns.buddy, targetField: 'buddy'),
