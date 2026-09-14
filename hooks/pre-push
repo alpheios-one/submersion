@@ -587,19 +587,26 @@ if [ "${#test_files[@]}" -gt 0 ]; then
     echo ""
     # Same Windows command-line overflow as the format check above, but here
     # flutter.bat is the one re-exec'ing: a large merge easily selects
-    # thousands of affected test files. Past that point the selection is not
-    # much narrower than the whole suite anyway, so just run it all.
-    test_files_total_len=0
+    # thousands of affected test files. Running the whole suite instead would
+    # sidestep the limit but pulls in every test, including ones the
+    # selection deliberately excluded (distant single-hit importers, most
+    # generated-l10n importers) -- so batch the explicit list into chunks
+    # under the limit instead, preserving the scoped selection.
+    batch=()
+    batch_len=0
+    test_run_ok=1
     for t in "${test_files[@]}"; do
-        test_files_total_len=$((test_files_total_len + ${#t} + 1))
+        t_len=$((${#t} + 1))
+        if [ "${#batch[@]}" -gt 0 ] && [ "$((batch_len + t_len))" -gt 3000 ]; then
+            run_tests "${batch[@]}" || test_run_ok=0
+            batch=()
+            batch_len=0
+        fi
+        batch+=("$t")
+        batch_len=$((batch_len + t_len))
     done
-    if [ "$test_files_total_len" -gt 4000 ]; then
-        echo "(affected file list too long for the command line; running the whole suite)"
-        test_run_ok=1
-        run_tests || test_run_ok=0
-    else
-        test_run_ok=1
-        run_tests "${test_files[@]}" || test_run_ok=0
+    if [ "${#batch[@]}" -gt 0 ]; then
+        run_tests "${batch[@]}" || test_run_ok=0
     fi
     if [ "$test_run_ok" = "0" ]; then
         echo ""
