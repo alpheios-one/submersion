@@ -353,4 +353,75 @@ void main() {
     );
     expect(field.decoration?.errorText, isNull);
   });
+
+  testWidgets(
+    'a genuinely unreadable price shows the error and keeps the price '
+    'that was already stored',
+    (tester) async {
+      // A lone separator has nothing on either side for
+      // smartParseUserDecimal to correct, unlike the single-dot-under-German
+      // case above -- genuinely unreadable under any locale. The stored
+      // price must survive the bad keystroke rather than being discarded
+      // (see _priceOrKeep/#1876 hardening).
+      final ref = await _pump(
+        tester,
+        overrides: [
+          blenderGasPricesProvider.overrideWith(
+            (ref) => const [9.5, null, null],
+          ),
+        ],
+      );
+
+      await tester.enterText(
+        find.byKey(const Key('blender-gas-price-o2')),
+        ',',
+      );
+      await tester.pump();
+
+      final field = tester.widget<TextField>(
+        find.byKey(const Key('blender-gas-price-o2')),
+      );
+      expect(field.decoration?.errorText, isNotNull);
+      expect(
+        ref.read(blenderGasPricesProvider)[BlenderGasRole.o2.index],
+        closeTo(9.5, 0.001),
+      );
+    },
+  );
+
+  testWidgets(
+    'a genuinely unreadable flush volume shows the error and keeps the '
+    'volume that was already stored',
+    (tester) async {
+      final ref = await _pump(
+        tester,
+        overrides: [
+          blenderFlushFeeGasesProvider.overrideWith(
+            (ref) => const [
+              FlushFeeGasSetting(volumeLiters: 40),
+              FlushFeeGasSetting(volumeLiters: 20),
+              FlushFeeGasSetting(volumeLiters: 20),
+            ],
+          ),
+        ],
+      );
+
+      await tester.enterText(
+        find.byKey(const Key('blender-flush-fee-volume-o2')),
+        ',',
+      );
+      await tester.pump();
+
+      final field = tester.widget<TextField>(
+        find.byKey(const Key('blender-flush-fee-volume-o2')),
+      );
+      expect(field.decoration?.errorText, isNotNull);
+      expect(
+        ref
+            .read(blenderFlushFeeGasesProvider)[BlenderGasRole.o2.index]
+            .volumeLiters,
+        closeTo(40, 0.001),
+      );
+    },
+  );
 }

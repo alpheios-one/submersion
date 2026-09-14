@@ -115,6 +115,82 @@ void main() {
 
       expect(find.text('Incomplete'), findsOneWidget);
     });
+
+    testWidgets(
+      'the app bar delete action removes the invoice and pops back, once '
+      'confirmed',
+      (tester) async {
+        // The app bar action shares deleteArchivedInvoice with the archive
+        // list tile (issue #1876), so the running invoice's data stays in
+        // sync from either entry point.
+        final container = ProviderContainer(
+          overrides: [
+            settingsProvider.overrideWith(
+              (ref) => MockSettingsNotifier(
+                const AppSettings(defaultCurrency: 'CHF'),
+              ),
+            ),
+            blenderArchivedInvoicesProvider.overrideWith(
+              (ref) => [
+                ArchivedInvoice(
+                  id: 'inv-1',
+                  date: DateTime(2026, 3, 5),
+                  billedTo: 'Ada',
+                  fills: const [
+                    BilledFill(
+                      id: 'f1',
+                      label: 'Tx 18/45',
+                      lines: [],
+                      total: 30,
+                    ),
+                  ],
+                  total: 30,
+                  currencyCode: 'CHF',
+                ),
+              ],
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              locale: const Locale('en'),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Builder(
+                builder: (context) => TextButton(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const BlenderInvoiceArchiveDetailPage(
+                        invoiceId: 'inv-1',
+                      ),
+                    ),
+                  ),
+                  child: const Text('open'),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.tap(find.text('open'));
+        await tester.pumpAndSettle();
+        expect(find.text('Tx 18/45'), findsOneWidget);
+
+        await tester.tap(
+          find.byKey(const Key('blender-archived-invoice-detail-delete')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Delete'));
+        await tester.pumpAndSettle();
+
+        expect(container.read(blenderArchivedInvoicesProvider), isEmpty);
+        expect(find.text('open'), findsOneWidget);
+        expect(find.text('Tx 18/45'), findsNothing);
+      },
+    );
   });
 
   group('reached without the calculator', () {
