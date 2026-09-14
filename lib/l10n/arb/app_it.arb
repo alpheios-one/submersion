@@ -11917,5 +11917,18 @@
   "equipment_arrange_reset": "Ripristina predefiniti",
   "equipment_arrange_saveFailed": "Impossibile salvare la disposizione",
   "settings_appearance_gearArrangement": "Disposizione dell'attrezzatura",
-  "settings_appearance_gearArrangementSubtitle": "Come l'attrezzatura viene raggruppata e ordinata in un'immersione"
+  "settings_appearance_gearArrangementSubtitle": "Come l'attrezzatura viene raggruppata e ordinata in un'immersione",
+  "gasCalculators_mod_semanticsLabel": "Profondità massima operativa: {depth} {unit} a {ppo2} bar ppO2 con {o2}% di ossigeno",
+  "gasCalculators_blender_stepColumnAction": "Azione",
+  "gasCalculators_blender_stepColumnAdded": "Aggiunto",
+  "gasCalculators_blender_stepColumnPressure": "Pressione",
+  "gasCalculators_blender_stepColumnMix": "Miscela",
+  "gasCalculators_blender_invalidNumber": "Inserisci un numero valido (separatore decimale: \"{separator}\")",
+  "gasCalculators_blender_flushFeeColumnGas": "Gas",
+  "gasCalculators_blender_cylinderColumnShort": "Bombola",
+  "gasCalculators_blender_volumeColumn": "Volume",
+  "gasCalculators_blender_lineActions": "Azioni per {label}",
+  "gasCalculators_blender_invoiceArchiveDelete": "Elimina questa fattura",
+  "gasCalculators_blender_invoiceArchiveDeleteTitle": "Eliminare la fattura?",
+  "gasCalculators_blender_invoiceArchiveDeleteBody": "Questa azione non può essere annullata."
 }

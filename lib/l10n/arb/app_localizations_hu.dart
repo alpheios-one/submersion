@@ -12979,7 +12979,7 @@ class AppLocalizationsHu extends AppLocalizations {
     String ppo2,
     String o2,
   ) {
-    return 'Maximum Operating Depth: $depth $unit at $ppo2 bar ppO2 with $o2% oxygen';
+    return 'Maximális üzemi mélység: $depth $unit, $ppo2 bar ppO2 mellett, $o2% oxigénnel';
   }
 
   @override
@@ -13213,16 +13213,16 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_blender_stepStartLabel => 'Kezdés';
 
   @override
-  String get gasCalculators_blender_stepColumnAction => 'Action';
+  String get gasCalculators_blender_stepColumnAction => 'Művelet';
 
   @override
-  String get gasCalculators_blender_stepColumnAdded => 'Added';
+  String get gasCalculators_blender_stepColumnAdded => 'Hozzáadva';
 
   @override
-  String get gasCalculators_blender_stepColumnPressure => 'Pressure';
+  String get gasCalculators_blender_stepColumnPressure => 'Nyomás';
 
   @override
-  String get gasCalculators_blender_stepColumnMix => 'Mix';
+  String get gasCalculators_blender_stepColumnMix => 'Keverék';
 
   @override
   String gasCalculators_blender_settlesTo(String pressure, String temperature) {
@@ -13294,7 +13294,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String gasCalculators_blender_invalidNumber(String separator) {
-    return 'Enter a valid number (decimal separator: \"$separator\")';
+    return 'Adjon meg egy érvényes számot (tizedesjel: \"$separator\")';
   }
 
   @override
@@ -13338,13 +13338,13 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_blender_flushFeeVolume => 'Öblítési térfogat';
 
   @override
-  String get gasCalculators_blender_flushFeeColumnGas => 'Gas';
+  String get gasCalculators_blender_flushFeeColumnGas => 'Gáz';
 
   @override
-  String get gasCalculators_blender_cylinderColumnShort => 'Cylinder';
+  String get gasCalculators_blender_cylinderColumnShort => 'Palack';
 
   @override
-  String get gasCalculators_blender_volumeColumn => 'Volume';
+  String get gasCalculators_blender_volumeColumn => 'Térfogat';
 
   @override
   String gasCalculators_blender_flushFeeLine(String gas) {
@@ -13427,7 +13427,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String gasCalculators_blender_lineActions(String label) {
-    return 'Actions for $label';
+    return 'Műveletek: $label';
   }
 
   @override
@@ -13479,16 +13479,15 @@ class AppLocalizationsHu extends AppLocalizations {
       'A számla nem található.';
 
   @override
-  String get gasCalculators_blender_invoiceArchiveDelete =>
-      'Delete this invoice';
+  String get gasCalculators_blender_invoiceArchiveDelete => 'Számla törlése';
 
   @override
   String get gasCalculators_blender_invoiceArchiveDeleteTitle =>
-      'Delete invoice?';
+      'Törli a számlát?';
 
   @override
   String get gasCalculators_blender_invoiceArchiveDeleteBody =>
-      'This cannot be undone.';
+      'Ez a művelet nem vonható vissza.';
 
   @override
   String get gasCalculators_blender_defaults =>

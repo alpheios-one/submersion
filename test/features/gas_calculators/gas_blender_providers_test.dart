@@ -221,9 +221,12 @@ void main() {
 
       final before = DateTime.now();
       await loaderContainer.read(blenderPreferencesLoaderProvider.future);
-      final after = DateTime.now();
-
+      // blenderBilledDateProvider is lazy: its DateTime.now() default is
+      // only computed on first read, so "after" has to be captured once
+      // that read has happened, not before it -- otherwise it is always
+      // earlier than the value it is meant to bound.
       final restored = loaderContainer.read(blenderBilledDateProvider);
+      final after = DateTime.now();
       expect(restored, isNot(staleDate));
       expect(
         restored.isAfter(before.subtract(const Duration(seconds: 5))) &&

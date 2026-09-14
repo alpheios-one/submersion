@@ -11917,5 +11917,18 @@
   "equipment_arrange_reset": "إعادة التعيين إلى الإعدادات الافتراضية",
   "equipment_arrange_saveFailed": "تعذر حفظ الترتيب",
   "settings_appearance_gearArrangement": "ترتيب المعدات",
-  "settings_appearance_gearArrangementSubtitle": "كيفية تجميع المعدات وترتيبها في الغوصة"
+  "settings_appearance_gearArrangementSubtitle": "كيفية تجميع المعدات وترتيبها في الغوصة",
+  "gasCalculators_mod_semanticsLabel": "أقصى عمق تشغيلي: {depth} {unit} عند {ppo2} بار ppO2 مع {o2}% أكسجين",
+  "gasCalculators_blender_stepColumnAction": "الإجراء",
+  "gasCalculators_blender_stepColumnAdded": "أضيف",
+  "gasCalculators_blender_stepColumnPressure": "الضغط",
+  "gasCalculators_blender_stepColumnMix": "الخليط",
+  "gasCalculators_blender_invalidNumber": "أدخل رقمًا صالحًا (الفاصلة العشرية: \"{separator}\")",
+  "gasCalculators_blender_flushFeeColumnGas": "الغاز",
+  "gasCalculators_blender_cylinderColumnShort": "الأسطوانة",
+  "gasCalculators_blender_volumeColumn": "الحجم",
+  "gasCalculators_blender_lineActions": "إجراءات {label}",
+  "gasCalculators_blender_invoiceArchiveDelete": "حذف هذه الفاتورة",
+  "gasCalculators_blender_invoiceArchiveDeleteTitle": "حذف الفاتورة؟",
+  "gasCalculators_blender_invoiceArchiveDeleteBody": "لا يمكن التراجع عن هذا الإجراء."
 }

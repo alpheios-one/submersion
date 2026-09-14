@@ -13019,7 +13019,7 @@ class AppLocalizationsIt extends AppLocalizations {
     String ppo2,
     String o2,
   ) {
-    return 'Maximum Operating Depth: $depth $unit at $ppo2 bar ppO2 with $o2% oxygen';
+    return 'Profondità massima operativa: $depth $unit a $ppo2 bar ppO2 con $o2% di ossigeno';
   }
 
   @override
@@ -13253,16 +13253,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get gasCalculators_blender_stepStartLabel => 'Inizio';
 
   @override
-  String get gasCalculators_blender_stepColumnAction => 'Action';
+  String get gasCalculators_blender_stepColumnAction => 'Azione';
 
   @override
-  String get gasCalculators_blender_stepColumnAdded => 'Added';
+  String get gasCalculators_blender_stepColumnAdded => 'Aggiunto';
 
   @override
-  String get gasCalculators_blender_stepColumnPressure => 'Pressure';
+  String get gasCalculators_blender_stepColumnPressure => 'Pressione';
 
   @override
-  String get gasCalculators_blender_stepColumnMix => 'Mix';
+  String get gasCalculators_blender_stepColumnMix => 'Miscela';
 
   @override
   String gasCalculators_blender_settlesTo(String pressure, String temperature) {
@@ -13336,7 +13336,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String gasCalculators_blender_invalidNumber(String separator) {
-    return 'Enter a valid number (decimal separator: \"$separator\")';
+    return 'Inserisci un numero valido (separatore decimale: \"$separator\")';
   }
 
   @override
@@ -13383,7 +13383,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get gasCalculators_blender_flushFeeColumnGas => 'Gas';
 
   @override
-  String get gasCalculators_blender_cylinderColumnShort => 'Cylinder';
+  String get gasCalculators_blender_cylinderColumnShort => 'Bombola';
 
   @override
   String get gasCalculators_blender_volumeColumn => 'Volume';
@@ -13468,7 +13468,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String gasCalculators_blender_lineActions(String label) {
-    return 'Actions for $label';
+    return 'Azioni per $label';
   }
 
   @override
@@ -13520,15 +13520,15 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_invoiceArchiveDelete =>
-      'Delete this invoice';
+      'Elimina questa fattura';
 
   @override
   String get gasCalculators_blender_invoiceArchiveDeleteTitle =>
-      'Delete invoice?';
+      'Eliminare la fattura?';
 
   @override
   String get gasCalculators_blender_invoiceArchiveDeleteBody =>
-      'This cannot be undone.';
+      'Questa azione non può essere annullata.';
 
   @override
   String get gasCalculators_blender_defaults =>

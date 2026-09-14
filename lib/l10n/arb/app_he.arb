@@ -11917,5 +11917,18 @@
   "equipment_arrange_reset": "איפוס לברירת המחדל",
   "equipment_arrange_saveFailed": "לא ניתן לשמור את הסידור",
   "settings_appearance_gearArrangement": "סידור הציוד",
-  "settings_appearance_gearArrangementSubtitle": "כיצד הציוד מקובץ וממוין בצלילה"
+  "settings_appearance_gearArrangementSubtitle": "כיצד הציוד מקובץ וממוין בצלילה",
+  "gasCalculators_mod_semanticsLabel": "עומק תפעול מרבי: {depth} {unit} ב-{ppo2} בר ppO2 עם {o2}% חמצן",
+  "gasCalculators_blender_stepColumnAction": "פעולה",
+  "gasCalculators_blender_stepColumnAdded": "נוסף",
+  "gasCalculators_blender_stepColumnPressure": "לחץ",
+  "gasCalculators_blender_stepColumnMix": "תערובת",
+  "gasCalculators_blender_invalidNumber": "הזן מספר תקין (מפריד עשרוני: \"{separator}\")",
+  "gasCalculators_blender_flushFeeColumnGas": "גז",
+  "gasCalculators_blender_cylinderColumnShort": "בלון",
+  "gasCalculators_blender_volumeColumn": "נפח",
+  "gasCalculators_blender_lineActions": "פעולות עבור {label}",
+  "gasCalculators_blender_invoiceArchiveDelete": "מחק חשבונית זו",
+  "gasCalculators_blender_invoiceArchiveDeleteTitle": "למחוק את החשבונית?",
+  "gasCalculators_blender_invoiceArchiveDeleteBody": "לא ניתן לבטל פעולה זו."
 }

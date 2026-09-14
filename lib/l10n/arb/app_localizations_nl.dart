@@ -12916,7 +12916,7 @@ class AppLocalizationsNl extends AppLocalizations {
     String ppo2,
     String o2,
   ) {
-    return 'Maximum Operating Depth: $depth $unit at $ppo2 bar ppO2 with $o2% oxygen';
+    return 'Maximale werkdiepte: $depth $unit bij $ppo2 bar ppO2 met $o2% zuurstof';
   }
 
   @override
@@ -13150,13 +13150,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_blender_stepStartLabel => 'Start';
 
   @override
-  String get gasCalculators_blender_stepColumnAction => 'Action';
+  String get gasCalculators_blender_stepColumnAction => 'Actie';
 
   @override
-  String get gasCalculators_blender_stepColumnAdded => 'Added';
+  String get gasCalculators_blender_stepColumnAdded => 'Toegevoegd';
 
   @override
-  String get gasCalculators_blender_stepColumnPressure => 'Pressure';
+  String get gasCalculators_blender_stepColumnPressure => 'Druk';
 
   @override
   String get gasCalculators_blender_stepColumnMix => 'Mix';
@@ -13232,7 +13232,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String gasCalculators_blender_invalidNumber(String separator) {
-    return 'Enter a valid number (decimal separator: \"$separator\")';
+    return 'Voer een geldig getal in (decimaalteken: \"$separator\")';
   }
 
   @override
@@ -13278,7 +13278,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_blender_flushFeeColumnGas => 'Gas';
 
   @override
-  String get gasCalculators_blender_cylinderColumnShort => 'Cylinder';
+  String get gasCalculators_blender_cylinderColumnShort => 'Fles';
 
   @override
   String get gasCalculators_blender_volumeColumn => 'Volume';
@@ -13362,7 +13362,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String gasCalculators_blender_lineActions(String label) {
-    return 'Actions for $label';
+    return 'Acties voor $label';
   }
 
   @override
@@ -13414,15 +13414,15 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_invoiceArchiveDelete =>
-      'Delete this invoice';
+      'Deze factuur verwijderen';
 
   @override
   String get gasCalculators_blender_invoiceArchiveDeleteTitle =>
-      'Delete invoice?';
+      'Factuur verwijderen?';
 
   @override
   String get gasCalculators_blender_invoiceArchiveDeleteBody =>
-      'This cannot be undone.';
+      'Dit kan niet ongedaan worden gemaakt.';
 
   @override
   String get gasCalculators_blender_defaults =>
