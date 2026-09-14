@@ -489,15 +489,16 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     );
   }
 
-  static const List<int> _flushFeeFlex = [5, 2, 3];
-
-  /// Every gas's purge volume and rate on a flexible `Row`/`Expanded` grid,
-  /// units in a header row rather than repeated per cell (issue #1876
-  /// follow-up), so narrow screens compress the columns in place instead of
-  /// overflowing off-screen the way `DataTable`'s fixed widths did. Both
-  /// figures are entered once, next to their bank on the Fill gases settings
-  /// card, and shown here as plain text rather than a second, easily-
-  /// drifting entry point for the same numbers.
+  /// Every gas's purge volume and rate on the same `_costFlex` grid the cost
+  /// table below it uses (issue #1876 follow-up): gas in column 1, column 2
+  /// left blank since a flush has no "added bar" of its own, volume in
+  /// column 3, rate in column 4 -- so both tables' columns share one set of
+  /// edges. Units sit in a header row rather than repeated per cell, so
+  /// narrow screens compress the columns in place instead of overflowing
+  /// off-screen the way `DataTable`'s fixed widths did. Both figures are
+  /// entered once, next to their bank on the Fill gases settings card, and
+  /// shown here as plain text rather than a second, easily-drifting entry
+  /// point for the same numbers.
   Widget _flushFeeTable(
     BuildContext context,
     WidgetRef ref,
@@ -515,14 +516,15 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
         Row(
           children: [
             Expanded(
-              flex: _flushFeeFlex[0],
+              flex: _costFlex[0],
               child: Text(
                 context.l10n.gasCalculators_blender_flushFeeColumnGas,
                 style: headerStyle,
               ),
             ),
+            Expanded(flex: _costFlex[1], child: const SizedBox()),
             Expanded(
-              flex: _flushFeeFlex[1],
+              flex: _costFlex[2],
               child: Text(
                 units.volumeSymbol,
                 style: headerStyle,
@@ -530,7 +532,7 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
               ),
             ),
             Expanded(
-              flex: _flushFeeFlex[2],
+              flex: _costFlex[3],
               child: Text(
                 '$currency/100${units.volumeSymbol}',
                 style: headerStyle,
@@ -567,11 +569,12 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
       child: Row(
         children: [
           Expanded(
-            flex: _flushFeeFlex[0],
+            flex: _costFlex[0],
             child: Text(blenderGasRoleLabel(context, role), style: style),
           ),
+          Expanded(flex: _costFlex[1], child: const SizedBox()),
           Expanded(
-            flex: _flushFeeFlex[1],
+            flex: _costFlex[2],
             child: Text(
               formatRoundedForInput(
                 litersToDisplayVolume(volumeLiters, settings),
@@ -583,7 +586,7 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
             ),
           ),
           Expanded(
-            flex: _flushFeeFlex[2],
+            flex: _costFlex[3],
             child: Text(
               price == null
                   ? ''

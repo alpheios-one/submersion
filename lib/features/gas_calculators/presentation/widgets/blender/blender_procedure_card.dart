@@ -145,7 +145,7 @@ class BlenderProcedureCard extends ConsumerWidget {
   /// off-screen the way `DataTable`'s fixed column widths did (issue #1876
   /// follow-up: the diver could not read the pressure or mix columns at all
   /// on a phone).
-  static const List<int> _flex = [5, 4, 5, 5];
+  static const List<int> _flex = [4, 4, 4, 4];
 
   Widget _stepTable(
     BuildContext context,
@@ -167,6 +167,7 @@ class BlenderProcedureCard extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               flex: _flex[0],
