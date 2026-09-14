@@ -724,39 +724,44 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
               // total left no room to breathe (issue #1876 follow-up).
               SizedBox(
                 width: kBilledLineTrailingWidth,
-                child: PopupMenuButton<_FillLineAction>(
-                  key: Key('blender-fill-line-menu-${fill.id}'),
-                  icon: const Icon(Icons.more_vert, size: 18),
-                  // PopupMenuButton's own default padding (8 on every side)
-                  // otherwise kept the icon short of the card's right edge
-                  // even though its reserved SizedBox already reached it
-                  // (issue #1876 follow-up).
-                  padding: EdgeInsets.zero,
-                  tooltip: context.l10n.gasCalculators_blender_lineActions(
-                    fill.label,
+                // A `SizedBox` only constrains its child's width, not where
+                // the child sits within it -- an un-aligned PopupMenuButton
+                // centers in the reserved 80px, leaving visible space to its
+                // right. `Align` is what actually pins it to the card's edge
+                // (issue #1876 follow-up; the earlier `padding: EdgeInsets
+                // .zero` alone was not enough).
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: PopupMenuButton<_FillLineAction>(
+                    key: Key('blender-fill-line-menu-${fill.id}'),
+                    icon: const Icon(Icons.more_vert, size: 18),
+                    padding: EdgeInsets.zero,
+                    tooltip: context.l10n.gasCalculators_blender_lineActions(
+                      fill.label,
+                    ),
+                    onSelected: (action) => switch (action) {
+                      _FillLineAction.edit => _editLine(fill),
+                      _FillLineAction.delete => _delete(fill),
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: _FillLineAction.edit,
+                        child: Text(
+                          context.l10n.gasCalculators_blender_editLine(
+                            fill.label,
+                          ),
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: _FillLineAction.delete,
+                        child: Text(
+                          context.l10n.gasCalculators_blender_deleteLine(
+                            fill.label,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  onSelected: (action) => switch (action) {
-                    _FillLineAction.edit => _editLine(fill),
-                    _FillLineAction.delete => _delete(fill),
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: _FillLineAction.edit,
-                      child: Text(
-                        context.l10n.gasCalculators_blender_editLine(
-                          fill.label,
-                        ),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: _FillLineAction.delete,
-                      child: Text(
-                        context.l10n.gasCalculators_blender_deleteLine(
-                          fill.label,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ],
