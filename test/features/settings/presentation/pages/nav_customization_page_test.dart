@@ -438,6 +438,19 @@ void main() {
         );
         expect(tile.value, isTrue);
       });
+
+      testWidgets('a failed read hides the switch but the rest of the page '
+          'still renders', (tester) async {
+        final repo = FakeAppSettingsRepository()
+          ..throwOnRead = StateError('read failed');
+        await pumpPage(tester, repo: repo);
+
+        // The switch's AsyncValue.when has no data to build a tile from, and
+        // this shows the error branch renders nothing rather than crashing.
+        expect(find.byKey(const ValueKey('navShowLabelsSwitch')), findsNothing);
+        // The rest of the page is unaffected by the failed read.
+        expect(find.byKey(const ValueKey('navScopeSegments')), findsOneWidget);
+      });
     });
   });
 }

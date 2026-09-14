@@ -336,6 +336,28 @@ void main() {
 
       expect(find.byType(NavigationBar), findsOneWidget);
     });
+
+    testWidgets(
+      'a phone build viewing an overflow route highlights the More tab',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        // Default primary destinations are [dashboard, dives, sites, trips];
+        // equipment only appears in the overflow "More" sheet, so no primary
+        // route matches and _calculateSelectedIndex must fall through to the
+        // last (More) index rather than defaulting to 0.
+        await tester.pumpWidget(
+          await _buildTestApp(initialLocation: '/equipment'),
+        );
+        await tester.pumpAndSettle();
+
+        final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
+        expect(bar.selectedIndex, bar.destinations.length - 1);
+      },
+    );
   });
 
   group('MainScaffold mobile nav customization', () {
@@ -562,6 +584,27 @@ void main() {
         // [Home, 6 middle, More] = 8 destinations, not the old fixed 5.
         expect(find.byType(NavigationDestination), findsNWidgets(8));
       });
+
+      testWidgets(
+        'a narrow landscape phone bases the slot count on height, not width',
+        (tester) async {
+          // width (700) >= height (400), but 700 is still under the 800px
+          // rail threshold, so this is phone bottom-bar mode. The slot count
+          // must use min(width, height) so a rotation cannot change it:
+          // basing it on height (400) gives the 3-slot minimum, while
+          // wrongly basing it on width (700) would give 6.
+          tester.view.physicalSize = const Size(700, 400);
+          tester.view.devicePixelRatio = 1.0;
+          addTearDown(tester.view.reset);
+
+          final repo = _FakeRepo();
+          await tester.pumpWidget(await buildHarness(repo: repo));
+          await tester.pumpAndSettle();
+
+          // [Home, 3 middle (the minimum), More] = 5 destinations.
+          expect(find.byType(NavigationDestination), findsNWidgets(5));
+        },
+      );
     });
 
     testWidgets('default primary ids render default nav labels', (
