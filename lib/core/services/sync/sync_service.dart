@@ -1528,6 +1528,12 @@ class SyncService {
             hasUpdatedAt: false,
           ),
           (type: 'siteTags', records: data.siteTags, hasUpdatedAt: false),
+          // After both parents (equipment and tags), issue #1942.
+          (
+            type: 'equipmentTags',
+            records: data.equipmentTags,
+            hasUpdatedAt: false,
+          ),
           (
             type: 'mediaSpecies',
             records: data.mediaSpecies,
@@ -2365,6 +2371,7 @@ class SyncService {
     'siteSpecies': false,
     'siteSiteTypes': false,
     'siteTags': false,
+    'equipmentTags': false,
     'mediaSpecies': false,
     'siteFeatures': true,
     'csvPresets': true,
@@ -2712,6 +2719,16 @@ class SyncService {
     ],
     'siteTags': [
       (field: 'siteId', parent: 'diveSites', nullable: false, alsoClear: []),
+      (field: 'tagId', parent: 'tags', nullable: false, alsoClear: []),
+    ],
+    // v219: an equipment item's tags (issue #1942), the siteTags twin.
+    'equipmentTags': [
+      (
+        field: 'equipmentId',
+        parent: 'equipment',
+        nullable: false,
+        alsoClear: [],
+      ),
       (field: 'tagId', parent: 'tags', nullable: false, alsoClear: []),
     ],
     'mediaSpecies': [
@@ -3389,15 +3406,25 @@ class SyncService {
 
       case ConflictResolution.keepRemote:
         if (isDeletion) {
-          await _serializer.deleteRecord(entityType, recordId);
-          await _syncRepository.logDeletionIfMissing(
-            entityType: entityType,
-            recordId: recordId,
-            deletedAt: deletedAt ?? DateTime.now().millisecondsSinceEpoch,
-            originHlc: remoteData['hlc'] is String
-                ? remoteData['hlc'] as String
-                : null,
-          );
+          // A local row can still reference this record through a
+          // non-cascading FK (a dive plan's source dive, a dive's site), and
+          // a bare delete then fails with SqliteException(787), leaving the
+          // conflict unresolved. Defer the FK checks and repair the dangling
+          // references before COMMIT, as _applyRemoteDeletions does. The
+          // repaired rows are not marked pending: every peer applying this
+          // tombstone runs the same repair.
+          await _serializer.applyInDeferredFkTransaction(() async {
+            await _serializer.deleteRecord(entityType, recordId);
+            await _serializer.repairDanglingForeignKeys();
+            await _syncRepository.logDeletionIfMissing(
+              entityType: entityType,
+              recordId: recordId,
+              deletedAt: deletedAt ?? DateTime.now().millisecondsSinceEpoch,
+              originHlc: remoteData['hlc'] is String
+                  ? remoteData['hlc'] as String
+                  : null,
+            );
+          });
         } else {
           // keepRemote overwrites the local row. For HLC-bearing entities the
           // upsert uses `.toCompanion(false)`, so a cross-version remote map
