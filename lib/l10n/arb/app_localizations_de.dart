@@ -4342,6 +4342,17 @@ class AppLocalizationsDe extends AppLocalizations {
       'Noch keine Tauchgänge protokolliert';
 
   @override
+  String diveCenters_dialog_deleteDivesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge bleiben ohne Tauchcenter.',
+      one: '1 Tauchgang bleibt ohne Tauchcenter.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String diveCenters_dialog_deleteMessage(Object name) {
     return 'Möchten Sie \"$name\" wirklich löschen?';
   }
@@ -8918,6 +8929,28 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String diveSites_detail_showSitesWith(String name) {
     return 'Tauchplätze mit $name anzeigen';
+  }
+
+  @override
+  String diveSites_deleteDialog_divesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge bleiben ohne Tauchplatz.',
+      one: '1 Tauchgang bleibt ohne Tauchplatz.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_deleteDialog_plansKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count gespeicherte Pläne bleiben ohne Tauchplatz.',
+      one: '1 gespeicherter Plan bleibt ohne Tauchplatz.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -21005,6 +21038,19 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String tags_manage_narrowDialog_equipment(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Dieser Tag ist an $count Ausrüstungsteilen. Wenn „Für Ausrüstung verwenden“ ausgeschaltet wird, wird er von diesen Ausrüstungsteilen entfernt.',
+      one:
+          'Dieser Tag ist an 1 Ausrüstungsteil. Wenn „Für Ausrüstung verwenden“ ausgeschaltet wird, wird er von diesem Ausrüstungsteil entfernt.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String tags_manage_narrowDialog_sites(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -21023,10 +21069,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tags_manage_scopeRequired =>
-      'Tauchgänge, Tauchplätze oder beides wählen';
+      'Mindestens eines wählen: Tauchgänge, Tauchplätze oder Ausrüstung';
 
   @override
   String get tags_manage_scope_dives => 'Tauchgänge';
+
+  @override
+  String get tags_manage_scope_equipment => 'Ausrüstung';
 
   @override
   String get tags_manage_scope_sites => 'Tauchplätze';
@@ -21044,7 +21093,22 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String tags_manage_equipmentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Ausrüstungsteile',
+      one: '1 Ausrüstungsteil',
+      zero: '0 Ausrüstungsteile',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_manage_useForDives => 'Für Tauchgänge verwenden';
+
+  @override
+  String get tags_manage_useForEquipment => 'Für Ausrüstung verwenden';
 
   @override
   String get tags_manage_useForSites => 'Für Tauchplätze verwenden';
@@ -40999,4 +41063,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get plannerCanvas_compare_showOnChart => 'Show on chart';
+
+  @override
+  String get numberInput_invalidValue => 'Geben Sie eine gültige Zahl ein';
 }

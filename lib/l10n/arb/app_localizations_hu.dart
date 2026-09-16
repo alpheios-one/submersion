@@ -4323,6 +4323,17 @@ class AppLocalizationsHu extends AppLocalizations {
       'Még nincsenek rögzített merülések';
 
   @override
+  String diveCenters_dialog_deleteDivesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés búvárközpont nélkül marad.',
+      one: '1 merülés búvárközpont nélkül marad.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String diveCenters_dialog_deleteMessage(Object name) {
     return 'Biztosan törölni szeretnéd: \"$name\"?';
   }
@@ -8910,6 +8921,28 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String diveSites_detail_showSitesWith(String name) {
     return 'Merülőhelyek ezzel: $name';
+  }
+
+  @override
+  String diveSites_deleteDialog_divesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés helyszín nélkül marad.',
+      one: '1 merülés helyszín nélkül marad.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_deleteDialog_plansKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mentett terv helyszín nélkül marad.',
+      one: '1 mentett terv helyszín nélkül marad.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -20997,6 +21030,19 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String tags_manage_narrowDialog_equipment(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Ez a címke $count felszerelésen szerepel. A „Felszereléshez” kikapcsolása eltávolítja ezekről a felszerelésekről.',
+      one:
+          'Ez a címke 1 felszerelésen szerepel. A „Felszereléshez” kikapcsolása eltávolítja erről a felszerelésről.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String tags_manage_narrowDialog_sites(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -21015,10 +21061,13 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get tags_manage_scopeRequired =>
-      'Válasszon merüléseket, merülőhelyeket vagy mindkettőt';
+      'Válasszon legalább egyet: merülések, merülőhelyek vagy felszerelés';
 
   @override
   String get tags_manage_scope_dives => 'Merülések';
+
+  @override
+  String get tags_manage_scope_equipment => 'Felszerelés';
 
   @override
   String get tags_manage_scope_sites => 'Merülőhelyek';
@@ -21036,7 +21085,22 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String tags_manage_equipmentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count felszerelés',
+      one: '1 felszerelés',
+      zero: '0 felszerelés',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_manage_useForDives => 'Merülésekhez';
+
+  @override
+  String get tags_manage_useForEquipment => 'Felszereléshez';
 
   @override
   String get tags_manage_useForSites => 'Merülőhelyekhez';
@@ -40923,4 +40987,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get plannerCanvas_compare_showOnChart => 'Show on chart';
+
+  @override
+  String get numberInput_invalidValue => 'Adjon meg érvényes számot';
 }

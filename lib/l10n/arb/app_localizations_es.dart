@@ -4336,6 +4336,17 @@ class AppLocalizationsEs extends AppLocalizations {
       'Aún no hay inmersiones registradas';
 
   @override
+  String diveCenters_dialog_deleteDivesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count inmersiones quedarán sin centro de buceo.',
+      one: '1 inmersión quedará sin centro de buceo.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String diveCenters_dialog_deleteMessage(Object name) {
     return '¿Estás seguro de que deseas eliminar \"$name\"?';
   }
@@ -8923,6 +8934,28 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String diveSites_detail_showSitesWith(String name) {
     return 'Mostrar puntos con $name';
+  }
+
+  @override
+  String diveSites_deleteDialog_divesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count inmersiones quedarán sin sitio.',
+      one: '1 inmersión quedará sin sitio.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_deleteDialog_plansKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count planes guardados quedarán sin sitio.',
+      one: '1 plan guardado quedará sin sitio.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -21066,6 +21099,19 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String tags_manage_narrowDialog_equipment(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Esta etiqueta está en $count equipos. Desactivar «Usar en equipos» la quita de esos equipos.',
+      one:
+          'Esta etiqueta está en 1 equipo. Desactivar «Usar en equipos» la quita de ese equipo.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String tags_manage_narrowDialog_sites(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -21083,10 +21129,14 @@ class AppLocalizationsEs extends AppLocalizations {
       '¿Quitar la etiqueta de los elementos existentes?';
 
   @override
-  String get tags_manage_scopeRequired => 'Elige inmersiones, puntos o ambos';
+  String get tags_manage_scopeRequired =>
+      'Elige al menos uno: inmersiones, puntos o equipo';
 
   @override
   String get tags_manage_scope_dives => 'Inmersiones';
+
+  @override
+  String get tags_manage_scope_equipment => 'Equipo';
 
   @override
   String get tags_manage_scope_sites => 'Puntos';
@@ -21104,7 +21154,22 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String tags_manage_equipmentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count equipos',
+      one: '1 equipo',
+      zero: '0 equipos',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_manage_useForDives => 'Usar en inmersiones';
+
+  @override
+  String get tags_manage_useForEquipment => 'Usar en equipos';
 
   @override
   String get tags_manage_useForSites => 'Usar en puntos';
@@ -41120,4 +41185,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get plannerCanvas_compare_showOnChart => 'Show on chart';
+
+  @override
+  String get numberInput_invalidValue => 'Ingresa un número válido';
 }

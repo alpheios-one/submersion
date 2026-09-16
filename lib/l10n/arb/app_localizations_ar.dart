@@ -4247,6 +4247,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveCenters_detail_noDivesLogged => 'لا توجد غطسات مسجلة بعد';
 
   @override
+  String diveCenters_dialog_deleteDivesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ستبقى $count غطسة بدون مركز غوص.',
+      one: 'ستبقى غطسة واحدة بدون مركز غوص.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String diveCenters_dialog_deleteMessage(Object name) {
     return 'هل أنت متأكد من حذف \"$name\"؟';
   }
@@ -8755,6 +8766,28 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String diveSites_detail_showSitesWith(String name) {
     return 'عرض المواقع التي تحمل $name';
+  }
+
+  @override
+  String diveSites_deleteDialog_divesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ستبقى $count غطسة بدون موقع.',
+      one: 'ستبقى غطسة واحدة بدون موقع.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_deleteDialog_plansKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ستبقى $count خطة محفوظة بدون موقع.',
+      one: 'ستبقى خطة محفوظة واحدة بدون موقع.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -20664,6 +20697,25 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String tags_manage_narrowDialog_equipment(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'هذا الوسم على $count قطعة معدات. إيقاف \"استخدام للمعدات\" يزيله من تلك القطع.',
+      many:
+          'هذا الوسم على $count قطعة معدات. إيقاف \"استخدام للمعدات\" يزيله من تلك القطع.',
+      few:
+          'هذا الوسم على $count قطع معدات. إيقاف \"استخدام للمعدات\" يزيله من تلك القطع.',
+      two:
+          'هذا الوسم على قطعتي معدات. إيقاف \"استخدام للمعدات\" يزيله من هاتين القطعتين.',
+      one:
+          'هذا الوسم على قطعة معدات واحدة. إيقاف \"استخدام للمعدات\" يزيله من تلك القطعة.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String tags_manage_narrowDialog_sites(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -20681,10 +20733,14 @@ class AppLocalizationsAr extends AppLocalizations {
       'إزالة الوسم من العناصر الحالية؟';
 
   @override
-  String get tags_manage_scopeRequired => 'اختر الغوصات أو المواقع أو كليهما';
+  String get tags_manage_scopeRequired =>
+      'اختر واحدًا على الأقل: الغوصات أو المواقع أو المعدات';
 
   @override
   String get tags_manage_scope_dives => 'الغوصات';
+
+  @override
+  String get tags_manage_scope_equipment => 'المعدات';
 
   @override
   String get tags_manage_scope_sites => 'المواقع';
@@ -20702,7 +20758,25 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String tags_manage_equipmentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count قطعة معدات',
+      many: '$count قطعة معدات',
+      few: '$count قطع معدات',
+      two: 'قطعتا معدات',
+      one: 'قطعة معدات واحدة',
+      zero: '0 قطع معدات',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_manage_useForDives => 'استخدام للغوصات';
+
+  @override
+  String get tags_manage_useForEquipment => 'استخدام للمعدات';
 
   @override
   String get tags_manage_useForSites => 'استخدام للمواقع';
@@ -40665,4 +40739,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get plannerCanvas_compare_showOnChart => 'Show on chart';
+
+  @override
+  String get numberInput_invalidValue => 'أدخل رقمًا صالحًا';
 }

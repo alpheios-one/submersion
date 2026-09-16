@@ -4221,6 +4221,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveCenters_detail_noDivesLogged => 'עדיין לא נרשמו צלילות';
 
   @override
+  String diveCenters_dialog_deleteDivesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות יישארו ללא מרכז צלילה.',
+      one: 'צלילה אחת תישאר ללא מרכז צלילה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String diveCenters_dialog_deleteMessage(Object name) {
     return 'האם אתה בטוח שברצונך למחוק את \"$name\"?';
   }
@@ -8708,6 +8719,28 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String diveSites_detail_showSitesWith(String name) {
     return 'הצג אתרים עם $name';
+  }
+
+  @override
+  String diveSites_deleteDialog_divesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות יישארו ללא אתר.',
+      one: 'צלילה אחת תישאר ללא אתר.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_deleteDialog_plansKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תוכניות שמורות יישארו ללא אתר.',
+      one: 'תוכנית שמורה אחת תישאר ללא אתר.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -20512,6 +20545,19 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String tags_manage_narrowDialog_equipment(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'התגית הזו מופיעה ב-$count פריטי ציוד. כיבוי \"שימוש לציוד\" יסיר אותה מפריטים אלה.',
+      one:
+          'התגית הזו מופיעה בפריט ציוד אחד. כיבוי \"שימוש לציוד\" יסיר אותה מפריט זה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String tags_manage_narrowDialog_sites(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -20528,10 +20574,14 @@ class AppLocalizationsHe extends AppLocalizations {
   String get tags_manage_narrowDialog_title => 'להסיר את התגית מפריטים קיימים?';
 
   @override
-  String get tags_manage_scopeRequired => 'בחר צלילות, אתרים או את שניהם';
+  String get tags_manage_scopeRequired =>
+      'בחר לפחות אחד: צלילות, אתרים או ציוד';
 
   @override
   String get tags_manage_scope_dives => 'צלילות';
+
+  @override
+  String get tags_manage_scope_equipment => 'ציוד';
 
   @override
   String get tags_manage_scope_sites => 'אתרים';
@@ -20549,7 +20599,22 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String tags_manage_equipmentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count פריטי ציוד',
+      one: 'פריט ציוד אחד',
+      zero: '0 פריטי ציוד',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_manage_useForDives => 'שימוש לצלילות';
+
+  @override
+  String get tags_manage_useForEquipment => 'שימוש לציוד';
 
   @override
   String get tags_manage_useForSites => 'שימוש לאתרים';
@@ -40259,4 +40324,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get plannerCanvas_compare_showOnChart => 'Show on chart';
+
+  @override
+  String get numberInput_invalidValue => 'הזן מספר תקין';
 }

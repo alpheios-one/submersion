@@ -4335,6 +4335,17 @@ class AppLocalizationsPt extends AppLocalizations {
       'Nenhum mergulho registrado ainda';
 
   @override
+  String diveCenters_dialog_deleteDivesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos ficarão sem centro de mergulho.',
+      one: '1 mergulho ficará sem centro de mergulho.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String diveCenters_dialog_deleteMessage(Object name) {
     return 'Tem certeza de que deseja excluir \"$name\"?';
   }
@@ -8924,6 +8935,28 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String diveSites_detail_showSitesWith(String name) {
     return 'Mostrar pontos com $name';
+  }
+
+  @override
+  String diveSites_deleteDialog_divesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos ficarão sem ponto de mergulho.',
+      one: '1 mergulho ficará sem ponto de mergulho.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_deleteDialog_plansKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count planos salvos ficarão sem ponto de mergulho.',
+      one: '1 plano salvo ficará sem ponto de mergulho.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -21061,6 +21094,19 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String tags_manage_narrowDialog_equipment(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Esta etiqueta está em $count equipamentos. Desativar \"Usar em equipamentos\" remove-a desses equipamentos.',
+      one:
+          'Esta etiqueta está em 1 equipamento. Desativar \"Usar em equipamentos\" remove-a desse equipamento.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String tags_manage_narrowDialog_sites(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -21078,10 +21124,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'Remover a etiqueta dos itens existentes?';
 
   @override
-  String get tags_manage_scopeRequired => 'Escolha mergulhos, pontos ou ambos';
+  String get tags_manage_scopeRequired =>
+      'Escolha pelo menos um: mergulhos, pontos ou equipamentos';
 
   @override
   String get tags_manage_scope_dives => 'Mergulhos';
+
+  @override
+  String get tags_manage_scope_equipment => 'Equipamentos';
 
   @override
   String get tags_manage_scope_sites => 'Pontos';
@@ -21099,7 +21149,22 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String tags_manage_equipmentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count equipamentos',
+      one: '1 equipamento',
+      zero: '0 equipamentos',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_manage_useForDives => 'Usar em mergulhos';
+
+  @override
+  String get tags_manage_useForEquipment => 'Usar em equipamentos';
 
   @override
   String get tags_manage_useForSites => 'Usar em pontos';
@@ -41091,4 +41156,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get plannerCanvas_compare_showOnChart => 'Show on chart';
+
+  @override
+  String get numberInput_invalidValue => 'Insira um número válido';
 }

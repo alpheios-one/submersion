@@ -7100,6 +7100,12 @@ abstract class AppLocalizations {
   /// **'No dives logged yet'**
   String get diveCenters_detail_noDivesLogged;
 
+  /// No description provided for @diveCenters_dialog_deleteDivesKept.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive will be left without a dive center.} other{{count} dives will be left without a dive center.}}'**
+  String diveCenters_dialog_deleteDivesKept(int count);
+
   /// No description provided for @diveCenters_dialog_deleteMessage.
   ///
   /// In en, this message translates to:
@@ -14709,6 +14715,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show sites with {name}'**
   String diveSites_detail_showSitesWith(String name);
+
+  /// No description provided for @diveSites_deleteDialog_divesKept.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive will be left without a site.} other{{count} dives will be left without a site.}}'**
+  String diveSites_deleteDialog_divesKept(int count);
+
+  /// No description provided for @diveSites_deleteDialog_plansKept.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 saved plan will be left without a site.} other{{count} saved plans will be left without a site.}}'**
+  String diveSites_deleteDialog_plansKept(int count);
 
   /// No description provided for @diveSites_detail_access_accessNotes.
   ///
@@ -34431,6 +34449,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{This tag is on 1 dive. Turning off \"Use for dives\" removes it from that dive.} other{This tag is on {count} dives. Turning off \"Use for dives\" removes it from those dives.}}'**
   String tags_manage_narrowDialog_dives(int count);
 
+  /// No description provided for @tags_manage_narrowDialog_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{This tag is on 1 equipment item. Turning off \"Use for equipment\" removes it from that item.} other{This tag is on {count} equipment items. Turning off \"Use for equipment\" removes it from those items.}}'**
+  String tags_manage_narrowDialog_equipment(int count);
+
   /// No description provided for @tags_manage_narrowDialog_sites.
   ///
   /// In en, this message translates to:
@@ -34446,7 +34470,7 @@ abstract class AppLocalizations {
   /// No description provided for @tags_manage_scopeRequired.
   ///
   /// In en, this message translates to:
-  /// **'Choose dives, sites, or both'**
+  /// **'Choose at least one: dives, sites, or equipment'**
   String get tags_manage_scopeRequired;
 
   /// No description provided for @tags_manage_scope_dives.
@@ -34454,6 +34478,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dives'**
   String get tags_manage_scope_dives;
+
+  /// No description provided for @tags_manage_scope_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment'**
+  String get tags_manage_scope_equipment;
 
   /// No description provided for @tags_manage_scope_sites.
   ///
@@ -34467,11 +34497,23 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{0 sites} =1{1 site} other{{count} sites}}'**
   String tags_manage_siteCount(int count);
 
+  /// No description provided for @tags_manage_equipmentCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 equipment items} =1{1 equipment item} other{{count} equipment items}}'**
+  String tags_manage_equipmentCount(int count);
+
   /// No description provided for @tags_manage_useForDives.
   ///
   /// In en, this message translates to:
   /// **'Use for dives'**
   String get tags_manage_useForDives;
+
+  /// No description provided for @tags_manage_useForEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Use for equipment'**
+  String get tags_manage_useForEquipment;
 
   /// No description provided for @tags_manage_useForSites.
   ///
@@ -66420,6 +66462,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show on chart'**
   String get plannerCanvas_compare_showOnChart;
+
+  /// No description provided for @numberInput_invalidValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid number'**
+  String get numberInput_invalidValue;
 }
 
 class _AppLocalizationsDelegate

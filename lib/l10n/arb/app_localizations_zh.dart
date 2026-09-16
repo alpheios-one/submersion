@@ -4107,6 +4107,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveCenters_detail_noDivesLogged => '尚未记录潜水';
 
   @override
+  String diveCenters_dialog_deleteDivesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次潜水将不再关联潜水中心。',
+      one: '1 次潜水将不再关联潜水中心。',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String diveCenters_dialog_deleteMessage(Object name) {
     return '确定要删除 \"$name\"?';
   }
@@ -8499,6 +8510,28 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String diveSites_detail_showSitesWith(String name) {
     return '显示带有 $name 的潜水点';
+  }
+
+  @override
+  String diveSites_deleteDialog_divesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次潜水将不再关联潜水点。',
+      one: '1 次潜水将不再关联潜水点。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_deleteDialog_plansKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个已保存的计划将不再关联潜水点。',
+      one: '1 个已保存的计划将不再关联潜水点。',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -19935,6 +19968,17 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String tags_manage_narrowDialog_equipment(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '此标签用于 $count 件装备。关闭“用于装备”将从这些装备中移除它。',
+      one: '此标签用于 1 件装备。关闭“用于装备”将从该装备中移除它。',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String tags_manage_narrowDialog_sites(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -19949,10 +19993,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tags_manage_narrowDialog_title => '从现有项目中移除此标签？';
 
   @override
-  String get tags_manage_scopeRequired => '请选择潜水、潜水点或两者';
+  String get tags_manage_scopeRequired => '请至少选择一项：潜水、潜水点或装备';
 
   @override
   String get tags_manage_scope_dives => '潜水';
+
+  @override
+  String get tags_manage_scope_equipment => '装备';
 
   @override
   String get tags_manage_scope_sites => '潜水点';
@@ -19970,7 +20017,22 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String tags_manage_equipmentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 件装备',
+      one: '1 件装备',
+      zero: '0 件装备',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_manage_useForDives => '用于潜水';
+
+  @override
+  String get tags_manage_useForEquipment => '用于装备';
 
   @override
   String get tags_manage_useForSites => '用于潜水点';
@@ -38674,4 +38736,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get plannerCanvas_compare_showOnChart => 'Show on chart';
+
+  @override
+  String get numberInput_invalidValue => '请输入有效的数字';
 }

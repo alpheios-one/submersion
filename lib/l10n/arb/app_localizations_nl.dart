@@ -4301,6 +4301,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveCenters_detail_noDivesLogged => 'Nog geen duiken gelogd';
 
   @override
+  String diveCenters_dialog_deleteDivesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken blijven zonder duikcentrum.',
+      one: '1 duik blijft zonder duikcentrum.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String diveCenters_dialog_deleteMessage(Object name) {
     return 'Weet je zeker dat je \"$name\" wilt verwijderen?';
   }
@@ -8857,6 +8868,28 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String diveSites_detail_showSitesWith(String name) {
     return 'Duikstekken met $name tonen';
+  }
+
+  @override
+  String diveSites_deleteDialog_divesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken blijven zonder stek.',
+      one: '1 duik blijft zonder stek.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_deleteDialog_plansKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count opgeslagen plannen blijven zonder stek.',
+      one: '1 opgeslagen plan blijft zonder stek.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -20879,6 +20912,19 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String tags_manage_narrowDialog_equipment(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Deze tag staat op $count uitrustingsstukken. Als je \"Gebruiken voor uitrusting\" uitzet, wordt hij van die uitrustingsstukken verwijderd.',
+      one:
+          'Deze tag staat op 1 uitrustingsstuk. Als je \"Gebruiken voor uitrusting\" uitzet, wordt hij van dat uitrustingsstuk verwijderd.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String tags_manage_narrowDialog_sites(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -20896,10 +20942,14 @@ class AppLocalizationsNl extends AppLocalizations {
       'Tag van bestaande items verwijderen?';
 
   @override
-  String get tags_manage_scopeRequired => 'Kies duiken, duikstekken of beide';
+  String get tags_manage_scopeRequired =>
+      'Kies er minstens één: duiken, duikstekken of uitrusting';
 
   @override
   String get tags_manage_scope_dives => 'Duiken';
+
+  @override
+  String get tags_manage_scope_equipment => 'Uitrusting';
 
   @override
   String get tags_manage_scope_sites => 'Duikstekken';
@@ -20917,7 +20967,22 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String tags_manage_equipmentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+      zero: '0 uitrustingsstukken',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_manage_useForDives => 'Gebruiken voor duiken';
+
+  @override
+  String get tags_manage_useForEquipment => 'Gebruiken voor uitrusting';
 
   @override
   String get tags_manage_useForSites => 'Gebruiken voor duikstekken';
@@ -40804,4 +40869,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get plannerCanvas_compare_showOnChart => 'Show on chart';
+
+  @override
+  String get numberInput_invalidValue => 'Voer een geldig getal in';
 }

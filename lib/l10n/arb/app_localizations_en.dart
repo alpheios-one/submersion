@@ -4252,6 +4252,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveCenters_detail_noDivesLogged => 'No dives logged yet';
 
   @override
+  String diveCenters_dialog_deleteDivesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives will be left without a dive center.',
+      one: '1 dive will be left without a dive center.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String diveCenters_dialog_deleteMessage(Object name) {
     return 'Are you sure you want to delete \"$name\"?';
   }
@@ -8773,6 +8784,28 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String diveSites_detail_showSitesWith(String name) {
     return 'Show sites with $name';
+  }
+
+  @override
+  String diveSites_deleteDialog_divesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives will be left without a site.',
+      one: '1 dive will be left without a site.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_deleteDialog_plansKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saved plans will be left without a site.',
+      one: '1 saved plan will be left without a site.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -20693,6 +20726,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String tags_manage_narrowDialog_equipment(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'This tag is on $count equipment items. Turning off \"Use for equipment\" removes it from those items.',
+      one:
+          'This tag is on 1 equipment item. Turning off \"Use for equipment\" removes it from that item.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String tags_manage_narrowDialog_sites(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -20710,10 +20756,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Remove tag from existing items?';
 
   @override
-  String get tags_manage_scopeRequired => 'Choose dives, sites, or both';
+  String get tags_manage_scopeRequired =>
+      'Choose at least one: dives, sites, or equipment';
 
   @override
   String get tags_manage_scope_dives => 'Dives';
+
+  @override
+  String get tags_manage_scope_equipment => 'Equipment';
 
   @override
   String get tags_manage_scope_sites => 'Sites';
@@ -20731,7 +20781,22 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String tags_manage_equipmentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count equipment items',
+      one: '1 equipment item',
+      zero: '0 equipment items',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_manage_useForDives => 'Use for dives';
+
+  @override
+  String get tags_manage_useForEquipment => 'Use for equipment';
 
   @override
   String get tags_manage_useForSites => 'Use for sites';
@@ -40464,4 +40529,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plannerCanvas_compare_showOnChart => 'Show on chart';
+
+  @override
+  String get numberInput_invalidValue => 'Enter a valid number';
 }
