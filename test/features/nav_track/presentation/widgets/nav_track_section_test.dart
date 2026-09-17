@@ -22,7 +22,7 @@ class _RecordingNavTrackRepository extends NavTrackRepository {
   String? primaryId;
 
   @override
-  Future<void> link(
+  Future<bool> link(
     String routeId,
     String diveId, {
     required NavTrackLinkMode linkMode,
@@ -30,6 +30,7 @@ class _RecordingNavTrackRepository extends NavTrackRepository {
     linkedRouteId = routeId;
     linkedDiveId = diveId;
     this.linkMode = linkMode;
+    return true;
   }
 
   @override

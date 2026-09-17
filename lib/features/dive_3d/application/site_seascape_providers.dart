@@ -14,6 +14,7 @@ import 'package:submersion/features/dive_3d/application/spatial_providers.dart';
 import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/contour_builder.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/reckoned_path.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/site_seascape_geometry_service.dart';
@@ -103,9 +104,13 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
     kept.map((d) => ref.watch(spatialReckonedPathProvider(d.id).future)),
   );
   // A linked primary route carries its own georeferenced start point
-  // (`anchor`), set by the diver on the alignment page; when present it
-  // places the measured route where the diver actually put it, rather than
-  // the dive's own entry fix.
+  // (`anchor`), set by the diver on the alignment page; when the scene is
+  // drawing that measured route, use it in place of the dive's own entry
+  // fix (mirrors spatial_providers.dart's per-dive scene). Gated on
+  // provenance: a dive whose path fell back to dead reckoning (route
+  // toggled off, or too short) must anchor at its own entry fix, not the
+  // route's, or the dead-reckoned path renders offset from where it was
+  // actually reckoned from.
   final routes = await Future.wait(
     kept.map((d) => ref.watch(primaryNavTrackForDiveProvider(d.id).future)),
   );
@@ -113,7 +118,9 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
   for (var i = 0; i < kept.length; i++) {
     final path = paths[i];
     if (path == null || path.points.length < 2) continue;
-    final anchorPoint = routes[i]?.anchor ?? kept[i].entryLocation;
+    final anchorPoint = path.provenance == PathProvenance.measured
+        ? (routes[i]?.anchor ?? kept[i].entryLocation)
+        : kept[i].entryLocation;
     divePaths.add(
       SiteDivePathInput(
         diveId: kept[i].id,

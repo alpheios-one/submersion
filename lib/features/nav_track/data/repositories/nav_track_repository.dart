@@ -204,7 +204,13 @@ class NavTrackRepository {
   /// site/location into the route, and only when the route has neither a
   /// site nor an anchor of its own yet, so a route the diver already
   /// positioned is never overwritten.
-  Future<void> link(
+  /// Returns true when [routeId] was actually linked. False (not an
+  /// exception) means the row was gone or already changed under this call
+  /// -- e.g. deleted or linked elsewhere between a caller reading it as
+  /// unlinked and this write landing -- so a sweep can tell a real link
+  /// from a no-op instead of reporting success for a write that touched
+  /// nothing.
+  Future<bool> link(
     String routeId,
     String diveId, {
     required domain.NavTrackLinkMode linkMode,
@@ -219,26 +225,29 @@ class NavTrackRepository {
       final inherited = route == null
           ? null
           : await _siteAndAnchorToInherit(route, diveId);
-      await (_db.update(
-        _db.navTracks,
-      )..where((t) => t.id.equals(routeId))).write(
-        NavTracksCompanion(
-          diveId: Value(diveId),
-          linkMode: Value(linkMode.wireValue),
-          isPrimary: Value(isPrimary),
-          siteId: inherited == null
-              ? const Value.absent()
-              : Value(inherited.siteId),
-          anchorLatitude: inherited?.anchor == null
-              ? const Value.absent()
-              : Value(inherited!.anchor!.latitude),
-          anchorLongitude: inherited?.anchor == null
-              ? const Value.absent()
-              : Value(inherited!.anchor!.longitude),
-          updatedAt: Value(now),
-        ),
-      );
+      final rowsAffected =
+          await (_db.update(
+            _db.navTracks,
+          )..where((t) => t.id.equals(routeId))).write(
+            NavTracksCompanion(
+              diveId: Value(diveId),
+              linkMode: Value(linkMode.wireValue),
+              isPrimary: Value(isPrimary),
+              siteId: inherited == null
+                  ? const Value.absent()
+                  : Value(inherited.siteId),
+              anchorLatitude: inherited?.anchor == null
+                  ? const Value.absent()
+                  : Value(inherited!.anchor!.latitude),
+              anchorLongitude: inherited?.anchor == null
+                  ? const Value.absent()
+                  : Value(inherited!.anchor!.longitude),
+              updatedAt: Value(now),
+            ),
+          );
+      if (rowsAffected == 0) return false;
       await _markPending(routeId, now);
+      return true;
     } catch (e, stackTrace) {
       _log.error(
         'Failed to link nav track $routeId to dive $diveId',
@@ -277,6 +286,8 @@ class NavTrackRepository {
   /// itself, its correction, and its samples are untouched.
   Future<void> unlink(String routeId) async {
     try {
+      final route = await getById(routeId, includePoints: false);
+      final diveId = route?.diveId;
       final now = DateTime.now().millisecondsSinceEpoch;
       await (_db.update(
         _db.navTracks,
@@ -289,6 +300,7 @@ class NavTrackRepository {
         ),
       );
       await _markPending(routeId, now);
+      if (diveId != null) await _promoteSiblingIfNoPrimary(diveId, now);
     } catch (e, stackTrace) {
       _log.error(
         'Failed to unlink nav track $routeId',
@@ -506,6 +518,8 @@ class NavTrackRepository {
 
   Future<void> delete(String routeId) async {
     try {
+      final route = await getById(routeId, includePoints: false);
+      final diveId = route?.diveId;
       await (_db.delete(
         _db.navTracks,
       )..where((t) => t.id.equals(routeId))).go();
@@ -514,6 +528,12 @@ class NavTrackRepository {
         recordId: routeId,
       );
       SyncEventBus.notifyLocalChange();
+      if (diveId != null) {
+        await _promoteSiblingIfNoPrimary(
+          diveId,
+          DateTime.now().millisecondsSinceEpoch,
+        );
+      }
     } catch (e, stackTrace) {
       _log.error(
         'Failed to delete nav track $routeId',
@@ -539,6 +559,33 @@ class NavTrackRepository {
             }))
             .get();
     return rows.isEmpty;
+  }
+
+  /// Promotes the earliest-recorded route still linked to [diveId] to
+  /// primary, when unlinking or deleting a route has left the dive with
+  /// siblings but none of them marked primary. Without this, a dive that
+  /// still has a linked route can end up with no `isPrimary: true` row at
+  /// all until a user happens to call [setPrimary] by hand.
+  Future<void> _promoteSiblingIfNoPrimary(String diveId, int now) async {
+    final stillPrimary =
+        await (_db.select(
+              _db.navTracks,
+            )..where((t) => t.diveId.equals(diveId) & t.isPrimary.equals(true)))
+            .getSingleOrNull();
+    if (stillPrimary != null) return;
+    final sibling =
+        await (_db.select(_db.navTracks)
+              ..where((t) => t.diveId.equals(diveId))
+              ..orderBy([(t) => OrderingTerm.asc(t.startTime)])
+              ..limit(1))
+            .getSingleOrNull();
+    if (sibling == null) return;
+    await (_db.update(
+      _db.navTracks,
+    )..where((t) => t.id.equals(sibling.id))).write(
+      NavTracksCompanion(isPrimary: const Value(true), updatedAt: Value(now)),
+    );
+    await _markPending(sibling.id, now);
   }
 
   Future<void> _markPending(String routeId, int now) async {

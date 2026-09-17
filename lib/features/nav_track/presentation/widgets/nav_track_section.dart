@@ -71,6 +71,7 @@ class NavTrackSection extends ConsumerWidget {
     );
     if (file == null) return;
     final bytes = await file.readAsBytes();
+    if (!context.mounted) return;
 
     final NavTrackImportPreview preview;
     try {
@@ -90,6 +91,7 @@ class NavTrackSection extends ConsumerWidget {
       );
       return;
     }
+    if (!context.mounted) return;
 
     await navigator.push<void>(
       MaterialPageRoute(

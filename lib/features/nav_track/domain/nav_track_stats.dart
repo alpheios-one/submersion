@@ -96,7 +96,12 @@ class NavTrackStats {
         }
       }
     }
-    if (deviceDistanceUsable) return points.last.distance!;
+    // The device's cumulative distance channel is not reset to zero at the
+    // start of this range (e.g. a pre-dive GPS-fix prefix the active range
+    // excludes), so the swum distance is the delta, not the raw reading.
+    if (deviceDistanceUsable) {
+      return points.last.distance! - points.first.distance!;
+    }
 
     var total = 0.0;
     for (var i = 1; i < points.length; i++) {

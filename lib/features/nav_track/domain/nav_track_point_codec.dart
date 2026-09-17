@@ -58,10 +58,10 @@ const int kMaxNavTrackBlobBytes = kMaxNavTrackBodyBytes;
 /// once that graph exists. Commas give a bound that can be had from the raw
 /// bytes before that allocation: for any JSON array,
 /// `elementCount <= commaCount + 1`, and this encoder writes exactly
-/// `10N` commas for N eleven-field tuples (9 inside each tuple, 1 between
-/// tuples, none after the last), so a legitimate maximal route sits under
-/// this cap and is never wrongly refused.
-const int kMaxNavTrackBodyCommas = 10 * kMaxNavTrackPointCount;
+/// `11N - 1` commas for N eleven-field tuples (10 inside each tuple, 1
+/// between tuples, none after the last), so a legitimate maximal route sits
+/// under this cap and is never wrongly refused.
+const int kMaxNavTrackBodyCommas = 11 * kMaxNavTrackPointCount - 1;
 
 /// Encodes [points] as a gzipped JSON array of
 /// `[wallClockEpochSeconds, north, east, depth, course, pitch, roll,

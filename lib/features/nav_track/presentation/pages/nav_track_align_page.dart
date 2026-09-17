@@ -24,38 +24,14 @@ import 'package:submersion/features/nav_track/domain/nav_track_georef.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_segmenter.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_terrain_check.dart';
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
+import 'package:submersion/features/nav_track/presentation/widgets/nav_track_align_geometry.dart';
+import 'package:submersion/features/nav_track/presentation/widgets/nav_track_align_map_layers.dart';
+import 'package:submersion/features/nav_track/presentation/widgets/nav_track_align_rotation_control.dart';
 import 'package:submersion/features/nav_track/presentation/widgets/nav_track_polyline_layer.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// What the crosshair-and-pan flow is currently placing, or nothing.
 enum _Placing { none, start, end }
-
-/// Cumulative distance per point, in metres, from the route's own first
-/// sample -- presentation-local wrapper because the trust slider is the
-/// only reader that needs it purely as a distance axis.
-///
-/// Delegates to [NavTrackCorrector.cumulativeDistances] instead of
-/// recomputing geometric path length here: on an ENC log the device's own
-/// `distance` channel and the 2D path length can disagree (a route that
-/// loops back near itself keeps accumulating device distance from the
-/// speed log while its geometric path length barely grows), and the
-/// corrector itself prefers the device channel when it is present and
-/// monotone (see [NavTrackCorrector.apply]). Recomputing path length
-/// independently here would let the slider's trusted metres, cutoff
-/// marker and duration point at a different sample than the correction
-/// actually freezes.
-///
-/// Callers that feed this the trust slider's axis must first truncate
-/// [points] to the active range
-/// ([NavTrackCorrector.activeRangeStartIndex]..[NavTrackCorrector.activeRangeEndIndex]):
-/// passing the whole raw recording would let a GPS-fix event's jump and
-/// post-surfacing wobble (or a pre-dive calibration) dominate the total,
-/// so the slider's "trusted up to" position would disagree with where
-/// [NavTrackCorrector.apply] actually freezes the route -- the prefix
-/// would look like it keeps moving as the diver drags the slider, when
-/// the correction itself has already stopped touching it.
-List<double> cumulativeDistances(List<NavTrackPoint> points) =>
-    NavTrackCorrector.cumulativeDistances(points);
 
 /// The corrected points of the ACTIVE dead-reckoned range only -- up to
 /// [NavTrackCorrector.activeRangeEndIndex] -- for the terrain check and its
@@ -77,19 +53,6 @@ List<CorrectedNavTrackPoint> _activeCorrectedPoints(
     activeStart.clamp(0, corrected.length),
     (activeEnd + 1).clamp(0, corrected.length),
   );
-}
-
-/// The index of the first point whose cumulative distance reaches
-/// [trustedDistance] -- the point the trust slider's cutoff marker sits on
-/// -- or the last index when none does (the whole route is within the
-/// trusted range). Shared by the trust readout's duration and the map
-/// marker so the two never disagree about which sample the slider points
-/// at.
-int trustCutoffIndex(List<double> cumulative, double trustedDistance) {
-  for (var i = 0; i < cumulative.length; i++) {
-    if (cumulative[i] >= trustedDistance) return i;
-  }
-  return cumulative.isEmpty ? 0 : cumulative.length - 1;
 }
 
 /// The alignment page (spec 2026-09-10-underwater-nav-track-design.md, "The
@@ -341,6 +304,15 @@ class _AlignPageBody extends ConsumerWidget {
     );
     final totalDistance = cumulative.isEmpty ? 0.0 : cumulative.last;
     final trustedDistance = correction.trustFraction * totalDistance;
+    // Computed once per build and shared by every layer that needs it below
+    // -- each drag/slider frame already rebuilds this widget, so applying
+    // the correction transform again per layer would repeat the same
+    // full-route pass multiple times per frame.
+    final corrected = NavTrackCorrector.apply(route.points, correction);
+    final activeCorrected = corrected.sublist(
+      activeStart.clamp(0, corrected.length),
+      (activeEnd + 1).clamp(0, corrected.length),
+    );
 
     final initialCenter = anchor != null
         ? LatLng(anchor.latitude, anchor.longitude)
@@ -384,25 +356,24 @@ class _AlignPageBody extends ConsumerWidget {
                         BathymetryDepthOverlayLayer(location: anchor),
                       NavTrackPolylineLayer(route: transientRoute),
                       if (anchor != null && hasFix)
-                        _GpsFixDotsLayer(route: route, anchor: anchor),
+                        NavTrackGpsFixDotsLayer(route: route, anchor: anchor),
                       if (anchor != null && state._terrainResult != null)
-                        _ConflictDotsLayer(
-                          route: route,
+                        NavTrackConflictDotsLayer(
+                          corrected: activeCorrected,
                           anchor: anchor,
-                          correction: correction,
                           result: state._terrainResult!,
                         ),
                       if (anchor != null && route.points.length >= 2)
-                        _TrustMarkerLayer(
+                        NavTrackTrustMarkerLayer(
                           route: route,
+                          corrected: corrected,
                           anchor: anchor,
-                          correction: correction,
                           activeStart: activeStart,
                           cumulative: cumulative,
                           trustedDistance: trustedDistance,
                         ),
                       if (anchor != null)
-                        _DraggableMarker(
+                        NavTrackDraggableMarker(
                           point: anchor,
                           color: Colors.green,
                           keyValue: 'nav-track-align-start-marker',
@@ -410,7 +381,7 @@ class _AlignPageBody extends ConsumerWidget {
                         ),
                       if (correction.endMode == NavTrackEndMode.point &&
                           correction.endPoint != null)
-                        _DraggableMarker(
+                        NavTrackDraggableMarker(
                           point: correction.endPoint!,
                           color: Colors.red,
                           keyValue: 'nav-track-align-end-marker',
@@ -678,7 +649,7 @@ class _ControlsPanel extends ConsumerWidget {
                       route,
                     ),
             ),
-            _RotationControl(
+            NavTrackRotationControl(
               headingOffsetDeg: correction.headingOffsetDeg,
               onChanged: (value) => state._updateCorrection(
                 (c) => c.copyWith(headingOffsetDeg: value),
@@ -714,353 +685,5 @@ class _ControlsPanel extends ConsumerWidget {
         ),
       ),
     );
-  }
-}
-
-/// The rotation control: the existing +/- stepper (0.5 degree steps)
-/// alongside a directly editable numeric field, so a diver who knows the
-/// exact declination correction they want does not have to click a button
-/// dozens of times. Values are clamped to [_min, _max] -- the same range a
-/// diver could reach one 0.5-degree step at a time is unbounded in
-/// principle, but a rotation outside +/-180 degrees is never meaningful
-/// (it is equivalent to a smaller rotation the other way), so that is the
-/// sensible bound for typed input.
-class _RotationControl extends StatefulWidget {
-  const _RotationControl({
-    required this.headingOffsetDeg,
-    required this.onChanged,
-  });
-
-  final double headingOffsetDeg;
-  final ValueChanged<double> onChanged;
-
-  @override
-  State<_RotationControl> createState() => _RotationControlState();
-}
-
-class _RotationControlState extends State<_RotationControl> {
-  static const double _min = -180;
-  static const double _max = 180;
-
-  late final TextEditingController _controller;
-  late final FocusNode _focusNode;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: _format(widget.headingOffsetDeg));
-    _focusNode = FocusNode()..addListener(_onFocusChange);
-  }
-
-  @override
-  void didUpdateWidget(covariant _RotationControl oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Re-seed only when the stored value actually moved (a stepper tap, a
-    // reset, or this field's own commit) and the diver isn't mid-edit --
-    // otherwise every keystroke elsewhere on the page would overwrite what
-    // they just typed.
-    if (!_focusNode.hasFocus &&
-        oldWidget.headingOffsetDeg != widget.headingOffsetDeg) {
-      _controller.text = _format(widget.headingOffsetDeg);
-    }
-  }
-
-  @override
-  void dispose() {
-    _focusNode.removeListener(_onFocusChange);
-    _focusNode.dispose();
-    _controller.dispose();
-    super.dispose();
-  }
-
-  static String _format(double value) => value.toStringAsFixed(1);
-
-  void _onFocusChange() {
-    if (!_focusNode.hasFocus) _commit();
-  }
-
-  /// Parses the field, clamps it, and reports it -- or, when the text is
-  /// not a valid number, leaves [widget.headingOffsetDeg] unchanged and
-  /// restores the field to it rather than crashing or silently zeroing it.
-  void _commit() {
-    final parsed = double.tryParse(_controller.text.trim());
-    if (parsed == null || !parsed.isFinite) {
-      _controller.text = _format(widget.headingOffsetDeg);
-      return;
-    }
-    final clamped = parsed.clamp(_min, _max);
-    _controller.text = _format(clamped);
-    if (clamped != widget.headingOffsetDeg) widget.onChanged(clamped);
-  }
-
-  void _step(double delta) {
-    final next = (widget.headingOffsetDeg + delta).clamp(_min, _max);
-    widget.onChanged(next);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    return Row(
-      children: [
-        Text(l10n.navTrack_align_rotationLabel),
-        IconButton(
-          key: const ValueKey('nav-track-align-rotate-down'),
-          icon: const Icon(Icons.remove),
-          onPressed: () => _step(-0.5),
-        ),
-        SizedBox(
-          width: 80,
-          child: TextField(
-            key: const ValueKey('nav-track-align-rotation-field'),
-            controller: _controller,
-            focusNode: _focusNode,
-            keyboardType: const TextInputType.numberWithOptions(
-              decimal: true,
-              signed: true,
-            ),
-            textInputAction: TextInputAction.done,
-            decoration: const InputDecoration(suffixText: '°', isDense: true),
-            onTapOutside: (_) => _focusNode.unfocus(),
-            onEditingComplete: _focusNode.unfocus,
-            onSubmitted: (_) => _focusNode.unfocus(),
-          ),
-        ),
-        IconButton(
-          key: const ValueKey('nav-track-align-rotate-up'),
-          icon: const Icon(Icons.add),
-          onPressed: () => _step(0.5),
-        ),
-      ],
-    );
-  }
-}
-
-/// A correction-target marker that reports pixel-delta drags. Fine
-/// adjustment uses screen-pixel deltas converted to degrees via the local
-/// Web Mercator metres-per-pixel formula rather than any flutter_map
-/// internal API, so it stays independent of the package's camera
-/// implementation.
-///
-/// Uses a raw [Listener] rather than [GestureDetector]'s `onPanUpdate`: a
-/// marker sits on top of `FlutterMap`'s own pan-to-move-the-map gesture, and
-/// a plain [GestureDetector] loses the gesture arena to it almost every
-/// time, so the marker looked draggable but silently never moved (the drag
-/// panned the map underneath it instead) -- easy to miss by eye since a
-/// marker pinned to a lat/lon does not visibly detach from the map while
-/// the whole view pans with it. [Listener] receives every routed pointer
-/// event directly, independent of which [GestureRecognizer] wins the arena
-/// for the same pointer, so the marker now actually moves every time.
-class _DraggableMarker extends StatelessWidget {
-  const _DraggableMarker({
-    required this.point,
-    required this.color,
-    required this.keyValue,
-    required this.onDrag,
-  });
-
-  final GeoPoint point;
-  final Color color;
-  final String keyValue;
-  final ValueChanged<Offset> onDrag;
-
-  @override
-  Widget build(BuildContext context) {
-    return MarkerLayer(
-      markers: [
-        Marker(
-          point: LatLng(point.latitude, point.longitude),
-          width: 36,
-          height: 36,
-          child: Listener(
-            key: ValueKey(keyValue),
-            behavior: HitTestBehavior.opaque,
-            onPointerMove: (event) => onDrag(event.delta),
-            child: Container(
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Marks the point on the route where the trust slider's cutoff sits: the
-/// sample whose cumulative distance first reaches `trustFraction *
-/// totalDistance` (design spec "The alignment page": "the trust point
-/// marked on the route"). Rendered as a diamond, distinct from the green
-/// start and red end glyphs, and moves live as the slider is dragged since
-/// it reads straight from the in-progress [correction].
-class _TrustMarkerLayer extends StatelessWidget {
-  const _TrustMarkerLayer({
-    required this.route,
-    required this.anchor,
-    required this.correction,
-    required this.activeStart,
-    required this.cumulative,
-    required this.trustedDistance,
-  });
-
-  final NavTrack route;
-  final GeoPoint anchor;
-  final NavTrackCorrection correction;
-  final int activeStart;
-  final List<double> cumulative;
-  final double trustedDistance;
-
-  @override
-  Widget build(BuildContext context) {
-    final corrected = NavTrackCorrector.apply(route.points, correction);
-    final relativeIndex = trustCutoffIndex(cumulative, trustedDistance);
-    final index = activeStart + relativeIndex;
-    if (index >= corrected.length) return const SizedBox.shrink();
-    final p = corrected[index];
-    final geo = offsetToGeoPoint(anchor, east: p.east, north: p.north);
-    return MarkerLayer(
-      markers: [
-        Marker(
-          point: LatLng(geo.latitude, geo.longitude),
-          width: 20,
-          height: 20,
-          child: Tooltip(
-            message: context.l10n.navTrack_align_trustSummary(
-              trustedDistance.toStringAsFixed(0),
-              ((route.points[index].timestamp -
-                          route.points[activeStart].timestamp) /
-                      60)
-                  .round(),
-            ),
-            child: const _TrustGlyph(
-              key: ValueKey('nav-track-align-trust-marker'),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// A small orange diamond -- visually distinct from the round green start
-/// and red end glyphs -- marking the trust slider's cutoff point.
-class _TrustGlyph extends StatelessWidget {
-  const _TrustGlyph({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Transform.rotate(
-      angle: math.pi / 4,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.orange,
-          border: Border.all(color: Colors.white, width: 1.5),
-        ),
-      ),
-    );
-  }
-}
-
-/// Renders the device's own GPS-fixed samples as yellow dots.
-///
-/// Deliberately built from the RAW `route.points`, never from
-/// `NavTrackCorrector.apply`: a `gpsFixed` sample is the console's own
-/// GPS-derived position (see the design spec, "Segments and GPS fixes"),
-/// already the truth the dead-reckoned path is being corrected *against*,
-/// not part of the path being corrected. Rotating it by `headingOffsetDeg`
-/// or shifting it by the trust/end-point rubber band would apply a
-/// correction for the console's dead-reckoning error to a position that
-/// never went through dead reckoning in the first place. The dot only ever
-/// moves when the anchor itself moves, since it is still expressed as a
-/// local (north, east) offset from the recording's own origin.
-class _GpsFixDotsLayer extends StatelessWidget {
-  const _GpsFixDotsLayer({required this.route, required this.anchor});
-
-  final NavTrack route;
-  final GeoPoint anchor;
-
-  @override
-  Widget build(BuildContext context) {
-    final kinds = NavTrackSegmenter.classify(route.points).kinds;
-    final points = route.points;
-    final markers = <Marker>[
-      for (var i = 0; i < points.length; i++)
-        if (kinds[i] == NavTrackSampleKind.gpsFixed)
-          Marker(
-            point: LatLng(
-              offsetToGeoPoint(
-                anchor,
-                east: points[i].east,
-                north: points[i].north,
-              ).latitude,
-              offsetToGeoPoint(
-                anchor,
-                east: points[i].east,
-                north: points[i].north,
-              ).longitude,
-            ),
-            width: 6,
-            height: 6,
-            child: const DecoratedBox(
-              decoration: BoxDecoration(
-                color: Colors.yellow,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-    ];
-    return MarkerLayer(markers: markers);
-  }
-}
-
-class _ConflictDotsLayer extends StatelessWidget {
-  const _ConflictDotsLayer({
-    required this.route,
-    required this.anchor,
-    required this.correction,
-    required this.result,
-  });
-
-  final NavTrack route;
-  final GeoPoint anchor;
-  final NavTrackCorrection correction;
-  final NavTrackTerrainCheckResult result;
-
-  @override
-  Widget build(BuildContext context) {
-    // Must use the same active-range truncation _runTerrainCheck used to
-    // produce [result], so its indices land on the same points here.
-    final corrected = _activeCorrectedPoints(route.points, correction);
-    final conflicts = result.conflictingIndices;
-    final markers = <Marker>[
-      for (final i in conflicts)
-        if (i < corrected.length)
-          Marker(
-            point: LatLng(
-              offsetToGeoPoint(
-                anchor,
-                east: corrected[i].east,
-                north: corrected[i].north,
-              ).latitude,
-              offsetToGeoPoint(
-                anchor,
-                east: corrected[i].east,
-                north: corrected[i].north,
-              ).longitude,
-            ),
-            width: 8,
-            height: 8,
-            child: const DecoratedBox(
-              decoration: BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-    ];
-    return MarkerLayer(markers: markers);
   }
 }

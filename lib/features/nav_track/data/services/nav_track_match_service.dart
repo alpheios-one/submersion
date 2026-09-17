@@ -65,12 +65,12 @@ class NavTrackMatchService {
         needsChoice.add(route.id);
         continue;
       }
-      await _routeRepository.link(
+      final didLink = await _routeRepository.link(
         route.id,
         candidates.single.id,
         linkMode: NavTrackLinkMode.auto,
       );
-      linked.add(route.id);
+      if (didLink) linked.add(route.id);
     }
     return (linked: linked, needsChoice: needsChoice);
   }
