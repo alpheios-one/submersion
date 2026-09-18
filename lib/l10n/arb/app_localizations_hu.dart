@@ -9619,7 +9619,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveSites_filter_clearAll => 'Összes törlése';
 
   @override
-  String get diveSites_filter_country_hint => 'pl. Thaiföld';
+  String get diveSites_filter_allCountries => 'All countries';
+
+  @override
+  String get diveSites_filter_allRegions => 'All regions';
 
   @override
   String get diveSites_filter_country_label => 'Ország';
@@ -9656,10 +9659,13 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get diveSites_filter_region_hint => 'pl. Phuket';
+  String get diveSites_filter_region_label => 'Régió';
 
   @override
-  String get diveSites_filter_region_label => 'Régió';
+  String get diveSites_filter_searchCountriesHint => 'Type to search countries';
+
+  @override
+  String get diveSites_filter_searchRegionsHint => 'Type to search regions';
 
   @override
   String get diveSites_filter_section_depthRange => 'Max mélység tartomány';

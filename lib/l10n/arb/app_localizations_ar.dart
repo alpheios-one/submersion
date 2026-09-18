@@ -9453,7 +9453,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveSites_filter_clearAll => 'مسح الكل';
 
   @override
-  String get diveSites_filter_country_hint => 'مثال: تايلاند';
+  String get diveSites_filter_allCountries => 'All countries';
+
+  @override
+  String get diveSites_filter_allRegions => 'All regions';
 
   @override
   String get diveSites_filter_country_label => 'الدولة';
@@ -9491,10 +9494,13 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get diveSites_filter_region_hint => 'مثال: فوكيت';
+  String get diveSites_filter_region_label => 'المنطقة';
 
   @override
-  String get diveSites_filter_region_label => 'المنطقة';
+  String get diveSites_filter_searchCountriesHint => 'Type to search countries';
+
+  @override
+  String get diveSites_filter_searchRegionsHint => 'Type to search regions';
 
   @override
   String get diveSites_filter_section_depthRange => 'نطاق أقصى عمق';

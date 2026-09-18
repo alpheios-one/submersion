@@ -9173,7 +9173,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_filter_clearAll => '清除全部';
 
   @override
-  String get diveSites_filter_country_hint => '例如，泰国';
+  String get diveSites_filter_allCountries => 'All countries';
+
+  @override
+  String get diveSites_filter_allRegions => 'All regions';
 
   @override
   String get diveSites_filter_country_label => '国家';
@@ -9209,10 +9212,13 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get diveSites_filter_region_hint => '例如，普吉岛';
+  String get diveSites_filter_region_label => '地区';
 
   @override
-  String get diveSites_filter_region_label => '地区';
+  String get diveSites_filter_searchCountriesHint => 'Type to search countries';
+
+  @override
+  String get diveSites_filter_searchRegionsHint => 'Type to search regions';
 
   @override
   String get diveSites_filter_section_depthRange => '最大深度范围';
