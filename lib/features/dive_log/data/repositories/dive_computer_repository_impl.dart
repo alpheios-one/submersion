@@ -36,6 +36,7 @@ import 'package:submersion/features/dive_log/domain/services/bottom_time_calcula
 import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
 import 'package:submersion/features/dive_log/domain/services/tank_pressure_series.dart';
 import 'package:submersion/features/equipment/data/services/dive_computer_gear_linker.dart';
+import 'package:submersion/features/equipment/data/services/equipment_set_for_computer_linker.dart';
 import 'package:submersion/features/equipment/data/services/dive_computer_gear_resolver.dart';
 import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
 import 'package:submersion/features/pre_dive/data/services/checklist_dive_linker.dart';
@@ -1221,6 +1222,14 @@ class DiveComputerRepository {
     int? gfLow,
     int? gfHigh,
     int? decoConservatism,
+    // CCR/SCR diluent gas mix (issue #1879), derived from the resolved tank
+    // list's Diluent cylinder by the caller. Null when the download had none
+    // (OC dive, or a CCR dive whose transmitter naming did not resolve to a
+    // role). Only ever written for a brand-new dive row below; a dive
+    // matched to an existing row keeps whatever diluent it already has, the
+    // same way every other field in that branch is left untouched.
+    double? diluentO2,
+    double? diluentHe,
     List<EventData>? events,
     List<GasSwitchData>? gasSwitches,
     int? diveNumber,
@@ -1358,6 +1367,16 @@ class DiveComputerRepository {
                 decoAlgorithm: Value(decoAlgorithm),
                 decoConservatism: Value(decoConservatism),
                 diveMode: Value(diveMode.code),
+                // Only set when the caller resolved a Diluent cylinder,
+                // never a fabricated default -- an OC dive or a CCR dive
+                // whose transmitter naming didn't resolve to a role stays
+                // without one, exactly as if no diluent had been entered.
+                diluentO2: diluentO2 != null
+                    ? Value(diluentO2)
+                    : const Value.absent(),
+                diluentHe: diluentO2 != null
+                    ? Value(diluentHe ?? 0.0)
+                    : const Value.absent(),
                 diveType: Value(diveTypeId),
                 createdAt: Value(now),
                 updatedAt: Value(now),
@@ -1410,6 +1429,13 @@ class DiveComputerRepository {
         // that already has equipment, so linking first would suppress the
         // diver's default and geofenced sets.
         await DiveComputerGearLinker().linkComputerGearForDive(diveId: diveId);
+
+        // Apply every equipment set that lists this computer as a member
+        // (issue #1020), e.g. a CCR rig set that bundles the controller with
+        // drysuit and tec fins. Additive, independent of the defaulter above.
+        await EquipmentSetForComputerLinker().linkComputerSetsForDive(
+          diveId: diveId,
+        );
 
         // Auto-link a pre-dive checklist session started shortly before
         // this dive's entry time.
@@ -1761,6 +1787,11 @@ class DiveComputerRepository {
         // existing dive, but the computer did log it. Idempotent through
         // insertOnConflictUpdate.
         await DiveComputerGearLinker().linkComputerGearForDive(diveId: diveId);
+        // Apply every equipment set that lists this computer as a member
+        // (issue #1020). Additive, independent of the defaulter above.
+        await EquipmentSetForComputerLinker().linkComputerSetsForDive(
+          diveId: diveId,
+        );
       }
 
       // Note: Computer stats (incrementDiveCount, updateLastDownload) are

@@ -23,15 +23,24 @@ class _TagMergeSheetState extends ConsumerState<TagMergeSheet> {
   late String _selectedColor;
   late String _selectedNameFromTag;
 
-  /// The dives and sites the merge rewrites, counted as a union; null until
+  /// The items the merge rewrites per scope, counted as a union; null until
   /// loaded.
-  ({int dives, int sites})? _affected;
+  Map<TagScope, int>? _affected;
   bool _isMerging = false;
 
+  /// Most used first, in the Manage Tags list's order: dives, then sites,
+  /// then equipment (#1942). The first one seeds the name and the color, so
+  /// a merge of equipment-only tags starts from the one on the most items.
   List<TagStatistic> get _sortedStats {
-    final sorted = [...widget.selectedStats];
-    sorted.sort((a, b) => b.diveCount.compareTo(a.diveCount));
-    return sorted;
+    int byUse(TagStatistic a, TagStatistic b) {
+      for (final scope in TagScope.values) {
+        final order = b.count(scope).compareTo(a.count(scope));
+        if (order != 0) return order;
+      }
+      return 0;
+    }
+
+    return [...widget.selectedStats]..sort(byUse);
   }
 
   @override
@@ -52,8 +61,8 @@ class _TagMergeSheetState extends ConsumerState<TagMergeSheet> {
     );
   }
 
-  /// mergeTags relinks site_tags as well as dive_tags, so the preview counts
-  /// both (#1902).
+  /// mergeTags relinks every junction of the tag scope registry, so the
+  /// preview counts each scope (#1902, #1942).
   Future<void> _loadAffected() async {
     final repository = ref.read(tagRepositoryProvider);
     final tagIds = widget.selectedStats.map((s) => s.tag.id).toList();
@@ -170,11 +179,7 @@ class _TagMergeSheetState extends ConsumerState<TagMergeSheet> {
                         value: stat.tag.id,
                         title: Text(stat.tag.name),
                         subtitle: Text(
-                          tagUsageCounts(
-                            context.l10n,
-                            dives: stat.diveCount,
-                            sites: stat.siteCount,
-                          ),
+                          tagUsageCounts(context.l10n, stat.counts),
                         ),
                         secondary: CircleAvatar(
                           radius: 12,
@@ -208,11 +213,7 @@ class _TagMergeSheetState extends ConsumerState<TagMergeSheet> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Text(
-                  tagsMergeAffectedMessage(
-                    context.l10n,
-                    dives: affected.dives,
-                    sites: affected.sites,
-                  ),
+                  tagsMergeAffectedMessage(context.l10n, affected),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),

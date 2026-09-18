@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
+import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/tags/data/repositories/tag_repository.dart';
 import 'package:submersion/features/tags/domain/entities/tag.dart';
@@ -16,6 +17,7 @@ import 'package:submersion/features/tags/presentation/widgets/tag_merge_sheet.da
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/shared/selection/selection_leading.dart';
 
+import '../../../../helpers/fab_clearance.dart';
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/selection_contract.dart';
 
@@ -33,7 +35,7 @@ final _testStats = [
       createdAt: DateTime(2024),
       updatedAt: DateTime(2024),
     ),
-    diveCount: 12,
+    counts: const {TagScope.dives: 12},
   ),
   TagStatistic(
     tag: Tag(
@@ -44,7 +46,7 @@ final _testStats = [
       createdAt: DateTime(2024),
       updatedAt: DateTime(2024),
     ),
-    diveCount: 5,
+    counts: const {TagScope.dives: 5},
   ),
 ];
 
@@ -109,13 +111,15 @@ class _MockTagListNotifier extends StateNotifier<AsyncValue<List<Tag>>>
 
 /// Mock TagRepository used only for [tagRepositoryProvider] overrides.
 class _MockTagRepository extends TagRepository {
-  _MockTagRepository({this.mergedUsage = (dives: 0, sites: 0)});
+  _MockTagRepository({
+    this.mergedUsage = const {TagScope.dives: 0, TagScope.sites: 0},
+  });
 
   /// What a bulk delete's preview reports for the selection.
-  final ({int dives, int sites}) mergedUsage;
+  final Map<TagScope, int> mergedUsage;
 
   @override
-  Future<({int dives, int sites})> getMergedUsage(List<String> tagIds) async =>
+  Future<Map<TagScope, int>> getMergedUsage(List<String> tagIds) async =>
       mergedUsage;
 
   @override
@@ -128,6 +132,25 @@ class _MockTagRepository extends TagRepository {
 
 List<Tag> _tagsFromStats(List<TagStatistic> stats) =>
     stats.map((s) => s.tag).toList();
+
+/// A stat for a tag offered in [scopes] and used [counts] times per scope.
+TagStatistic _scopedStat(
+  String id,
+  String name,
+  Set<TagScope> scopes,
+  Map<TagScope, int> counts,
+) => TagStatistic(
+  tag: Tag(
+    id: id,
+    diverId: 'diver1',
+    name: name,
+    colorHex: '#F97316',
+    scopes: scopes,
+    createdAt: DateTime(2024),
+    updatedAt: DateTime(2024),
+  ),
+  counts: counts,
+);
 
 Widget _buildTestWidget({
   List<TagStatistic> stats = const [],
@@ -184,6 +207,11 @@ Widget _buildRoutedTestWidget({
         path: '/sites',
         builder: (context, state) =>
             const Scaffold(body: Text('SITES_LIST_PAGE')),
+      ),
+      GoRoute(
+        path: '/equipment',
+        builder: (context, state) =>
+            const Scaffold(body: Text('EQUIPMENT_LIST_PAGE')),
       ),
     ],
   );
@@ -294,6 +322,27 @@ void main() {
       // Usage counts: "12 dives" and "5 dives"
       expect(find.text('12 dives'), findsOneWidget);
       expect(find.text('5 dives'), findsOneWidget);
+    });
+
+    testWidgets('the last tag\'s edit button clears the Add Tag button', (
+      tester,
+    ) async {
+      final stats = [
+        for (var i = 0; i < 20; i++)
+          _scopedStat(
+            'tag$i',
+            'Tag $i',
+            const {TagScope.dives},
+            const {TagScope.dives: 1},
+          ),
+      ];
+      await tester.pumpWidget(_buildTestWidget(stats: stats));
+      await tester.pumpAndSettle();
+
+      await expectLastRowClearOfFab(
+        tester,
+        lastRow: find.byKey(const ValueKey('tag_edit_tag19')),
+      );
     });
 
     testWidgets('shows empty state when no tags exist', (tester) async {
@@ -522,11 +571,9 @@ void main() {
           name: 'To try',
           createdAt: DateTime(2024),
           updatedAt: DateTime(2024),
-          appliesToDives: forDives,
-          appliesToSites: true,
+          scopes: {if (forDives) TagScope.dives, TagScope.sites},
         ),
-        diveCount: forDives ? 2 : 0,
-        siteCount: 3,
+        counts: {TagScope.dives: forDives ? 2 : 0, TagScope.sites: 3},
       );
 
       Future<void> tapAndExpectStayPut(WidgetTester tester) async {
@@ -870,8 +917,8 @@ void main() {
       final created = notifier.added.single;
       expect(created.name, 'To try');
       expect(created.colorHex, '#22C55E');
-      expect(created.appliesToDives, isFalse);
-      expect(created.appliesToSites, isTrue);
+      expect(created.appliesTo(TagScope.dives), isFalse);
+      expect(created.appliesTo(TagScope.sites), isTrue);
       expect(find.byType(AlertDialog), findsNothing);
     });
 
@@ -1006,13 +1053,13 @@ void main() {
       await tester.tap(find.widgetWithText(CheckboxListTile, 'Use for dives'));
       await tester.pump();
 
-      repository.usage.complete((dives: 0, sites: 0));
+      repository.usage.complete(const {TagScope.dives: 0, TagScope.sites: 0});
       await tester.pumpAndSettle();
 
       final saved = notifier.updated.single;
       expect(saved.colorHex, '#EF4444');
-      expect(saved.appliesToDives, isFalse);
-      expect(saved.appliesToSites, isTrue);
+      expect(saved.appliesTo(TagScope.dives), isFalse);
+      expect(saved.appliesTo(TagScope.sites), isTrue);
     });
   });
 
@@ -1191,13 +1238,11 @@ void main() {
         diverId: 'diver1',
         name: 'To try',
         colorHex: '#F97316',
-        appliesToDives: false,
-        appliesToSites: true,
+        scopes: const {TagScope.sites},
         createdAt: DateTime(2024),
         updatedAt: DateTime(2024),
       ),
-      diveCount: 0,
-      siteCount: 3,
+      counts: const {TagScope.dives: 0, TagScope.sites: 3},
     );
 
     testWidgets('a sites-only tag names its sites', (tester) async {
@@ -1223,7 +1268,9 @@ void main() {
       await tester.pumpWidget(
         _buildTestWidget(
           stats: [..._testStats, sitesOnlyStat],
-          repository: _MockTagRepository(mergedUsage: (dives: 12, sites: 3)),
+          repository: _MockTagRepository(
+            mergedUsage: const {TagScope.dives: 12, TagScope.sites: 3},
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -1242,6 +1289,131 @@ void main() {
         find.text(
           'These tags will be removed from 12 dives and 3 sites total. '
           'This cannot be undone.',
+        ),
+        findsOneWidget,
+      );
+    });
+  });
+
+  group('the equipment scope (#1942)', () {
+    const d = TagScope.dives;
+    const s = TagScope.sites;
+    const e = TagScope.equipment;
+    final kit = _scopedStat('kit', 'Travel kit', const {e}, const {e: 2});
+
+    testWidgets('a row names every scope and its usage in each', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildTestWidget(
+          stats: [
+            _scopedStat(
+              'all',
+              'Everywhere',
+              const {d, s, e},
+              const {d: 12, s: 3, e: 5},
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Dives · Sites · Equipment'), findsOneWidget);
+      expect(find.text('12 dives, 3 sites, 5 equipment items'), findsOneWidget);
+    });
+
+    testWidgets('an equipment tag row stays on the page', (tester) async {
+      await tester.pumpWidget(_buildRoutedTestWidget(stats: [kit]));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Travel kit'));
+      await tester.pumpAndSettle();
+
+      // Rows are inert outside selection (#1888), whatever the scope.
+      expect(find.text('EQUIPMENT_LIST_PAGE'), findsNothing);
+      expect(find.text('Edit Tag'), findsNothing);
+      final container = ProviderScope.containerOf(
+        tester.element(find.text('Travel kit')),
+      );
+      expect(container.read(equipmentFilterProvider).tagIds, isEmpty);
+    });
+
+    testWidgets('a create can offer a tag for equipment only', (tester) async {
+      final notifier = _MockTagListNotifier(_tagsFromStats(_testStats));
+      await tester.pumpWidget(
+        _buildTestWidget(stats: _testStats, notifier: notifier),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, 'Rental');
+      await tester.tap(find.widgetWithText(CheckboxListTile, 'Use for dives'));
+      final useForEquipment = find.widgetWithText(
+        CheckboxListTile,
+        'Use for equipment',
+      );
+      await tester.ensureVisible(useForEquipment);
+      await tester.tap(useForEquipment);
+      await tester.pump();
+      await tester.tap(find.widgetWithText(TextButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      expect(notifier.added.single.scopes, {e});
+    });
+
+    testWidgets('widening a tag to equipment saves without asking', (
+      tester,
+    ) async {
+      final notifier = _MockTagListNotifier(_tagsFromStats(_testStats));
+      await tester.pumpWidget(
+        _buildTestWidget(stats: _testStats, notifier: notifier),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey('tag_edit_tag1')));
+      await tester.pumpAndSettle();
+      final useForEquipment = find.widgetWithText(
+        CheckboxListTile,
+        'Use for equipment',
+      );
+      await tester.ensureVisible(useForEquipment);
+      await tester.tap(useForEquipment);
+      await tester.pump();
+      await tester.tap(find.widgetWithText(TextButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Remove tag from existing items?'), findsNothing);
+      expect(notifier.updated.single.scopes, {d, e});
+    });
+
+    testWidgets('a bulk delete names dives, sites and equipment', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildTestWidget(
+          stats: [..._testStats, kit],
+          repository: _MockTagRepository(
+            mergedUsage: const {d: 12, s: 3, e: 2},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Night Dive'));
+      await tester.tap(find.text('Travel kit'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('selection_overflow')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('selection_delete')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(
+          'These tags will be removed from 12 dives, 3 sites, and 2 equipment '
+          'items total. This cannot be undone.',
         ),
         findsOneWidget,
       );
@@ -1281,10 +1453,10 @@ class _FailOnceTagListNotifier extends _MockTagListNotifier {
 /// A repository whose usage read waits on [usage], so a test can act while
 /// the narrowing check is in flight.
 class _GatedUsageTagRepository extends _MockTagRepository {
-  final Completer<({int dives, int sites})> usage = Completer();
+  final Completer<Map<TagScope, int>> usage = Completer();
 
   @override
-  Future<({int dives, int sites})> getTagUsage(String tagId) => usage.future;
+  Future<Map<TagScope, int>> getTagUsage(String tagId) => usage.future;
 }
 
 /// A notifier whose saves fail, as a database or sync failure would.

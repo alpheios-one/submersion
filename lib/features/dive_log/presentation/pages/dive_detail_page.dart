@@ -1829,54 +1829,6 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               ),
               // Content
               content,
-              // View Site button
-              if (site != null)
-                Positioned(
-                  right: 8,
-                  top: 8,
-                  // Decorative label only: no gesture recognizer of its own.
-                  // It is a DESCENDANT of the card's InkWell, so the hit path
-                  // still reaches that ancestor and the whole card stays one
-                  // tap target. Giving this badge its own onTap would carve a
-                  // competing recognizer out of the card (see the badge tap
-                  // test).
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.arrow_forward,
-                          size: 14,
-                          color: colorScheme.onPrimaryContainer,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          context.l10n.diveLog_detail_viewSite,
-                          style: Theme.of(context).textTheme.labelSmall
-                              ?.copyWith(
-                                color: colorScheme.onPrimaryContainer,
-                                fontWeight: FontWeight.w600,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
             ],
           ),
         ),
@@ -2048,39 +2000,6 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                               ? notifier.disableRangeMode()
                               : notifier.enableRangeMode();
                         },
-                      ),
-                    // A Builder so the share anchor resolves to this button
-                    // rather than the whole profile card; it contributes no
-                    // render object, so the lookup descends to the IconButton.
-                    Builder(
-                      builder: (shareContext) => IconButton(
-                        icon: _isExportingProfile
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(Icons.share),
-                        tooltip: context
-                            .l10n
-                            .diveLog_detail_tooltip_exportProfileImage,
-                        visualDensity: VisualDensity.compact,
-                        onPressed: _isExportingProfile
-                            ? null
-                            : () => _exportProfileChart(
-                                dive,
-                                shareAnchorFrom(shareContext),
-                              ),
-                      ),
-                    ),
-                    if (dive.profile.isNotEmpty)
-                      IconButton(
-                        icon: const Icon(Icons.alt_route),
-                        tooltip: context.l10n.diveLog_detail_tooltip_whatIf,
-                        visualDensity: VisualDensity.compact,
-                        onPressed: () => showWhatIfSheet(context, dive),
                       ),
                     IconButton(
                       icon: const Icon(Icons.view_in_ar),
@@ -3359,11 +3278,18 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             if (dive.trip != null) _buildTripRow(context, dive),
             if (dive.diveCenter != null) _buildDiveCenterRow(context, dive),
             if (dive.courseId != null) _buildCourseRow(context, ref, dive),
-            if (dive.visibility != null)
+            if (formatDiveVisibility(
+                  meters: dive.visibilityMeters,
+                  legacy: dive.visibility,
+                  scale: ref.watch(settingsProvider).visibilityScale,
+                  l10n: context.l10n,
+                  units: units,
+                )
+                case final visibility?)
               _buildDetailRow(
                 context,
                 context.l10n.diveLog_detail_label_visibility,
-                visibilityName(dive.visibility!, context.l10n),
+                visibility,
               ),
             if (dive.avgDepth != null)
               _buildDetailRow(
@@ -5691,6 +5617,31 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               },
             ),
             const Divider(height: 1),
+            // Only offered when there is a chart to capture. The profile
+            // section does not build for an empty profile, so the
+            // RepaintBoundary _exportProfileChart reads would not exist and
+            // the export could only fail.
+            if (dive.profile.isNotEmpty)
+              ListTile(
+                leading: const Icon(Icons.show_chart),
+                title: Text(context.l10n.diveLog_export_profileAsImage),
+                subtitle: Text(
+                  context.l10n.diveLog_export_profileAsImageDescription,
+                ),
+                trailing: _isExportingProfile
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : null,
+                onTap: _isExportingProfile
+                    ? null
+                    : () {
+                        Navigator.of(sheetContext).pop();
+                        _exportProfileChart(dive, shareAnchor);
+                      },
+              ),
             ListTile(
               leading: const Icon(Icons.image),
               title: Text(context.l10n.diveLog_export_pageAsImage),

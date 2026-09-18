@@ -35,6 +35,32 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String equipment_rowLabel_identifier(Object identifier) {
+    return 'ID $identifier';
+  }
+
+  @override
+  String equipment_rowLabel_serial(Object serial) {
+    return 'S/N $serial';
+  }
+
+  @override
+  String equipment_rowLabel_purchased(Object date) {
+    return 'Gekocht $date';
+  }
+
+  @override
+  String equipment_components_countOfTotal(int count, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$count van $total onderdelen',
+      one: '$count van 1 onderdeel',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get equipment_components_cycleError =>
       'Dat item bevat dit item al, dus het kan niet als onderdeel worden toegevoegd.';
 
@@ -213,6 +239,14 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get equipment_setEdit_defaultSwitch_subtitle =>
       'Automatisch toegepast op nieuwe duiken zonder uitrusting';
+
+  @override
+  String get equipment_setEdit_computerAutoApplySwitch_title =>
+      'Toepassen wanneer de computer van deze set wordt geïmporteerd';
+
+  @override
+  String get equipment_setEdit_computerAutoApplySwitch_subtitle =>
+      'Als deze set een duikcomputer bevat, wordt de hele set automatisch toegevoegd aan een duik die van deze computer is gedownload of geïmporteerd';
 
   @override
   String get equipment_setEdit_geofencesTitle => 'Geofences';
@@ -2534,6 +2568,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get certifications_wallet_tooltip_add => 'Certificering toevoegen';
 
   @override
+  String get certifications_wallet_tooltip_moreOptions => 'Meer opties';
+
+  @override
   String get certifications_wallet_tooltip_share => 'Certificering delen';
 
   @override
@@ -3034,6 +3071,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get preDive_start_begin => 'Beginnen';
+
+  @override
+  String get diveLog_gear_addMissingParts => 'Ontbrekende onderdelen toevoegen';
 
   @override
   String get diveLog_gear_collapse => 'Onderdelen verbergen';
@@ -4298,6 +4338,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveCenters_detail_noDivesLogged => 'Nog geen duiken gelogd';
 
   @override
+  String diveCenters_dialog_deleteDivesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken blijven zonder duikcentrum.',
+      one: '1 duik blijft zonder duikcentrum.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String diveCenters_dialog_deleteMessage(Object name) {
     return 'Weet je zeker dat je \"$name\" wilt verwijderen?';
   }
@@ -5477,10 +5528,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_detail_tooltip_nextDive => 'Next dive';
 
   @override
-  String get diveLog_detail_tooltip_exportProfileImage =>
-      'Profiel exporteren als afbeelding';
-
-  @override
   String get diveLog_detail_tooltip_removeFromFavorites =>
       'Uit favorieten verwijderen';
 
@@ -6257,6 +6304,13 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveLog_export_pdfLogbookEntry => 'PDF Logboekvermelding';
+
+  @override
+  String get diveLog_export_profileAsImage => 'Profiel als afbeelding';
+
+  @override
+  String get diveLog_export_profileAsImageDescription =>
+      'Schermafbeelding van de duikprofielgrafiek';
 
   @override
   String get diveLog_export_success => 'Duik succesvol geëxporteerd';
@@ -8854,6 +8908,28 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String diveSites_detail_showSitesWith(String name) {
     return 'Duikstekken met $name tonen';
+  }
+
+  @override
+  String diveSites_deleteDialog_divesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken blijven zonder stek.',
+      one: '1 duik blijft zonder stek.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_deleteDialog_plansKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count opgeslagen plannen blijven zonder stek.',
+      one: '1 opgeslagen plan blijft zonder stek.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -11672,6 +11748,92 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_appBar_title => 'Uitrusting';
 
   @override
+  String get equipment_bulkTags_action => 'Tags bewerken';
+
+  @override
+  String equipment_bulkTags_adding(int total) {
+    return 'toevoegen aan alle $total';
+  }
+
+  @override
+  String equipment_bulkTags_applied(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tags van $count items bijgewerkt',
+      one: 'Tags van 1 item bijgewerkt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipment_bulkTags_confirmAdding(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Toevoegen aan alle $count uitrustingsstukken',
+      one: 'Toevoegen aan 1 uitrustingsstuk',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipment_bulkTags_confirmRemoving(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Verwijderen van alle $count uitrustingsstukken',
+      one: 'Verwijderen van 1 uitrustingsstuk',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_bulkTags_confirmTitle => 'Wijzigingen toepassen?';
+
+  @override
+  String get equipment_bulkTags_empty => 'Nog geen uitrustingstags';
+
+  @override
+  String equipment_bulkTags_failed(String error) {
+    return 'Kan tags niet bijwerken: $error';
+  }
+
+  @override
+  String equipment_bulkTags_onAll(int count) {
+    return 'op alle $count';
+  }
+
+  @override
+  String equipment_bulkTags_onSome(int count, int total) {
+    return 'op $count van $total';
+  }
+
+  @override
+  String get equipment_bulkTags_removing => 'verwijderen van alle';
+
+  @override
+  String get equipment_bulkTags_tagsLabel => 'Tags';
+
+  @override
+  String equipment_bulkTags_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tags van $count items bewerken',
+      one: 'Tags van 1 item bewerken',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_bulkTags_undo => 'Ongedaan maken';
+
+  @override
+  String get equipment_bulkTags_undoFailed =>
+      'Kan de tagwijziging niet ongedaan maken.';
+
+  @override
   String get equipment_deleteDialog_cancel => 'Annuleren';
 
   @override
@@ -12196,6 +12358,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_detail_serviceOverdue => 'Service is achterstallig!';
 
   @override
+  String equipment_detail_showEquipmentWith(String name) {
+    return 'Uitrusting met $name tonen';
+  }
+
+  @override
   String get equipment_detail_sizeLabel => 'Maat';
 
   @override
@@ -12405,6 +12572,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_edit_statusLabel => 'Status';
 
   @override
+  String get equipment_edit_tagsLabel => 'Tags';
+
+  @override
   String get equipment_edit_parentLabel => 'Geplaatst in';
 
   @override
@@ -12474,6 +12644,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Geen uitrusting met deze status';
 
   @override
+  String get equipment_list_emptyState_noTagMatch =>
+      'Geen uitrusting met deze tags';
+
+  @override
   String get equipment_list_emptyState_noTypeMatch =>
       'Geen uitrusting in deze categorie';
 
@@ -12520,6 +12694,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get equipment_filter_section_status => 'Status';
+
+  @override
+  String get equipment_filter_section_tags => 'Tags';
 
   @override
   String get equipment_filter_section_category => 'Categorie';
@@ -13376,6 +13553,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_mod_maximumOperatingDepth => 'Maximale werkdiepte';
 
   @override
+  String gasCalculators_mod_semanticsLabel(
+    String depth,
+    String unit,
+    String ppo2,
+    String o2,
+  ) {
+    return 'Maximale werkdiepte: $depth $unit bij $ppo2 bar ppO2 met $o2% zuurstof';
+  }
+
+  @override
   String get gasCalculators_mod_oxygenO2 => 'Zuurstof (O₂)';
 
   @override
@@ -13599,11 +13786,23 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String gasCalculators_blender_stepAdd(String gas) {
-    return '$gas toevoegen';
+    return '+ $gas';
   }
 
   @override
   String get gasCalculators_blender_stepStartLabel => 'Start';
+
+  @override
+  String get gasCalculators_blender_stepColumnAction => 'Actie';
+
+  @override
+  String get gasCalculators_blender_stepColumnAdded => 'Toegevoegd';
+
+  @override
+  String get gasCalculators_blender_stepColumnPressure => 'Druk';
+
+  @override
+  String get gasCalculators_blender_stepColumnMix => 'Mix';
 
   @override
   String gasCalculators_blender_settlesTo(String pressure, String temperature) {
@@ -13675,6 +13874,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String gasCalculators_blender_invalidNumber(String separator) {
+    return 'Voer een geldig getal in (decimaalteken: \"$separator\")';
+  }
+
+  @override
   String get gasCalculators_blender_currency => 'Valuta';
 
   @override
@@ -13712,6 +13916,15 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_flushFeeVolume => 'Spoelvolume';
+
+  @override
+  String get gasCalculators_blender_flushFeeColumnGas => 'Gas';
+
+  @override
+  String get gasCalculators_blender_cylinderColumnShort => 'Fles';
+
+  @override
+  String get gasCalculators_blender_volumeColumn => 'Volume';
 
   @override
   String gasCalculators_blender_flushFeeLine(String gas) {
@@ -13791,6 +14004,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String gasCalculators_blender_lineActions(String label) {
+    return 'Acties voor $label';
+  }
+
+  @override
   String gasCalculators_blender_fillAdded(String mix) {
     return '$mix toegevoegd aan de factuur';
   }
@@ -13836,6 +14054,18 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get gasCalculators_blender_invoiceArchiveNotFound =>
       'Factuur niet gevonden.';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveDelete =>
+      'Deze factuur verwijderen';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveDeleteTitle =>
+      'Factuur verwijderen?';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveDeleteBody =>
+      'Dit kan niet ongedaan worden gemaakt.';
 
   @override
   String get gasCalculators_blender_defaults =>
@@ -17076,7 +17306,15 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_navCustomization_description =>
-      'Drag items to reorder. The top three appear in your bottom navigation bar.';
+      'Sleep items om ze opnieuw te ordenen. De bovenste items verschijnen in de onderste navigatiebalk; hoeveel hangt af van de schermgrootte, niet van de oriëntatie.';
+
+  @override
+  String get settings_navCustomization_alwaysHideLabels_title =>
+      'Labels altijd verbergen';
+
+  @override
+  String get settings_navCustomization_alwaysHideLabels_subtitle =>
+      'Alleen pictogrammen, ook als er ruimte is voor labels';
 
   @override
   String get settings_navCustomization_descriptionDesktop =>
@@ -17090,7 +17328,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_navCustomization_dividerLabel =>
-      'Items below appear in the More menu';
+      'Items hieronder gaan naar het menu Meer als ze niet in de balk passen';
 
   @override
   String get settings_navCustomization_resetButton => 'Reset to defaults';
@@ -19430,6 +19668,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get statistics_chart_noTrendData => 'Geen trendgegevens beschikbaar';
 
   @override
+  String get statistics_chart_notRecorded => 'Niet vastgelegd';
+
+  @override
   String statistics_chart_trendSemanticLabel(Object count) {
     return 'Trendlijndiagram met $count datapunten';
   }
@@ -20876,6 +21117,19 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String tags_manage_narrowDialog_equipment(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Deze tag staat op $count uitrustingsstukken. Als je \"Gebruiken voor uitrusting\" uitzet, wordt hij van die uitrustingsstukken verwijderd.',
+      one:
+          'Deze tag staat op 1 uitrustingsstuk. Als je \"Gebruiken voor uitrusting\" uitzet, wordt hij van dat uitrustingsstuk verwijderd.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String tags_manage_narrowDialog_sites(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -20893,10 +21147,14 @@ class AppLocalizationsNl extends AppLocalizations {
       'Tag van bestaande items verwijderen?';
 
   @override
-  String get tags_manage_scopeRequired => 'Kies duiken, duikstekken of beide';
+  String get tags_manage_scopeRequired =>
+      'Kies er minstens één: duiken, duikstekken of uitrusting';
 
   @override
   String get tags_manage_scope_dives => 'Duiken';
+
+  @override
+  String get tags_manage_scope_equipment => 'Uitrusting';
 
   @override
   String get tags_manage_scope_sites => 'Duikstekken';
@@ -20914,7 +21172,22 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String tags_manage_equipmentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+      zero: '0 uitrustingsstukken',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_manage_useForDives => 'Gebruiken voor duiken';
+
+  @override
+  String get tags_manage_useForEquipment => 'Gebruiken voor uitrusting';
 
   @override
   String get tags_manage_useForSites => 'Gebruiken voor duikstekken';
@@ -20970,8 +21243,89 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String tags_manage_deleteMessage_equipment(String tagName, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return '\"$tagName\" wordt verwijderd van $_temp0. Dit kan niet ongedaan worden gemaakt.';
+  }
+
+  @override
+  String tags_manage_deleteMessage_divesAndEquipment(
+    String tagName,
+    int diveCount,
+    int equipmentCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount duiken',
+      one: '1 duik',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      equipmentCount,
+      locale: localeName,
+      other: '$equipmentCount uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return '\"$tagName\" wordt verwijderd van $_temp0 en $_temp1. Dit kan niet ongedaan worden gemaakt.';
+  }
+
+  @override
+  String tags_manage_deleteMessage_sitesAndEquipment(
+    String tagName,
+    int siteCount,
+    int equipmentCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount duikstekken',
+      one: '1 duikstek',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      equipmentCount,
+      locale: localeName,
+      other: '$equipmentCount uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return '\"$tagName\" wordt verwijderd van $_temp0 en $_temp1. Dit kan niet ongedaan worden gemaakt.';
+  }
+
+  @override
+  String tags_manage_deleteMessage_all(
+    String tagName,
+    int diveCount,
+    int siteCount,
+    int equipmentCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount duiken',
+      one: '1 duik',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount duikstekken',
+      one: '1 duikstek',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      equipmentCount,
+      locale: localeName,
+      other: '$equipmentCount uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return '\"$tagName\" wordt verwijderd van $_temp0, $_temp1 en $_temp2. Dit kan niet ongedaan worden gemaakt.';
+  }
+
+  @override
   String tags_manage_deleteMessage_unused(String tagName) {
-    return '\"$tagName\" wordt bij geen enkele duik of duikstek gebruikt. Dit kan niet ongedaan worden gemaakt.';
+    return '\"$tagName\" wordt bij geen enkele duik, duikstek of uitrustingsstuk gebruikt. Dit kan niet ongedaan worden gemaakt.';
   }
 
   @override
@@ -21023,8 +21377,86 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String tags_manage_bulkDeleteMessage_equipment(int equipmentCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      equipmentCount,
+      locale: localeName,
+      other: '$equipmentCount uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return 'Deze tags worden verwijderd van in totaal $_temp0. Dit kan niet ongedaan worden gemaakt.';
+  }
+
+  @override
+  String tags_manage_bulkDeleteMessage_divesAndEquipment(
+    int diveCount,
+    int equipmentCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount duiken',
+      one: '1 duik',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      equipmentCount,
+      locale: localeName,
+      other: '$equipmentCount uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return 'Deze tags worden verwijderd van in totaal $_temp0 en $_temp1. Dit kan niet ongedaan worden gemaakt.';
+  }
+
+  @override
+  String tags_manage_bulkDeleteMessage_sitesAndEquipment(
+    int siteCount,
+    int equipmentCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount duikstekken',
+      one: '1 duikstek',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      equipmentCount,
+      locale: localeName,
+      other: '$equipmentCount uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return 'Deze tags worden verwijderd van in totaal $_temp0 en $_temp1. Dit kan niet ongedaan worden gemaakt.';
+  }
+
+  @override
+  String tags_manage_bulkDeleteMessage_all(
+    int diveCount,
+    int siteCount,
+    int equipmentCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount duiken',
+      one: '1 duik',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount duikstekken',
+      one: '1 duikstek',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      equipmentCount,
+      locale: localeName,
+      other: '$equipmentCount uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return 'Deze tags worden verwijderd van in totaal $_temp0, $_temp1 en $_temp2. Dit kan niet ongedaan worden gemaakt.';
+  }
+
+  @override
   String get tags_manage_bulkDeleteMessage_unused =>
-      'Deze tags worden bij geen enkele duik of duikstek gebruikt. Dit kan niet ongedaan worden gemaakt.';
+      'Deze tags worden bij geen enkele duik, duikstek of uitrustingsstuk gebruikt. Dit kan niet ongedaan worden gemaakt.';
 
   @override
   String tags_manage_mergeTitle(int count) {
@@ -21078,8 +21510,86 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String tags_manage_mergeAffected_equipment(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return 'Dit heeft betrekking op in totaal $_temp0.';
+  }
+
+  @override
+  String tags_manage_mergeAffected_divesAndEquipment(
+    int diveCount,
+    int equipmentCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount duiken',
+      one: '1 duik',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      equipmentCount,
+      locale: localeName,
+      other: '$equipmentCount uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return 'Dit heeft betrekking op in totaal $_temp0 en $_temp1.';
+  }
+
+  @override
+  String tags_manage_mergeAffected_sitesAndEquipment(
+    int siteCount,
+    int equipmentCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount duikstekken',
+      one: '1 duikstek',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      equipmentCount,
+      locale: localeName,
+      other: '$equipmentCount uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return 'Dit heeft betrekking op in totaal $_temp0 en $_temp1.';
+  }
+
+  @override
+  String tags_manage_mergeAffected_all(
+    int diveCount,
+    int siteCount,
+    int equipmentCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount duiken',
+      one: '1 duik',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount duikstekken',
+      one: '1 duikstek',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      equipmentCount,
+      locale: localeName,
+      other: '$equipmentCount uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return 'Dit heeft betrekking op in totaal $_temp0, $_temp1 en $_temp2.';
+  }
+
+  @override
   String get tags_manage_mergeAffected_unused =>
-      'Deze tags worden bij geen enkele duik of duikstek gebruikt.';
+      'Deze tags worden bij geen enkele duik, duikstek of uitrustingsstuk gebruikt.';
 
   @override
   String get tags_manage_mergeAction => 'Samenvoegen';
@@ -30685,6 +31195,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get enum_equipmentField_notes => 'Notities';
 
   @override
+  String get enum_equipmentField_tags => 'Tags';
+
+  @override
   String get enum_equipmentField_itemName_short => 'Naam';
 
   @override
@@ -30731,6 +31244,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get enum_equipmentField_notes_short => 'Notities';
+
+  @override
+  String get enum_equipmentField_tags_short => 'Tags';
 
   @override
   String get enum_diveCenterField_centerName => 'Naam';
@@ -38099,20 +38615,32 @@ class AppLocalizationsNl extends AppLocalizations {
     Object databaseVersion,
     Object appVersion,
   ) {
-    return 'Je duikgegevens zijn opgeslagen door een nieuwere versie van Submersion (schema v$databaseVersion). Deze versie ondersteunt schema’s alleen tot v$appVersion.';
+    return 'Je duiklogboek is opgeslagen met schema v$databaseVersion door een nieuwere versie van Submersion. Deze versie opent bestanden tot schema v$appVersion.';
   }
 
   @override
-  String get startup_versionMismatch_causes =>
-      'Dit betekent meestal dat een bètaversie je gegevens heeft bijgewerkt, dat er een back-up uit een nieuwere versie is teruggezet, of dat het bestand wordt gedeeld met een apparaat op een ander updatekanaal. Een nieuwere stabiele versie bestaat mogelijk nog niet.';
+  String get startup_versionMismatch_causes_lead =>
+      'Dit gebeurt meestal wanneer:';
+
+  @override
+  String get startup_versionMismatch_cause_beta =>
+      'Een bètaversie heeft het bestand bijgewerkt.';
+
+  @override
+  String get startup_versionMismatch_cause_restored =>
+      'Er is een back-up uit een nieuwere versie teruggezet.';
+
+  @override
+  String get startup_versionMismatch_cause_shared =>
+      'Het bestand wordt gedeeld met een apparaat op een ander updatekanaal.';
 
   @override
   String get startup_versionMismatch_instructions =>
-      'Je gegevens zijn veilig en zijn niet gewijzigd. Open ze met de versie die ze heeft geschreven, of met een latere versie. Als er vóór de upgrade een back-up is gemaakt, staat die in je map Backups en kan die worden teruggezet zodra je een versie gebruikt die het bestand kan openen.';
+      'Je gegevens zijn niet gewijzigd. Open ze met de versie die ze heeft geschreven, of met een latere.';
 
   @override
   String get startup_versionMismatch_storeInstructions =>
-      'Deze app is geïnstalleerd vanuit een appstore en is ouder dan de versie die uw gegevens heeft gemaakt. Uw gegevens zijn veilig en niet gewijzigd. Werk Submersion bij zodra de nieuwe versie in de store verschijnt en open de app daarna opnieuw.';
+      'Deze app komt uit een appstore en is ouder dan de versie die uw gegevens heeft opgeslagen. Uw gegevens zijn niet gewijzigd. Werk Submersion bij zodra de nieuwe versie in de store verschijnt en open de app daarna opnieuw.';
 
   @override
   String get startup_versionMismatch_download =>
@@ -38127,7 +38655,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get startup_versionMismatch_manualLink =>
-      'Als die knoppen geen browser openen, ga naar:';
+      'Als de knoppen geen browser openen:';
 
   @override
   String get universalImport_compare_downloaded => 'Gedownload';
@@ -39874,12 +40402,8 @@ class AppLocalizationsNl extends AppLocalizations {
       'Back-up van voor de upgrade terugzetten';
 
   @override
-  String get startup_versionMismatch_restore_body =>
-      'Er staat een veiligheidskopie van je duiklogboek van voor de upgrade op dit apparaat, en deze versie kan die openen.';
-
-  @override
   String get startup_versionMismatch_restore_warning =>
-      'Alles wat je na de upgrade hebt gelogd, bestaat alleen in het nieuwere bestand. Dat bestand wordt bewaard als vastgezette back-up, dus je krijgt het terug door de nieuwere versie opnieuw te installeren.';
+      'Duiken die na de upgrade zijn gelogd, bestaan alleen in het nieuwere bestand. Dat wordt bewaard als vastgezette back-up, dus je krijgt ze terug door de nieuwere versie opnieuw te installeren.';
 
   @override
   String get startup_interruptedRestore_title =>
@@ -40301,9 +40825,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Hoe uitrusting bij een duik wordt gegroepeerd en gesorteerd';
 
   @override
-  String get diveLog_detail_tooltip_whatIf => 'Replan this dive';
-
-  @override
   String get diveLog_detail_menu_whatIf => 'Replan this dive';
 
   @override
@@ -40374,4 +40895,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get plannerCanvas_compare_showOnChart => 'Show on chart';
+
+  @override
+  String get numberInput_invalidValue => 'Voer een geldig getal in';
 }

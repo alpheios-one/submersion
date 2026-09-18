@@ -36,14 +36,21 @@ import 'package:submersion/features/equipment/presentation/providers/equipment_c
 import 'package:submersion/features/equipment/presentation/utils/condition_finding_text.dart';
 import 'package:submersion/features/equipment/presentation/utils/service_severity_colors.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
+import 'package:submersion/features/equipment/presentation/providers/equipment_tag_providers.dart';
+import 'package:submersion/features/tags/domain/entities/tag.dart';
+import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
+import 'package:submersion/features/tags/presentation/widgets/tag_input_widget.dart';
 import 'package:submersion/features/equipment/presentation/widgets/assembly_chips.dart';
 import 'package:submersion/features/equipment/presentation/widgets/dense_equipment_list_tile.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_filter_sheet.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_group_header.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_list_sort_sheet.dart';
+import 'package:submersion/features/equipment/presentation/widgets/bulk_equipment_tag_sheet.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
 import 'package:submersion/features/equipment/presentation/utils/equipment_enum_display.dart';
+import 'package:submersion/features/equipment/presentation/utils/equipment_row_label.dart';
+import 'package:submersion/features/equipment/presentation/utils/equipment_row_labels_of.dart';
 
 /// Content widget for the equipment list, used in master-detail layout.
 class EquipmentListContent extends ConsumerStatefulWidget {
@@ -232,6 +239,14 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
         : const <String, ServiceClockStatus>{};
 
     final filter = ref.watch(equipmentFilterProvider);
+    // Tags ride beside the items, not on them (issue #1942): one batch read
+    // for the whole list feeds the tag filter and the detailed tiles' chips.
+    final tagsByEquipment =
+        ref.watch(tagsByEquipmentProvider).value ?? const <String, List<Tag>>{};
+    final tagIdsByEquipment = {
+      for (final entry in tagsByEquipment.entries)
+        entry.key: [for (final t in entry.value) t.id],
+    };
 
     final AsyncValue<List<EquipmentItem>> equipmentAsync;
     if (filter.serviceDueOnly) {
@@ -244,11 +259,18 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
       equipmentAsync = ref.watch(equipmentByStatusProvider(filter.status!));
     }
 
+    // Whether the tag selection is what emptied the list (issue #1942), so
+    // the empty state blames the tags rather than a stocked category.
+    final tagsEmptied = filter.tagsEmptied(
+      equipmentAsync.value ?? const <EquipmentItem>[],
+      tagIdsByEquipment,
+    );
+
     // Table mode uses a dedicated scaffold with column configuration support.
     if (viewMode == ListViewMode.table) {
       final sortedAsync = equipmentAsync.whenData(
         (equipment) => applyEquipmentSorting(
-          filter.apply(equipment),
+          filter.apply(equipment, tagIdsByEquipment),
           sort,
           serviceUrgency: serviceUrgency,
         ),
@@ -259,6 +281,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
         filter,
         hadItemsBeforeTypeFilter:
             (equipmentAsync.value ?? const <EquipmentItem>[]).isNotEmpty,
+        tagsEmptied: tagsEmptied,
       );
     }
 
@@ -284,13 +307,19 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     // re-sorting the whole inventory there made bulk selection cost a full
     // sort per tap.
     final visibleGroups = arrangeEquipment(
-      filter.apply(equipmentAsync.value ?? const <EquipmentItem>[]),
+      filter.apply(
+        equipmentAsync.value ?? const <EquipmentItem>[],
+        tagIdsByEquipment,
+      ),
       arrangement,
       typeLabel: (t) => t.localizedName(context.l10n),
       compareItems: compareItems,
     );
     final sortedVisible = [for (final group in visibleGroups) ...group.items];
     final visibleIds = sortedVisible.map((e) => e.id).toList();
+    // Labelled once per build, like the arrangement above and for the same
+    // reason: the list below is rebuilt on every check toggle.
+    final rowLabels = equipmentRowLabelsOf(context, ref, sortedVisible);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _selection.pruneTo(visibleIds);
@@ -307,8 +336,16 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                 context,
                 ref,
                 hadItemsBeforeTypeFilter: equipment.isNotEmpty,
+                tagsEmptied: tagsEmptied,
               )
-            : _buildEquipmentList(context, ref, visibleGroups, arrangement),
+            : _buildEquipmentList(
+                context,
+                ref,
+                visibleGroups,
+                arrangement,
+                tagsByEquipment: tagsByEquipment,
+                labels: rowLabels,
+              ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => _buildErrorState(context, error),
       );
@@ -431,6 +468,10 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
   /// Retire and reactivate are enabled only on a uniform selection -- every
   /// checked item active, or none of them -- so the action never has to guess
   /// what a mixed selection means.
+  ///
+  /// Edit tags works on any selection (issue #1942). It comes last, so the
+  /// pane's single inline slot stays with Retire and it lands in the
+  /// overflow there, while the app bar shows all three.
   List<BulkAction> _bulkActions(List<EquipmentItem> equipment) {
     bool everyChecked(Set<String> ids, bool Function(EquipmentItem) test) {
       final checked = equipment.where((e) => ids.contains(e.id));
@@ -451,6 +492,16 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
         label: context.l10n.equipment_menu_reactivate,
         isEnabled: (ids) => everyChecked(ids, (e) => !e.isActive),
         onInvoke: () => _applyRetirement(retire: false),
+      ),
+      BulkAction(
+        id: 'editTags',
+        icon: Icons.sell,
+        label: context.l10n.equipment_bulkTags_action,
+        onInvoke: () => showBulkEquipmentTagSheet(
+          context,
+          ref,
+          equipmentIds: _selectedIds.toList(),
+        ),
       ),
     ];
   }
@@ -561,6 +612,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     AsyncValue<List<EquipmentItem>> equipmentAsync,
     EquipmentFilterState filter, {
     required bool hadItemsBeforeTypeFilter,
+    required bool tagsEmptied,
   }) {
     final visibleIds = (equipmentAsync.value ?? const <EquipmentItem>[])
         .map((e) => e.id)
@@ -601,6 +653,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                 context,
                 equipmentAsync,
                 hadItemsBeforeTypeFilter: hadItemsBeforeTypeFilter,
+                tagsEmptied: tagsEmptied,
               ),
             ),
           ],
@@ -614,6 +667,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     BuildContext context,
     AsyncValue<List<EquipmentItem>> equipmentAsync, {
     required bool hadItemsBeforeTypeFilter,
+    required bool tagsEmptied,
   }) {
     return equipmentAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -624,6 +678,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
             context,
             ref,
             hadItemsBeforeTypeFilter: hadItemsBeforeTypeFilter,
+            tagsEmptied: tagsEmptied,
           );
         }
         final config = ref.watch(equipmentTableConfigProvider);
@@ -637,6 +692,9 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
         final index =
             ref.watch(equipmentComponentsIndexProvider).value ??
             ComponentsIndex.empty;
+        final tagsByEquipment =
+            ref.watch(tagsByEquipmentProvider).value ??
+            const <String, List<Tag>>{};
 
         return EntityTableView<EquipmentItem, EquipmentField>(
           entities: equipment,
@@ -647,6 +705,10 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
             },
             componentCounts: {
               for (final e in index.byParent.entries) e.key: e.value.length,
+            },
+            tagNames: {
+              for (final e in tagsByEquipment.entries)
+                e.key: [for (final t in e.value) t.name],
             },
           ),
           config: config,
@@ -792,6 +854,10 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     EquipmentFilterState filter,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
+    final tagNames = {
+      for (final t in ref.watch(tagsProvider).value ?? const <Tag>[])
+        t.id: t.name,
+    };
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -845,6 +911,15 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                       ],
                     ),
               ),
+            for (final tagId in filter.tagIds)
+              _buildActiveFilterChip(
+                tagNames[tagId] ?? tagId,
+                () => ref.read(equipmentFilterProvider.notifier).state = filter
+                    .copyWith(
+                      tagIds: filter.tagIds.where((id) => id != tagId).toSet(),
+                    ),
+                icon: Icons.sell_outlined,
+              ),
           ],
         ),
       ),
@@ -871,8 +946,10 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     BuildContext context,
     WidgetRef ref,
     List<EquipmentGroup> groups,
-    EquipmentArrangement arrangement,
-  ) {
+    EquipmentArrangement arrangement, {
+    required Map<String, List<Tag>> tagsByEquipment,
+    required Map<String, EquipmentRowLabel> labels,
+  }) {
     // One flat run of rows for the lazy builder: a heading before each group
     // when the arrangement groups, then that group's gear.
     final rows = <_EquipmentListRow>[
@@ -940,6 +1017,11 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
               isSelectionMode: _isSelectionMode,
               isChecked: isChecked,
               onCheckChanged: onCheckChanged,
+              // Chips only in the detailed mode; compact stays one line.
+              tags: viewMode == ListViewMode.detailed
+                  ? tagsByEquipment[item.id] ?? const []
+                  : const [],
+              label: labels[item.id],
             ),
             ListViewMode.dense || ListViewMode.table => DenseEquipmentListTile(
               item: item,
@@ -959,16 +1041,24 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     BuildContext context,
     WidgetRef ref, {
     required bool hadItemsBeforeTypeFilter,
+    required bool tagsEmptied,
   }) {
     final filter = ref.watch(equipmentFilterProvider);
 
-    // Blame the category only when it actually narrowed something away; if
-    // the status-filtered source was already empty, the status (or the lack
-    // of any gear) is the real cause and the wording should say so.
-    final blameCategory = filter.type != null && hadItemsBeforeTypeFilter;
+    // Blame the tags (issue #1942) when the category and its conditions left
+    // items that none of the selected tags is on: a tag chip on a retired
+    // item can land here, since the default view hides retired gear.
+    final blameTags = tagsEmptied;
+    // Otherwise blame the category only when it actually narrowed something
+    // away; if the status-filtered source was already empty, the status (or
+    // the lack of any gear) is the real cause and the wording should say so.
+    final blameCategory =
+        !blameTags && filter.type != null && hadItemsBeforeTypeFilter;
 
     String filterText;
-    if (blameCategory) {
+    if (blameTags) {
+      filterText = context.l10n.equipment_list_emptyState_filterText_equipment;
+    } else if (blameCategory) {
       filterText = context.l10n.equipment_list_emptyState_filterText_type(
         filter.type!.localizedName(context.l10n),
       );
@@ -998,7 +1088,9 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
           ),
           const SizedBox(height: 8),
           Text(
-            blameCategory
+            blameTags
+                ? context.l10n.equipment_list_emptyState_noTagMatch
+                : blameCategory
                 ? context.l10n.equipment_list_emptyState_noTypeMatch
                 : filter.serviceDueOnly
                 ? context.l10n.equipment_list_emptyState_serviceDueUpToDate
@@ -1060,6 +1152,16 @@ class EquipmentListTile extends ConsumerWidget {
   final bool isChecked;
   final ValueChanged<bool>? onCheckChanged;
 
+  /// The item's tags, handed in by the list (issue #1942), which reads every
+  /// item's tags in one batch; the tile reads no provider for them. Up to
+  /// three show, then a "+N" chip.
+  final List<Tag> tags;
+
+  /// The row's label as its list computed it (issue #1549): telling identical
+  /// items apart takes the whole list. Null falls back to the item's own
+  /// brand and model, for a tile shown on its own.
+  final EquipmentRowLabel? label;
+
   const EquipmentListTile({
     super.key,
     required this.item,
@@ -1068,6 +1170,8 @@ class EquipmentListTile extends ConsumerWidget {
     this.isSelectionMode = false,
     this.isChecked = false,
     this.onCheckChanged,
+    this.tags = const [],
+    this.label,
   });
 
   @override
@@ -1096,7 +1200,9 @@ class EquipmentListTile extends ConsumerWidget {
     final hasChips =
         index != null &&
         (index.isAssembly(item.id) || index.parentIdsOf(item.id).isNotEmpty);
-    final hasFullName = item.fullName != item.name;
+    final detail =
+        label?.subtitle ?? (item.fullName != item.name ? item.fullName : null);
+    final hasTags = tags.isNotEmpty;
     final accent = resolveFeatureAccent(
       context,
       ref,
@@ -1132,13 +1238,18 @@ class EquipmentListTile extends ConsumerWidget {
           ),
         ),
         title: Text(item.name),
-        subtitle: hasFullName || hasChips
+        subtitle: detail != null || hasChips || hasTags
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (hasFullName) Text(item.fullName),
+                  if (detail != null) Text(detail),
                   if (hasChips) AssemblyChips(itemId: item.id),
+                  if (hasTags)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: TagChips(tags: tags, maxTags: 3),
+                    ),
                 ],
               )
             : null,
@@ -1307,15 +1418,23 @@ class EquipmentSearchDelegate extends SearchDelegate<EquipmentItem?> {
       query: query,
       watchProvider: (ref, q) => ref.watch(equipmentSearchProvider(q)),
       dataBuilder: (context, equipment) {
-        return ListView.builder(
-          itemCount: equipment.length,
-          itemBuilder: (context, index) {
-            final item = equipment[index];
-            return EquipmentListTile(
-              item: item,
-              onTap: () {
-                close(context, item);
-                context.push('/equipment/${item.id}');
+        // A Consumer for the ref the labels need: they are computed across
+        // the results, so two identical hits can be told apart (#1549).
+        return Consumer(
+          builder: (context, ref, _) {
+            final labels = equipmentRowLabelsOf(context, ref, equipment);
+            return ListView.builder(
+              itemCount: equipment.length,
+              itemBuilder: (context, index) {
+                final item = equipment[index];
+                return EquipmentListTile(
+                  item: item,
+                  label: labels[item.id],
+                  onTap: () {
+                    close(context, item);
+                    context.push('/equipment/${item.id}');
+                  },
+                );
               },
             );
           },

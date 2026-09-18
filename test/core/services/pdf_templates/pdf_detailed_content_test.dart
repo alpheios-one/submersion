@@ -10,6 +10,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_custom_field.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_weight.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 import '../../../helpers/pdf_text.dart';
@@ -110,6 +111,41 @@ void main() {
     });
   });
 
+  // #2056: notes taller than one page body threw "Widget won't fit into the
+  // page" and failed the whole export. A pw.Text only breaks across pages
+  // when it is built with TextOverflow.span.
+  group('notes longer than a page (#2056)', () {
+    final pageLongNote = List.generate(
+      400,
+      (i) => 'Sentence $i of a very long dive story.',
+    ).join(' ');
+    final longNotesDive = dive.copyWith(notes: pageLongNote);
+
+    for (final pageSize in PdfPageSize.values) {
+      test('continues the notes onto another sheet on $pageSize', () async {
+        final bytes = await PdfTemplateDetailed().buildPdf(
+          dives: [longNotesDive],
+          pageSize: pageSize,
+          dates: dates,
+          units: units,
+        );
+
+        final text = pdfVisibleText(bytes);
+        expect(text, contains('Sentence 0 of'));
+        expect(
+          text,
+          contains('Sentence 399 of'),
+          reason: 'the tail of the note must land on a continuation sheet',
+        );
+        expect(
+          pdfPageCount(bytes),
+          greaterThan(pdfPageCount(await render(dive))),
+          reason: 'a note taller than a page needs more than one dive sheet',
+        );
+      });
+    }
+  });
+
   group('field coverage from #1017', () {
     late String text;
 
@@ -151,6 +187,34 @@ void main() {
     test('renders the rating', () {
       expect(text, contains('****'));
     });
+  });
+
+  group('water type and entry method fallback (#793)', () {
+    test(
+      'renders the site\'s water type and entry method when the dive has none',
+      () async {
+        // Built rather than copyWith'd: copyWith cannot null out waterType/
+        // entryMethod (its `??` pattern reads a null argument as "unchanged").
+        final fallbackDive = Dive(
+          id: 'd-fallback',
+          dateTime: dive.dateTime,
+          entryTime: dive.entryTime,
+          exitTime: dive.exitTime,
+          runtime: dive.runtime,
+          maxDepth: dive.maxDepth,
+          avgDepth: dive.avgDepth,
+          site: const DiveSite(
+            id: 'site-1',
+            name: 'Blue Hole',
+            waterType: WaterType.fresh,
+            entryMethod: EntryMethod.shore,
+          ),
+        );
+        final text = pdfVisibleText(await render(fallbackDive));
+        expect(text, contains(WaterType.fresh.displayName));
+        expect(text, contains(EntryMethod.shore.displayName));
+      },
+    );
   });
 
   group('review findings', () {

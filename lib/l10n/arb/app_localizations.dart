@@ -146,6 +146,30 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 component} other{{count} components}}'**
   String equipment_components_count(num count);
 
+  /// No description provided for @equipment_rowLabel_identifier.
+  ///
+  /// In en, this message translates to:
+  /// **'ID {identifier}'**
+  String equipment_rowLabel_identifier(Object identifier);
+
+  /// No description provided for @equipment_rowLabel_serial.
+  ///
+  /// In en, this message translates to:
+  /// **'S/N {serial}'**
+  String equipment_rowLabel_serial(Object serial);
+
+  /// No description provided for @equipment_rowLabel_purchased.
+  ///
+  /// In en, this message translates to:
+  /// **'Bought {date}'**
+  String equipment_rowLabel_purchased(Object date);
+
+  /// No description provided for @equipment_components_countOfTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'{total, plural, =1{{count} of 1 component} other{{count} of {total} components}}'**
+  String equipment_components_countOfTotal(int count, int total);
+
   /// No description provided for @equipment_components_cycleError.
   ///
   /// In en, this message translates to:
@@ -391,6 +415,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Auto-applied to new dives that have no equipment yet'**
   String get equipment_setEdit_defaultSwitch_subtitle;
+
+  /// No description provided for @equipment_setEdit_computerAutoApplySwitch_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply when this set\'s computer is imported'**
+  String get equipment_setEdit_computerAutoApplySwitch_title;
+
+  /// No description provided for @equipment_setEdit_computerAutoApplySwitch_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'If this set includes a dive computer, auto-add the whole set to a dive downloaded or imported from it'**
+  String get equipment_setEdit_computerAutoApplySwitch_subtitle;
 
   /// No description provided for @equipment_setEdit_geofencesTitle.
   ///
@@ -4103,6 +4139,12 @@ abstract class AppLocalizations {
   /// **'Add certification'**
   String get certifications_wallet_tooltip_add;
 
+  /// No description provided for @certifications_wallet_tooltip_moreOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'More options'**
+  String get certifications_wallet_tooltip_moreOptions;
+
   /// No description provided for @certifications_wallet_tooltip_share.
   ///
   /// In en, this message translates to:
@@ -4940,6 +4982,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Begin'**
   String get preDive_start_begin;
+
+  /// No description provided for @diveLog_gear_addMissingParts.
+  ///
+  /// In en, this message translates to:
+  /// **'Add missing parts'**
+  String get diveLog_gear_addMissingParts;
 
   /// No description provided for @diveLog_gear_collapse.
   ///
@@ -7094,6 +7142,12 @@ abstract class AppLocalizations {
   /// **'No dives logged yet'**
   String get diveCenters_detail_noDivesLogged;
 
+  /// No description provided for @diveCenters_dialog_deleteDivesKept.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive will be left without a dive center.} other{{count} dives will be left without a dive center.}}'**
+  String diveCenters_dialog_deleteDivesKept(int count);
+
   /// No description provided for @diveCenters_dialog_deleteMessage.
   ///
   /// In en, this message translates to:
@@ -8949,12 +9003,6 @@ abstract class AppLocalizations {
   /// **'Next dive'**
   String get diveLog_detail_tooltip_nextDive;
 
-  /// No description provided for @diveLog_detail_tooltip_exportProfileImage.
-  ///
-  /// In en, this message translates to:
-  /// **'Export profile as image'**
-  String get diveLog_detail_tooltip_exportProfileImage;
-
   /// No description provided for @diveLog_detail_tooltip_removeFromFavorites.
   ///
   /// In en, this message translates to:
@@ -10208,6 +10256,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'PDF Logbook Entry'**
   String get diveLog_export_pdfLogbookEntry;
+
+  /// No description provided for @diveLog_export_profileAsImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile as Image'**
+  String get diveLog_export_profileAsImage;
+
+  /// No description provided for @diveLog_export_profileAsImageDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Screenshot of the dive profile chart'**
+  String get diveLog_export_profileAsImageDescription;
 
   /// No description provided for @diveLog_export_success.
   ///
@@ -14703,6 +14763,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show sites with {name}'**
   String diveSites_detail_showSitesWith(String name);
+
+  /// No description provided for @diveSites_deleteDialog_divesKept.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive will be left without a site.} other{{count} dives will be left without a site.}}'**
+  String diveSites_deleteDialog_divesKept(int count);
+
+  /// No description provided for @diveSites_deleteDialog_plansKept.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 saved plan will be left without a site.} other{{count} saved plans will be left without a site.}}'**
+  String diveSites_deleteDialog_plansKept(int count);
 
   /// No description provided for @diveSites_detail_access_accessNotes.
   ///
@@ -19690,6 +19762,96 @@ abstract class AppLocalizations {
   /// **'Equipment'**
   String get equipment_appBar_title;
 
+  /// No description provided for @equipment_bulkTags_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit tags'**
+  String get equipment_bulkTags_action;
+
+  /// No description provided for @equipment_bulkTags_adding.
+  ///
+  /// In en, this message translates to:
+  /// **'adding to all {total}'**
+  String equipment_bulkTags_adding(int total);
+
+  /// No description provided for @equipment_bulkTags_applied.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Updated tags on 1 item} other{Updated tags on {count} items}}'**
+  String equipment_bulkTags_applied(int count);
+
+  /// No description provided for @equipment_bulkTags_confirmAdding.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Adding to 1 equipment item} other{Adding to all {count} equipment items}}'**
+  String equipment_bulkTags_confirmAdding(int count);
+
+  /// No description provided for @equipment_bulkTags_confirmRemoving.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Removing from 1 equipment item} other{Removing from all {count} equipment items}}'**
+  String equipment_bulkTags_confirmRemoving(int count);
+
+  /// No description provided for @equipment_bulkTags_confirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply changes?'**
+  String get equipment_bulkTags_confirmTitle;
+
+  /// No description provided for @equipment_bulkTags_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No equipment tags yet'**
+  String get equipment_bulkTags_empty;
+
+  /// No description provided for @equipment_bulkTags_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update tags: {error}'**
+  String equipment_bulkTags_failed(String error);
+
+  /// No description provided for @equipment_bulkTags_onAll.
+  ///
+  /// In en, this message translates to:
+  /// **'on all {count}'**
+  String equipment_bulkTags_onAll(int count);
+
+  /// No description provided for @equipment_bulkTags_onSome.
+  ///
+  /// In en, this message translates to:
+  /// **'on {count} of {total}'**
+  String equipment_bulkTags_onSome(int count, int total);
+
+  /// No description provided for @equipment_bulkTags_removing.
+  ///
+  /// In en, this message translates to:
+  /// **'removing from all'**
+  String get equipment_bulkTags_removing;
+
+  /// No description provided for @equipment_bulkTags_tagsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get equipment_bulkTags_tagsLabel;
+
+  /// No description provided for @equipment_bulkTags_title.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Edit tags on 1 item} other{Edit tags on {count} items}}'**
+  String equipment_bulkTags_title(int count);
+
+  /// No description provided for @equipment_bulkTags_undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get equipment_bulkTags_undo;
+
+  /// No description provided for @equipment_bulkTags_undoFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t undo the tag change.'**
+  String get equipment_bulkTags_undoFailed;
+
   /// No description provided for @equipment_deleteDialog_cancel.
   ///
   /// In en, this message translates to:
@@ -20488,6 +20650,12 @@ abstract class AppLocalizations {
   /// **'Service is overdue!'**
   String get equipment_detail_serviceOverdue;
 
+  /// Tooltip on a tag chip on equipment detail; tapping it opens the equipment list filtered to that tag
+  ///
+  /// In en, this message translates to:
+  /// **'Show equipment with {name}'**
+  String equipment_detail_showEquipmentWith(String name);
+
   /// No description provided for @equipment_detail_sizeLabel.
   ///
   /// In en, this message translates to:
@@ -20860,6 +21028,12 @@ abstract class AppLocalizations {
   /// **'Status'**
   String get equipment_edit_statusLabel;
 
+  /// No description provided for @equipment_edit_tagsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get equipment_edit_tagsLabel;
+
   /// No description provided for @equipment_edit_parentLabel.
   ///
   /// In en, this message translates to:
@@ -20974,6 +21148,12 @@ abstract class AppLocalizations {
   /// **'No equipment with this status'**
   String get equipment_list_emptyState_noStatusMatch;
 
+  /// No description provided for @equipment_list_emptyState_noTagMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No equipment with these tags'**
+  String get equipment_list_emptyState_noTagMatch;
+
   /// Empty-state body shown when a selected category chip narrowed the (already non-empty) status-filtered list down to zero items
   ///
   /// In en, this message translates to:
@@ -21057,6 +21237,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Status'**
   String get equipment_filter_section_status;
+
+  /// No description provided for @equipment_filter_section_tags.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get equipment_filter_section_tags;
 
   /// No description provided for @equipment_filter_section_category.
   ///
@@ -22455,6 +22641,17 @@ abstract class AppLocalizations {
   /// **'Maximum Operating Depth'**
   String get gasCalculators_mod_maximumOperatingDepth;
 
+  /// No description provided for @gasCalculators_mod_semanticsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum Operating Depth: {depth} {unit} at {ppo2} bar ppO2 with {o2}% oxygen'**
+  String gasCalculators_mod_semanticsLabel(
+    String depth,
+    String unit,
+    String ppo2,
+    String o2,
+  );
+
   /// No description provided for @gasCalculators_mod_oxygenO2.
   ///
   /// In en, this message translates to:
@@ -22840,7 +23037,7 @@ abstract class AppLocalizations {
   /// No description provided for @gasCalculators_blender_stepAdd.
   ///
   /// In en, this message translates to:
-  /// **'Add {gas}'**
+  /// **'+ {gas}'**
   String gasCalculators_blender_stepAdd(String gas);
 
   /// No description provided for @gasCalculators_blender_stepStartLabel.
@@ -22848,6 +23045,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start'**
   String get gasCalculators_blender_stepStartLabel;
+
+  /// No description provided for @gasCalculators_blender_stepColumnAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Action'**
+  String get gasCalculators_blender_stepColumnAction;
+
+  /// No description provided for @gasCalculators_blender_stepColumnAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added'**
+  String get gasCalculators_blender_stepColumnAdded;
+
+  /// No description provided for @gasCalculators_blender_stepColumnPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Pressure'**
+  String get gasCalculators_blender_stepColumnPressure;
+
+  /// No description provided for @gasCalculators_blender_stepColumnMix.
+  ///
+  /// In en, this message translates to:
+  /// **'Mix'**
+  String get gasCalculators_blender_stepColumnMix;
 
   /// No description provided for @gasCalculators_blender_settlesTo.
   ///
@@ -22957,6 +23178,12 @@ abstract class AppLocalizations {
   /// **'Price per 100 {unit}'**
   String gasCalculators_blender_unitPrice(String unit);
 
+  /// No description provided for @gasCalculators_blender_invalidNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid number (decimal separator: \"{separator}\")'**
+  String gasCalculators_blender_invalidNumber(String separator);
+
   /// No description provided for @gasCalculators_blender_currency.
   ///
   /// In en, this message translates to:
@@ -23022,6 +23249,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Purge volume'**
   String get gasCalculators_blender_flushFeeVolume;
+
+  /// No description provided for @gasCalculators_blender_flushFeeColumnGas.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas'**
+  String get gasCalculators_blender_flushFeeColumnGas;
+
+  /// No description provided for @gasCalculators_blender_cylinderColumnShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Cylinder'**
+  String get gasCalculators_blender_cylinderColumnShort;
+
+  /// No description provided for @gasCalculators_blender_volumeColumn.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get gasCalculators_blender_volumeColumn;
 
   /// No description provided for @gasCalculators_blender_flushFeeLine.
   ///
@@ -23149,6 +23394,12 @@ abstract class AppLocalizations {
   /// **'Delete {label}'**
   String gasCalculators_blender_deleteLine(String label);
 
+  /// No description provided for @gasCalculators_blender_lineActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions for {label}'**
+  String gasCalculators_blender_lineActions(String label);
+
   /// No description provided for @gasCalculators_blender_fillAdded.
   ///
   /// In en, this message translates to:
@@ -23226,6 +23477,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invoice not found.'**
   String get gasCalculators_blender_invoiceArchiveNotFound;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this invoice'**
+  String get gasCalculators_blender_invoiceArchiveDelete;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete invoice?'**
+  String get gasCalculators_blender_invoiceArchiveDeleteTitle;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This cannot be undone.'**
+  String get gasCalculators_blender_invoiceArchiveDeleteBody;
 
   /// No description provided for @gasCalculators_blender_defaults.
   ///
@@ -28258,8 +28527,20 @@ abstract class AppLocalizations {
   /// Help text at the top of the navigation customization page.
   ///
   /// In en, this message translates to:
-  /// **'Drag items to reorder. The top three appear in your bottom navigation bar.'**
+  /// **'Drag items to reorder. The items at the top appear in your bottom navigation bar; how many depends on your screen size, not its orientation.'**
   String get settings_navCustomization_description;
+
+  /// Switch title: forces nav destinations to icon-only, hiding the text label next to the icon even where the phone bottom bar or the expanded desktop sidebar would otherwise show one (#1424).
+  ///
+  /// In en, this message translates to:
+  /// **'Always hide labels'**
+  String get settings_navCustomization_alwaysHideLabels_title;
+
+  /// Subtitle under the always-hide-labels switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Icons only, even where labels would normally fit'**
+  String get settings_navCustomization_alwaysHideLabels_subtitle;
 
   /// Help text shown when arranging the wide-screen navigation rail.
   ///
@@ -28282,7 +28563,7 @@ abstract class AppLocalizations {
   /// Non-interactive divider row between primary and overflow destinations.
   ///
   /// In en, this message translates to:
-  /// **'Items below appear in the More menu'**
+  /// **'Items below go to the More menu when they do not fit in the bar'**
   String get settings_navCustomization_dividerLabel;
 
   /// Button that restores the default nav order.
@@ -32160,6 +32441,12 @@ abstract class AppLocalizations {
   /// **'No trend data available'**
   String get statistics_chart_noTrendData;
 
+  /// No description provided for @statistics_chart_notRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'Not recorded'**
+  String get statistics_chart_notRecorded;
+
   /// No description provided for @statistics_chart_trendSemanticLabel.
   ///
   /// In en, this message translates to:
@@ -34425,6 +34712,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{This tag is on 1 dive. Turning off \"Use for dives\" removes it from that dive.} other{This tag is on {count} dives. Turning off \"Use for dives\" removes it from those dives.}}'**
   String tags_manage_narrowDialog_dives(int count);
 
+  /// No description provided for @tags_manage_narrowDialog_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{This tag is on 1 equipment item. Turning off \"Use for equipment\" removes it from that item.} other{This tag is on {count} equipment items. Turning off \"Use for equipment\" removes it from those items.}}'**
+  String tags_manage_narrowDialog_equipment(int count);
+
   /// No description provided for @tags_manage_narrowDialog_sites.
   ///
   /// In en, this message translates to:
@@ -34440,7 +34733,7 @@ abstract class AppLocalizations {
   /// No description provided for @tags_manage_scopeRequired.
   ///
   /// In en, this message translates to:
-  /// **'Choose dives, sites, or both'**
+  /// **'Choose at least one: dives, sites, or equipment'**
   String get tags_manage_scopeRequired;
 
   /// No description provided for @tags_manage_scope_dives.
@@ -34448,6 +34741,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dives'**
   String get tags_manage_scope_dives;
+
+  /// No description provided for @tags_manage_scope_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment'**
+  String get tags_manage_scope_equipment;
 
   /// No description provided for @tags_manage_scope_sites.
   ///
@@ -34461,11 +34760,23 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{0 sites} =1{1 site} other{{count} sites}}'**
   String tags_manage_siteCount(int count);
 
+  /// No description provided for @tags_manage_equipmentCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 equipment items} =1{1 equipment item} other{{count} equipment items}}'**
+  String tags_manage_equipmentCount(int count);
+
   /// No description provided for @tags_manage_useForDives.
   ///
   /// In en, this message translates to:
   /// **'Use for dives'**
   String get tags_manage_useForDives;
+
+  /// No description provided for @tags_manage_useForEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Use for equipment'**
+  String get tags_manage_useForEquipment;
 
   /// No description provided for @tags_manage_useForSites.
   ///
@@ -34507,10 +34818,47 @@ abstract class AppLocalizations {
     int siteCount,
   );
 
+  /// No description provided for @tags_manage_deleteMessage_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{tagName}\" will be removed from {count, plural, =1{1 equipment item} other{{count} equipment items}}. This cannot be undone.'**
+  String tags_manage_deleteMessage_equipment(String tagName, int count);
+
+  /// No description provided for @tags_manage_deleteMessage_divesAndEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{tagName}\" will be removed from {diveCount, plural, =1{1 dive} other{{diveCount} dives}} and {equipmentCount, plural, =1{1 equipment item} other{{equipmentCount} equipment items}}. This cannot be undone.'**
+  String tags_manage_deleteMessage_divesAndEquipment(
+    String tagName,
+    int diveCount,
+    int equipmentCount,
+  );
+
+  /// No description provided for @tags_manage_deleteMessage_sitesAndEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{tagName}\" will be removed from {siteCount, plural, =1{1 site} other{{siteCount} sites}} and {equipmentCount, plural, =1{1 equipment item} other{{equipmentCount} equipment items}}. This cannot be undone.'**
+  String tags_manage_deleteMessage_sitesAndEquipment(
+    String tagName,
+    int siteCount,
+    int equipmentCount,
+  );
+
+  /// No description provided for @tags_manage_deleteMessage_all.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{tagName}\" will be removed from {diveCount, plural, =1{1 dive} other{{diveCount} dives}}, {siteCount, plural, =1{1 site} other{{siteCount} sites}}, and {equipmentCount, plural, =1{1 equipment item} other{{equipmentCount} equipment items}}. This cannot be undone.'**
+  String tags_manage_deleteMessage_all(
+    String tagName,
+    int diveCount,
+    int siteCount,
+    int equipmentCount,
+  );
+
   /// No description provided for @tags_manage_deleteMessage_unused.
   ///
   /// In en, this message translates to:
-  /// **'\"{tagName}\" is not used on any dives or sites. This cannot be undone.'**
+  /// **'\"{tagName}\" is not used on any dives, sites, or equipment. This cannot be undone.'**
   String tags_manage_deleteMessage_unused(String tagName);
 
   /// No description provided for @tags_manage_bulkDeleteTitle.
@@ -34540,10 +34888,44 @@ abstract class AppLocalizations {
     int siteCount,
   );
 
+  /// No description provided for @tags_manage_bulkDeleteMessage_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'These tags will be removed from {equipmentCount, plural, =1{1 equipment item} other{{equipmentCount} equipment items}} total. This cannot be undone.'**
+  String tags_manage_bulkDeleteMessage_equipment(int equipmentCount);
+
+  /// No description provided for @tags_manage_bulkDeleteMessage_divesAndEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'These tags will be removed from {diveCount, plural, =1{1 dive} other{{diveCount} dives}} and {equipmentCount, plural, =1{1 equipment item} other{{equipmentCount} equipment items}} total. This cannot be undone.'**
+  String tags_manage_bulkDeleteMessage_divesAndEquipment(
+    int diveCount,
+    int equipmentCount,
+  );
+
+  /// No description provided for @tags_manage_bulkDeleteMessage_sitesAndEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'These tags will be removed from {siteCount, plural, =1{1 site} other{{siteCount} sites}} and {equipmentCount, plural, =1{1 equipment item} other{{equipmentCount} equipment items}} total. This cannot be undone.'**
+  String tags_manage_bulkDeleteMessage_sitesAndEquipment(
+    int siteCount,
+    int equipmentCount,
+  );
+
+  /// No description provided for @tags_manage_bulkDeleteMessage_all.
+  ///
+  /// In en, this message translates to:
+  /// **'These tags will be removed from {diveCount, plural, =1{1 dive} other{{diveCount} dives}}, {siteCount, plural, =1{1 site} other{{siteCount} sites}}, and {equipmentCount, plural, =1{1 equipment item} other{{equipmentCount} equipment items}} total. This cannot be undone.'**
+  String tags_manage_bulkDeleteMessage_all(
+    int diveCount,
+    int siteCount,
+    int equipmentCount,
+  );
+
   /// No description provided for @tags_manage_bulkDeleteMessage_unused.
   ///
   /// In en, this message translates to:
-  /// **'These tags are not used on any dives or sites. This cannot be undone.'**
+  /// **'These tags are not used on any dives, sites, or equipment. This cannot be undone.'**
   String get tags_manage_bulkDeleteMessage_unused;
 
   /// No description provided for @tags_manage_mergeTitle.
@@ -34582,10 +34964,44 @@ abstract class AppLocalizations {
   /// **'This will affect {diveCount, plural, =1{1 dive} other{{diveCount} dives}} and {siteCount, plural, =1{1 site} other{{siteCount} sites}} total.'**
   String tags_manage_mergeAffected_divesAndSites(int diveCount, int siteCount);
 
+  /// No description provided for @tags_manage_mergeAffected_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'This will affect {count, plural, =1{1 equipment item} other{{count} equipment items}} total.'**
+  String tags_manage_mergeAffected_equipment(int count);
+
+  /// No description provided for @tags_manage_mergeAffected_divesAndEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'This will affect {diveCount, plural, =1{1 dive} other{{diveCount} dives}} and {equipmentCount, plural, =1{1 equipment item} other{{equipmentCount} equipment items}} total.'**
+  String tags_manage_mergeAffected_divesAndEquipment(
+    int diveCount,
+    int equipmentCount,
+  );
+
+  /// No description provided for @tags_manage_mergeAffected_sitesAndEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'This will affect {siteCount, plural, =1{1 site} other{{siteCount} sites}} and {equipmentCount, plural, =1{1 equipment item} other{{equipmentCount} equipment items}} total.'**
+  String tags_manage_mergeAffected_sitesAndEquipment(
+    int siteCount,
+    int equipmentCount,
+  );
+
+  /// No description provided for @tags_manage_mergeAffected_all.
+  ///
+  /// In en, this message translates to:
+  /// **'This will affect {diveCount, plural, =1{1 dive} other{{diveCount} dives}}, {siteCount, plural, =1{1 site} other{{siteCount} sites}}, and {equipmentCount, plural, =1{1 equipment item} other{{equipmentCount} equipment items}} total.'**
+  String tags_manage_mergeAffected_all(
+    int diveCount,
+    int siteCount,
+    int equipmentCount,
+  );
+
   /// No description provided for @tags_manage_mergeAffected_unused.
   ///
   /// In en, this message translates to:
-  /// **'These tags are not used on any dives or sites.'**
+  /// **'These tags are not used on any dives, sites, or equipment.'**
   String get tags_manage_mergeAffected_unused;
 
   /// No description provided for @tags_manage_mergeAction.
@@ -50260,6 +50676,12 @@ abstract class AppLocalizations {
   /// **'Notes'**
   String get enum_equipmentField_notes;
 
+  /// No description provided for @enum_equipmentField_tags.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get enum_equipmentField_tags;
+
   /// No description provided for @enum_equipmentField_itemName_short.
   ///
   /// In en, this message translates to:
@@ -50355,6 +50777,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notes'**
   String get enum_equipmentField_notes_short;
+
+  /// No description provided for @enum_equipmentField_tags_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get enum_equipmentField_tags_short;
 
   /// No description provided for @enum_diveCenterField_centerName.
   ///
@@ -62262,28 +62690,46 @@ abstract class AppLocalizations {
   /// Explains a database written by a newer app build. Object, not int, so schema numbers are never group-separated.
   ///
   /// In en, this message translates to:
-  /// **'Your dive data was saved by a newer version of Submersion (schema v{databaseVersion}). This version only supports up to schema v{appVersion}.'**
+  /// **'Your dive log was saved at schema v{databaseVersion} by a newer version of Submersion. This version opens files up to schema v{appVersion}.'**
   String startup_versionMismatch_body(
     Object databaseVersion,
     Object appVersion,
   );
 
-  /// No description provided for @startup_versionMismatch_causes.
+  /// No description provided for @startup_versionMismatch_causes_lead.
   ///
   /// In en, this message translates to:
-  /// **'This usually means a beta build upgraded your data, a backup was restored from a newer build, or the file is shared with a device on a different update channel. A newer stable release may not exist yet.'**
-  String get startup_versionMismatch_causes;
+  /// **'This usually happens when:'**
+  String get startup_versionMismatch_causes_lead;
+
+  /// No description provided for @startup_versionMismatch_cause_beta.
+  ///
+  /// In en, this message translates to:
+  /// **'A beta build upgraded the file.'**
+  String get startup_versionMismatch_cause_beta;
+
+  /// No description provided for @startup_versionMismatch_cause_restored.
+  ///
+  /// In en, this message translates to:
+  /// **'A backup from a newer build was restored.'**
+  String get startup_versionMismatch_cause_restored;
+
+  /// No description provided for @startup_versionMismatch_cause_shared.
+  ///
+  /// In en, this message translates to:
+  /// **'The file is shared with a device on another update channel.'**
+  String get startup_versionMismatch_cause_shared;
 
   /// No description provided for @startup_versionMismatch_instructions.
   ///
   /// In en, this message translates to:
-  /// **'Your data is safe and has not been modified. Reopen it with the build that wrote it, or with any later build. If a backup was taken before the upgrade, it is in your Backups folder and can be restored once you are running a build that opens it.'**
+  /// **'Your data has not been changed. Open it with the build that wrote it, or with a later one.'**
   String get startup_versionMismatch_instructions;
 
   /// No description provided for @startup_versionMismatch_storeInstructions.
   ///
   /// In en, this message translates to:
-  /// **'This app was installed from an app store and is older than the version that created your data. Your data is safe and has not been modified. Update Submersion when the new version appears in the store, then reopen it.'**
+  /// **'This app came from an app store and is older than the version that saved your data. Your data has not been changed. Update Submersion when the new version appears in the store, then open it again.'**
   String get startup_versionMismatch_storeInstructions;
 
   /// No description provided for @startup_versionMismatch_download.
@@ -62307,7 +62753,7 @@ abstract class AppLocalizations {
   /// No description provided for @startup_versionMismatch_manualLink.
   ///
   /// In en, this message translates to:
-  /// **'If those buttons do not open a browser, visit:'**
+  /// **'If the buttons do not open a browser:'**
   String get startup_versionMismatch_manualLink;
 
   /// No description provided for @universalImport_compare_downloaded.
@@ -64986,16 +65432,10 @@ abstract class AppLocalizations {
   /// **'Restore your pre-upgrade backup'**
   String get startup_versionMismatch_restore_title;
 
-  /// No description provided for @startup_versionMismatch_restore_body.
-  ///
-  /// In en, this message translates to:
-  /// **'A safety copy of your dive log, taken before the upgrade, is on this device and this version can open it.'**
-  String get startup_versionMismatch_restore_body;
-
   /// No description provided for @startup_versionMismatch_restore_warning.
   ///
   /// In en, this message translates to:
-  /// **'Anything you logged after the upgrade exists only in the newer file. That file is kept as a pinned backup, so installing the newer version again gets it back.'**
+  /// **'Dives logged after the upgrade exist only in the newer file. It is kept as a pinned backup, so installing the newer version again brings them back.'**
   String get startup_versionMismatch_restore_warning;
 
   /// No description provided for @startup_interruptedRestore_title.
@@ -65588,12 +66028,6 @@ abstract class AppLocalizations {
   /// **'How equipment is grouped and sorted on a dive'**
   String get settings_appearance_gearArrangementSubtitle;
 
-  /// No description provided for @diveLog_detail_tooltip_whatIf.
-  ///
-  /// In en, this message translates to:
-  /// **'Replan this dive'**
-  String get diveLog_detail_tooltip_whatIf;
-
   /// No description provided for @diveLog_detail_menu_whatIf.
   ///
   /// In en, this message translates to:
@@ -65719,6 +66153,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show on chart'**
   String get plannerCanvas_compare_showOnChart;
+
+  /// No description provided for @numberInput_invalidValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid number'**
+  String get numberInput_invalidValue;
 }
 
 class _AppLocalizationsDelegate
