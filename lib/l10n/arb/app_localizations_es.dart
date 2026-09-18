@@ -9631,10 +9631,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveSites_filter_clearAll => 'Borrar todo';
 
   @override
-  String get diveSites_filter_allCountries => 'All countries';
+  String get diveSites_filter_allCountries => 'Todos los paises';
 
   @override
-  String get diveSites_filter_allRegions => 'All regions';
+  String get diveSites_filter_allRegions => 'Todas las regiones';
 
   @override
   String get diveSites_filter_country_label => 'Pais';
@@ -9675,10 +9675,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveSites_filter_region_label => 'Region';
 
   @override
-  String get diveSites_filter_searchCountriesHint => 'Type to search countries';
+  String get diveSites_filter_searchCountriesHint =>
+      'Escribe para buscar paises';
 
   @override
-  String get diveSites_filter_searchRegionsHint => 'Type to search regions';
+  String get diveSites_filter_searchRegionsHint =>
+      'Escribe para buscar regiones';
 
   @override
   String get diveSites_filter_section_depthRange =>

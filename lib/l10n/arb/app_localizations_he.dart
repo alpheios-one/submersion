@@ -9403,10 +9403,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveSites_filter_clearAll => 'נקה הכל';
 
   @override
-  String get diveSites_filter_allCountries => 'All countries';
+  String get diveSites_filter_allCountries => 'כל המדינות';
 
   @override
-  String get diveSites_filter_allRegions => 'All regions';
+  String get diveSites_filter_allRegions => 'כל האזורים';
 
   @override
   String get diveSites_filter_country_label => 'מדינה';
@@ -9446,10 +9446,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveSites_filter_region_label => 'אזור';
 
   @override
-  String get diveSites_filter_searchCountriesHint => 'Type to search countries';
+  String get diveSites_filter_searchCountriesHint => 'הקלד כדי לחפש מדינות';
 
   @override
-  String get diveSites_filter_searchRegionsHint => 'Type to search regions';
+  String get diveSites_filter_searchRegionsHint => 'הקלד כדי לחפש אזורים';
 
   @override
   String get diveSites_filter_section_depthRange => 'טווח עומק מקסימלי';
