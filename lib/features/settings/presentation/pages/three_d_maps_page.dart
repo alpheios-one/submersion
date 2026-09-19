@@ -11,11 +11,22 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// providers (EMODnet, NOAA DEM, GMRT, ETOPO), and a "reload for every dive
 /// site" action that spans all five.
 ///
-/// Only one of the four actions runs at a time: [_localBusy] covers the
-/// three simple ones (the refresh tile reports its own run through
+/// Only one of the four actions runs at a time: [_otherActionBusy] covers
+/// the delete/reset actions (via [_runExclusive]), [_refreshBusy] covers
+/// the refresh tile (it reports its own run through
 /// [BathymetryRefreshTile.onBusyChanged]), and [mapReloadProvider]'s own
 /// `isRunning` covers the reload action, which has a dialog and a
 /// cancellable progress bar of its own.
+///
+/// These are deliberately two separate booleans, not one shared flag: the
+/// refresh tile's own dimming must ask "is something ELSE running" (so it
+/// stays bright and shows its own spinner while IT is the one running,
+/// rather than looking disabled), while the other two tiles' dimming must
+/// ask "is ANYTHING running, including the refresh tile". A single shared
+/// flag can only answer one of those two questions correctly (regression:
+/// it used to also double as "am I excluded from my own dimming check",
+/// which silently re-enabled every other tile the moment the refresh tile
+/// started, and vice versa -- found by code review).
 class ThreeDMapsPage extends ConsumerStatefulWidget {
   const ThreeDMapsPage({super.key});
 
@@ -24,16 +35,19 @@ class ThreeDMapsPage extends ConsumerStatefulWidget {
 }
 
 class _ThreeDMapsPageState extends ConsumerState<ThreeDMapsPage> {
-  bool _localBusy = false;
+  bool _otherActionBusy = false;
+  bool _refreshBusy = false;
 
   bool _busy(WidgetRef ref) =>
-      _localBusy || ref.watch(mapReloadProvider).isRunning;
+      _otherActionBusy ||
+      _refreshBusy ||
+      ref.watch(mapReloadProvider).isRunning;
 
   Future<void> _runExclusive(
     Future<void> Function() action, {
     required String doneMessage,
   }) async {
-    setState(() => _localBusy = true);
+    setState(() => _otherActionBusy = true);
     try {
       await action();
       if (!mounted) return;
@@ -41,7 +55,7 @@ class _ThreeDMapsPageState extends ConsumerState<ThreeDMapsPage> {
         context,
       ).showSnackBar(SnackBar(content: Text(doneMessage)));
     } finally {
-      if (mounted) setState(() => _localBusy = false);
+      if (mounted) setState(() => _otherActionBusy = false);
     }
   }
 
@@ -139,19 +153,24 @@ class _ThreeDMapsPageState extends ConsumerState<ThreeDMapsPage> {
             child: Column(
               children: [
                 IgnorePointer(
-                  ignoring: busy && !_localBusy,
+                  ignoring: _otherActionBusy || reloadState.isRunning,
                   child: Opacity(
                     // Matches the dimming a plain ListTile(enabled: false)
                     // already gives the other three actions below -- this
                     // tile has no such built-in disabled look of its own
                     // (BathymetryRefreshTile never sets ListTile.enabled),
                     // so without this it stayed visually identical whether
-                    // it was actually tappable or not.
-                    opacity: (busy && !_localBusy) ? 0.5 : 1.0,
+                    // it was actually tappable or not. Asks "is something
+                    // ELSE running", not the page-wide `busy`: while this
+                    // tile is the one running, it must stay bright and show
+                    // its own spinner, not look disabled too.
+                    opacity: (_otherActionBusy || reloadState.isRunning)
+                        ? 0.5
+                        : 1.0,
                     child: BathymetryRefreshTile(
                       leading: const Icon(Icons.refresh),
                       onBusyChanged: (value) =>
-                          setState(() => _localBusy = value),
+                          setState(() => _refreshBusy = value),
                     ),
                   ),
                 ),

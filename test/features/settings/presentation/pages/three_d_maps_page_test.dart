@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -77,28 +79,76 @@ void main() {
     },
   );
 
+  testWidgets('cancelling the confirm dialog does not run the clear action', (
+    tester,
+  ) async {
+    var cleared = false;
+    await pumpPage(
+      tester,
+      extraOverrides: [
+        bathymetryRepositoryProvider.overrideWithValue(null),
+        swissBathyTileCacheRepositoryProvider.overrideWithValue(null),
+        knownDiveSiteLocationsProvider.overrideWith((ref) async => const []),
+        bathymetryOtherSourcesClearProvider.overrideWithValue(() async {
+          cleared = true;
+        }),
+      ],
+    );
+
+    await tester.tap(find.text('Reset remaining bathymetry data').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(cleared, isFalse);
+  });
+
   testWidgets(
-    'cancelling the confirm dialog does not run the clear action',
+    'the refresh tile is disabled while a delete/reset action is running '
+    '(regression: a shared busy flag used to leave it tappable, letting it '
+    'start concurrently with the delete)',
     (tester) async {
-      var cleared = false;
+      final clearStarted = Completer<void>();
+      final clearGate = Completer<void>();
+      var refreshCalls = 0;
       await pumpPage(
         tester,
         extraOverrides: [
           bathymetryRepositoryProvider.overrideWithValue(null),
           swissBathyTileCacheRepositoryProvider.overrideWithValue(null),
           knownDiveSiteLocationsProvider.overrideWith((ref) async => const []),
-          bathymetryOtherSourcesClearProvider.overrideWithValue(() async {
-            cleared = true;
+          swissBathyClearProvider.overrideWithValue(() async {
+            clearStarted.complete();
+            await clearGate.future;
+          }),
+          swissBathyManualRefreshProvider.overrideWithValue(() async {
+            refreshCalls++;
+            return null;
           }),
         ],
       );
 
-      await tester.tap(find.text('Reset remaining bathymetry data').first);
+      await tester.tap(find.text('Delete data'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Cancel'));
-      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete data').last);
+      await tester.pump();
+      await clearStarted.future;
+      await tester.pump();
 
-      expect(cleared, isFalse);
+      // The delete is now in flight. Tapping the refresh tile must do
+      // nothing: IgnorePointer should be blocking it, not just dimming it --
+      // the tap is expected to miss its target entirely, which is exactly
+      // what warnIfMissed: false is here to confirm without flagging it as
+      // a test-authoring mistake.
+      await tester.tap(
+        find.text('Update Existing Map Data'),
+        warnIfMissed: false,
+      );
+      await tester.pump();
+      expect(refreshCalls, 0);
+
+      clearGate.complete();
+      await tester.pumpAndSettle();
     },
   );
 }
