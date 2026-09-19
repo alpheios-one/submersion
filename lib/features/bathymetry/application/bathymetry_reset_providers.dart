@@ -102,6 +102,15 @@ class MapReloadEstimate {
   }
 }
 
+// no-tick: reads the same local-only, never-synced cache database
+// bathymetryGridProvider does (see that provider's own no-tick comment) --
+// there is no merge, bulk-delete, or sync-pull path that can touch it. The
+// two writers that actually change what this estimate measures
+// (swissBathyClearProvider, bathymetryOtherSourcesClearProvider) already
+// call ref.invalidate(mapReloadEstimateProvider) directly; any other write
+// (an individual site's own resolve) only makes the estimate more accurate
+// over time, never meaningfully stale, since it is a rough approximation
+// shown once before a destructive action, not rendered data.
 final mapReloadEstimateProvider = FutureProvider<MapReloadEstimate?>((
   ref,
 ) async {
