@@ -123,6 +123,28 @@ void main() {
   );
 
   group('MapReloadNotifier', () {
+    test('reports an error rather than a silent success when the local cache '
+        'database is not initialized (every clear/fetch step would otherwise '
+        'no-op and the run would look complete)', () async {
+      final container = ProviderContainer(
+        overrides: [
+          bathymetryRepositoryProvider.overrideWithValue(null),
+          swissBathyTileCacheRepositoryProvider.overrideWithValue(null),
+          knownDiveSiteLocationsProvider.overrideWith(
+            (ref) async => const [betlis, bonaire],
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(mapReloadProvider.notifier).start();
+
+      final state = container.read(mapReloadProvider);
+      expect(state.isRunning, isFalse);
+      expect(state.error, isNotNull);
+      expect(state.completed, 0);
+    });
+
     test('clears both caches, then re-fetches every known site', () async {
       final source = TaggedSource('gmrt');
       final repo = BathymetryRepository(

@@ -129,11 +129,20 @@ class MapReloadNotifier extends StateNotifier<MapReloadState> {
 
       final sites = await _ref.read(knownDiveSiteLocationsProvider.future);
       final repo = _ref.read(bathymetryRepositoryProvider);
+      if (repo == null) {
+        // The clears above and every getGrid() call below silently no-op
+        // wherever the local cache database is not initialized -- without
+        // this check the loop would "complete" every site without ever
+        // clearing or fetching anything, and the caller would report
+        // success for a run that did nothing.
+        state = state.copyWith(error: 'local cache database not initialized');
+        return;
+      }
       state = state.copyWith(total: sites.length);
 
       for (final site in sites) {
         if (_cancelRequested) break;
-        await repo?.getGrid(site);
+        await repo.getGrid(site);
         state = state.copyWith(completed: state.completed + 1);
       }
     } catch (e) {
