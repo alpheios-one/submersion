@@ -42902,6 +42902,24 @@ abstract class AppLocalizations {
   /// **'about {count, plural, =1{1 minute} other{{count} minutes}} remaining'**
   String maps3d_reload_remainingMinutes(int count);
 
+  /// No description provided for @maps3d_reload_warming.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing: lake {index} of {total} ({name})'**
+  String maps3d_reload_warming(int index, int total, String name);
+
+  /// No description provided for @maps3d_reload_elapsedSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'running for {count, plural, =1{1 second} other{{count} seconds}}'**
+  String maps3d_reload_elapsedSeconds(int count);
+
+  /// No description provided for @maps3d_reload_elapsedMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'running for {count, plural, =1{1 minute} other{{count} minutes}}'**
+  String maps3d_reload_elapsedMinutes(int count);
+
   /// Generic re-parse action label
   ///
   /// In en, this message translates to:

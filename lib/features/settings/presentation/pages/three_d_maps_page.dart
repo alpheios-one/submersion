@@ -240,10 +240,39 @@ class _ReloadProgress extends ConsumerWidget {
     );
   }
 
+  /// Time elapsed since the diver pressed the button, formatted the same
+  /// way [_formatRemaining] formats a remaining estimate -- the only time
+  /// signal available during the warm phase, which has no per-lake
+  /// duration to extrapolate a remaining estimate from the way the
+  /// per-site loop does.
+  String? _formatElapsed(BuildContext context) {
+    final overallStartedAt = state.overallStartedAt;
+    if (overallStartedAt == null) return null;
+    final elapsed = DateTime.now().difference(overallStartedAt);
+    if (elapsed.inMinutes >= 1) {
+      return context.l10n.maps3d_reload_elapsedMinutes(elapsed.inMinutes);
+    }
+    return context.l10n.maps3d_reload_elapsedSeconds(
+      elapsed.inSeconds.clamp(1, 59),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final progress = state.total == 0 ? null : state.completed / state.total;
-    final remainingText = _formatRemaining(context, _estimateRemaining());
+    final isWarming = state.warmingLakeName != null;
+    final progress = isWarming || state.total == 0
+        ? null
+        : state.completed / state.total;
+    final secondaryText = isWarming
+        ? _formatElapsed(context)
+        : _formatRemaining(context, _estimateRemaining());
+    final primaryText = isWarming
+        ? context.l10n.maps3d_reload_warming(
+            state.warmingLakeIndex,
+            state.warmingLakeTotal,
+            state.warmingLakeName!,
+          )
+        : context.l10n.maps3d_reload_progress(state.completed, state.total);
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -254,22 +283,17 @@ class _ReloadProgress extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                context.l10n.maps3d_reload_progress(
-                  state.completed,
-                  state.total,
-                ),
-              ),
+              Expanded(child: Text(primaryText)),
               TextButton(
                 onPressed: () => ref.read(mapReloadProvider.notifier).cancel(),
                 child: Text(context.l10n.maps3d_reload_cancel),
               ),
             ],
           ),
-          if (remainingText != null) ...[
+          if (secondaryText != null) ...[
             const SizedBox(height: 4),
             Text(
-              remainingText,
+              secondaryText,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),

@@ -26687,6 +26687,33 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String maps3d_reload_warming(int index, int total, String name) {
+    return 'Bereite vor: See $index von $total ($name)';
+  }
+
+  @override
+  String maps3d_reload_elapsedSeconds(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Sekunden',
+      one: '1 Sekunde',
+    );
+    return 'läuft seit $_temp0';
+  }
+
+  @override
+  String maps3d_reload_elapsedMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Minuten',
+      one: '1 Minute',
+    );
+    return 'läuft seit $_temp0';
+  }
+
+  @override
   String get common_action_reparse => 'Neu auswerten';
 
   @override

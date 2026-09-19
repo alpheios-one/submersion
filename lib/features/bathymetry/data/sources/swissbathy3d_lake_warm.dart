@@ -44,9 +44,17 @@ part of 'swissbathy3d_source.dart';
 /// logging anything for its duration -- without this, a diver watching the
 /// debug log during a long reload sees no activity for however long the
 /// warm pass takes and reasonably assumes the app has hung.
+///
+/// [onLakeStart], if given, is called with the same information right
+/// before each lake starts (name, its 1-based position, and the total lake
+/// count) -- the UI-facing counterpart of the log line above, since the
+/// reload progress card has no other way to show that it is working
+/// through this phase at all (its own site counter stays at zero the whole
+/// time this runs).
 Future<void> _warmKnownSitesImpl(
   SwissBathy3dSource source, {
   bool Function()? isCancelled,
+  void Function(String lakeName, int index, int total)? onLakeStart,
 }) async {
   final knownSiteLocations = source._knownSiteLocations;
   if (knownSiteLocations == null) return;
@@ -86,7 +94,9 @@ Future<void> _warmKnownSitesImpl(
     '${tilesByLake.length} swissBATHY3D lake(s)',
   );
 
-  for (final lakeName in tilesByLake.keys) {
+  final lakeNames = tilesByLake.keys.toList();
+  for (var i = 0; i < lakeNames.length; i++) {
+    final lakeName = lakeNames[i];
     if (isCancelled?.call() ?? false) {
       _log.info('warmKnownSites: cancelled before lake $lakeName');
       return;
@@ -96,6 +106,7 @@ Future<void> _warmKnownSitesImpl(
     _log.info(
       'warmKnownSites: warming lake $lakeName (${tiles.length} tile(s))',
     );
+    onLakeStart?.call(lakeName, i + 1, lakeNames.length);
     final shared = _SharedFetchState();
     final parsedEntries = <String, Future<RawEsriGrid>>{};
     await _runBounded(tiles, SwissBathy3dSource.maxConcurrentTileRequests, (

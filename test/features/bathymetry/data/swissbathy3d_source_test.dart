@@ -2228,6 +2228,68 @@ nodata_value -9999
       expect(itemCalls, 1);
     });
 
+    test('onLakeStart fires once per lake with its 1-based position, the '
+        'total lake count, and its name', () async {
+      const rotseeTileE = 2666;
+      const rotseeTileN = 1213;
+      final rotseeWgs84 = Lv95Transform.toWgs84(
+        (rotseeTileE + 0.5) * 1000,
+        (rotseeTileN + 0.5) * 1000,
+      );
+      final rotseePoint = GeoPoint(rotseeWgs84.latitude, rotseeWgs84.longitude);
+      expect(findSwissLake(rotseePoint)?.name, 'Rotsee');
+
+      final source = SwissBathy3dSource(
+        tileCache: SwissBathyTileCacheRepository(db),
+        stacClient: SwissStacClient(
+          client: MockClient((req) async {
+            if (req.url.path.endsWith('/items')) {
+              return http.Response(
+                jsonEncode({
+                  'features': [
+                    {
+                      'bbox': _requestedBbox(req),
+                      'assets': {
+                        'grid': {'href': 'https://example.org/lake.zip'},
+                      },
+                    },
+                  ],
+                }),
+                200,
+              );
+            }
+            return http.Response.bytes(
+              _zipOfMultiple({
+                'swissBATHY3D_CHLV95_LN02_2685_1240.asc': tileAsc(
+                  2685,
+                  1240,
+                  100.0,
+                ),
+                'swissBATHY3D_CHLV95_LN02_$rotseeTileE'
+                    '_$rotseeTileN.asc': tileAsc(
+                  rotseeTileE,
+                  rotseeTileN,
+                  50.0,
+                ),
+              }),
+              200,
+            );
+          }),
+        ),
+        knownSiteLocations: () async => [zurichseePoint, rotseePoint],
+      );
+
+      final calls = <(String, int, int)>[];
+      await source.warmKnownSites(
+        onLakeStart: (name, index, total) => calls.add((name, index, total)),
+      );
+
+      expect(calls, hasLength(2));
+      expect(calls.map((c) => c.$1).toSet(), {'Zürichsee', 'Rotsee'});
+      expect(calls.every((c) => c.$3 == 2), isTrue);
+      expect(calls.map((c) => c.$2).toSet(), {1, 2});
+    });
+
     test('a null knownSiteLocations callback is a no-op', () async {
       final source = SwissBathy3dSource(
         tileCache: SwissBathyTileCacheRepository(db),

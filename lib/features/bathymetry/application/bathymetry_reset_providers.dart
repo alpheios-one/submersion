@@ -23,15 +23,23 @@ final swissBathyClearProvider = Provider<Future<void> Function()>((ref) {
 /// [SwissBathy3dSource.fetch]'s fire-and-forget sibling precache to keep up
 /// with its own fast, sequential per-site loop. `isCancelled` is checked
 /// between lakes, same caveat as [MapReloadNotifier.cancel]: a lake already
-/// being warmed still finishes. A no-op wherever the local cache database
-/// is not initialized.
+/// being warmed still finishes. `onLakeStart` lets the reload progress card
+/// show which lake is currently being warmed, since its own site counter
+/// stays at zero for this whole phase. A no-op wherever the local cache
+/// database is not initialized.
 final swissBathyWarmKnownSitesProvider =
-    Provider<Future<void> Function({required bool Function() isCancelled})>((
-      ref,
-    ) {
-      return ({required isCancelled}) async {
+    Provider<
+      Future<void> Function({
+        required bool Function() isCancelled,
+        void Function(String lakeName, int index, int total)? onLakeStart,
+      })
+    >((ref) {
+      return ({required isCancelled, onLakeStart}) async {
         final source = ref.read(swissBathy3dSourceProvider);
-        await source?.warmKnownSites(isCancelled: isCancelled);
+        await source?.warmKnownSites(
+          isCancelled: isCancelled,
+          onLakeStart: onLakeStart,
+        );
       };
     });
 
@@ -101,6 +109,21 @@ class MapReloadState {
   /// starts.
   final DateTime? startedAt;
 
+  /// When the diver pressed the button, i.e. BEFORE clearing/warming --
+  /// unlike [startedAt], covers the whole run. Used only to show elapsed
+  /// time during the warm phase, where no reliable per-lake duration
+  /// estimate exists the way [startedAt]/[completed] give one for sites.
+  final DateTime? overallStartedAt;
+
+  /// The lake [SwissBathy3dSource.warmKnownSites] is currently warming, its
+  /// 1-based position, and the total lake count -- null once that phase
+  /// ends (see [copyWith]'s `clearWarming`). The only progress signal the
+  /// warm phase has to show, since [completed]/[total] stay at their
+  /// per-site meaning and do not move during this phase.
+  final String? warmingLakeName;
+  final int warmingLakeIndex;
+  final int warmingLakeTotal;
+
   const MapReloadState({
     this.isRunning = false,
     this.total = 0,
@@ -108,6 +131,10 @@ class MapReloadState {
     this.cancelled = false,
     this.error,
     this.startedAt,
+    this.overallStartedAt,
+    this.warmingLakeName,
+    this.warmingLakeIndex = 0,
+    this.warmingLakeTotal = 0,
   });
 
   MapReloadState copyWith({
@@ -118,6 +145,11 @@ class MapReloadState {
     String? error,
     bool clearError = false,
     DateTime? startedAt,
+    DateTime? overallStartedAt,
+    String? warmingLakeName,
+    int? warmingLakeIndex,
+    int? warmingLakeTotal,
+    bool clearWarming = false,
   }) {
     return MapReloadState(
       isRunning: isRunning ?? this.isRunning,
@@ -126,6 +158,16 @@ class MapReloadState {
       cancelled: cancelled ?? this.cancelled,
       error: clearError ? null : (error ?? this.error),
       startedAt: startedAt ?? this.startedAt,
+      overallStartedAt: overallStartedAt ?? this.overallStartedAt,
+      warmingLakeName: clearWarming
+          ? null
+          : (warmingLakeName ?? this.warmingLakeName),
+      warmingLakeIndex: clearWarming
+          ? 0
+          : (warmingLakeIndex ?? this.warmingLakeIndex),
+      warmingLakeTotal: clearWarming
+          ? 0
+          : (warmingLakeTotal ?? this.warmingLakeTotal),
     );
   }
 }
@@ -151,7 +193,7 @@ class MapReloadNotifier extends StateNotifier<MapReloadState> {
   Future<void> start() async {
     if (state.isRunning) return;
     _cancelRequested = false;
-    state = const MapReloadState(isRunning: true);
+    state = MapReloadState(isRunning: true, overallStartedAt: DateTime.now());
     try {
       await _ref.read(swissBathyClearProvider)();
       await _ref.read(bathymetryOtherSourcesClearProvider)();
@@ -176,11 +218,20 @@ class MapReloadNotifier extends StateNotifier<MapReloadState> {
       // already-warm lake (see swissBathyWarmKnownSitesProvider's own doc).
       await _ref.read(swissBathyWarmKnownSitesProvider)(
         isCancelled: () => _cancelRequested,
+        onLakeStart: (lakeName, index, total) {
+          state = state.copyWith(
+            warmingLakeName: lakeName,
+            warmingLakeIndex: index,
+            warmingLakeTotal: total,
+          );
+        },
       );
 
       // Marks the start of the per-site loop's own pace, deliberately
       // after clearing/warming -- see [MapReloadState.startedAt]'s doc.
-      state = state.copyWith(startedAt: DateTime.now());
+      // Also clears the warm phase's own progress fields, so the UI
+      // switches from "warming lake X of Y" to the per-site counter.
+      state = state.copyWith(startedAt: DateTime.now(), clearWarming: true);
 
       for (final site in sites) {
         if (_cancelRequested) break;

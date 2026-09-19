@@ -26538,6 +26538,33 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String maps3d_reload_warming(int index, int total, String name) {
+    return 'Preparing: lake $index of $total ($name)';
+  }
+
+  @override
+  String maps3d_reload_elapsedSeconds(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count seconds',
+      one: '1 second',
+    );
+    return 'running for $_temp0';
+  }
+
+  @override
+  String maps3d_reload_elapsedMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minutes',
+      one: '1 minute',
+    );
+    return 'running for $_temp0';
+  }
+
+  @override
   String get common_action_reparse => 'Opnieuw verwerken';
 
   @override
