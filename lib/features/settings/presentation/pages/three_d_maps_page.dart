@@ -240,11 +240,9 @@ class _ReloadProgress extends ConsumerWidget {
     );
   }
 
-  /// Time elapsed since the diver pressed the button, formatted the same
-  /// way [_formatRemaining] formats a remaining estimate -- the only time
-  /// signal available during the warm phase, which has no per-lake
-  /// duration to extrapolate a remaining estimate from the way the
-  /// per-site loop does.
+  /// Time elapsed since the diver pressed the button -- the warm phase's
+  /// own duration signal, since [MapReloadState.startedAt] (the per-site
+  /// loop's own clock) does not exist yet during this phase.
   String? _formatElapsed(BuildContext context) {
     final overallStartedAt = state.overallStartedAt;
     if (overallStartedAt == null) return null;
@@ -257,6 +255,32 @@ class _ReloadProgress extends ConsumerWidget {
     );
   }
 
+  /// Remaining time, estimated from the warm phase's OWN pace so far --
+  /// same shape as [_estimateRemaining], but per LAKE rather than per site,
+  /// and against [MapReloadState.overallStartedAt] rather than
+  /// [MapReloadState.startedAt] (which does not exist yet during this
+  /// phase). Null before the first lake finishes, since there is no rate to
+  /// extrapolate from yet.
+  ///
+  /// Far less reliable than the per-site estimate: lake sizes vary hugely
+  /// (a 3-tile lake vs. an 18-tile one), so an estimate taken after just one
+  /// or two lakes can be well off if a small lake happened to go first (or
+  /// last) -- shown anyway, on the same "better than nothing" basis as the
+  /// per-site estimate, but this doc is the reason it is not held to the
+  /// same expectation of accuracy.
+  Duration? _estimateWarmRemaining() {
+    final overallStartedAt = state.overallStartedAt;
+    // The lake at warmingLakeIndex is still IN FLIGHT; only the ones before
+    // it are actually finished and count toward the rate.
+    final completedLakes = state.warmingLakeIndex - 1;
+    if (overallStartedAt == null || completedLakes <= 0) return null;
+    final elapsed = DateTime.now().difference(overallStartedAt);
+    final remainingLakes = state.warmingLakeTotal - completedLakes;
+    if (remainingLakes <= 0) return Duration.zero;
+    final msPerLake = elapsed.inMilliseconds / completedLakes;
+    return Duration(milliseconds: (msPerLake * remainingLakes).round());
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isWarming = state.warmingLakeName != null;
@@ -264,7 +288,10 @@ class _ReloadProgress extends ConsumerWidget {
         ? null
         : state.completed / state.total;
     final secondaryText = isWarming
-        ? _formatElapsed(context)
+        ? [
+            _formatElapsed(context),
+            _formatRemaining(context, _estimateWarmRemaining()),
+          ].nonNulls.join(' · ')
         : _formatRemaining(context, _estimateRemaining());
     final primaryText = isWarming
         ? context.l10n.maps3d_reload_warming(
