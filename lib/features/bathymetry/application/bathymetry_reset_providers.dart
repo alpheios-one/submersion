@@ -21,16 +21,19 @@ final swissBathyClearProvider = Provider<Future<void> Function()>((ref) {
 /// by lake and awaited -- see [SwissBathy3dSource.warmKnownSites]'s own doc
 /// (`swissbathy3d_lake_warm.dart`) for why the reload action cannot rely on
 /// [SwissBathy3dSource.fetch]'s fire-and-forget sibling precache to keep up
-/// with its own fast, sequential per-site loop. A no-op wherever the local
-/// cache database is not initialized.
-final swissBathyWarmKnownSitesProvider = Provider<Future<void> Function()>((
-  ref,
-) {
-  return () async {
-    final source = ref.read(swissBathy3dSourceProvider);
-    await source?.warmKnownSites();
-  };
-});
+/// with its own fast, sequential per-site loop. `isCancelled` is checked
+/// between lakes, same caveat as [MapReloadNotifier.cancel]: a lake already
+/// being warmed still finishes. A no-op wherever the local cache database
+/// is not initialized.
+final swissBathyWarmKnownSitesProvider =
+    Provider<Future<void> Function({required bool Function() isCancelled})>((
+      ref,
+    ) {
+      return ({required isCancelled}) async {
+        final source = ref.read(swissBathy3dSourceProvider);
+        await source?.warmKnownSites(isCancelled: isCancelled);
+      };
+    });
 
 /// Deletes every cached bathymetry row NOT attributed to swissBATHY3D
 /// (EMODnet, NOAA DEM, GMRT, ETOPO, and any row with no source at all). A
@@ -90,12 +93,21 @@ class MapReloadState {
   final bool cancelled;
   final String? error;
 
+  /// When the per-site loop itself started, i.e. AFTER clearing and
+  /// warming, not when the diver pressed the button -- the UI's remaining-
+  /// time estimate divides elapsed time since here by [completed], and
+  /// including the warm phase's own variable, site-count-independent
+  /// duration would skew that estimate. Null until the loop actually
+  /// starts.
+  final DateTime? startedAt;
+
   const MapReloadState({
     this.isRunning = false,
     this.total = 0,
     this.completed = 0,
     this.cancelled = false,
     this.error,
+    this.startedAt,
   });
 
   MapReloadState copyWith({
@@ -105,6 +117,7 @@ class MapReloadState {
     bool? cancelled,
     String? error,
     bool clearError = false,
+    DateTime? startedAt,
   }) {
     return MapReloadState(
       isRunning: isRunning ?? this.isRunning,
@@ -112,6 +125,7 @@ class MapReloadState {
       completed: completed ?? this.completed,
       cancelled: cancelled ?? this.cancelled,
       error: clearError ? null : (error ?? this.error),
+      startedAt: startedAt ?? this.startedAt,
     );
   }
 }
@@ -160,7 +174,13 @@ class MapReloadNotifier extends StateNotifier<MapReloadState> {
       // lake site in that loop would pay for its own from-scratch zip
       // download and decompress instead of reusing a sibling site's
       // already-warm lake (see swissBathyWarmKnownSitesProvider's own doc).
-      await _ref.read(swissBathyWarmKnownSitesProvider)();
+      await _ref.read(swissBathyWarmKnownSitesProvider)(
+        isCancelled: () => _cancelRequested,
+      );
+
+      // Marks the start of the per-site loop's own pace, deliberately
+      // after clearing/warming -- see [MapReloadState.startedAt]'s doc.
+      state = state.copyWith(startedAt: DateTime.now());
 
       for (final site in sites) {
         if (_cancelRequested) break;

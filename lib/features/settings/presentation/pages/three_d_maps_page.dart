@@ -216,9 +216,34 @@ class _ReloadProgress extends ConsumerWidget {
 
   final MapReloadState state;
 
+  /// Remaining time, estimated from the per-site loop's OWN pace so far
+  /// (elapsed since [MapReloadState.startedAt], which is set after
+  /// clearing/warming -- see that field's own doc on why). Null before the
+  /// first site completes, since there is no rate to extrapolate from yet.
+  Duration? _estimateRemaining() {
+    final startedAt = state.startedAt;
+    if (startedAt == null || state.completed == 0) return null;
+    final elapsed = DateTime.now().difference(startedAt);
+    final remainingSites = state.total - state.completed;
+    if (remainingSites <= 0) return Duration.zero;
+    final msPerSite = elapsed.inMilliseconds / state.completed;
+    return Duration(milliseconds: (msPerSite * remainingSites).round());
+  }
+
+  String? _formatRemaining(BuildContext context, Duration? remaining) {
+    if (remaining == null) return null;
+    if (remaining.inMinutes >= 1) {
+      return context.l10n.maps3d_reload_remainingMinutes(remaining.inMinutes);
+    }
+    return context.l10n.maps3d_reload_remainingSeconds(
+      remaining.inSeconds.clamp(1, 59),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final progress = state.total == 0 ? null : state.completed / state.total;
+    final remainingText = _formatRemaining(context, _estimateRemaining());
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -241,6 +266,15 @@ class _ReloadProgress extends ConsumerWidget {
               ),
             ],
           ),
+          if (remainingText != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              remainingText,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
         ],
       ),
     );

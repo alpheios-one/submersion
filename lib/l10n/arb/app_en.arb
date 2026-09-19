@@ -17066,6 +17066,22 @@
   "maps3d_reload_cancelled": "Reload cancelled",
   "maps3d_reload_failed": "Reload failed; some dive sites may not have been reloaded",
   "maps3d_busy_notice": "Another 3D Maps action is running. Please wait until it finishes.",
+  "maps3d_reload_remainingSeconds": "about {count, plural, =1{1 second} other{{count} seconds}} remaining",
+  "@maps3d_reload_remainingSeconds": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "maps3d_reload_remainingMinutes": "about {count, plural, =1{1 minute} other{{count} minutes}} remaining",
+  "@maps3d_reload_remainingMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "common_action_reparse": "Re-parse",
   "@common_action_reparse": {
     "description": "Generic re-parse action label"

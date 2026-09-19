@@ -34,7 +34,20 @@ part of 'swissbathy3d_source.dart';
 /// Reuses [SwissBathy3dSource._fetchTile] exactly as [_precacheSiblingSites]
 /// already does -- no change to that well-tested per-tile logic, only to
 /// when and how it is driven.
-Future<void> _warmKnownSitesImpl(SwissBathy3dSource source) async {
+///
+/// [isCancelled], if given, is checked BETWEEN lakes (never mid-download —
+/// a lake already in flight still finishes, matching the same in-flight
+/// caveat [MapReloadNotifier.cancel] documents for the caller's own
+/// per-site loop): once it returns true, no further lake is started. Logs
+/// each lake it starts and how many tiles it holds, since this whole pass
+/// is otherwise silent CPU/network work with nothing else in the app
+/// logging anything for its duration -- without this, a diver watching the
+/// debug log during a long reload sees no activity for however long the
+/// warm pass takes and reasonably assumes the app has hung.
+Future<void> _warmKnownSitesImpl(
+  SwissBathy3dSource source, {
+  bool Function()? isCancelled,
+}) async {
   final knownSiteLocations = source._knownSiteLocations;
   if (knownSiteLocations == null) return;
   final List<GeoPoint> sites;
@@ -68,9 +81,21 @@ Future<void> _warmKnownSitesImpl(SwissBathy3dSource source) async {
     }
   }
 
+  _log.info(
+    'warmKnownSites: ${sites.length} known site(s) resolve to '
+    '${tilesByLake.length} swissBATHY3D lake(s)',
+  );
+
   for (final lakeName in tilesByLake.keys) {
+    if (isCancelled?.call() ?? false) {
+      _log.info('warmKnownSites: cancelled before lake $lakeName');
+      return;
+    }
     final lake = lakesByName[lakeName]!;
     final tiles = tilesByLake[lakeName]!.values.toList();
+    _log.info(
+      'warmKnownSites: warming lake $lakeName (${tiles.length} tile(s))',
+    );
     final shared = _SharedFetchState();
     final parsedEntries = <String, Future<RawEsriGrid>>{};
     await _runBounded(tiles, SwissBathy3dSource.maxConcurrentTileRequests, (
@@ -90,4 +115,5 @@ Future<void> _warmKnownSitesImpl(SwissBathy3dSource source) async {
       }
     });
   }
+  _log.info('warmKnownSites: finished warming ${tilesByLake.length} lake(s)');
 }

@@ -2164,6 +2164,70 @@ nodata_value -9999
       expect(itemCalls, 2);
     });
 
+    test('isCancelled is checked BETWEEN lakes: once true, no further lake '
+        'is started, but a lake already in flight still finishes', () async {
+      const rotseeTileE = 2666;
+      const rotseeTileN = 1213;
+      final rotseeWgs84 = Lv95Transform.toWgs84(
+        (rotseeTileE + 0.5) * 1000,
+        (rotseeTileN + 0.5) * 1000,
+      );
+      final rotseePoint = GeoPoint(rotseeWgs84.latitude, rotseeWgs84.longitude);
+      expect(findSwissLake(rotseePoint)?.name, 'Rotsee');
+
+      var itemCalls = 0;
+      var cancelled = false;
+      final source = SwissBathy3dSource(
+        tileCache: SwissBathyTileCacheRepository(db),
+        stacClient: SwissStacClient(
+          client: MockClient((req) async {
+            if (req.url.path.endsWith('/items')) {
+              itemCalls++;
+              // The first lake's own lookup flips the flag, simulating a
+              // cancel pressed while that lake was already in flight.
+              cancelled = true;
+              return http.Response(
+                jsonEncode({
+                  'features': [
+                    {
+                      'bbox': _requestedBbox(req),
+                      'assets': {
+                        'grid': {'href': 'https://example.org/lake.zip'},
+                      },
+                    },
+                  ],
+                }),
+                200,
+              );
+            }
+            return http.Response.bytes(
+              _zipOfMultiple({
+                'swissBATHY3D_CHLV95_LN02_2685_1240.asc': tileAsc(
+                  2685,
+                  1240,
+                  100.0,
+                ),
+                'swissBATHY3D_CHLV95_LN02_$rotseeTileE'
+                    '_$rotseeTileN.asc': tileAsc(
+                  rotseeTileE,
+                  rotseeTileN,
+                  50.0,
+                ),
+              }),
+              200,
+            );
+          }),
+        ),
+        knownSiteLocations: () async => [zurichseePoint, rotseePoint],
+      );
+
+      await source.warmKnownSites(isCancelled: () => cancelled);
+
+      // Exactly one lake's lookup ran (whichever the map iteration reached
+      // first); the second lake was never started once cancelled flipped.
+      expect(itemCalls, 1);
+    });
+
     test('a null knownSiteLocations callback is a no-op', () async {
       final source = SwissBathy3dSource(
         tileCache: SwissBathyTileCacheRepository(db),

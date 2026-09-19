@@ -7596,6 +7596,22 @@
   "maps3d_reload_cancelled": "Neu laden abgebrochen",
   "maps3d_reload_failed": "Neu laden fehlgeschlagen; einige Tauchplätze wurden evtl. nicht neu geladen",
   "maps3d_busy_notice": "Eine andere 3D-Karten-Aktion läuft gerade. Bitte warten, bis sie abgeschlossen ist.",
+  "maps3d_reload_remainingSeconds": "noch ca. {count, plural, =1{1 Sekunde} other{{count} Sekunden}}",
+  "@maps3d_reload_remainingSeconds": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "maps3d_reload_remainingMinutes": "noch ca. {count, plural, =1{1 Minute} other{{count} Minuten}}",
+  "@maps3d_reload_remainingMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "settings_appearance_mapStyle_openStreetMap": "Straßenkarte",
   "settings_appearance_mapStyle_openTopoMap": "Topografisch",
   "universalImport_bulk_replaceSourceAll": "Alle ersetzen ({count})",

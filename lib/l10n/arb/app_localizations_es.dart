@@ -26735,6 +26735,28 @@ class AppLocalizationsEs extends AppLocalizations {
       'Another 3D Maps action is running. Please wait until it finishes.';
 
   @override
+  String maps3d_reload_remainingSeconds(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count seconds',
+      one: '1 second',
+    );
+    return 'about $_temp0 remaining';
+  }
+
+  @override
+  String maps3d_reload_remainingMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minutes',
+      one: '1 minute',
+    );
+    return 'about $_temp0 remaining';
+  }
+
+  @override
   String get common_action_reparse => 'Reanalizar';
 
   @override

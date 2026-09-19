@@ -558,8 +558,10 @@ class SwissBathy3dSource implements BathymetrySource {
   /// [fetch]'s fire-and-forget sibling precache for a caller that needs
   /// every site actually warm before it moves on. See
   /// `swissbathy3d_lake_warm.dart`'s own doc for why the fire-and-forget
-  /// version cannot be relied on here.
-  Future<void> warmKnownSites() => _warmKnownSitesImpl(this);
+  /// version cannot be relied on here, and for what [isCancelled] can and
+  /// cannot stop.
+  Future<void> warmKnownSites({bool Function()? isCancelled}) =>
+      _warmKnownSitesImpl(this, isCancelled: isCancelled);
 }
 
 /// Runs [task] over [items] with at most [maxConcurrent] running at once —

@@ -26665,6 +26665,28 @@ class AppLocalizationsDe extends AppLocalizations {
       'Eine andere 3D-Karten-Aktion läuft gerade. Bitte warten, bis sie abgeschlossen ist.';
 
   @override
+  String maps3d_reload_remainingSeconds(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Sekunden',
+      one: '1 Sekunde',
+    );
+    return 'noch ca. $_temp0';
+  }
+
+  @override
+  String maps3d_reload_remainingMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Minuten',
+      one: '1 Minute',
+    );
+    return 'noch ca. $_temp0';
+  }
+
+  @override
   String get common_action_reparse => 'Neu auswerten';
 
   @override

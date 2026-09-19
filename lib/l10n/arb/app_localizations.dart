@@ -42890,6 +42890,18 @@ abstract class AppLocalizations {
   /// **'Another 3D Maps action is running. Please wait until it finishes.'**
   String get maps3d_busy_notice;
 
+  /// No description provided for @maps3d_reload_remainingSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'about {count, plural, =1{1 second} other{{count} seconds}} remaining'**
+  String maps3d_reload_remainingSeconds(int count);
+
+  /// No description provided for @maps3d_reload_remainingMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'about {count, plural, =1{1 minute} other{{count} minutes}} remaining'**
+  String maps3d_reload_remainingMinutes(int count);
+
   /// Generic re-parse action label
   ///
   /// In en, this message translates to:
