@@ -140,10 +140,19 @@ class _ThreeDMapsPageState extends ConsumerState<ThreeDMapsPage> {
               children: [
                 IgnorePointer(
                   ignoring: busy && !_localBusy,
-                  child: BathymetryRefreshTile(
-                    leading: const Icon(Icons.refresh),
-                    onBusyChanged: (value) =>
-                        setState(() => _localBusy = value),
+                  child: Opacity(
+                    // Matches the dimming a plain ListTile(enabled: false)
+                    // already gives the other three actions below -- this
+                    // tile has no such built-in disabled look of its own
+                    // (BathymetryRefreshTile never sets ListTile.enabled),
+                    // so without this it stayed visually identical whether
+                    // it was actually tappable or not.
+                    opacity: (busy && !_localBusy) ? 0.5 : 1.0,
+                    child: BathymetryRefreshTile(
+                      leading: const Icon(Icons.refresh),
+                      onBusyChanged: (value) =>
+                          setState(() => _localBusy = value),
+                    ),
                   ),
                 ),
                 const Divider(height: 1),
