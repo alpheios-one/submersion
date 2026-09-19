@@ -27028,6 +27028,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dive3d_seascape_orbitView => 'عرض ثلاثي الأبعاد';
 
   @override
+  String get dive3d_seascape_verticalExaggeration => 'المبالغة الرأسية';
+
+  @override
+  String get dive3d_seascape_verticalExaggerationReset =>
+      'إعادة التعيين إلى تلقائي';
+
+  @override
+  String get dive3d_seascape_verticalExaggerationLabel => 'العمق';
+
+  @override
   String get dive3d_seascape_appearance_surface => 'سطح التضاريس';
 
   @override

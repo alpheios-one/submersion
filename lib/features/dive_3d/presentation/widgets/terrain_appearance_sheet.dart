@@ -3,14 +3,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/core/providers/async_value_extensions.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/utils/number_input.dart';
+import 'package:submersion/features/dive_3d/application/site_seascape_providers.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/vertical_exaggeration.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// Opens the terrain-appearance editor for the seascape views.
-void showTerrainAppearanceSheet(BuildContext context) {
+/// Opens the terrain-appearance editor for the seascape views. [siteId],
+/// when given, shows the per-site vertical-exaggeration section (issue
+/// #2141 follow-up) -- omitted for views with no persistent site (e.g. the
+/// single-dive spatial page), where exaggeration does not apply.
+void showTerrainAppearanceSheet(BuildContext context, {String? siteId}) {
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -48,8 +54,10 @@ void showTerrainAppearanceSheet(BuildContext context) {
             // Loose fit: the sheet still hugs short content, but a body
             // taller than the cap scrolls under the pinned header instead of
             // pushing it (and the close action) off the screen.
-            const Flexible(
-              child: SingleChildScrollView(child: TerrainAppearanceSheet()),
+            Flexible(
+              child: SingleChildScrollView(
+                child: TerrainAppearanceSheet(siteId: siteId),
+              ),
             ),
           ],
         ),
@@ -96,7 +104,12 @@ class _SheetHeader extends StatelessWidget {
 /// writes straight through SettingsNotifier (device-local persistence),
 /// so both seascape pages and their providers react immediately.
 class TerrainAppearanceSheet extends ConsumerWidget {
-  const TerrainAppearanceSheet({super.key});
+  /// The site this sheet was opened for; null hides the vertical-
+  /// exaggeration section (issue #2141 follow-up), which only makes sense
+  /// for a persistent site, not the single-dive spatial page.
+  final String? siteId;
+
+  const TerrainAppearanceSheet({super.key, this.siteId});
 
   static const List<int?> _palette = [
     null, // default ink
@@ -268,9 +281,65 @@ class TerrainAppearanceSheet extends ConsumerWidget {
             l10n.dive3d_seascape_appearance_wallAngleNote,
             style: Theme.of(context).textTheme.bodySmall,
           ),
+          if (siteId != null) ..._exaggerationSection(context, ref, siteId!),
         ],
       ),
     );
+  }
+
+  /// Manual override of the site terrain's vertical exaggeration (issue
+  /// #2141 follow-up), starting from whatever value the terrain is
+  /// currently rendered with (automatic or already overridden).
+  List<Widget> _exaggerationSection(
+    BuildContext context,
+    WidgetRef ref,
+    String siteId,
+  ) {
+    final l10n = context.l10n;
+    final override = ref.watch(
+      settingsProvider.select(
+        (s) => s.seascapeVerticalExaggerationOverrides[siteId],
+      ),
+    );
+    final seascapeState = ref.watch(siteSeascapeProvider(siteId)).valueOrNull;
+    final effective =
+        override ??
+        (seascapeState is SiteSeascapeReady
+            ? seascapeState.axisInputs.verticalExaggeration
+            : minManualVerticalExaggeration);
+    void setOverride(double? factor) => ref
+        .read(settingsProvider.notifier)
+        .setSeascapeVerticalExaggerationOverride(siteId, factor);
+
+    return [
+      _sectionRule,
+      ListTile(
+        contentPadding: EdgeInsets.zero,
+        title: Text(l10n.dive3d_seascape_verticalExaggeration),
+        subtitle: Slider(
+          key: const ValueKey('seascapeExaggerationSlider'),
+          min: minManualVerticalExaggeration,
+          max: maxManualVerticalExaggeration,
+          value: effective.clamp(
+            minManualVerticalExaggeration,
+            maxManualVerticalExaggeration,
+          ),
+          label: '${effective.toStringAsFixed(1)}×',
+          onChanged: setOverride,
+        ),
+        trailing: Text('${effective.toStringAsFixed(1)}×'),
+      ),
+      if (override != null)
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            key: const ValueKey('seascapeExaggerationReset'),
+            icon: const Icon(Icons.replay, size: 16),
+            label: Text(l10n.dive3d_seascape_verticalExaggerationReset),
+            onPressed: () => setOverride(null),
+          ),
+        ),
+    ];
   }
 }
 

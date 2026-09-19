@@ -27346,6 +27346,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dive3d_seascape_orbitView => '3D-Ansicht';
 
   @override
+  String get dive3d_seascape_verticalExaggeration => 'Vertikale Überhöhung';
+
+  @override
+  String get dive3d_seascape_verticalExaggerationReset =>
+      'Auf automatisch zurücksetzen';
+
+  @override
+  String get dive3d_seascape_verticalExaggerationLabel => 'Tiefe';
+
+  @override
   String get dive3d_seascape_appearance_surface => 'Geländeoberfläche';
 
   @override

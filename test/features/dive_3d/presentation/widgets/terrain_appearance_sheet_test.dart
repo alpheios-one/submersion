@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart' show Intl;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/features/dive_3d/application/site_seascape_providers.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/terrain_appearance_sheet.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -49,6 +50,7 @@ void main() {
   Future<ProviderContainer> pumpSheet(
     WidgetTester tester, {
     AppSettings initial = const AppSettings(),
+    String? siteId,
   }) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
@@ -56,18 +58,24 @@ void main() {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
         settingsProvider.overrideWith((ref) => MockSettingsNotifier(initial)),
+        if (siteId != null)
+          siteSeascapeProvider(
+            siteId,
+          ).overrideWith((ref) async => const SiteSeascapeNoData()),
       ],
     );
     addTearDown(container.dispose);
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: const MaterialApp(
-          locale: Locale('en'),
+        child: MaterialApp(
+          locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
-            body: SingleChildScrollView(child: TerrainAppearanceSheet()),
+            body: SingleChildScrollView(
+              child: TerrainAppearanceSheet(siteId: siteId),
+            ),
           ),
         ),
       ),
@@ -571,5 +579,103 @@ void main() {
           .bottom,
       lessThanOrEqualTo(800 - 320),
     );
+  });
+
+  // Issue #2141 follow-up: the auto-computed exaggeration can still read
+  // too strong for some narrow lakes, so the diver can override it per
+  // site, persisted like the rest of the terrain-appearance knobs.
+  group('vertical exaggeration (issue #2141 follow-up)', () {
+    testWidgets('no siteId: the section is not shown', (tester) async {
+      await pumpSheet(tester);
+      expect(
+        find.byKey(const ValueKey('seascapeExaggerationSlider')),
+        findsNothing,
+      );
+    });
+
+    testWidgets('with a siteId: the slider is shown, no reset yet', (
+      tester,
+    ) async {
+      await pumpSheet(tester, siteId: 'site-1');
+      expect(
+        find.byKey(const ValueKey('seascapeExaggerationSlider')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('seascapeExaggerationReset')),
+        findsNothing,
+      );
+    });
+
+    testWidgets('dragging the slider persists a per-site override', (
+      tester,
+    ) async {
+      final container = await pumpSheet(tester, siteId: 'site-1');
+      await tester.drag(
+        find.byKey(const ValueKey('seascapeExaggerationSlider')),
+        const Offset(200, 0),
+      );
+      await tester.pump();
+
+      final override = container
+          .read(settingsProvider)
+          .seascapeVerticalExaggerationOverrides['site-1'];
+      expect(override, isNotNull);
+      expect(override, greaterThan(1.0));
+      expect(
+        find.byKey(const ValueKey('seascapeExaggerationReset')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('a different site keeps its own override separate', (
+      tester,
+    ) async {
+      final container = await pumpSheet(
+        tester,
+        siteId: 'site-2',
+        initial: const AppSettings(
+          seascapeVerticalExaggerationOverrides: {'site-1': 4.2},
+        ),
+      );
+      // site-2 has no override of its own yet.
+      expect(
+        find.byKey(const ValueKey('seascapeExaggerationReset')),
+        findsNothing,
+      );
+      expect(
+        container
+            .read(settingsProvider)
+            .seascapeVerticalExaggerationOverrides['site-1'],
+        4.2,
+      );
+    });
+
+    testWidgets('the reset button clears only this site\'s override', (
+      tester,
+    ) async {
+      final container = await pumpSheet(
+        tester,
+        siteId: 'site-1',
+        initial: const AppSettings(
+          seascapeVerticalExaggerationOverrides: {'site-1': 3.0, 'site-2': 5.0},
+        ),
+      );
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('seascapeExaggerationReset')),
+      );
+      await tester.tap(find.byKey(const ValueKey('seascapeExaggerationReset')));
+      await tester.pump();
+
+      final overrides = container
+          .read(settingsProvider)
+          .seascapeVerticalExaggerationOverrides;
+      expect(overrides.containsKey('site-1'), isFalse);
+      expect(overrides['site-2'], 5.0); // untouched
+      expect(
+        find.byKey(const ValueKey('seascapeExaggerationReset')),
+        findsNothing,
+      );
+    });
   });
 }

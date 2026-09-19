@@ -43934,6 +43934,24 @@ abstract class AppLocalizations {
   /// **'3D view'**
   String get dive3d_seascape_orbitView;
 
+  /// No description provided for @dive3d_seascape_verticalExaggeration.
+  ///
+  /// In en, this message translates to:
+  /// **'Vertical exaggeration'**
+  String get dive3d_seascape_verticalExaggeration;
+
+  /// No description provided for @dive3d_seascape_verticalExaggerationReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to automatic'**
+  String get dive3d_seascape_verticalExaggerationReset;
+
+  /// No description provided for @dive3d_seascape_verticalExaggerationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Depth'**
+  String get dive3d_seascape_verticalExaggerationLabel;
+
   /// No description provided for @dive3d_seascape_appearance_surface.
   ///
   /// In en, this message translates to:

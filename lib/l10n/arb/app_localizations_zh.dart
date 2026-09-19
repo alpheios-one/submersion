@@ -25963,6 +25963,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dive3d_seascape_orbitView => '3D 视图';
 
   @override
+  String get dive3d_seascape_verticalExaggeration => '垂直夸张';
+
+  @override
+  String get dive3d_seascape_verticalExaggerationReset => '重置为自动';
+
+  @override
+  String get dive3d_seascape_verticalExaggerationLabel => '深度';
+
+  @override
   String get dive3d_seascape_appearance_surface => '地形表面';
 
   @override
