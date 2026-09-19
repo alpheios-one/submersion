@@ -334,6 +334,22 @@ void main() {
     expect(BathymetryRepository.keyFor(p), isNot(legacyKey));
   });
 
+  group('BathymetryRepository.averageCachedGridBytes', () {
+    test('returns null when there are no ok rows to average from', () async {
+      final r = repo(ScriptedSource(() => const BathymetryResolution.empty()));
+      await r.getGrid(bonaire); // caches an 'empty' row, not 'ok'
+      expect(await r.averageCachedGridBytes(), isNull);
+    });
+
+    test('averages the JSON byte size of every ok row', () async {
+      final r = repo(ScriptedSource(() => BathymetryResolution.ok(wetGrid())));
+      await r.getGrid(bonaire);
+      final avg = await r.averageCachedGridBytes();
+      expect(avg, isNotNull);
+      expect(avg, greaterThan(0));
+    });
+  });
+
   group('BathymetryRepository.clearBySource', () {
     test('deletes only rows attributed to the given source', () async {
       final swissSite = repo(

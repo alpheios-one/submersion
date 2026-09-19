@@ -18200,6 +18200,13 @@ class AppLocalizationsHu extends AppLocalizations {
       'Térképek letöltése offline használathoz';
 
   @override
+  String get settings_data_threeDMaps => '3D Maps';
+
+  @override
+  String get settings_data_threeDMaps_subtitle =>
+      'Manage cached swissBATHY3D and other bathymetry data';
+
+  @override
   String get settings_data_restore => 'Visszaállítás';
 
   @override
@@ -26519,6 +26526,111 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_appearance_bathymetryRefresh_resultNothingCached =>
       'Még nincsenek tárolt tómélységadatok';
+
+  @override
+  String get maps3d_appBar_title => '3D Maps';
+
+  @override
+  String get maps3d_section_swissBathy => 'swissBATHY3D';
+
+  @override
+  String get maps3d_swissBathy_delete => 'Delete data';
+
+  @override
+  String get maps3d_swissBathy_delete_subtitle =>
+      'Removes cached swissBATHY3D depth tiles and lake grids';
+
+  @override
+  String get maps3d_swissBathy_delete_confirmTitle =>
+      'Delete swissBATHY3D data?';
+
+  @override
+  String get maps3d_swissBathy_delete_confirmMessage =>
+      'Cached depth data for Swiss lakes will be removed and reloaded the next time a dive site\'s 3D view is opened.';
+
+  @override
+  String get maps3d_swissBathy_delete_done => 'swissBATHY3D data deleted';
+
+  @override
+  String get maps3d_section_other => 'Other providers';
+
+  @override
+  String get maps3d_other_reset => 'Reset remaining bathymetry data';
+
+  @override
+  String get maps3d_other_reset_subtitle =>
+      'Removes cached data from EMODnet, NOAA DEM, GMRT and ETOPO';
+
+  @override
+  String get maps3d_other_reset_confirmTitle =>
+      'Reset remaining bathymetry data?';
+
+  @override
+  String get maps3d_other_reset_confirmMessage =>
+      'Cached data from every provider other than swissBATHY3D will be removed and reloaded the next time a dive site\'s 3D view is opened.';
+
+  @override
+  String get maps3d_other_reset_done => 'Remaining bathymetry data reset';
+
+  @override
+  String get maps3d_reload => 'Reload map data';
+
+  @override
+  String get maps3d_reload_subtitle =>
+      'Deletes all cached bathymetry data and downloads it again for every dive site';
+
+  @override
+  String get maps3d_reload_confirmTitle =>
+      'Reload map data for every dive site?';
+
+  @override
+  String maps3d_reload_confirm_siteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dive sites will be reloaded.',
+      one: '1 dive site will be reloaded.',
+      zero: 'No dive sites have a location.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String maps3d_reload_confirm_estimatedSize(String size) {
+    return 'Estimated download: approx. $size';
+  }
+
+  @override
+  String get maps3d_reload_confirm_duration => 'This can take several minutes.';
+
+  @override
+  String get maps3d_reload_confirm_wifiHint =>
+      'A lot of data will be downloaded — a fast Wi-Fi connection is recommended.';
+
+  @override
+  String get maps3d_reload_start => 'Reload';
+
+  @override
+  String maps3d_reload_progress(int completed, int total) {
+    return '$completed of $total dive sites';
+  }
+
+  @override
+  String get maps3d_reload_cancel => 'Cancel';
+
+  @override
+  String get maps3d_reload_done => 'Map data reloaded for every dive site';
+
+  @override
+  String get maps3d_reload_cancelled => 'Reload cancelled';
+
+  @override
+  String get maps3d_reload_failed =>
+      'Reload failed; some dive sites may not have been reloaded';
+
+  @override
+  String get maps3d_busy_notice =>
+      'Another 3D Maps action is running. Please wait until it finishes.';
 
   @override
   String get common_action_reparse => 'Újraelemzés';

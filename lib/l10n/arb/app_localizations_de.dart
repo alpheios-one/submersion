@@ -18221,6 +18221,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Karten für die Offline-Nutzung herunterladen';
 
   @override
+  String get settings_data_threeDMaps => '3D-Karten';
+
+  @override
+  String get settings_data_threeDMaps_subtitle =>
+      'Gecachte swissBATHY3D- und andere Bathymetrie-Daten verwalten';
+
+  @override
   String get settings_data_restore => 'Wiederherstellen';
 
   @override
@@ -26545,6 +26552,114 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settings_appearance_bathymetryRefresh_resultNothingCached =>
       'Noch keine Seetiefendaten gespeichert';
+
+  @override
+  String get maps3d_appBar_title => '3D-Karten';
+
+  @override
+  String get maps3d_section_swissBathy => 'swissBATHY3D';
+
+  @override
+  String get maps3d_swissBathy_delete => 'Daten löschen';
+
+  @override
+  String get maps3d_swissBathy_delete_subtitle =>
+      'Entfernt gecachte swissBATHY3D-Tiefenkacheln und Seenetze';
+
+  @override
+  String get maps3d_swissBathy_delete_confirmTitle =>
+      'swissBATHY3D-Daten löschen?';
+
+  @override
+  String get maps3d_swissBathy_delete_confirmMessage =>
+      'Gecachte Tiefendaten für Schweizer Seen werden entfernt und beim nächsten Öffnen der 3D-Ansicht eines Tauchplatzes neu geladen.';
+
+  @override
+  String get maps3d_swissBathy_delete_done => 'swissBATHY3D-Daten gelöscht';
+
+  @override
+  String get maps3d_section_other => 'Übrige Anbieter';
+
+  @override
+  String get maps3d_other_reset => 'Übrige Bathymetrie-Daten zurücksetzen';
+
+  @override
+  String get maps3d_other_reset_subtitle =>
+      'Entfernt gecachte Daten von EMODnet, NOAA DEM, GMRT und ETOPO';
+
+  @override
+  String get maps3d_other_reset_confirmTitle =>
+      'Übrige Bathymetrie-Daten zurücksetzen?';
+
+  @override
+  String get maps3d_other_reset_confirmMessage =>
+      'Gecachte Daten aller Anbieter ausser swissBATHY3D werden entfernt und beim nächsten Öffnen der 3D-Ansicht eines Tauchplatzes neu geladen.';
+
+  @override
+  String get maps3d_other_reset_done =>
+      'Übrige Bathymetrie-Daten zurückgesetzt';
+
+  @override
+  String get maps3d_reload => 'Kartendaten neu laden';
+
+  @override
+  String get maps3d_reload_subtitle =>
+      'Löscht alle gecachten Bathymetrie-Daten und lädt sie für jeden Tauchplatz neu herunter';
+
+  @override
+  String get maps3d_reload_confirmTitle =>
+      'Kartendaten für alle Tauchplätze neu laden?';
+
+  @override
+  String maps3d_reload_confirm_siteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchplätze werden neu geladen.',
+      one: '1 Tauchplatz wird neu geladen.',
+      zero: 'Kein Tauchplatz hat eine Koordinate.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String maps3d_reload_confirm_estimatedSize(String size) {
+    return 'Geschätzter Download: ca. $size';
+  }
+
+  @override
+  String get maps3d_reload_confirm_duration =>
+      'Dies kann mehrere Minuten dauern.';
+
+  @override
+  String get maps3d_reload_confirm_wifiHint =>
+      'Es werden viele Daten heruntergeladen — ein schnelles WLAN wird empfohlen.';
+
+  @override
+  String get maps3d_reload_start => 'Neu laden';
+
+  @override
+  String maps3d_reload_progress(int completed, int total) {
+    return '$completed von $total Tauchplätzen';
+  }
+
+  @override
+  String get maps3d_reload_cancel => 'Abbrechen';
+
+  @override
+  String get maps3d_reload_done =>
+      'Kartendaten für alle Tauchplätze neu geladen';
+
+  @override
+  String get maps3d_reload_cancelled => 'Neu laden abgebrochen';
+
+  @override
+  String get maps3d_reload_failed =>
+      'Neu laden fehlgeschlagen; einige Tauchplätze wurden evtl. nicht neu geladen';
+
+  @override
+  String get maps3d_busy_notice =>
+      'Eine andere 3D-Karten-Aktion läuft gerade. Bitte warten, bis sie abgeschlossen ist.';
 
   @override
   String get common_action_reparse => 'Neu auswerten';

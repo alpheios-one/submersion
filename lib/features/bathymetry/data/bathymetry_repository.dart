@@ -261,6 +261,23 @@ class BathymetryRepository {
     )..where((t) => t.sourceId.equals(sourceId))).go();
   }
 
+  /// Average byte size of a cached 'ok' grid's JSON across every provider,
+  /// or null when there are no 'ok' rows to average from (e.g. right after a
+  /// reset). Used only for the "3D Maps" reload confirmation dialog's
+  /// approximate size estimate -- computed BEFORE any deletion, since the
+  /// estimate would otherwise have nothing left to average from.
+  Future<int?> averageCachedGridBytes() async {
+    final rows = await (_db.select(
+      _db.bathymetryCache,
+    )..where((t) => t.status.equals('ok') & t.gridJson.isNotNull())).get();
+    if (rows.isEmpty) return null;
+    final total = rows.fold<int>(
+      0,
+      (sum, r) => sum + utf8.encode(r.gridJson!).length,
+    );
+    return total ~/ rows.length;
+  }
+
   /// Deletes every cached row NOT attributed to [sourceId] -- including rows
   /// with no `sourceId` at all (a definitive "no water here" negative from a
   /// GLOBAL source, see the 'empty' branch above, which is never attributed

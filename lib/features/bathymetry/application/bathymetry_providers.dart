@@ -37,6 +37,14 @@ Future<List<GeoPoint>> _knownDiveSiteLocations(Ref ref) async {
   ];
 }
 
+/// Public wrapper around [_knownDiveSiteLocations], so the "3D Maps"
+/// settings page's reload action can reuse the exact same list
+/// [SwissBathy3dSource]'s sibling pre-cache already reads, instead of
+/// querying [siteRepositoryProvider] a second, independent way.
+final knownDiveSiteLocationsProvider = FutureProvider<List<GeoPoint>>(
+  (ref) => _knownDiveSiteLocations(ref),
+);
+
 /// How long a TRANSIENT null (fetch failure, cache DB not ready) survives
 /// before the grid provider forgets it and lets the next read retry.
 /// Without this, one offline moment would pin "no bathymetry" onto a cell
@@ -77,6 +85,21 @@ final bathymetryRepositoryProvider = Provider<BathymetryRepository?>((ref) {
     return null;
   }
 });
+
+/// Shared swissBATHY3D tile cache repository, so the "3D Maps" settings
+/// page's delete action reaches the same table the resolver reads through
+/// [bathymetryRepositoryProvider], without constructing its own throwaway
+/// instance. Null when the local cache database is not initialized,
+/// matching [bathymetryRepositoryProvider].
+final swissBathyTileCacheRepositoryProvider =
+    Provider<SwissBathyTileCacheRepository?>((ref) {
+      try {
+        final db = LocalCacheDatabaseService.instance.database;
+        return SwissBathyTileCacheRepository(db);
+      } on StateError {
+        return null;
+      }
+    });
 
 /// Depth queries for Swiss dive sites via swissBATHY3D directly (Part 1 of
 /// the Bathymetrie-Daten Schweiz task) — bypasses the resolver's tiered
