@@ -54,6 +54,17 @@ class _ThreeDMapsPageState extends ConsumerState<ThreeDMapsPage> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(doneMessage)));
+    } catch (e) {
+      // Without this, a throwing delete/reset (locked DB, I/O error) left
+      // the diver with no signal at all -- the busy flag still cleared via
+      // `finally` below, so the tile just went idle again, indistinguishable
+      // from a silent success. Every other action on this page (the refresh
+      // tile, the reload flow) already surfaces its own failure (found by
+      // code review).
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${context.l10n.common_label_error}: $e')),
+      );
     } finally {
       if (mounted) setState(() => _otherActionBusy = false);
     }
@@ -285,10 +296,13 @@ class _ReloadProgress extends ConsumerWidget {
 
   /// Remaining time, estimated from the warm phase's OWN pace so far --
   /// same shape as [_estimateRemaining], but per LAKE rather than per site,
-  /// and against [MapReloadState.overallStartedAt] rather than
-  /// [MapReloadState.startedAt] (which does not exist yet during this
-  /// phase). Null before the first lake finishes, since there is no rate to
-  /// extrapolate from yet.
+  /// and against [MapReloadState.warmStartedAt] (set once the warm phase
+  /// itself begins, AFTER clearing) rather than [MapReloadState.
+  /// overallStartedAt] (covers the whole run, clearing included) -- using
+  /// the latter would fold the clearing duration into the per-lake rate,
+  /// inflating the estimate for as long as clearing took (found by code
+  /// review). Null before the first lake finishes, since there is no rate
+  /// to extrapolate from yet.
   ///
   /// Far less reliable than the per-site estimate: lake sizes vary hugely
   /// (a 3-tile lake vs. an 18-tile one), so an estimate taken after just one
@@ -297,12 +311,12 @@ class _ReloadProgress extends ConsumerWidget {
   /// per-site estimate, but this doc is the reason it is not held to the
   /// same expectation of accuracy.
   Duration? _estimateWarmRemaining() {
-    final overallStartedAt = state.overallStartedAt;
+    final warmStartedAt = state.warmStartedAt;
     // The lake at warmingLakeIndex is still IN FLIGHT; only the ones before
     // it are actually finished and count toward the rate.
     final completedLakes = state.warmingLakeIndex - 1;
-    if (overallStartedAt == null || completedLakes <= 0) return null;
-    final elapsed = DateTime.now().difference(overallStartedAt);
+    if (warmStartedAt == null || completedLakes <= 0) return null;
+    final elapsed = DateTime.now().difference(warmStartedAt);
     final remainingLakes = state.warmingLakeTotal - completedLakes;
     if (remainingLakes <= 0) return Duration.zero;
     final msPerLake = elapsed.inMilliseconds / completedLakes;

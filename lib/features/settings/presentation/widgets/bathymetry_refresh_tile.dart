@@ -45,8 +45,16 @@ class _BathymetryRefreshTileState extends ConsumerState<BathymetryRefreshTile> {
     } catch (_) {
       summary = null;
     } finally {
-      if (mounted) setState(() => _isRefreshing = false);
-      widget.onBusyChanged?.call(false);
+      // Both guarded by the same `mounted` check: widget.onBusyChanged is
+      // wired by the parent to its own setState (three_d_maps_page.dart), so
+      // calling it after this tile (and so its ancestor) is disposed --
+      // e.g. the diver navigated away while the refresh was still in
+      // flight -- would throw "setState() called after dispose()" on the
+      // parent, not just this widget (found by code review).
+      if (mounted) {
+        setState(() => _isRefreshing = false);
+        widget.onBusyChanged?.call(false);
+      }
     }
     if (!mounted) return;
 

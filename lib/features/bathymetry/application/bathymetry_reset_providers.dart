@@ -1,4 +1,5 @@
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/screen_awake.dart';
 import 'package:submersion/core/utils/byte_format.dart';
 import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
 import 'package:submersion/features/bathymetry/data/sources/swissbathy3d_source.dart';
@@ -14,8 +15,41 @@ final swissBathyClearProvider = Provider<Future<void> Function()>((ref) {
     final repo = ref.read(bathymetryRepositoryProvider);
     await tileCache?.clearAll();
     await repo?.clearBySource(SwissBathy3dSource.sourceId);
+    _invalidateAfterCacheChange(ref);
   };
 });
+
+/// Deletes every cached bathymetry row NOT attributed to swissBATHY3D
+/// (EMODnet, NOAA DEM, GMRT, ETOPO, and any row with no source at all). A
+/// no-op wherever the local cache database is not initialized.
+final bathymetryOtherSourcesClearProvider = Provider<Future<void> Function()>((
+  ref,
+) {
+  return () async {
+    final repo = ref.read(bathymetryRepositoryProvider);
+    await repo?.clearAllExceptSource(SwissBathy3dSource.sourceId);
+    _invalidateAfterCacheChange(ref);
+  };
+});
+
+/// Both providers above delete rows out from under two other providers that
+/// never learn about it on their own:
+///
+/// - [mapReloadEstimateProvider] would otherwise keep showing the size it
+///   computed from data that is now gone, the next time the reload dialog
+///   opens in the same session.
+/// - [bathymetryGridProvider], for any cell a diver already has a dive
+///   site's 3D view open on, would otherwise keep serving its last-resolved
+///   grid from memory even though the row it came from was just deleted --
+///   directly undermining a page whose whole purpose is to force a refresh.
+///
+/// Invalidating the family as a whole (no specific cell) drops every
+/// currently-watched instance; anything not currently watched has nothing to
+/// invalidate anyway. Found missing by code review.
+void _invalidateAfterCacheChange(Ref ref) {
+  ref.invalidate(mapReloadEstimateProvider);
+  ref.invalidate(bathymetryGridProvider);
+}
 
 /// Ensures every known dive site's own swissBATHY3D tile is warm, grouped
 /// by lake and awaited -- see [SwissBathy3dSource.warmKnownSites]'s own doc
@@ -42,18 +76,6 @@ final swissBathyWarmKnownSitesProvider =
         );
       };
     });
-
-/// Deletes every cached bathymetry row NOT attributed to swissBATHY3D
-/// (EMODnet, NOAA DEM, GMRT, ETOPO, and any row with no source at all). A
-/// no-op wherever the local cache database is not initialized.
-final bathymetryOtherSourcesClearProvider = Provider<Future<void> Function()>((
-  ref,
-) {
-  return () async {
-    final repo = ref.read(bathymetryRepositoryProvider);
-    await repo?.clearAllExceptSource(SwissBathy3dSource.sourceId);
-  };
-});
 
 /// What the "3D Maps" reload confirmation dialog shows before the diver
 /// commits: how many dive sites will be reloaded, and an approximate
@@ -110,10 +132,20 @@ class MapReloadState {
   final DateTime? startedAt;
 
   /// When the diver pressed the button, i.e. BEFORE clearing/warming --
-  /// unlike [startedAt], covers the whole run. Used only to show elapsed
-  /// time during the warm phase, where no reliable per-lake duration
-  /// estimate exists the way [startedAt]/[completed] give one for sites.
+  /// unlike [startedAt], covers the whole run. Used only for the "running
+  /// for..." elapsed-time display, which is deliberately meant to cover the
+  /// whole run including clearing.
   final DateTime? overallStartedAt;
+
+  /// When the warm phase itself began, i.e. AFTER clearing but BEFORE the
+  /// first lake starts -- the warm-phase counterpart of [startedAt]. The
+  /// warm-phase remaining-time estimate divides elapsed time since here by
+  /// the number of lakes finished so far; using [overallStartedAt] instead
+  /// would fold the (site-count-independent, sometimes multi-second)
+  /// clearing duration into that rate, inflating the estimate for exactly
+  /// as long as clearing took, worst right after the first lake finishes
+  /// (found by code review).
+  final DateTime? warmStartedAt;
 
   /// The lake [SwissBathy3dSource.warmKnownSites] is currently warming, its
   /// 1-based position, and the total lake count -- null once that phase
@@ -132,6 +164,7 @@ class MapReloadState {
     this.error,
     this.startedAt,
     this.overallStartedAt,
+    this.warmStartedAt,
     this.warmingLakeName,
     this.warmingLakeIndex = 0,
     this.warmingLakeTotal = 0,
@@ -146,6 +179,7 @@ class MapReloadState {
     bool clearError = false,
     DateTime? startedAt,
     DateTime? overallStartedAt,
+    DateTime? warmStartedAt,
     String? warmingLakeName,
     int? warmingLakeIndex,
     int? warmingLakeTotal,
@@ -159,6 +193,7 @@ class MapReloadState {
       error: clearError ? null : (error ?? this.error),
       startedAt: startedAt ?? this.startedAt,
       overallStartedAt: overallStartedAt ?? this.overallStartedAt,
+      warmStartedAt: warmStartedAt ?? this.warmStartedAt,
       warmingLakeName: clearWarming
           ? null
           : (warmingLakeName ?? this.warmingLakeName),
@@ -195,49 +230,62 @@ class MapReloadNotifier extends StateNotifier<MapReloadState> {
     _cancelRequested = false;
     state = MapReloadState(isRunning: true, overallStartedAt: DateTime.now());
     try {
-      await _ref.read(swissBathyClearProvider)();
-      await _ref.read(bathymetryOtherSourcesClearProvider)();
+      // A reload can run for minutes across many sites/lakes; without this,
+      // the OS can lock the screen and suspend the fetch loop mid-run --
+      // the same failure mode ScreenAwake was written to prevent for sync
+      // maintenance (issue #1194) and dive-computer downloads (#1646),
+      // missing here until code review pointed it out.
+      await ScreenAwake.hold(() async {
+        await _ref.read(swissBathyClearProvider)();
+        await _ref.read(bathymetryOtherSourcesClearProvider)();
 
-      final sites = await _ref.read(knownDiveSiteLocationsProvider.future);
-      final repo = _ref.read(bathymetryRepositoryProvider);
-      if (repo == null) {
-        // The clears above and every getGrid() call below silently no-op
-        // wherever the local cache database is not initialized -- without
-        // this check the loop would "complete" every site without ever
-        // clearing or fetching anything, and the caller would report
-        // success for a run that did nothing.
-        state = state.copyWith(error: 'local cache database not initialized');
-        return;
-      }
-      state = state.copyWith(total: sites.length);
+        final sites = await _ref.read(knownDiveSiteLocationsProvider.future);
+        final repo = _ref.read(bathymetryRepositoryProvider);
+        if (repo == null) {
+          // The clears above and every getGrid() call below silently no-op
+          // wherever the local cache database is not initialized -- without
+          // this check the loop would "complete" every site without ever
+          // clearing or fetching anything, and the caller would report
+          // success for a run that did nothing.
+          state = state.copyWith(error: 'local cache database not initialized');
+          return;
+        }
+        state = state.copyWith(
+          total: sites.length,
+          // Marks the start of the warm phase's own pace -- see
+          // [MapReloadState.warmStartedAt]'s doc on why this must be its
+          // own timestamp, not overallStartedAt.
+          warmStartedAt: DateTime.now(),
+        );
 
-      // Warm every swissBATHY3D dive site's tile, grouped by lake and
-      // awaited, BEFORE the per-site loop below -- otherwise each Swiss
-      // lake site in that loop would pay for its own from-scratch zip
-      // download and decompress instead of reusing a sibling site's
-      // already-warm lake (see swissBathyWarmKnownSitesProvider's own doc).
-      await _ref.read(swissBathyWarmKnownSitesProvider)(
-        isCancelled: () => _cancelRequested,
-        onLakeStart: (lakeName, index, total) {
-          state = state.copyWith(
-            warmingLakeName: lakeName,
-            warmingLakeIndex: index,
-            warmingLakeTotal: total,
-          );
-        },
-      );
+        // Warm every swissBATHY3D dive site's tile, grouped by lake and
+        // awaited, BEFORE the per-site loop below -- otherwise each Swiss
+        // lake site in that loop would pay for its own from-scratch zip
+        // download and decompress instead of reusing a sibling site's
+        // already-warm lake (see swissBathyWarmKnownSitesProvider's own doc).
+        await _ref.read(swissBathyWarmKnownSitesProvider)(
+          isCancelled: () => _cancelRequested,
+          onLakeStart: (lakeName, index, total) {
+            state = state.copyWith(
+              warmingLakeName: lakeName,
+              warmingLakeIndex: index,
+              warmingLakeTotal: total,
+            );
+          },
+        );
 
-      // Marks the start of the per-site loop's own pace, deliberately
-      // after clearing/warming -- see [MapReloadState.startedAt]'s doc.
-      // Also clears the warm phase's own progress fields, so the UI
-      // switches from "warming lake X of Y" to the per-site counter.
-      state = state.copyWith(startedAt: DateTime.now(), clearWarming: true);
+        // Marks the start of the per-site loop's own pace, deliberately
+        // after clearing/warming -- see [MapReloadState.startedAt]'s doc.
+        // Also clears the warm phase's own progress fields, so the UI
+        // switches from "warming lake X of Y" to the per-site counter.
+        state = state.copyWith(startedAt: DateTime.now(), clearWarming: true);
 
-      for (final site in sites) {
-        if (_cancelRequested) break;
-        await repo.getGrid(site);
-        state = state.copyWith(completed: state.completed + 1);
-      }
+        for (final site in sites) {
+          if (_cancelRequested) break;
+          await repo.getGrid(site);
+          state = state.copyWith(completed: state.completed + 1);
+        }
+      });
     } catch (e) {
       state = state.copyWith(error: e.toString());
     } finally {

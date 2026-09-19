@@ -75,6 +75,69 @@ void main() {
   }
 
   test(
+    'swissBathyClearProvider invalidates mapReloadEstimateProvider and '
+    'bathymetryGridProvider so both recompute against the now-emptied '
+    'cache instead of serving a stale value from before the delete '
+    '(regression: found by code review -- neither was invalidated)',
+    () async {
+      final swiss = TaggedSource('swissbathy3d');
+      final repo = BathymetryRepository(
+        db: db,
+        resolver: BathymetryResolver(sources: [swiss]),
+      );
+      // Seeds a cached row so both providers below have something non-null
+      // to report before the clear.
+      await repo.getGrid(betlis);
+      expect(swiss.calls, 1);
+
+      final container = buildContainer(repo: repo, sites: const [betlis]);
+      final cell = BathymetryRepository.quantize(betlis);
+      // Keeps the family instance alive so invalidating the whole family
+      // actually has something to mark dirty, matching how a real dive
+      // site's 3D view holds it open.
+      final gridSub = container.listen(bathymetryGridProvider(cell), (_, _) {});
+      addTearDown(gridSub.close);
+
+      final firstEstimate = await container.read(
+        mapReloadEstimateProvider.future,
+      );
+      expect(firstEstimate!.averageBytesPerSite, isNotNull);
+      final firstGrid = await container.read(
+        bathymetryGridProvider(cell).future,
+      );
+      expect(firstGrid, isNotNull);
+      // The cell was already cached from the seed call above, so this read
+      // was a cache hit -- no second fetch yet.
+      expect(swiss.calls, 1);
+
+      await container.read(swissBathyClearProvider)();
+
+      final secondEstimate = await container.read(
+        mapReloadEstimateProvider.future,
+      );
+      expect(
+        secondEstimate!.averageBytesPerSite,
+        isNull,
+        reason:
+            'the cache is now empty; a stale, un-invalidated provider '
+            'would still report the old non-null average',
+      );
+      final secondGrid = await container.read(
+        bathymetryGridProvider(cell).future,
+      );
+      expect(secondGrid, isNotNull); // re-resolved, not the old stale grid
+      expect(
+        swiss.calls,
+        2,
+        reason:
+            'a genuine re-fetch must have happened; a stale, '
+            'un-invalidated provider would still serve the first grid '
+            'without calling the source again',
+      );
+    },
+  );
+
+  test(
     'swissBathyClearProvider removes only swissBATHY3D rows, not others',
     () async {
       final swiss = TaggedSource('swissbathy3d');
