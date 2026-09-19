@@ -249,4 +249,29 @@ class BathymetryRepository {
     }
     return null; // transient: no row, next call retries
   }
+
+  /// Deletes every cached row whose winning source was [sourceId]. Used by
+  /// the "3D Maps" settings page's swissBATHY3D delete action, alongside
+  /// clearing that tile's own rows in [SwissBathyTileCache] -- deleting only
+  /// one of the two tables has no visible effect, since the other keeps
+  /// serving its already-resolved answer.
+  Future<void> clearBySource(String sourceId) async {
+    await (_db.delete(
+      _db.bathymetryCache,
+    )..where((t) => t.sourceId.equals(sourceId))).go();
+  }
+
+  /// Deletes every cached row NOT attributed to [sourceId] -- including rows
+  /// with no `sourceId` at all (a definitive "no water here" negative from a
+  /// GLOBAL source, see the 'empty' branch above, which is never attributed
+  /// to any one source). Without including those, a negative cached before
+  /// [sourceId] started covering that coordinate (e.g. a swissBATHY3D lake
+  /// whitelist addition) would stay permanently unreachable by either this
+  /// or [clearBySource].
+  Future<void> clearAllExceptSource(String sourceId) async {
+    await (_db.delete(_db.bathymetryCache)..where(
+          (t) => t.sourceId.isNull() | t.sourceId.equals(sourceId).not(),
+        ))
+        .go();
+  }
 }
