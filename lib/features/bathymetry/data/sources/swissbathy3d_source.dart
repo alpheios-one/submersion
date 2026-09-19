@@ -18,6 +18,7 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 part 'swissbathy3d_sibling_precache.dart';
 part 'swissbathy3d_resolution.dart';
 part 'swissbathy3d_freshness.dart';
+part 'swissbathy3d_lake_warm.dart';
 
 const _log = LoggerService('SwissBathy3dSource');
 
@@ -551,6 +552,14 @@ class SwissBathy3dSource implements BathymetrySource {
   /// manual freshness-check logic) purely for file size.
   Future<SwissBathyRefreshSummary> refreshAllCachedTiles() =>
       _refreshAllCachedTilesImpl(this);
+
+  /// Ensures every known dive site's own swissBATHY3D tile is cached,
+  /// grouped by lake and awaited -- the deterministic alternative to
+  /// [fetch]'s fire-and-forget sibling precache for a caller that needs
+  /// every site actually warm before it moves on. See
+  /// `swissbathy3d_lake_warm.dart`'s own doc for why the fire-and-forget
+  /// version cannot be relied on here.
+  Future<void> warmKnownSites() => _warmKnownSitesImpl(this);
 }
 
 /// Runs [task] over [items] with at most [maxConcurrent] running at once —

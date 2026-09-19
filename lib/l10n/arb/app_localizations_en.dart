@@ -26145,7 +26145,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_appearance_mapStyle_esriSatellite => 'Satellite';
 
   @override
-  String get settings_appearance_bathymetryRefresh => 'Reload Map Data';
+  String get settings_appearance_bathymetryRefresh =>
+      'Update Existing Map Data';
 
   @override
   String get settings_appearance_bathymetryRefresh_subtitle =>
@@ -26176,6 +26177,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get maps3d_appBar_title => '3D Maps';
+
+  @override
+  String get maps3d_section_all => 'All Providers';
 
   @override
   String get maps3d_section_swissBathy => 'swissBATHY3D';

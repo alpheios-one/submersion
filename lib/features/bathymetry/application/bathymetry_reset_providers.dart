@@ -17,6 +17,21 @@ final swissBathyClearProvider = Provider<Future<void> Function()>((ref) {
   };
 });
 
+/// Ensures every known dive site's own swissBATHY3D tile is warm, grouped
+/// by lake and awaited -- see [SwissBathy3dSource.warmKnownSites]'s own doc
+/// (`swissbathy3d_lake_warm.dart`) for why the reload action cannot rely on
+/// [SwissBathy3dSource.fetch]'s fire-and-forget sibling precache to keep up
+/// with its own fast, sequential per-site loop. A no-op wherever the local
+/// cache database is not initialized.
+final swissBathyWarmKnownSitesProvider = Provider<Future<void> Function()>((
+  ref,
+) {
+  return () async {
+    final source = ref.read(swissBathy3dSourceProvider);
+    await source?.warmKnownSites();
+  };
+});
+
 /// Deletes every cached bathymetry row NOT attributed to swissBATHY3D
 /// (EMODnet, NOAA DEM, GMRT, ETOPO, and any row with no source at all). A
 /// no-op wherever the local cache database is not initialized.
@@ -139,6 +154,13 @@ class MapReloadNotifier extends StateNotifier<MapReloadState> {
         return;
       }
       state = state.copyWith(total: sites.length);
+
+      // Warm every swissBATHY3D dive site's tile, grouped by lake and
+      // awaited, BEFORE the per-site loop below -- otherwise each Swiss
+      // lake site in that loop would pay for its own from-scratch zip
+      // download and decompress instead of reusing a sibling site's
+      // already-warm lake (see swissBathyWarmKnownSitesProvider's own doc).
+      await _ref.read(swissBathyWarmKnownSitesProvider)();
 
       for (final site in sites) {
         if (_cancelRequested) break;

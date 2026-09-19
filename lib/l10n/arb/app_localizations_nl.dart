@@ -26411,6 +26411,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get maps3d_appBar_title => '3D Maps';
 
   @override
+  String get maps3d_section_all => 'All Providers';
+
+  @override
   String get maps3d_section_swissBathy => 'swissBATHY3D';
 
   @override

@@ -17001,7 +17001,7 @@
   "settings_appearance_mapStyle_openStreetMap": "Street Map",
   "settings_appearance_mapStyle_openTopoMap": "Topographic",
   "settings_appearance_mapStyle_esriSatellite": "Satellite",
-  "settings_appearance_bathymetryRefresh": "Reload Map Data",
+  "settings_appearance_bathymetryRefresh": "Update Existing Map Data",
   "settings_appearance_bathymetryRefresh_subtitle": "Check swissBATHY3D lake depth data for updates",
   "settings_appearance_bathymetryRefresh_resultUpdated": "{count, plural, =1{1 tile updated} other{{count} tiles updated}}",
   "@settings_appearance_bathymetryRefresh_resultUpdated": {
@@ -17015,6 +17015,7 @@
   "settings_appearance_bathymetryRefresh_resultFailed": "Couldn't check all data; existing values were kept",
   "settings_appearance_bathymetryRefresh_resultNothingCached": "No lake depth data cached yet",
   "maps3d_appBar_title": "3D Maps",
+  "maps3d_section_all": "All Providers",
   "maps3d_section_swissBathy": "swissBATHY3D",
   "maps3d_swissBathy_delete": "Delete data",
   "maps3d_swissBathy_delete_subtitle": "Removes cached swissBATHY3D depth tiles and lake grids",

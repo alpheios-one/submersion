@@ -113,6 +113,26 @@ class _ThreeDMapsPageState extends ConsumerState<ThreeDMapsPage> {
                 ),
               ),
             ),
+          _SectionHeader(context.l10n.maps3d_section_all),
+          Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                ListTile(
+                  enabled: !busy,
+                  leading: const Icon(Icons.cloud_download_outlined),
+                  title: Text(context.l10n.maps3d_reload),
+                  subtitle: Text(context.l10n.maps3d_reload_subtitle),
+                  onTap: _startReload,
+                ),
+                if (reloadState.isRunning) ...[
+                  const Divider(height: 1),
+                  _ReloadProgress(state: reloadState),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
           _SectionHeader(context.l10n.maps3d_section_swissBathy),
           Card(
             margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -162,25 +182,6 @@ class _ThreeDMapsPageState extends ConsumerState<ThreeDMapsPage> {
                 action: ref.read(bathymetryOtherSourcesClearProvider),
                 doneMessage: context.l10n.maps3d_other_reset_done,
               ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                ListTile(
-                  enabled: !busy,
-                  leading: const Icon(Icons.cloud_download_outlined),
-                  title: Text(context.l10n.maps3d_reload),
-                  subtitle: Text(context.l10n.maps3d_reload_subtitle),
-                  onTap: _startReload,
-                ),
-                if (reloadState.isRunning) ...[
-                  const Divider(height: 1),
-                  _ReloadProgress(state: reloadState),
-                ],
-              ],
             ),
           ),
           const SizedBox(height: 32),

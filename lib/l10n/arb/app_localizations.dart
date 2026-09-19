@@ -42689,7 +42689,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_appearance_bathymetryRefresh.
   ///
   /// In en, this message translates to:
-  /// **'Reload Map Data'**
+  /// **'Update Existing Map Data'**
   String get settings_appearance_bathymetryRefresh;
 
   /// No description provided for @settings_appearance_bathymetryRefresh_subtitle.
@@ -42727,6 +42727,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'3D Maps'**
   String get maps3d_appBar_title;
+
+  /// No description provided for @maps3d_section_all.
+  ///
+  /// In en, this message translates to:
+  /// **'All Providers'**
+  String get maps3d_section_all;
 
   /// No description provided for @maps3d_section_swissBathy.
   ///

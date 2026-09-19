@@ -53,39 +53,6 @@ final knownDiveSiteLocationsProvider = FutureProvider<List<GeoPoint>>(
 @visibleForTesting
 Duration bathymetryTransientRetryBackoff = const Duration(seconds: 30);
 
-/// Null when the local cache database is not initialized (early startup,
-/// plain widget tests): bathymetry silently degrades to synthesized
-/// terrain rather than erroring.
-final bathymetryRepositoryProvider = Provider<BathymetryRepository?>((ref) {
-  try {
-    final db = LocalCacheDatabaseService.instance.database;
-    return BathymetryRepository(
-      db: db,
-      resolver: BathymetryResolver(
-        // Tier order: swissBATHY3D first (lake-only, ~0.5-2 m, beats every
-        // other tier where it applies), then regional survey data
-        // (NOAA's coastal mosaic leads only where it is MATERIALLY finer,
-        // which the resolver's preemption factor decides; where the mosaic
-        // holds nothing but its ETOPO background it declines during probe
-        // and is never fetched), then global GMRT, then the coarse
-        // public-domain fallback.
-        sources: [
-          SwissBathy3dSource(
-            tileCache: SwissBathyTileCacheRepository(db),
-            knownSiteLocations: () => _knownDiveSiteLocations(ref),
-          ),
-          NoaaDemSource(),
-          EmodnetSource(),
-          GmrtSource(),
-          EtopoErddapSource(),
-        ],
-      ),
-    );
-  } on StateError {
-    return null;
-  }
-});
-
 /// Shared swissBATHY3D tile cache repository, so the "3D Maps" settings
 /// page's delete action reaches the same table the resolver reads through
 /// [bathymetryRepositoryProvider], without constructing its own throwaway
@@ -101,23 +68,67 @@ final swissBathyTileCacheRepositoryProvider =
       }
     });
 
+/// The single [SwissBathy3dSource] instance every provider in this file
+/// shares -- [bathymetryRepositoryProvider]'s resolver, [
+/// swissLakeDepthServiceProvider], and the "3D Maps" reload action's
+/// [swissBathyWarmKnownSitesProvider] (see bathymetry_reset_providers.dart)
+/// all reach the exact same tile cache and known-site-locations wiring
+/// instead of each constructing its own separate, functionally-identical
+/// instance. Null when the local cache database is not initialized,
+/// matching every other provider in this file.
+final swissBathy3dSourceProvider = Provider<SwissBathy3dSource?>((ref) {
+  try {
+    final db = LocalCacheDatabaseService.instance.database;
+    return SwissBathy3dSource(
+      tileCache: SwissBathyTileCacheRepository(db),
+      knownSiteLocations: () => _knownDiveSiteLocations(ref),
+    );
+  } on StateError {
+    return null;
+  }
+});
+
+/// Null when the local cache database is not initialized (early startup,
+/// plain widget tests): bathymetry silently degrades to synthesized
+/// terrain rather than erroring.
+final bathymetryRepositoryProvider = Provider<BathymetryRepository?>((ref) {
+  final swissSource = ref.watch(swissBathy3dSourceProvider);
+  if (swissSource == null) return null;
+  try {
+    final db = LocalCacheDatabaseService.instance.database;
+    return BathymetryRepository(
+      db: db,
+      resolver: BathymetryResolver(
+        // Tier order: swissBATHY3D first (lake-only, ~0.5-2 m, beats every
+        // other tier where it applies), then regional survey data
+        // (NOAA's coastal mosaic leads only where it is MATERIALLY finer,
+        // which the resolver's preemption factor decides; where the mosaic
+        // holds nothing but its ETOPO background it declines during probe
+        // and is never fetched), then global GMRT, then the coarse
+        // public-domain fallback.
+        sources: [
+          swissSource,
+          NoaaDemSource(),
+          EmodnetSource(),
+          GmrtSource(),
+          EtopoErddapSource(),
+        ],
+      ),
+    );
+  } on StateError {
+    return null;
+  }
+});
+
 /// Depth queries for Swiss dive sites via swissBATHY3D directly (Part 1 of
 /// the Bathymetrie-Daten Schweiz task) — bypasses the resolver's tiered
 /// best-source-wins mosaic since this is a single-coordinate lookup, not a
 /// terrain grid for rendering. Null when the local cache database is not
 /// initialized, matching [bathymetryRepositoryProvider].
 final swissLakeDepthServiceProvider = Provider<SwissLakeDepthService?>((ref) {
-  try {
-    final db = LocalCacheDatabaseService.instance.database;
-    return SwissLakeDepthService(
-      SwissBathy3dSource(
-        tileCache: SwissBathyTileCacheRepository(db),
-        knownSiteLocations: () => _knownDiveSiteLocations(ref),
-      ),
-    );
-  } on StateError {
-    return null;
-  }
+  final swissSource = ref.watch(swissBathy3dSourceProvider);
+  if (swissSource == null) return null;
+  return SwissLakeDepthService(swissSource);
 });
 
 /// Immediately revalidates every cached swissBATHY3D tile's freshness (the

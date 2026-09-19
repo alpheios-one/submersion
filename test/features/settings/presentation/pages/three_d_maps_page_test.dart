@@ -39,7 +39,7 @@ void main() {
       ],
     );
 
-    expect(find.text('Reload Map Data'), findsOneWidget);
+    expect(find.text('Update Existing Map Data'), findsOneWidget);
     expect(find.text('Delete data'), findsOneWidget);
     expect(find.text('Reset remaining bathymetry data'), findsOneWidget);
     expect(find.text('Reload map data'), findsOneWidget);

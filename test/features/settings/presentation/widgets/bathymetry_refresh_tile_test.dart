@@ -48,7 +48,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Reload Map Data'));
+      await tester.tap(find.text('Update Existing Map Data'));
       await tester.pump();
 
       expect(calls, 1);
@@ -86,7 +86,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Reload Map Data'));
+      await tester.tap(find.text('Update Existing Map Data'));
       await tester.pumpAndSettle();
 
       expect(find.text('No lake depth data cached yet'), findsOneWidget);
@@ -108,7 +108,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Reload Map Data'));
+    await tester.tap(find.text('Update Existing Map Data'));
     await tester.pumpAndSettle();
 
     expect(find.text('2 tiles updated'), findsOneWidget);
@@ -129,7 +129,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Reload Map Data'));
+    await tester.tap(find.text('Update Existing Map Data'));
     await tester.pumpAndSettle();
 
     expect(
@@ -150,7 +150,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Reload Map Data'));
+      await tester.tap(find.text('Update Existing Map Data'));
       await tester.pumpAndSettle();
 
       expect(

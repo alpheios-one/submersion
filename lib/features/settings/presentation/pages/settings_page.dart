@@ -2912,7 +2912,7 @@ class _DataSectionContent extends ConsumerWidget {
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.view_in_ar_outlined),
+                  leading: const Icon(Icons.terrain),
                   title: Text(context.l10n.settings_data_threeDMaps),
                   subtitle: Text(
                     context.l10n.settings_data_threeDMaps_subtitle,

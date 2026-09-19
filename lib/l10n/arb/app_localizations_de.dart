@@ -26524,7 +26524,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_appearance_bathymetryRefresh =>
-      'Kartendaten aktualisieren';
+      'Bestehende Kartendaten aktualisieren';
 
   @override
   String get settings_appearance_bathymetryRefresh_subtitle =>
@@ -26555,6 +26555,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get maps3d_appBar_title => '3D-Karten';
+
+  @override
+  String get maps3d_section_all => 'Alle Anbieter';
 
   @override
   String get maps3d_section_swissBathy => 'swissBATHY3D';
