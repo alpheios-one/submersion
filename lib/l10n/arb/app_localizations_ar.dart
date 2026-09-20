@@ -3148,6 +3148,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get common_action_ok => 'موافق';
 
   @override
+  String get common_action_openSettings => 'فتح الإعدادات';
+
+  @override
   String get common_action_save => 'حفظ';
 
   @override
@@ -5047,9 +5050,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_deco_label_ceiling => 'السقف';
 
   @override
-  String get diveLog_deco_label_leading => 'الأنسجة الرائدة';
-
-  @override
   String get diveLog_deco_label_gf99 => 'GF99';
 
   @override
@@ -5161,9 +5161,6 @@ class AppLocalizationsAr extends AppLocalizations {
     );
     return '$count $_temp0';
   }
-
-  @override
-  String get diveLog_detail_button_playback => 'تشغيل';
 
   @override
   String get diveLog_detail_button_rangeAnalysis => 'إحصائيات النطاق';
@@ -7649,47 +7646,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_playbackStats_deco => 'تخفيف ضغط';
 
   @override
-  String get diveLog_playbackStats_depth => 'العمق';
-
-  @override
-  String get diveLog_playbackStats_header => 'إحصائيات مباشرة';
-
-  @override
-  String get diveLog_playbackStats_heartRate => 'معدل نبض القلب';
-
-  @override
-  String get diveLog_playbackStats_ndl => 'NDL';
-
-  @override
-  String get diveLog_playbackStats_ppO2 => 'ppO₂';
-
-  @override
-  String get diveLog_playbackStats_pressure => 'الضغط';
-
-  @override
-  String get diveLog_playbackStats_temp => 'الحرارة';
-
-  @override
-  String get diveLog_playback_sliderLabel => 'موضع التشغيل';
-
-  @override
-  String diveLog_playback_speed_label(Object speed) {
-    return '${speed}x';
-  }
-
-  @override
-  String get diveLog_playback_stepThrough => 'تشغيل خطوة بخطوة';
-
-  @override
-  String get diveLog_playback_tooltip_back10 => 'رجوع 10 ثوانٍ';
-
-  @override
-  String get diveLog_playback_tooltip_exit => 'الخروج من وضع التشغيل';
-
-  @override
-  String get diveLog_playback_tooltip_forward10 => 'تقديم 10 ثوانٍ';
-
-  @override
   String get diveLog_playback_tooltip_pause => 'إيقاف مؤقت';
 
   @override
@@ -8198,27 +8154,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_tank_regulatorNone => 'لا شيء';
-
-  @override
-  String get diveLog_tissue_label_ceiling => 'السقف';
-
-  @override
-  String get diveLog_tissue_label_gf => 'GF';
-
-  @override
-  String get diveLog_tissue_label_ndl => 'NDL';
-
-  @override
-  String get diveLog_tissue_label_tts => 'TTS';
-
-  @override
-  String get diveLog_tissue_legend_he => 'He';
-
-  @override
-  String get diveLog_tissue_legend_mValue => '100% M-value';
-
-  @override
-  String get diveLog_tissue_legend_n2 => 'N₂';
 
   @override
   String get diveLog_tissue_title => 'تحميل الأنسجة';
@@ -11944,6 +11879,15 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String equipment_serviceClocks_divesUsedAndLeft(
+    int used,
+    int remaining,
+    int total,
+  ) {
+    return '$used غوصة، متبقٍ $remaining من $total غوصة';
+  }
+
+  @override
   String get cylinderConfigs_title => 'إعدادات الأسطوانات';
 
   @override
@@ -12034,8 +11978,26 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String equipment_serviceClocks_hoursUsedAndLeft(
+    String used,
+    String remaining,
+    String total,
+  ) {
+    return '$used ساعة، متبقٍ $remaining من $total ساعة';
+  }
+
+  @override
   String equipment_serviceClocks_saltHoursLeft(String remaining, String total) {
     return 'تبقى $remaining من $total ساعة في الماء المالح';
+  }
+
+  @override
+  String equipment_serviceClocks_saltHoursUsedAndLeft(
+    String used,
+    String remaining,
+    String total,
+  ) {
+    return '$used ساعة في الماء المالح، تبقى $remaining من $total ساعة في الماء المالح';
   }
 
   @override
@@ -12044,8 +12006,26 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String equipment_serviceClocks_coldDivesUsedAndLeft(
+    String used,
+    String remaining,
+    String total,
+  ) {
+    return '$used غطسة في الماء البارد، تبقى $remaining من $total غطسة في الماء البارد';
+  }
+
+  @override
   String equipment_serviceClocks_o2HoursLeft(String remaining, String total) {
     return 'تبقى $remaining من $total ساعة بأكسجين مرتفع';
+  }
+
+  @override
+  String equipment_serviceClocks_o2HoursUsedAndLeft(
+    String used,
+    String remaining,
+    String total,
+  ) {
+    return '$used ساعة بأكسجين مرتفع، تبقى $remaining من $total ساعة بأكسجين مرتفع';
   }
 
   @override
@@ -12057,8 +12037,26 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String equipment_serviceClocks_deepCyclesUsedAndLeft(
+    String used,
+    String remaining,
+    String total,
+  ) {
+    return '$used غطسة عميقة، تبقى $remaining من $total غطسة عميقة';
+  }
+
+  @override
   String equipment_serviceClocks_cyclesLeft(String remaining, String total) {
     return 'تبقى $remaining من $total دورة بطارية';
+  }
+
+  @override
+  String equipment_serviceClocks_cyclesUsedAndLeft(
+    String used,
+    String remaining,
+    String total,
+  ) {
+    return '$used دورة بطارية، تبقى $remaining من $total دورة بطارية';
   }
 
   @override
@@ -12832,6 +12830,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'إدارة أنواع الصيانة';
 
   @override
+  String get equipment_serviceDialog_filterToConfiguredTypes =>
+      'إظهار أنواع الصيانة المهيأة فقط';
+
+  @override
   String get equipment_serviceDialog_categoryLabel => 'الفئة';
 
   @override
@@ -12935,6 +12937,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String equipment_service_filterMatchCount(int count, int total) {
     return 'عرض $count من $total';
   }
+
+  @override
+  String equipment_service_showMore(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'إظهار $count عناصر إضافية',
+      one: 'إظهار عنصر واحد إضافي',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_service_showFewer => 'إظهار عدد أقل';
 
   @override
   String get equipment_serviceKinds_defaultCategoryLabel => 'الفئة الافتراضية';
@@ -16873,12 +16889,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get diveDetailSection_dataSources_description =>
       'أجهزة الغوص المتصلة، إدارة المصادر';
-
-  @override
-  String get siteDetailSection_map_name => 'الخريطة';
-
-  @override
-  String get siteDetailSection_map_description => 'معاينة خريطة لموقع الغوص';
 
   @override
   String get siteDetailSection_diveStatistics_description =>
@@ -23304,6 +23314,14 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_noticeSitesUnresolvedTitle =>
+      'بعض الغطسات بلا موقع غوص';
+
+  @override
+  String get universalImport_summary_noticeSitesUnresolvedBody =>
+      'أشارت هذه الغطسات إلى موقع غوص لا يصفه الملف، فاستُوردت بدون موقع. يمكنك تعيين موقع بتحرير الغطسة.';
+
+  @override
   String get universalImport_summary_noticeMacdiveXmlCertsTitle =>
       'الشهادات وسجلات الصيانة غير موجودة في الملف';
 
@@ -23448,6 +23466,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get universalImport_error_unreadableDatesHint =>
       'تحقق من ربط عمودي التاريخ والوقت في هذه الخطوة، ومن أنهما يحتويان على تواريخ.';
+
+  @override
+  String get universalImport_error_unreadableDatesHintNoMapping =>
+      'تحقق من أن عمود التاريخ يحتوي على تواريخ مكتوبة بالصيغة التي يذكرها عنوانه.';
 
   @override
   String get universalImport_error_noDataInFile =>
@@ -38503,6 +38525,83 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get startup_failure_showBackupsFolder => 'إظهار مجلد النسخ الاحتياطية';
+
+  @override
+  String get startup_failure_moreWays_title => 'طرق أخرى للعودة';
+
+  @override
+  String get startup_failure_useAnotherFolder => 'استخدام سجل غوص في مجلد آخر';
+
+  @override
+  String get startup_failure_useAnotherFolder_subtitle =>
+      'انتقل إلى سجل غوص تحتفظ به بالفعل في مكان آخر، مثل مجلد في iCloud Drive أو Dropbox.';
+
+  @override
+  String get startup_failure_restoreFromFile =>
+      'الاستعادة من ملف نسخة احتياطية';
+
+  @override
+  String get startup_failure_restoreFromFile_subtitle =>
+      'اختر نسخة احتياطية من Submersion من أي مكان على هذا الجهاز أو في مجلد متزامن.';
+
+  @override
+  String get startup_failure_startFresh => 'البدء بسجل غوص فارغ';
+
+  @override
+  String get startup_failure_startFresh_subtitle =>
+      'ضع الملف التالف جانبًا وابدأ من جديد. لا يُحذف أي شيء.';
+
+  @override
+  String get startup_recovery_adopt_title => 'استخدام سجل الغوص هذا؟';
+
+  @override
+  String get startup_recovery_adopt_body =>
+      'سيفتح Submersion سجل الغوص هذا من الآن فصاعدًا. أما الملف الذي تعذر فتحه فيبقى في مكانه.';
+
+  @override
+  String startup_recovery_adopt_contents(Object dives, Object sites) {
+    return '$dives غطسة، $sites موقع غوص';
+  }
+
+  @override
+  String get startup_recovery_adopt_confirm => 'استخدام هذا السجل';
+
+  @override
+  String get startup_recovery_startFresh_title => 'البدء بسجل غوص فارغ؟';
+
+  @override
+  String get startup_recovery_startFresh_body =>
+      'ينقل Submersion الملف التالف إلى مجلد خاص به ويفتح سجل غوص جديدًا وفارغًا. لا يُحذف أي شيء، لذا يمكنك تجربة الملف القديم لاحقًا أو إرساله إلى الدعم.';
+
+  @override
+  String get startup_recovery_startFresh_confirm => 'البدء من جديد';
+
+  @override
+  String startup_recovery_startFresh_done(Object path) {
+    return 'تم نقل سجل الغوص التالف إلى:\n$path';
+  }
+
+  @override
+  String get startup_recovery_problem_title => 'لم ينجح ذلك';
+
+  @override
+  String startup_recovery_noDiveLog_body(Object filename, Object folder) {
+    return 'لا يوجد ملف $filename في $folder. اختر المجلد الذي يحتوي على ملف سجل الغوص نفسه.';
+  }
+
+  @override
+  String startup_recovery_unusable_body(Object path) {
+    return 'سجل الغوص في $path تالف، أو أنه ليس سجل غوص خاص بـ Submersion.';
+  }
+
+  @override
+  String startup_recovery_unusableBackup_body(Object path) {
+    return 'هذا الملف ليس نسخة احتياطية يستطيع Submersion استعادتها: $path';
+  }
+
+  @override
+  String get startup_recovery_encryptedBackup_body =>
+      'هذه النسخة الاحتياطية مشفَّرة. لا يستطيع Submersion فتح نسخة مشفَّرة إلا بعد تشغيل التطبيق، لذا استخدم إحدى الطرق الأخرى هنا أولًا ثم استعِدها من الإعدادات ضمن النسخ الاحتياطي والاستعادة.';
 
   @override
   String get startup_failure_downgrade_title => 'العودة إلى الإصدار السابق';
