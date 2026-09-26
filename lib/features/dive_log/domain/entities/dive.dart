@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/deco/constants/buhlmann_coefficients.dart';
+import 'package:submersion/core/deco/max_operating_depth.dart';
 import 'package:submersion/core/utils/gas_compressibility.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/dive_centers/domain/entities/dive_center.dart';
@@ -174,6 +175,10 @@ class Dive extends Equatable {
   // Dive planner flag (v1.5)
   final bool isPlanned; // True for planned dives (not yet executed)
 
+  /// Shared id across sibling dives mirrored from one save (issue #2002).
+  /// Null for a dive that was never mirrored.
+  final String? outingId;
+
   // Training course (v1.5)
   final String? courseId; // FK to training course
 
@@ -278,6 +283,7 @@ class Dive extends Equatable {
     this.scrubber,
     // Dive planner (v1.5)
     this.isPlanned = false,
+    this.outingId,
     // Training course (v1.5)
     this.courseId,
     // Import source tracking
@@ -683,6 +689,8 @@ class Dive extends Equatable {
     ScrubberInfo? scrubber,
     // Dive planner
     bool? isPlanned,
+    String? outingId,
+    bool clearOutingId = false,
     // Training course
     String? courseId,
     // Import source tracking
@@ -780,6 +788,7 @@ class Dive extends Equatable {
       scrubber: scrubber ?? this.scrubber,
       // Dive planner
       isPlanned: isPlanned ?? this.isPlanned,
+      outingId: clearOutingId ? null : (outingId ?? this.outingId),
       // Training course
       courseId: courseId ?? this.courseId,
       // Import source tracking
@@ -880,6 +889,7 @@ class Dive extends Equatable {
     scrubber,
     // Dive planner
     isPlanned,
+    outingId,
     // Training course
     courseId,
     // Import source tracking
@@ -1267,10 +1277,11 @@ class GasMix extends Equatable {
     return '$roundedO2% O2';
   }
 
-  /// Maximum Operating Depth (MOD) at given ppO2
-  double mod({double ppO2 = 1.4}) {
-    return ((ppO2 / (o2 / 100)) - 1) * 10;
-  }
+  /// Maximum Operating Depth (MOD) at given ppO2, exact and unrounded.
+  ///
+  /// Round it down for display with `UnitFormatter.formatDepthFloor`.
+  double mod({double ppO2 = 1.4}) =>
+      maxOperatingDepthMeters(o2 / 100, maxPpO2: ppO2);
 
   /// Equivalent Narcotic Depth at given depth.
   ///

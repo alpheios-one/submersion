@@ -10,6 +10,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart'
     as domain;
 
 import '../../../../helpers/test_database.dart';
+import '../../../../helpers/unique_ids.dart';
 
 void main() {
   late DiveComputerRepository repository;
@@ -69,7 +70,7 @@ void main() {
     double? avgDepth,
     int? diveNumber,
   }) async {
-    final diveId = id ?? 'dive-${DateTime.now().microsecondsSinceEpoch}';
+    final diveId = id ?? uniqueTestId('dive');
     final now = DateTime.now().millisecondsSinceEpoch;
     await db
         .into(db.dives)
@@ -99,7 +100,7 @@ void main() {
     String? computerSerial,
     String? sourceFormat,
   }) async {
-    final id = 'ds-${DateTime.now().microsecondsSinceEpoch}';
+    final id = uniqueTestId('ds');
     final now = DateTime.now();
     await db
         .into(db.diveDataSources)
@@ -752,34 +753,32 @@ void main() {
       return rows.map((r) => r.diveTypeId).toList();
     }
 
-    test(
-      'a profile with a deco ceiling defaults the dive type to technical',
-      () async {
-        final computerId = await insertComputer();
-        final entryTime = DateTime(2026, 4, 1, 9, 0);
+    test('a profile with a deco ceiling no longer changes the dive type '
+        '(#1513)', () async {
+      final computerId = await insertComputer();
+      final entryTime = DateTime(2026, 4, 1, 9, 0);
 
-        final diveId = await repository.importProfile(
-          computerId: computerId,
-          profileStartTime: entryTime,
-          points: const [
-            ProfilePointData(timestamp: 0, depth: 1.5, ceiling: 0.0),
-            ProfilePointData(timestamp: 600, depth: 42.0, ceiling: 6.0),
-          ],
-          durationSeconds: 3600,
-          maxDepth: 42.0,
-          forceNew: true,
-        );
+      final diveId = await repository.importProfile(
+        computerId: computerId,
+        profileStartTime: entryTime,
+        points: const [
+          ProfilePointData(timestamp: 0, depth: 1.5, ceiling: 0.0),
+          ProfilePointData(timestamp: 600, depth: 42.0, ceiling: 6.0),
+        ],
+        durationSeconds: 3600,
+        maxDepth: 42.0,
+        forceNew: true,
+      );
 
-        final dive = await (db.select(
-          db.dives,
-        )..where((t) => t.id.equals(diveId))).getSingle();
-        expect(dive.diveType, 'technical');
-        expect(await diveTypeIdsFor(diveId), ['technical']);
-      },
-    );
+      final dive = await (db.select(
+        db.dives,
+      )..where((t) => t.id.equals(diveId))).getSingle();
+      expect(dive.diveType, 'recreational');
+      expect(await diveTypeIdsFor(diveId), ['recreational']);
+    });
 
-    test('exhausted NDL with TTS remaining at depth defaults the dive type to '
-        'technical', () async {
+    test('exhausted NDL with TTS remaining at depth no longer changes the dive '
+        'type (#1513)', () async {
       final computerId = await insertComputer();
       final entryTime = DateTime(2026, 4, 1, 10, 0);
 
@@ -798,12 +797,12 @@ void main() {
       final dive = await (db.select(
         db.dives,
       )..where((t) => t.id.equals(diveId))).getSingle();
-      expect(dive.diveType, 'technical');
-      expect(await diveTypeIdsFor(diveId), ['technical']);
+      expect(dive.diveType, 'recreational');
+      expect(await diveTypeIdsFor(diveId), ['recreational']);
     });
 
-    test('a deco-stop event defaults the dive type to technical even with a '
-        'no-deco profile', () async {
+    test('a deco-stop event no longer changes the dive type, even with a '
+        'no-deco profile (#1513)', () async {
       final computerId = await insertComputer();
       final entryTime = DateTime(2026, 4, 1, 11, 0);
 
@@ -823,8 +822,8 @@ void main() {
       final dive = await (db.select(
         db.dives,
       )..where((t) => t.id.equals(diveId))).getSingle();
-      expect(dive.diveType, 'technical');
-      expect(await diveTypeIdsFor(diveId), ['technical']);
+      expect(dive.diveType, 'recreational');
+      expect(await diveTypeIdsFor(diveId), ['recreational']);
     });
 
     test('a deepstop event alone (precautionary, not mandatory deco) keeps the '
@@ -877,8 +876,8 @@ void main() {
       expect(await diveTypeIdsFor(diveId), ['recreational']);
     });
 
-    test('a ceiling event (a real deco ceiling) still defaults the dive type '
-        'to technical', () async {
+    test('a ceiling event (a real deco ceiling) no longer changes the dive '
+        'type (#1513)', () async {
       final computerId = await insertComputer();
       final entryTime = DateTime(2026, 4, 1, 11, 50);
 
@@ -898,8 +897,8 @@ void main() {
       final dive = await (db.select(
         db.dives,
       )..where((t) => t.id.equals(diveId))).getSingle();
-      expect(dive.diveType, 'technical');
-      expect(await diveTypeIdsFor(diveId), ['technical']);
+      expect(dive.diveType, 'recreational');
+      expect(await diveTypeIdsFor(diveId), ['recreational']);
     });
 
     test('rbt and airtime events are stored as lowGas warnings and do not '

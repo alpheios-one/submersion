@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -6,8 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/gas_consumption_display.dart';
 import 'package:submersion/core/constants/gas_model.dart';
-import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
-import 'package:submersion/features/bathymetry/data/sources/swissbathy3d_source.dart';
 import 'package:submersion/core/theme/feature_accent_colors.dart';
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_finding.dart';
@@ -47,6 +44,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/tissue_color_s
 import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/features/settings/presentation/providers/debug_log_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/debug_mode_provider.dart';
+import 'package:submersion/core/constants/o2_cell_unit.dart';
 import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/settings/presentation/widgets/nav_customization_tile.dart';
@@ -104,6 +102,20 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
       state = state.copyWith(seascapeAppearance: appearance);
 
   @override
+  Future<void> setSeascapeVerticalExaggerationOverride(
+    String siteId,
+    double? factor,
+  ) async {
+    final overrides = {...state.seascapeVerticalExaggerationOverrides};
+    if (factor == null) {
+      overrides.remove(siteId);
+    } else {
+      overrides[siteId] = factor;
+    }
+    state = state.copyWith(seascapeVerticalExaggerationOverrides: overrides);
+  }
+
+  @override
   Future<void> setChamberHidden(String chamberId, bool hidden) async {
     final ids = {...state.hiddenChamberIds};
     if (hidden) {
@@ -112,6 +124,18 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
       ids.remove(chamberId);
     }
     state = state.copyWith(hiddenChamberIds: ids);
+  }
+
+  @override
+  Future<void> setTankPresetHidden(String presetName, bool hidden) async {
+    if (hidden && presetName == state.defaultTankPreset) return;
+    final ids = {...state.hiddenTankPresetIds};
+    if (hidden) {
+      ids.add(presetName);
+    } else {
+      ids.remove(presetName);
+    }
+    state = state.copyWith(hiddenTankPresetIds: ids);
   }
 
   @override
@@ -126,6 +150,10 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultShowO2CellMv(bool value) async =>
       state = state.copyWith(defaultShowO2CellMv: value);
+
+  @override
+  Future<void> setO2CellUnit(O2CellUnit value) async =>
+      state = state.copyWith(o2CellUnit: value);
 
   @override
   Future<void> setDefaultShowGtr(bool value) async =>
@@ -249,6 +277,16 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setPpO2Limits(double working, double max) async =>
       state = state.copyWith(ppO2MaxWorking: working, ppO2MaxDeco: max);
+  @override
+  Future<void> setCcrPpO2Limits({
+    required double setpointLow,
+    required double setpointHigh,
+    required double diluentModPpO2,
+  }) async => state = state.copyWith(
+    ccrSetpointLow: setpointLow,
+    ccrSetpointHigh: setpointHigh,
+    ccrDiluentModPpO2: diluentModPpO2,
+  );
   @override
   Future<void> setCnsWarningThreshold(int value) async =>
       state = state.copyWith(cnsWarningThreshold: value);
@@ -601,13 +639,6 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   }
 
   @override
-  Future<void> setFullscreenReadoutCardPosition(double x, double y) async =>
-      state = state.copyWith(
-        fullscreenReadoutCardX: x,
-        fullscreenReadoutCardY: y,
-      );
-
-  @override
   Future<void> setProfileMetricsFollowViewport(bool value) async =>
       state = state.copyWith(profileMetricsFollowViewport: value);
 
@@ -841,6 +872,19 @@ void main() {
         find.text('Give imported gear the type its name states'),
         findsOneWidget,
       );
+    });
+
+    testWidgets('Storage offers one Offline Maps row covering tiles and 3D '
+        'terrain', (tester) async {
+      // Map tiles and 3D terrain data used to be two rows with two pages.
+      await tester.pumpWidget(
+        buildTestWidget(const SettingsSectionDetailPage(sectionId: 'data')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Offline Maps'), findsOneWidget);
+      expect(find.text('Map tiles and 3D terrain data'), findsOneWidget);
+      expect(find.text('3D Maps'), findsNothing);
     });
 
     testWidgets('should display Diver Profile section', (tester) async {
@@ -1386,7 +1430,7 @@ void main() {
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
       final repo = FakeAppSettingsRepository()
-        ..navRailIds = ['statistics', 'gps-log', 'planning'];
+        ..navRailIds = ['insights', 'gps-log', 'planning'];
       await tester.pumpWidget(
         buildAppearanceWidget([
           ...getOverrides(),
@@ -1396,7 +1440,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(NavCustomizationTile), findsOneWidget);
-      expect(find.text('Statistics · GPS Log · Planning'), findsOneWidget);
+      expect(find.text('Insights · GPS Log · Planning'), findsOneWidget);
     });
 
     // The desktop master-detail pane renders _AppearanceSectionContent, a
@@ -1577,220 +1621,6 @@ void main() {
       // The section appearance page is shown for sites
       expect(find.byType(SectionAppearancePage), findsOneWidget);
     });
-  });
-
-  group('AppearanceSectionContent swissBATHY3D manual reload', () {
-    Widget buildAppearanceWidget(List<Override> overrides) {
-      final router = GoRouter(
-        initialLocation: '/settings?selected=appearance',
-        routes: [
-          GoRoute(
-            path: '/settings',
-            builder: (context, state) => const SettingsPage(),
-          ),
-          GoRoute(
-            path: '/settings/themes',
-            builder: (context, state) => const Text('Themes'),
-          ),
-        ],
-      );
-
-      return ProviderScope(
-        overrides: overrides,
-        child: MaterialApp.router(
-          locale: const Locale('en'),
-          routerConfig: router,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-        ),
-      );
-    }
-
-    testWidgets('reload tile calls the refresh action and shows a spinner '
-        'while pending', (tester) async {
-      var calls = 0;
-      final completer = Completer<SwissBathyRefreshSummary?>();
-      final overrides = [
-        ...getOverrides(),
-        swissBathyManualRefreshProvider.overrideWithValue(() {
-          calls++;
-          return completer.future;
-        }),
-      ];
-
-      await tester.pumpWidget(buildAppearanceWidget(overrides));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Reload Map Data'), findsOneWidget);
-      await tester.tap(find.text('Reload Map Data'));
-      await tester.pump();
-
-      expect(calls, 1);
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
-      completer.complete(
-        const SwissBathyRefreshSummary(updated: 0, upToDate: 3, failed: 0),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-      expect(find.text('All data is up to date'), findsOneWidget);
-    });
-
-    testWidgets('shows how many tiles were updated on success', (tester) async {
-      final overrides = [
-        ...getOverrides(),
-        swissBathyManualRefreshProvider.overrideWithValue(
-          () async => const SwissBathyRefreshSummary(
-            updated: 2,
-            upToDate: 1,
-            failed: 0,
-          ),
-        ),
-      ];
-
-      await tester.pumpWidget(buildAppearanceWidget(overrides));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.text('Reload Map Data'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('2 tiles updated'), findsOneWidget);
-    });
-
-    testWidgets(
-      'a failed check leaves cached values in place and shows a non-alarming '
-      'message instead of an error',
-      (tester) async {
-        final overrides = [
-          ...getOverrides(),
-          swissBathyManualRefreshProvider.overrideWithValue(
-            () async => const SwissBathyRefreshSummary(
-              updated: 0,
-              upToDate: 0,
-              failed: 2,
-            ),
-          ),
-        ];
-
-        await tester.pumpWidget(buildAppearanceWidget(overrides));
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.text('Reload Map Data'));
-        await tester.pumpAndSettle();
-
-        expect(
-          find.text("Couldn't check all data; existing values were kept"),
-          findsOneWidget,
-        );
-        expect(tester.takeException(), isNull);
-      },
-    );
-
-    testWidgets(
-      'reports a failure, not up-to-date, when the refresh could not run '
-      'at all (null summary)',
-      (tester) async {
-        final overrides = [
-          ...getOverrides(),
-          swissBathyManualRefreshProvider.overrideWithValue(() async => null),
-        ];
-
-        await tester.pumpWidget(buildAppearanceWidget(overrides));
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.text('Reload Map Data'));
-        await tester.pumpAndSettle();
-
-        expect(
-          find.text("Couldn't check all data; existing values were kept"),
-          findsOneWidget,
-        );
-        expect(find.text('All data is up to date'), findsNothing);
-      },
-    );
-  });
-
-  group('AppearanceSectionContent swissBATHY3D manual reload on the '
-      'desktop master-detail layout', () {
-    // Every prior test for this tile pumped it at the default 800x600 test
-    // surface, which is below ResponsiveBreakpoints.masterDetail (1100px).
-    // SettingsPage.build() only takes the split-view MasterDetailScaffold
-    // branch at >=1100px; below that (including exactly 800px) it falls
-    // back to the mobile ?selected= deep-link path, which happens to render
-    // the same _AppearanceSectionContent widget but through a different
-    // parent (SettingsSectionDetailPage instead of MasterDetailScaffold's
-    // split Row). This test pumps the real '/settings' route at a genuine
-    // desktop width with the master list and detail pane both mounted at
-    // once, taps "Appearance" in the master list exactly like a user would,
-    // and checks the reload tile actually appears in the live detail pane.
-    Widget buildWideSettingsWidget(List<Override> overrides) {
-      final router = GoRouter(
-        initialLocation: '/settings',
-        routes: [
-          GoRoute(
-            path: '/settings',
-            builder: (context, state) => const SettingsPage(),
-          ),
-          GoRoute(
-            path: '/settings/themes',
-            builder: (context, state) => const Text('Themes'),
-          ),
-        ],
-      );
-
-      return ProviderScope(
-        overrides: overrides,
-        child: MaterialApp.router(
-          locale: const Locale('en'),
-          routerConfig: router,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-        ),
-      );
-    }
-
-    testWidgets(
-      'tapping Appearance in the master list reveals the reload tile in '
-      'the detail pane',
-      (tester) async {
-        tester.view.devicePixelRatio = 1.0;
-        tester.view.physicalSize = const Size(1400, 900);
-        addTearDown(() {
-          tester.view.resetPhysicalSize();
-          tester.view.resetDevicePixelRatio();
-        });
-
-        final overrides = [
-          ...getOverrides(),
-          swissBathyManualRefreshProvider.overrideWithValue(
-            () async => const SwissBathyRefreshSummary(
-              updated: 0,
-              upToDate: 0,
-              failed: 0,
-            ),
-          ),
-        ];
-
-        await tester.pumpWidget(buildWideSettingsWidget(overrides));
-        await tester.pumpAndSettle();
-
-        // Master list is showing; the detail pane starts on the summary.
-        expect(find.text('Appearance'), findsOneWidget);
-        expect(find.text('Reload Map Data'), findsNothing);
-
-        await tester.tap(find.text('Appearance'));
-        await tester.pumpAndSettle();
-
-        expect(
-          find.text('Reload Map Data'),
-          findsOneWidget,
-          reason:
-              'the split-view detail pane must render the same reload tile '
-              'the mobile ?selected= path shows',
-        );
-      },
-    );
   });
 
   group('ManageSectionContent checklist templates tile', () {
@@ -2362,8 +2192,43 @@ void main() {
       await tester.pumpWidget(buildDecompressionWidget(getOverrides()));
       await tester.pumpAndSettle();
 
-      expect(find.text('ppO2 limits'), findsOneWidget);
+      expect(find.text('ppO2 limits OC'), findsOneWidget);
       expect(find.text('Working 1.4 bar · Max 1.6 bar'), findsOneWidget);
+    });
+
+    testWidgets('the CCR tile shows the setpoints and the diluent MOD '
+        '(issue #2342)', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(500, 6000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(buildDecompressionWidget(getOverrides()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('ppO2 limits CCR'), findsOneWidget);
+      expect(
+        find.text('Setpoint low 0.7 · high 1.3 · Dil MOD 1.6 bar'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('ppO2 limits CCR'));
+      await tester.pumpAndSettle();
+      expect(find.text('Setpoint low'), findsOneWidget);
+      expect(find.text('Setpoint high'), findsOneWidget);
+      expect(find.text('Dil MOD'), findsOneWidget);
+
+      // Drag the high setpoint to the far left: the pair is never inverted,
+      // so the low setpoint is pulled down with it to 0.5.
+      final sliders = find.byType(Slider);
+      expect(sliders, findsNWidgets(3));
+      await tester.drag(sliders.at(1), const Offset(-1000, 0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Setpoint low 0.5 · high 0.5 · Dil MOD 1.6 bar'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('saving a new maximum updates the tile', (tester) async {
@@ -2373,7 +2238,7 @@ void main() {
       await tester.pumpWidget(buildDecompressionWidget(getOverrides()));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('ppO2 limits'));
+      await tester.tap(find.text('ppO2 limits OC'));
       await tester.pumpAndSettle();
 
       // The "Maximum ppO2" dropdown currently reads 1.6 bar (working is 1.4).
@@ -2396,7 +2261,7 @@ void main() {
       await tester.pumpWidget(buildDecompressionWidget(getOverrides()));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('ppO2 limits'));
+      await tester.tap(find.text('ppO2 limits OC'));
       await tester.pumpAndSettle();
 
       // Working starts at 1.4; raise it to 1.6, above the 1.4/1.5/1.6 max.
@@ -2429,7 +2294,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('ppO2 limits'));
+      await tester.tap(find.text('ppO2 limits OC'));
       await tester.pumpAndSettle();
 
       // Snapped to the grid: 1.4 working, 1.5 max.

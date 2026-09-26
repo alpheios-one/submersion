@@ -4,7 +4,7 @@ import 'package:submersion/features/universal_import/data/models/import_enums.da
 void main() {
   group('ImportFormat', () {
     test('has all expected values', () {
-      expect(ImportFormat.values, hasLength(18));
+      expect(ImportFormat.values, hasLength(20));
     });
 
     test('displayName for each format', () {
@@ -26,6 +26,7 @@ void main() {
       expect(ImportFormat.macdiveSqlite.displayName, 'MacDive SQLite');
       expect(ImportFormat.subsurfaceXml.displayName, 'Subsurface XML');
       expect(ImportFormat.divingLogXml.displayName, 'Diving Log XML');
+      expect(ImportFormat.divingLogSqlite.displayName, 'Diving Log');
       expect(ImportFormat.suuntoSml.displayName, 'Suunto SML');
       expect(ImportFormat.suuntoDm5.displayName, 'Suunto DM5');
       expect(ImportFormat.fit.displayName, 'Garmin FIT');
@@ -34,7 +35,15 @@ void main() {
       expect(ImportFormat.danDl7.displayName, 'DAN DL7');
       expect(ImportFormat.ratioXml.displayName, 'Ratio XML');
       expect(ImportFormat.sqlite.displayName, 'SQLite Database');
+      expect(ImportFormat.navTrack.displayName, 'Seacraft ENC log');
       expect(ImportFormat.unknown.displayName, 'Unknown');
+    });
+
+    test('navTrack is deliberately unsupported by the dive pipeline', () {
+      // A Seacraft ENC log is a measured underwater route, not a dive log
+      // (spec 2026-09-10-underwater-nav-track-design.md); the parser
+      // registry must never receive it.
+      expect(ImportFormat.navTrack.isSupported, isFalse);
     });
 
     test(
@@ -106,7 +115,6 @@ void main() {
       expect(SourceApp.submersion.exportInstructions, isNull);
       expect(SourceApp.subsurface.exportInstructions, isNull);
       expect(SourceApp.macdive.exportInstructions, isNull);
-      expect(SourceApp.divingLog.exportInstructions, isNull);
       expect(SourceApp.diveMate.exportInstructions, isNull);
       expect(SourceApp.garminConnect.exportInstructions, isNull);
       expect(SourceApp.ratio.exportInstructions, isNull);
@@ -154,7 +162,7 @@ void main() {
   group('SourceOverrideOption', () {
     group('supported list', () {
       test('contains expected number of entries', () {
-        expect(SourceOverrideOption.supported.length, 22);
+        expect(SourceOverrideOption.supported.length, 23);
       });
 
       test('contains Submersion CSV entry', () {

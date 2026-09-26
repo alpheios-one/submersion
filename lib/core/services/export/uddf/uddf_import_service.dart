@@ -2,6 +2,7 @@ import 'package:xml/xml.dart';
 
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/export/uddf/uddf_import_parsers.dart';
+import 'package:submersion/features/universal_import/data/services/import_site_location.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/services/transmitter_serial.dart';
 
@@ -56,7 +57,12 @@ class UddfImportService {
       for (final siteElement in divesiteElement.findElements('site')) {
         final siteId = siteElement.getAttribute('id');
         if (siteId != null) {
-          final siteData = _parseUddfSite(siteElement);
+          // Named from its coordinates when the file gave it none, so a
+          // nameless site keeps its position (#2232).
+          final siteData = ImportSiteLocation.named(
+            _parseUddfSite(siteElement),
+          );
+          if (siteData == null) continue;
           siteData['uddfId'] = siteId; // Keep track of original ID for linking
           sites[siteId] = siteData;
         }
@@ -196,6 +202,12 @@ class UddfImportService {
       site['maxDepth'] = double.tryParse(maxDepth);
     }
     site['description'] = _getElementText(siteElement, 'notes');
+
+    // Site features (issue #2200). Parsed here as well as in the full
+    // importer because the dives-only export writes them: a field one
+    // exporter writes is read by its paired importer.
+    final siteFeatures = UddfImportParsers.parseSiteFeatures(siteElement);
+    if (siteFeatures.isNotEmpty) site['siteFeatures'] = siteFeatures;
 
     return site;
   }

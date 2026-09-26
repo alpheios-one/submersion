@@ -97,6 +97,11 @@ class DiverSettingsRepository {
               visibilityScaleModerateM: Value(s.visibilityScaleModerateM),
               coordinateFormat: Value(s.coordinateFormat.name),
               seascapeAppearance: Value(s.seascapeAppearance.encode()),
+              seascapeVerticalExaggerationOverrides: Value(
+                _encodeExaggerationOverrides(
+                  s.seascapeVerticalExaggerationOverrides,
+                ),
+              ),
               timeFormat: Value(s.timeFormat.name),
               dateFormat: Value(s.dateFormat.name),
               themeMode: Value(_themeModeToString(s.themeMode)),
@@ -115,6 +120,9 @@ class DiverSettingsRepository {
               gfHigh: Value(s.gfHigh),
               ppO2MaxWorking: Value(s.ppO2MaxWorking),
               ppO2MaxDeco: Value(s.ppO2MaxDeco),
+              ccrSetpointLow: Value(s.ccrSetpointLow),
+              ccrSetpointHigh: Value(s.ccrSetpointHigh),
+              ccrDiluentModPpO2: Value(s.ccrDiluentModPpO2),
               cnsWarningThreshold: Value(s.cnsWarningThreshold),
               ascentRateWarning: Value(s.ascentRateWarning),
               ascentRateCritical: Value(s.ascentRateCritical),
@@ -134,6 +142,9 @@ class DiverSettingsRepository {
               ),
               hiddenChamberIds: Value(_encodeDisabledRules(s.hiddenChamberIds)),
               emergencyRegion: Value(s.emergencyRegion),
+              hiddenTankPresetIds: Value(
+                _encodeDisabledRules(s.hiddenTankPresetIds),
+              ),
               showAscentRateColors: Value(s.showAscentRateColors),
               showNdlOnProfile: Value(s.showNdlOnProfile),
               lastStopDepth: Value(s.lastStopDepth),
@@ -280,6 +291,11 @@ class DiverSettingsRepository {
           visibilityScaleModerateM: Value(settings.visibilityScaleModerateM),
           coordinateFormat: Value(settings.coordinateFormat.name),
           seascapeAppearance: Value(settings.seascapeAppearance.encode()),
+          seascapeVerticalExaggerationOverrides: Value(
+            _encodeExaggerationOverrides(
+              settings.seascapeVerticalExaggerationOverrides,
+            ),
+          ),
           timeFormat: Value(settings.timeFormat.name),
           dateFormat: Value(settings.dateFormat.name),
           themeMode: Value(_themeModeToString(settings.themeMode)),
@@ -298,6 +314,9 @@ class DiverSettingsRepository {
           gfHigh: Value(settings.gfHigh),
           ppO2MaxWorking: Value(settings.ppO2MaxWorking),
           ppO2MaxDeco: Value(settings.ppO2MaxDeco),
+          ccrSetpointLow: Value(settings.ccrSetpointLow),
+          ccrSetpointHigh: Value(settings.ccrSetpointHigh),
+          ccrDiluentModPpO2: Value(settings.ccrDiluentModPpO2),
           cnsWarningThreshold: Value(settings.cnsWarningThreshold),
           ascentRateWarning: Value(settings.ascentRateWarning),
           ascentRateCritical: Value(settings.ascentRateCritical),
@@ -319,6 +338,9 @@ class DiverSettingsRepository {
             _encodeDisabledRules(settings.hiddenChamberIds),
           ),
           emergencyRegion: Value(settings.emergencyRegion),
+          hiddenTankPresetIds: Value(
+            _encodeDisabledRules(settings.hiddenTankPresetIds),
+          ),
           showAscentRateColors: Value(settings.showAscentRateColors),
           showNdlOnProfile: Value(settings.showNdlOnProfile),
           lastStopDepth: Value(settings.lastStopDepth),
@@ -513,6 +535,9 @@ class DiverSettingsRepository {
       visibilityScaleModerateM: row.visibilityScaleModerateM,
       coordinateFormat: _parseCoordinateFormat(row.coordinateFormat),
       seascapeAppearance: SeascapeAppearance.decode(row.seascapeAppearance),
+      seascapeVerticalExaggerationOverrides: _decodeExaggerationOverrides(
+        row.seascapeVerticalExaggerationOverrides,
+      ),
       timeFormat: _parseTimeFormat(row.timeFormat),
       dateFormat: _parseDateFormat(row.dateFormat),
       themeMode: _parseThemeMode(row.themeMode),
@@ -531,6 +556,9 @@ class DiverSettingsRepository {
       gfHigh: row.gfHigh,
       ppO2MaxWorking: row.ppO2MaxWorking,
       ppO2MaxDeco: row.ppO2MaxDeco,
+      ccrSetpointLow: row.ccrSetpointLow,
+      ccrSetpointHigh: row.ccrSetpointHigh,
+      ccrDiluentModPpO2: row.ccrDiluentModPpO2,
       cnsWarningThreshold: row.cnsWarningThreshold,
       ascentRateWarning: row.ascentRateWarning,
       ascentRateCritical: row.ascentRateCritical,
@@ -548,6 +576,7 @@ class DiverSettingsRepository {
       conditionDisabledRules: _decodeDisabledRules(row.conditionDisabledRules),
       hiddenChamberIds: _decodeDisabledRules(row.hiddenChamberIds),
       emergencyRegion: row.emergencyRegion,
+      hiddenTankPresetIds: _decodeDisabledRules(row.hiddenTankPresetIds),
       showAscentRateColors: row.showAscentRateColors,
       showNdlOnProfile: row.showNdlOnProfile,
       lastStopDepth: row.lastStopDepth,
@@ -744,6 +773,30 @@ class DiverSettingsRepository {
       case ThemeMode.system:
         return 'system';
     }
+  }
+
+  /// Encodes the per-site vertical-exaggeration override map (issue #2141
+  /// follow-up) as a plain JSON object of siteId -> factor.
+  String _encodeExaggerationOverrides(Map<String, double> overrides) =>
+      jsonEncode(overrides);
+
+  /// Defensive decode: a missing column, malformed JSON, or a non-numeric
+  /// entry never blocks settings loading -- it just drops that entry (or
+  /// the whole map) back to "fully automatic".
+  Map<String, double> _decodeExaggerationOverrides(String? raw) {
+    if (raw == null || raw.isEmpty) return const {};
+    Object? decoded;
+    try {
+      decoded = jsonDecode(raw);
+    } on FormatException {
+      return const {};
+    }
+    if (decoded is! Map) return const {};
+    return {
+      for (final entry in decoded.entries)
+        if (entry.key is String && entry.value is num)
+          entry.key as String: (entry.value as num).toDouble(),
+    };
   }
 
   List<int> _parseReminderDays(String json) {

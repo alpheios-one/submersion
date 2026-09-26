@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/features/data_quality/presentation/providers/quality_inbox_providers.dart';
+import 'package:submersion/features/dive_computer/data/services/planned_dive_fill_service.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_match_review_notifier.dart';
 import 'package:submersion/features/import_wizard/domain/models/diver_import_outcome.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_bundle.dart';
@@ -11,6 +14,8 @@ import 'package:submersion/features/import_wizard/domain/models/import_notice.da
 import 'package:submersion/features/import_wizard/presentation/providers/import_wizard_providers.dart';
 import 'package:submersion/features/import_wizard/presentation/widgets/import_summary_diver_outcomes.dart';
 import 'package:submersion/features/import_wizard/presentation/widgets/missing_dives_card.dart';
+import 'package:submersion/features/import_wizard/presentation/widgets/undo_fills_button.dart';
+import 'package:submersion/features/nav_track/presentation/pages/nav_track_import_review_page.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -58,6 +63,8 @@ class ImportSummaryStep extends ConsumerWidget {
       importedCounts: result.importedCounts,
       consolidatedCount: result.consolidatedCount,
       updatedCount: result.updatedCount,
+      filledCount: result.filledCount,
+      fillOutcomes: result.fillOutcomes,
       skippedCount: result.skippedCount,
       attachedPhotoCount: result.attachedPhotoCount,
       unmatchedPhotoCount: result.unmatchedPhotoCount,
@@ -80,6 +87,8 @@ class _SuccessView extends StatelessWidget {
   final Map<ImportEntityType, int> importedCounts;
   final int consolidatedCount;
   final int updatedCount;
+  final int filledCount;
+  final List<PlannedDiveFillOutcome> fillOutcomes;
   final int skippedCount;
   final int attachedPhotoCount;
   final int unmatchedPhotoCount;
@@ -95,6 +104,8 @@ class _SuccessView extends StatelessWidget {
     required this.importedCounts,
     required this.consolidatedCount,
     this.updatedCount = 0,
+    this.filledCount = 0,
+    this.fillOutcomes = const [],
     required this.skippedCount,
     this.attachedPhotoCount = 0,
     this.unmatchedPhotoCount = 0,
@@ -115,7 +126,10 @@ class _SuccessView extends StatelessWidget {
       (sum, v) => sum + v,
     );
     final hasActivity =
-        totalImported > 0 || consolidatedCount > 0 || updatedCount > 0;
+        totalImported > 0 ||
+        consolidatedCount > 0 ||
+        updatedCount > 0 ||
+        filledCount > 0;
     final l10n = context.l10n;
     // "Import notes" explain dives that imported. Dives that did not (rows
     // whose date could not be read, dives a parser could not read) get their
@@ -131,7 +145,7 @@ class _SuccessView extends StatelessWidget {
     final Color iconColor;
     final Color iconBg;
     if (hasActivity) {
-      if (totalImported > 0) {
+      if (totalImported > 0 || filledCount > 0) {
         title = l10n.universalImport_title_successImported;
       } else if (updatedCount > 0) {
         title = l10n.universalImport_title_successUpdated;
@@ -185,6 +199,13 @@ class _SuccessView extends StatelessWidget {
                   label: _labelForType(l10n, entry.key),
                   count: entry.value,
                 ),
+            if (filledCount > 0)
+              _CountRow(
+                icon: Icons.event_available_outlined,
+                label: l10n.universalImport_label_filledPlanned,
+                count: filledCount,
+                key: const Key('import_summary_filled_row'),
+              ),
             if (updatedCount > 0)
               _CountRow(
                 icon: Icons.sync,
@@ -220,6 +241,8 @@ class _SuccessView extends StatelessWidget {
                 count: skippedCount,
                 key: const Key('import_summary_skipped_row'),
               ),
+            if (fillOutcomes.isNotEmpty)
+              UndoFillsButton(outcomes: fillOutcomes),
             for (final notice in notices)
               if (notice.kind.reportsMissingDives) ...[
                 const SizedBox(height: 8),
@@ -528,6 +551,30 @@ _FileNoticeWording? _fileNoticeWording(
     ),
     // No action button: Dive Numbering is a dialog on the dive list, not
     // a route, so the body tells the diver where to find it.
+    ImportNoticeKind.gearUnavailable => (
+      title: l10n.universalImport_summary_noticeGearUnavailableTitle,
+      body: l10n.universalImport_summary_noticeGearUnavailableBody,
+      action: null,
+    ),
+    ImportNoticeKind.certificationsUnavailable => (
+      title: l10n.universalImport_summary_noticeCertificationsUnavailableTitle,
+      body: l10n.universalImport_summary_noticeCertificationsUnavailableBody,
+      action: null,
+    ),
+    ImportNoticeKind.photoListingsUnavailable => (
+      title: l10n.universalImport_summary_noticePhotoListingsUnavailableTitle,
+      body: l10n.universalImport_summary_noticePhotoListingsUnavailableBody(
+        notice.count,
+      ),
+      action: null,
+    ),
+    ImportNoticeKind.photosNotDownloaded => (
+      title: l10n.universalImport_summary_noticePhotosNotDownloadedTitle,
+      body: l10n.universalImport_summary_noticePhotosNotDownloadedBody(
+        notice.count,
+      ),
+      action: null,
+    ),
     ImportNoticeKind.diveNumberConflict => (
       title: l10n.universalImport_summary_noticeDiveNumberConflictTitle,
       body: l10n.universalImport_summary_noticeDiveNumberConflictBody,
@@ -643,6 +690,8 @@ class _FileOutcomeRow extends StatelessWidget {
         l10n.universalImport_summary_fileUnsupported,
     };
 
+    final canImportAsRoute =
+        outcome.isNavTrackRoute && outcome.filePath != null;
     // Why a file failed, verbatim from its parser. Only failures carry one.
     final reason = outcome.status == ImportFileOutcomeStatus.parseFailed
         ? outcome.error
@@ -654,11 +703,12 @@ class _FileOutcomeRow extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 10,
+            runSpacing: 4,
             children: [
               Icon(icon, size: 18, color: theme.colorScheme.onSurfaceVariant),
-              const SizedBox(width: 10),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 200),
                 child: Text(
@@ -667,13 +717,18 @@ class _FileOutcomeRow extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(width: 10),
               Text(
                 label,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
+              if (canImportAsRoute)
+                TextButton(
+                  key: const ValueKey('import-summary-import-as-route'),
+                  onPressed: () => _importAsRoute(context),
+                  child: Text(l10n.universalImport_summary_importAsRoute),
+                ),
             ],
           ),
           if (reason != null && reason.isNotEmpty)
@@ -693,6 +748,31 @@ class _FileOutcomeRow extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Re-reads the excluded file from its stored path and hands it to the
+  /// route review page. The batch pipeline only reads bytes to detect the
+  /// format and does not keep them, so a Seacraft ENC file flagged
+  /// `needsIndividualImport` would otherwise be a dead end in this batch
+  /// summary with no way to actually import it as a route.
+  Future<void> _importAsRoute(BuildContext context) async {
+    final path = outcome.filePath;
+    if (path == null) return;
+    final l10n = context.l10n;
+    try {
+      final bytes = await File(path).readAsBytes();
+      if (!context.mounted) return;
+      await navigateToNavTrackReview(
+        context,
+        bytes,
+        fileName: outcome.fileName,
+      );
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.dropTarget_error_readFailed)));
+    }
   }
 }
 

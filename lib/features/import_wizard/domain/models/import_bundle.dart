@@ -25,6 +25,9 @@ enum ImportSourceType {
 
   /// A Garmin Connect cloud import.
   garminCloud,
+
+  /// A divelogs.de logbook import.
+  divelogs,
 }
 
 /// The kind of entity represented by an [EntityGroup].
@@ -182,6 +185,21 @@ class EntityGroup {
     this.entityMatches,
     this.autoSkipIndices,
   });
+
+  /// The same group with its duplicate set or match results replaced; the
+  /// wizard uses it to repoint a planned-fill row (issue #2002).
+  EntityGroup copyWith({
+    Set<int>? duplicateIndices,
+    Map<int, DiveMatchResult>? matchResults,
+  }) {
+    return EntityGroup(
+      items: items,
+      duplicateIndices: duplicateIndices ?? this.duplicateIndices,
+      matchResults: matchResults ?? this.matchResults,
+      entityMatches: entityMatches,
+      autoSkipIndices: autoSkipIndices,
+    );
+  }
 }
 
 /// Data contract between import source adapters and the shared wizard UI.

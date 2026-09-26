@@ -1,5 +1,4 @@
-import 'dart:typed_data';
-
+import 'package:flutter/foundation.dart';
 import 'package:xml/xml.dart';
 
 import 'package:submersion/core/constants/enums.dart' as enums;
@@ -8,9 +7,11 @@ import 'package:submersion/core/services/export/models/uddf_import_result.dart';
 import 'package:submersion/core/services/export/uddf/uddf_buddy_roles.dart';
 import 'package:submersion/core/services/export/uddf/uddf_dump_codec.dart';
 import 'package:submersion/core/services/export/uddf/uddf_import_parsers.dart';
+import 'package:submersion/features/universal_import/data/services/import_site_location.dart';
 import 'package:submersion/core/services/export/uddf/uddf_normalizer.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/services/transmitter_serial.dart';
+import 'package:submersion/features/universal_import/data/csv/transforms/dive_type_mapper.dart';
 
 /// Handles comprehensive UDDF import including all application data.
 ///
@@ -19,6 +20,53 @@ import 'package:submersion/features/dive_log/domain/services/transmitter_serial.
 /// Delegates base parsing to [UddfImportService] and entity parsing
 /// to [UddfImportParsers].
 class UddfFullImportService {
+  /// Private marker `_parseFullDive` leaves on a dive whose `<link ref>`
+  /// matched nothing the parser knows about, so the caller can count it and
+  /// then strip it. Never reaches the payload.
+  static const _unresolvedSiteRefKey = '_unresolvedSiteRef';
+
+  /// Prefixes a `<link ref>` carries when it names something other than a
+  /// dive site: every id prefix Submersion's own UDDF writers mint, except
+  /// `site_`.
+  ///
+  /// The same `<link>` elements are walked twice: once by the pass that
+  /// reads trip, dive centre, course and buddy references, and once by the
+  /// chain that reads sites, buddies, deco models and dive computers. A ref
+  /// the chain does not recognise is only a lost site when it could have
+  /// been one, or a dive that merely belongs to a trip, or whose
+  /// `<divecomputer>` block went missing, would raise a `sitesUnresolved`
+  /// notice about a site it never had. A foreign file's ids carry none of
+  /// these prefixes and are still counted.
+  ///
+  /// `uddf_site_location_test.dart` pins this list to the writers, so a new
+  /// entity type the exporter starts linking fails the test rather than
+  /// being mistaken for a lost site.
+  @visibleForTesting
+  static const nonSiteRefPrefixes = {
+    'buddy_',
+    'center_',
+    'cert_',
+    'computer_',
+    'course_',
+    'dc_',
+    'dive_',
+    'equip_',
+    'gf_',
+    'mix_',
+    'obs_',
+    'owner_',
+    'service_',
+    'set_',
+    'sitefeature_',
+    'species_',
+    'tag_',
+    'tank_',
+    'trip_',
+  };
+
+  static bool _isNonSiteRef(String ref) =>
+      nonSiteRefPrefixes.any(ref.startsWith);
+
   static final _logger = LoggerService.forClass(UddfFullImportService);
 
   /// Import ALL application data from UDDF file.
@@ -65,7 +113,12 @@ class UddfFullImportService {
     final divesiteElement = uddfElement.findElements('divesite').firstOrNull;
     if (divesiteElement != null) {
       for (final siteElement in divesiteElement.findElements('site')) {
-        final siteData = _parseFullSite(siteElement);
+        // A `<site>` the file never named is filed under its own
+        // coordinates, so the review step shows where it is rather than
+        // "Unnamed" and the position survives the import (#2232). A site
+        // with neither is dropped, which is all it was ever worth.
+        final siteData = ImportSiteLocation.named(_parseFullSite(siteElement));
+        if (siteData == null) continue;
         final siteId = siteElement.getAttribute('id');
         if (siteId != null) {
           siteData['uddfId'] = siteId;
@@ -189,6 +242,8 @@ class UddfFullImportService {
     // Parse dives with extended fields
     final dives = <Map<String, dynamic>>[];
     final sightings = <Map<String, dynamic>>[];
+    // Dives that pointed at a site the file never described (#2209).
+    var divesMissingSite = 0;
     final profileDataElement = uddfElement
         .findElements('profiledata')
         .firstOrNull;
@@ -206,6 +261,9 @@ class UddfFullImportService {
             diveComputersMap,
           );
           if (diveData.isNotEmpty) {
+            if (diveData.remove(_unresolvedSiteRefKey) == true) {
+              divesMissingSite++;
+            }
             dives.add(diveData);
             // Extract sightings from dive
             if (diveData.containsKey('sightings')) {
@@ -554,9 +612,12 @@ class UddfFullImportService {
       if (entries.isNotEmpty) dive['dataSources'] = entries;
     }
 
+    _harvestCustomDiveTypes(dives, customDiveTypes);
+
     return UddfImportResult(
       dataSourcesByDiveRef: sources.byDiveRef,
       unpairedDumps: sources.unpaired,
+      divesMissingSite: divesMissingSite,
       dives: dives,
       sites: sites,
       equipment: equipment,
@@ -706,6 +767,67 @@ class UddfFullImportService {
     }
 
     return (byDiveRef: entries, unpaired: unpaired);
+  }
+
+  /// Creates a custom dive type for every id in [dives] that is neither a
+  /// built-in nor already declared in the file (#2203).
+  ///
+  /// [_parseDiveType] preserves a type it does not recognise as its slug
+  /// rather than recording it as 'recreational'. Only Submersion's own export
+  /// carries a `<submersion><divetypes>` block, so without this a third-party
+  /// file's "Cenote" would leave a `dive_dive_types` row pointing at no
+  /// `dive_types` row: the dive would still show the name, but the type would
+  /// be missing from the picker and from filters, and editing the dive would
+  /// drop it.
+  static void _harvestCustomDiveTypes(
+    List<Map<String, dynamic>> dives,
+    List<Map<String, dynamic>> customDiveTypes,
+  ) {
+    final declared = {
+      for (final t in customDiveTypes)
+        if (t['id'] is String) t['id'] as String,
+    };
+
+    for (final dive in dives) {
+      final ids = dive['diveTypeIds'];
+      if (ids is! List) continue;
+      final names = dive['diveTypeNames'];
+      String? nameOf(String id) {
+        final n = names is Map ? names[id] : null;
+        return n is String ? n : null;
+      }
+
+      // Relink an id the free-text mapper mangled. Submersion's own export
+      // writes `dive.diveTypeIds` into `<divetype>`, so the element text is
+      // a stored id, and `generateSlug` strips the underscores out of one:
+      // 'search_recovery_1a2b3c4d' would arrive as
+      // 'searchrecovery1a2b3c4d', no longer matching the type the file
+      // declares. Where the original text is a declared id, that is the id.
+      for (var i = 0; i < ids.length; i++) {
+        final id = ids[i];
+        if (id is! String) continue;
+        final original = nameOf(id)?.trim();
+        if (original != null && original != id && declared.contains(original)) {
+          ids[i] = original;
+          if (names is Map) {
+            names.remove(id);
+            names[original] = original;
+          }
+        }
+      }
+
+      for (final id in ids.whereType<String>()) {
+        if (kBuiltInDiveTypeIds.contains(id) || !declared.add(id)) continue;
+        final name = nameOf(id);
+        customDiveTypes.add({
+          'id': id,
+          'name': name != null && name.isNotEmpty
+              ? name
+              : Dive.diveTypeDisplayName(id),
+          'isBuiltIn': false,
+        });
+      }
+    }
   }
 
   /// One `<source>` element as a map keyed by `dive_data_sources` field name.
@@ -1050,9 +1172,18 @@ class UddfFullImportService {
 
       final diveTypeElements = beforeElement.findElements('divetype').toList();
       if (diveTypeElements.isNotEmpty) {
-        diveData['diveTypeIds'] = {
-          for (final e in diveTypeElements) _parseDiveType(e.innerText),
-        }.toList();
+        // The element text alongside the id it mapped to. A type the mapper
+        // did not recognise is preserved as its slug (#2203), and
+        // _harvestCustomDiveTypes needs the diver's own spelling to name the
+        // custom type it creates for it.
+        final named = <String, String>{};
+        for (final e in diveTypeElements) {
+          final text = e.innerText.trim();
+          final id = _parseDiveType(text);
+          if (!named.containsKey(id)) named[id] = text;
+        }
+        diveData['diveTypeIds'] = named.keys.toList();
+        diveData['diveTypeNames'] = named;
       }
 
       final entryType = UddfImportParsers.getElementText(
@@ -1794,7 +1925,21 @@ class UddfFullImportService {
       }
 
       // Get all linked references (can be sites, buddies, decomodels, or dive computers)
-      for (final linkElement in beforeElement.findElements('link')) {
+      // A ref matching none of them used to fall off the end of this chain
+      // without a word, which is how a logbook whose <divesite> block was
+      // lost imported every dive with no site and no notice (#2209).
+      //
+      // UDDF allows a <link> either inside <informationbeforedive> or
+      // directly under <dive>. Only the inner ones were read, so a file
+      // using the outer shape lost its site link in silence even when the
+      // <divesite> block described the site perfectly well. Inner links are
+      // walked first, so a resolving one still wins over a dangling outer
+      // one rather than the last read winning.
+      var sawDanglingRef = false;
+      for (final linkElement in [
+        ...beforeElement.findElements('link'),
+        ...diveElement.findElements('link'),
+      ]) {
         final ref = linkElement.getAttribute('ref');
         if (ref != null) {
           // Check if it's a site reference
@@ -1833,8 +1978,17 @@ class UddfFullImportService {
             if (computer['manufacturer']?.isNotEmpty == true) {
               diveData['diveComputerManufacturer'] = computer['manufacturer'];
             }
+          } else if (!_isNonSiteRef(ref)) {
+            sawDanglingRef = true;
           }
         }
+      }
+
+      // A dangling ref only counts against the dive when nothing else gave
+      // it a site: a file may legitimately link something this parser does
+      // not read, and that is not a lost location.
+      if (sawDanglingRef && diveData['site'] == null) {
+        diveData[_unresolvedSiteRefKey] = true;
       }
 
       // Also check equipmentused for dive computer links (Shearwater style)
@@ -2737,39 +2891,11 @@ class UddfFullImportService {
     }
   }
 
-  String _parseDiveType(String value) {
-    final lower = value.toLowerCase();
-    if (lower.contains('training') || lower.contains('course')) {
-      return 'training';
-    } else if (lower.contains('night')) {
-      return 'night';
-    } else if (lower.contains('deep')) {
-      return 'deep';
-    } else if (lower.contains('wreck')) {
-      return 'wreck';
-    } else if (lower.contains('drift')) {
-      return 'drift';
-    } else if (lower.contains('cavern')) {
-      return 'cavern';
-    } else if (lower.contains('cave')) {
-      return 'cave';
-    } else if (lower.contains('tech')) {
-      return 'technical';
-    } else if (lower.contains('free')) {
-      return 'freedive';
-    } else if (lower.contains('ice')) {
-      return 'ice';
-    } else if (lower.contains('altitude')) {
-      return 'altitude';
-    } else if (lower.contains('shore')) {
-      return 'shore';
-    } else if (lower.contains('boat')) {
-      return 'boat';
-    } else if (lower.contains('liveaboard')) {
-      return 'liveaboard';
-    }
-    return 'recreational';
-  }
+  /// Maps a UDDF dive type string to a dive type id.
+  ///
+  /// Delegates to the shared [mapDiveType] ladder, so this importer and the
+  /// CSV one cannot drift apart again (issue #2203).
+  String _parseDiveType(String value) => mapDiveType(value);
 
   /// UDDF 3.2 standard equipment child elements that appear under
   /// `<diver><owner><equipment>`. Each element represents one gear item and
