@@ -11,14 +11,23 @@ import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/checklists/data/repositories/trip_checklist_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/trip_cylinder_links.dart';
 import 'package:submersion/features/trips/data/repositories/itinerary_day_repository.dart';
 import 'package:submersion/features/trips/data/repositories/liveaboard_details_repository.dart';
 import 'package:submersion/features/trips/data/repositories/trip_day_weather_repository.dart';
+import 'package:submersion/features/trips/data/repositories/trip_cylinder_repository.dart';
+import 'package:submersion/features/trips/data/repositories/trip_equipment_repository.dart';
 import 'package:submersion/features/trips/domain/entities/dive_candidate.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart' as domain;
 
 class TripRepository {
+  TripRepository({ItineraryDayRepository? itineraryDays})
+    : _itineraryDays = itineraryDays ?? ItineraryDayRepository();
+
   AppDatabase get _db => DatabaseService.instance.database;
+
+  /// The trip's itinerary, which a date change and a delete also touch.
+  final ItineraryDayRepository _itineraryDays;
   final SyncRepository _syncRepository = SyncRepository();
   final _uuid = const Uuid();
   final _log = LoggerService.forClass(TripRepository);
@@ -117,6 +126,8 @@ class TripRepository {
               ),
               expectedDives: Value(trip.expectedDives),
               expectedRuntimeMinutes: Value(trip.expectedRuntimeMinutes),
+              diversSharingCylinders: Value(trip.diversSharingCylinders),
+              divesPerDayTarget: Value(trip.divesPerDayTarget),
               createdAt: Value(now.millisecondsSinceEpoch),
               updatedAt: Value(now.millisecondsSinceEpoch),
             ),
@@ -162,6 +173,8 @@ class TripRepository {
           returnFlightAt: Value(trip.returnFlightAt?.millisecondsSinceEpoch),
           expectedDives: Value(trip.expectedDives),
           expectedRuntimeMinutes: Value(trip.expectedRuntimeMinutes),
+          diversSharingCylinders: Value(trip.diversSharingCylinders),
+          divesPerDayTarget: Value(trip.divesPerDayTarget),
           updatedAt: Value(now),
         ),
       );
@@ -170,6 +183,22 @@ class TripRepository {
         recordId: trip.id,
         localUpdatedAt: now,
       );
+      // A shortened or moved trip drops the plan-only itinerary days it no
+      // longer covers (#2325). Cleanup only: the trip is saved, so a
+      // failure here is logged rather than reported as a failed save.
+      try {
+        await _itineraryDays.deleteBarePlanDaysOutside(
+          trip.id,
+          trip.startDate,
+          trip.endDate,
+        );
+      } catch (e, stackTrace) {
+        _log.error(
+          'Failed to drop plan-only itinerary days for trip: ${trip.id}',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
       SyncEventBus.notifyLocalChange();
       _log.info('Updated trip: ${trip.id}');
     } catch (e, stackTrace) {
@@ -270,9 +299,13 @@ class TripRepository {
       await _db.transaction(() async {
         // Delete child records with non-nullable FKs first
         await LiveaboardDetailsRepository().deleteByTripId(id);
-        await ItineraryDayRepository().deleteByTripId(id);
+        await _itineraryDays.deleteByTripId(id);
         await TripChecklistRepository().deleteByTripId(id);
         await TripDayWeatherRepository().deleteByTripId(id);
+        // Slots, their ledger and the links on the tanks that used them.
+        await TripCylinderRepository().deleteByTripId(id);
+        // Packed gear (issue #2338): deleted and tombstoned before the trip.
+        await TripEquipmentRepository().deleteByTripId(id);
 
         // Remove trip association from dives (nullable FK)
         await _db.customUpdate(
@@ -347,11 +380,24 @@ class TripRepository {
   Future<void> assignDiveToTrip(String diveId, String tripId) async {
     try {
       _log.info('Assigning dive $diveId to trip $tripId');
-      await _db.customUpdate(
-        'UPDATE dives SET trip_id = ? WHERE id = ?',
-        variables: [Variable.withString(tripId), Variable.withString(diveId)],
-        updates: {_db.dives},
-      );
+      // One transaction: a move that fails (an unknown trip id trips the
+      // foreign key) must not leave the tank links cleared.
+      await _db.transaction(() async {
+        await clearForeignTripCylinderLinks(
+          _db,
+          _syncRepository,
+          diveId,
+          tripId: tripId,
+          now: DateTime.now().millisecondsSinceEpoch,
+        );
+        await _db.customUpdate(
+          'UPDATE dives SET trip_id = ? WHERE id = ?',
+          variables: [Variable.withString(tripId), Variable.withString(diveId)],
+          updates: {_db.dives},
+        );
+      });
+      // The cleared tank links are staged; tell auto-sync.
+      SyncEventBus.notifyLocalChange();
       _log.info('Assigned dive to trip');
     } catch (e, stackTrace) {
       _log.error(
@@ -367,11 +413,24 @@ class TripRepository {
   Future<void> removeDiveFromTrip(String diveId) async {
     try {
       _log.info('Removing dive $diveId from trip');
-      await _db.customUpdate(
-        'UPDATE dives SET trip_id = NULL WHERE id = ?',
-        variables: [Variable.withString(diveId)],
-        updates: {_db.dives},
-      );
+      // One transaction, as in assignDiveToTrip: the links and the dive
+      // change together or not at all.
+      await _db.transaction(() async {
+        await clearForeignTripCylinderLinks(
+          _db,
+          _syncRepository,
+          diveId,
+          tripId: null,
+          now: DateTime.now().millisecondsSinceEpoch,
+        );
+        await _db.customUpdate(
+          'UPDATE dives SET trip_id = NULL WHERE id = ?',
+          variables: [Variable.withString(diveId)],
+          updates: {_db.dives},
+        );
+      });
+      // The cleared tank links are staged; tell auto-sync.
+      SyncEventBus.notifyLocalChange();
       _log.info('Removed dive from trip');
     } catch (e, stackTrace) {
       _log.error(
@@ -474,6 +533,13 @@ class TripRepository {
 
       await _db.transaction(() async {
         for (final diveId in diveIds) {
+          await clearForeignTripCylinderLinks(
+            _db,
+            _syncRepository,
+            diveId,
+            tripId: tripId,
+            now: now,
+          );
           await _db.customUpdate(
             'UPDATE dives SET trip_id = ?, updated_at = ? WHERE id = ?',
             variables: [
@@ -657,6 +723,8 @@ class TripRepository {
           : null,
       expectedDives: row.expectedDives,
       expectedRuntimeMinutes: row.expectedRuntimeMinutes,
+      diversSharingCylinders: row.diversSharingCylinders,
+      divesPerDayTarget: row.divesPerDayTarget,
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
     );
@@ -688,6 +756,8 @@ class TripRepository {
           : null,
       expectedDives: data['expected_dives'] as int?,
       expectedRuntimeMinutes: data['expected_runtime_minutes'] as int?,
+      diversSharingCylinders: (data['divers_sharing_cylinders'] as int?) ?? 1,
+      divesPerDayTarget: data['dives_per_day_target'] as int?,
       createdAt: DateTime.fromMillisecondsSinceEpoch(data['created_at'] as int),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(data['updated_at'] as int),
     );

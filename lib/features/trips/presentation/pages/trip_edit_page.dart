@@ -17,6 +17,8 @@ import 'package:submersion/features/trips/presentation/providers/trip_providers.
 import 'package:submersion/features/trips/presentation/widgets/dive_assignment_dialog.dart';
 import 'package:submersion/shared/widgets/app_bar_text_action.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
+import 'package:submersion/shared/widgets/forms/number_field.dart';
+import 'package:submersion/shared/widgets/forms/number_input_validation.dart';
 
 class TripEditPage extends ConsumerStatefulWidget {
   final String? tripId;
@@ -45,6 +47,8 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
   final _notesController = TextEditingController();
   final _expectedDivesController = TextEditingController();
   final _expectedRuntimeController = TextEditingController();
+  final _diversSharingController = TextEditingController();
+  final _divesPerDayController = TextEditingController();
 
   TripType _tripType = TripType.shore;
   final _vesselNameController = TextEditingController();
@@ -110,6 +114,8 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
     _notesController.addListener(_onFieldChanged);
     _expectedDivesController.addListener(_onFieldChanged);
     _expectedRuntimeController.addListener(_onFieldChanged);
+    _diversSharingController.addListener(_onFieldChanged);
+    _divesPerDayController.addListener(_onFieldChanged);
     _vesselNameController.addListener(_onFieldChanged);
     _operatorController.addListener(_onFieldChanged);
     _cabinTypeController.addListener(_onFieldChanged);
@@ -140,6 +146,8 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
         _expectedDivesController.text = trip.expectedDives?.toString() ?? '';
         _expectedRuntimeController.text =
             trip.expectedRuntimeMinutes?.toString() ?? '';
+        _diversSharingController.text = '${trip.diversSharingCylinders}';
+        _divesPerDayController.text = trip.divesPerDayTarget?.toString() ?? '';
         _tripType = trip.tripType;
 
         // Load liveaboard details if applicable
@@ -189,6 +197,8 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
     _notesController.dispose();
     _expectedDivesController.dispose();
     _expectedRuntimeController.dispose();
+    _diversSharingController.dispose();
+    _divesPerDayController.dispose();
     _vesselNameController.dispose();
     _operatorController.dispose();
     _cabinTypeController.dispose();
@@ -495,6 +505,9 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
                     // Capacity
                     TextFormField(
                       controller: _capacityController,
+                      // The filter keeps '-', so "-3" saves as none rather than as 3.
+                      inputFormatters: numberInputFormatters(),
+                      validator: numberValidator(context, integer: true),
                       decoration: InputDecoration(
                         labelText: context.l10n.trips_edit_label_capacity,
                         prefixIcon: const Icon(Icons.people),
@@ -568,6 +581,9 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _expectedDivesController,
+                    // The filter keeps '-', so "-3" saves as none rather than as 3.
+                    inputFormatters: numberInputFormatters(),
+                    validator: numberValidator(context, integer: true),
                     decoration: InputDecoration(
                       labelText: context.l10n.trips_edit_label_expectedDives,
                       prefixIcon: const Icon(Icons.scuba_diving),
@@ -578,10 +594,40 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _expectedRuntimeController,
+                    // The filter keeps '-', so "-3" saves as none rather than as 3.
+                    inputFormatters: numberInputFormatters(),
+                    validator: numberValidator(context, integer: true),
                     decoration: InputDecoration(
                       labelText: context.l10n.trips_edit_label_expectedRuntime,
                       prefixIcon: const Icon(Icons.timer_outlined),
                       hintText: context.l10n.trips_edit_hint_expectedRuntime,
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 16),
+                  // Fill forecast (#2325): who breathes from the trip's
+                  // cylinders, and a dives-per-day target. Blank sharing is
+                  // one diver; a blank target derives it.
+                  TextFormField(
+                    controller: _diversSharingController,
+                    inputFormatters: numberInputFormatters(),
+                    validator: numberValidator(context, integer: true),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.trips_edit_label_diversSharing,
+                      prefixIcon: const Icon(Icons.groups_outlined),
+                      hintText: context.l10n.trips_edit_hint_diversSharing,
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _divesPerDayController,
+                    inputFormatters: numberInputFormatters(),
+                    validator: numberValidator(context, integer: true),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.trips_edit_label_divesPerDay,
+                      prefixIcon: const Icon(Icons.today_outlined),
+                      hintText: context.l10n.trips_edit_hint_divesPerDay,
                     ),
                     keyboardType: TextInputType.number,
                   ),
@@ -892,10 +938,14 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
     );
   }
 
-  static int? _positiveOrNull(String text) {
-    final parsed = int.tryParse(text.trim());
-    return parsed != null && parsed > 0 ? parsed : null;
-  }
+  /// A whole number above zero, or null for blank and for zero or below,
+  /// as before. The field validators have already stopped unreadable text,
+  /// which used to save as null and erase the stored value (#1900).
+  static int? _positiveOrNull(String text) =>
+      switch (readNumber(text, integer: true)) {
+        NumberValue(:final value) when value > 0 => value.toInt(),
+        NumberValue() || NumberBlank() || NumberInvalid() => null,
+      };
 
   Future<void> _saveTrip() async {
     if (!_formKey.currentState!.validate()) return;
@@ -935,6 +985,10 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
         expectedRuntimeMinutes: _positiveOrNull(
           _expectedRuntimeController.text,
         ),
+        // Blank or non-positive is the default: one diver, the estimate.
+        diversSharingCylinders:
+            _positiveOrNull(_diversSharingController.text) ?? 1,
+        divesPerDayTarget: _positiveOrNull(_divesPerDayController.text),
         createdAt: _originalTrip?.createdAt ?? now,
         updatedAt: now,
       );
@@ -965,7 +1019,7 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
           cabinType: _cabinTypeController.text.trim().isEmpty
               ? null
               : _cabinTypeController.text.trim(),
-          capacity: capacityText.isEmpty ? null : int.tryParse(capacityText),
+          capacity: _positiveOrNull(capacityText),
           embarkPort: _embarkPortController.text.trim().isEmpty
               ? null
               : _embarkPortController.text.trim(),

@@ -115,6 +115,8 @@ void main() {
       'siteSiteTypes',
       'siteTags',
       'equipmentTags',
+      'equipmentShares',
+      'equipmentOwnershipEvents',
       'tankPresets',
       'diveComputers',
       'tankPressureProfiles',
@@ -133,6 +135,7 @@ void main() {
       'csvPresets',
       'viewConfigs',
       'fieldPresets',
+      'tripEquipment',
     ];
 
     for (final type in simpleTypes) {

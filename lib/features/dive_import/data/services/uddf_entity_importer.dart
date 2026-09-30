@@ -6,6 +6,9 @@ import 'package:submersion/core/database/imported_computer_identity.dart';
 import 'package:submersion/core/database/database.dart'
     show DiveDataSourcesCompanion, DiveSitesCompanion, DivesCompanion;
 import 'package:submersion/core/services/export/export_service.dart';
+import 'package:submersion/features/cylinder_passports/data/repositories/cylinder_fill_repository.dart';
+import 'package:submersion/features/cylinder_passports/data/repositories/cylinder_passport_repository.dart';
+import 'package:submersion/features/cylinder_passports/data/services/csv_fill_importer.dart';
 import 'package:submersion/features/dive_import/data/repositories/imported_file_repository.dart';
 import 'package:submersion/features/dive_import/data/services/import_map_readers.dart';
 import 'package:submersion/features/dive_import/data/services/parsed_profile_event_mapper.dart';
@@ -71,6 +74,7 @@ import 'package:submersion/features/tank_presets/domain/entities/tank_preset_ent
 import 'package:submersion/features/marine_life/data/repositories/species_repository.dart';
 import 'package:submersion/features/universal_import/data/models/import_enums.dart';
 import 'package:submersion/features/universal_import/data/models/import_tag_scopes.dart';
+import 'package:submersion/features/universal_import/data/models/source_diver.dart';
 import 'package:submersion/features/universal_import/data/services/import_site_location.dart';
 import 'package:submersion/features/universal_import/data/services/import_tank_defaults.dart';
 import 'package:uuid/uuid.dart';
@@ -133,6 +137,13 @@ class ImportRepositories {
   /// source are skipped rather than failing the import (issue #2200).
   final SiteFeatureRepository? siteFeatureRepository;
 
+  /// Optional for the same reason; when null, the fills in a Submersion
+  /// fills CSV are skipped rather than failing the import (cylinder
+  /// passports phase 5). Both are needed: the fills repository stores the
+  /// row, the passport repository finds the cylinder it links to.
+  final CylinderFillRepository? cylinderFillRepository;
+  final CylinderPassportRepository? cylinderPassportRepository;
+
   const ImportRepositories({
     required this.tripRepository,
     required this.equipmentRepository,
@@ -156,6 +167,8 @@ class ImportRepositories {
     this.equipmentTagRepository,
     this.siteFeatureRepository,
     this.speciesRepository,
+    this.cylinderFillRepository,
+    this.cylinderPassportRepository,
   });
 }
 
@@ -177,6 +190,7 @@ class UddfImportSelections {
   final Set<int> equipmentSets;
   final Set<int> dives;
   final Set<int> courses;
+  final Set<int> fills;
 
   const UddfImportSelections({
     this.trips = const {},
@@ -191,6 +205,7 @@ class UddfImportSelections {
     this.equipmentSets = const {},
     this.dives = const {},
     this.courses = const {},
+    this.fills = const {},
   });
 
   /// Create selections with all items selected.
@@ -207,6 +222,7 @@ class UddfImportSelections {
       equipmentSets: _allIndices(data.equipmentSets.length),
       dives: _allIndices(data.dives.length),
       courses: _allIndices(data.courses.length),
+      fills: _allIndices(data.fills.length),
     );
   }
 
@@ -227,6 +243,7 @@ class UddfEntityImportResult {
   final int sites;
   final int dives;
   final int courses;
+  final int fills;
   final List<String> diveIds;
 
   /// The persisted dive id created for each imported source-dive index.
@@ -253,6 +270,7 @@ class UddfEntityImportResult {
     this.sites = 0,
     this.dives = 0,
     this.courses = 0,
+    this.fills = 0,
     this.diveIds = const [],
     this.diveIdByIndex = const {},
     this.restoredDataSources = 0,
@@ -269,7 +287,8 @@ class UddfEntityImportResult {
       diveTypes +
       sites +
       dives +
-      courses;
+      courses +
+      fills;
 
   String get summary {
     final parts = <String>[];
@@ -284,6 +303,7 @@ class UddfEntityImportResult {
     if (courses > 0) parts.add('$courses courses');
     if (diveTypes > 0) parts.add('$diveTypes custom dive types');
     if (tags > 0) parts.add('$tags tags');
+    if (fills > 0) parts.add('$fills fills');
     return parts.isEmpty ? 'No data imported' : 'Imported ${parts.join(', ')}';
   }
 }
@@ -460,6 +480,24 @@ class UddfEntityImporter {
       },
       now,
     );
+
+    // Cylinder fills (passports phase 5) are keyed by passport id, not by
+    // an imported item, so they need only the diver and the two passport
+    // repositories. CsvFillImporter keeps each row's id, skips one already
+    // here or deleted here, and links the fill to the diver's cylinder that
+    // holds its passport id.
+    final fillsCount =
+        repositories.cylinderFillRepository == null ||
+            repositories.cylinderPassportRepository == null
+        ? 0
+        : await CsvFillImporter(
+            fills: repositories.cylinderFillRepository,
+            passports: repositories.cylinderPassportRepository,
+          ).importRows(
+            data.fills,
+            selected: selections.fills,
+            diverId: diverId,
+          );
 
     final buddiesCount = await _importBuddies(
       data.buddies,
@@ -640,6 +678,7 @@ class UddfEntityImporter {
       sites: sitesCount,
       dives: divesResult.count,
       courses: coursesCount,
+      fills: fillsCount,
       diveIds: divesResult.diveIds,
       diveIdByIndex: divesResult.diveIdByIndex,
       restoredDataSources: divesResult.restoredDataSources,
@@ -2937,6 +2976,15 @@ class UddfEntityImporter {
       final diveSourceFileName = source?.fileName ?? sourceFileName;
       final diveSourceFormat = source?.format ?? sourceFormat;
 
+      // Whose dive this is in a multi-diver logbook, so a resync replays
+      // this diver's copy of a shared buddy dive and not another's (#1921).
+      // Stored as the file itself emits it: the resync re-parses the one
+      // stored file with no batch merger in between.
+      final diverKey = diveData[SourceDiver.mapKey] as String?;
+      final sourceDiverKey = diverKey != null && sourceFileId != null
+          ? SourceDiver.unqualifyForFile(diverKey, sourceFileId)
+          : diverKey;
+
       if (sourceEntries.isEmpty) {
         final dataSourceId = _uuid.v4();
 
@@ -2959,9 +3007,12 @@ class UddfEntityImporter {
                     ),
             ),
             sourceUuid: Value(diveData['sourceUuid'] as String?),
+            sourceDiverKey: Value(sourceDiverKey),
             maxDepth: Value(asDoubleOrNull(diveData['maxDepth'])),
             avgDepth: Value(asDoubleOrNull(diveData['avgDepth'])),
-            duration: Value(dive.bottomTime?.inSeconds),
+            // The runtime the file reports; bottom time is derived and never
+            // stored in its place (issue #2421).
+            duration: Value(dive.runtime?.inSeconds),
             waterTemp: Value(asDoubleOrNull(diveData['waterTemp'])),
             entryTime: Value(dive.entryTime),
             exitTime: Value(dive.exitTime),
@@ -2974,20 +3025,34 @@ class UddfEntityImporter {
             createdAt: Value(now),
           ),
         );
+        // The pressure series were written before their source row existed
+        // (issue #2440): attribute them now, so a later consolidation keeps
+        // them apart from another source's series of the same cylinder.
+        await repos.tankPressureRepository.stampSourceWhereNull(
+          diveId,
+          dataSourceId,
+        );
       } else {
         // One insert for the whole batch, so the profile-adoption rule sees
         // the dive's real source count rather than a half-written dive.
-        await repos.diveRepository.saveComputerReadings(
-          _restoredSourceCompanions(
-            entries: sourceEntries,
-            diveId: diveId,
-            computerIdByKey: computerIdByKey,
-            fallbackComputerId: computerId,
-            sourceFileName: diveSourceFileName,
-            now: now,
-          ),
+        final restored = _restoredSourceCompanions(
+          entries: sourceEntries,
+          diveId: diveId,
+          computerIdByKey: computerIdByKey,
+          fallbackComputerId: computerId,
+          sourceFileName: diveSourceFileName,
+          now: now,
         );
+        await repos.diveRepository.saveComputerReadings(restored);
         restoredDataSources += sourceEntries.length;
+        // Only a single restored source owns the series unambiguously; with
+        // several, nothing in the file says which recorded them.
+        if (restored.length == 1 && restored.single.id.present) {
+          await repos.tankPressureRepository.stampSourceWhereNull(
+            diveId,
+            restored.single.id.value,
+          );
+        }
       }
 
       count++;

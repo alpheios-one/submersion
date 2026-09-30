@@ -4,10 +4,13 @@ import 'package:submersion/core/data/repositories/connected_accounts_repository.
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/cylinder_configs/data/repositories/cylinder_config_repository.dart';
 import 'package:submersion/features/cylinder_passports/data/repositories/cylinder_fill_repository.dart';
+import 'package:submersion/features/connections/data/repositories/connection_map_repository.dart';
+import 'package:submersion/features/query/data/repositories/saved_query_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_computer_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_custom_field_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/view_config_repository.dart';
+import 'package:submersion/features/equipment/data/repositories/equipment_share_repository.dart';
 import 'package:submersion/features/equipment/data/repositories/service_kind_repository.dart';
 import 'package:submersion/features/equipment/data/repositories/service_record_repository.dart';
 import 'package:submersion/features/equipment/data/repositories/service_schedule_repository.dart';
@@ -19,9 +22,11 @@ import 'package:submersion/features/media_store/data/media_stores_repository.dar
 import 'package:submersion/features/settings/data/repositories/app_settings_repository.dart';
 import 'package:submersion/features/insights/data/repositories/insights_repository.dart';
 import 'package:submersion/features/trips/data/repositories/itinerary_day_repository.dart';
+import 'package:submersion/features/trips/data/repositories/trip_cylinder_repository.dart';
 import 'package:submersion/features/trips/data/repositories/liveaboard_details_repository.dart';
 import 'package:submersion/features/universal_import/data/repositories/csv_preset_repository.dart';
 import 'package:submersion/features/weight_planner/data/repositories/weight_history_repository.dart';
+import 'package:submersion/features/trips/data/repositories/trip_equipment_repository.dart';
 
 import '../helpers/test_database.dart';
 
@@ -169,44 +174,57 @@ void main() {
     //
     // Covers every tick this file already exercises for firing, so the two
     // halves of the contract are checked over the same set.
+    // Each entry builds its repository when the test runs, not while the
+    // file is declared: a repository may create an HTTP client, and by then
+    // another file in the isolate may have set up the test binding, whose
+    // HTTP layer only works inside a test.
     final ticks = <String, Stream<void> Function()>{
-      'MediaLibraryRepository.watchMediaChanges':
-          MediaLibraryRepository().watchMediaChanges,
-      'MediaRepository.watchMediaChanges': MediaRepository().watchMediaChanges,
-      'MediaLibraryRepository.watchMapChanges':
-          MediaLibraryRepository().watchMapChanges,
-      'InsightsRepository.watchInsightsChanges':
-          InsightsRepository().watchInsightsChanges,
-      'ServiceRecordRepository.watchServiceRecordsChanges':
-          ServiceRecordRepository().watchServiceRecordsChanges,
-      'ServiceKindRepository.watchServiceKindsChanges':
-          ServiceKindRepository().watchServiceKindsChanges,
-      'ServiceScheduleRepository.watchSchedulesChanges':
-          ServiceScheduleRepository().watchSchedulesChanges,
-      'CylinderConfigRepository.watchConfigsChanges':
-          CylinderConfigRepository().watchConfigsChanges,
-      'CylinderFillRepository.watchFillsChanges':
-          CylinderFillRepository().watchFillsChanges,
-      'DiveComputerRepository.watchComputersChanges':
-          DiveComputerRepository().watchComputersChanges,
-      'OfflineMapRepository.watchRegionsChanges':
-          OfflineMapRepository().watchRegionsChanges,
-      'AppSettingsRepository.watchSettingsChanges':
-          AppSettingsRepository().watchSettingsChanges,
-      'ManifestSubscriptionRepository.watchSubscriptionsChanges':
-          ManifestSubscriptionRepository().watchSubscriptionsChanges,
-      'WeightHistoryRepository.watchGearLeadChanges':
-          WeightHistoryRepository().watchGearLeadChanges,
-      'CsvPresetRepository.watchPresetsChanges':
-          CsvPresetRepository().watchPresetsChanges,
-      'DiveRepository.watchAnalysisInputChanges':
-          DiveRepository().watchAnalysisInputChanges,
+      'MediaLibraryRepository.watchMediaChanges': () =>
+          MediaLibraryRepository().watchMediaChanges(),
+      'MediaRepository.watchMediaChanges': () =>
+          MediaRepository().watchMediaChanges(),
+      'MediaLibraryRepository.watchMapChanges': () =>
+          MediaLibraryRepository().watchMapChanges(),
+      'InsightsRepository.watchInsightsChanges': () =>
+          InsightsRepository().watchInsightsChanges(),
+      'ServiceRecordRepository.watchServiceRecordsChanges': () =>
+          ServiceRecordRepository().watchServiceRecordsChanges(),
+      'ServiceKindRepository.watchServiceKindsChanges': () =>
+          ServiceKindRepository().watchServiceKindsChanges(),
+      'EquipmentShareRepository.watchChanges': () =>
+          EquipmentShareRepository().watchChanges(),
+      'TripEquipmentRepository.watchChanges': () =>
+          TripEquipmentRepository().watchChanges(),
+      'ServiceScheduleRepository.watchSchedulesChanges': () =>
+          ServiceScheduleRepository().watchSchedulesChanges(),
+      'CylinderConfigRepository.watchConfigsChanges': () =>
+          CylinderConfigRepository().watchConfigsChanges(),
+      'CylinderFillRepository.watchFillsChanges': () =>
+          CylinderFillRepository().watchFillsChanges(),
+      'ConnectionMapRepository.watchConnectionMapsChanges': () =>
+          ConnectionMapRepository().watchConnectionMapsChanges(),
+      'SavedQueryRepository.watchSavedQueriesChanges': () =>
+          SavedQueryRepository().watchSavedQueriesChanges(),
+      'DiveComputerRepository.watchComputersChanges': () =>
+          DiveComputerRepository().watchComputersChanges(),
+      'OfflineMapRepository.watchRegionsChanges': () =>
+          OfflineMapRepository().watchRegionsChanges(),
+      'AppSettingsRepository.watchSettingsChanges': () =>
+          AppSettingsRepository().watchSettingsChanges(),
+      'ManifestSubscriptionRepository.watchSubscriptionsChanges': () =>
+          ManifestSubscriptionRepository().watchSubscriptionsChanges(),
+      'WeightHistoryRepository.watchGearLeadChanges': () =>
+          WeightHistoryRepository().watchGearLeadChanges(),
+      'CsvPresetRepository.watchPresetsChanges': () =>
+          CsvPresetRepository().watchPresetsChanges(),
+      'DiveRepository.watchAnalysisInputChanges': () =>
+          DiveRepository().watchAnalysisInputChanges(),
       'DiveRepository.watchTables': () =>
           DiveRepository().watchTables({'equipment_attributes'}),
-      'DiveRepository.watchDiveListChangesWithBuddyLinks':
-          DiveRepository().watchDiveListChangesWithBuddyLinks,
-      'DiveRepository.watchDivesChangesWithBuddyLinks':
-          DiveRepository().watchDivesChangesWithBuddyLinks,
+      'DiveRepository.watchDiveListChangesWithBuddyLinks': () =>
+          DiveRepository().watchDiveListChangesWithBuddyLinks(),
+      'DiveRepository.watchDivesChangesWithBuddyLinks': () =>
+          DiveRepository().watchDivesChangesWithBuddyLinks(),
     };
 
     for (final entry in ticks.entries) {
@@ -407,6 +425,27 @@ void main() {
       );
     });
 
+    test('EquipmentShareRepository.watchChanges fires on an event', () async {
+      // The ownership log is the table a share-only write would miss.
+      await seedParents();
+      expect(
+        await fires(
+          EquipmentShareRepository().watchChanges(),
+          () => db
+              .into(db.equipmentOwnershipEvents)
+              .insert(
+                EquipmentOwnershipEventsCompanion.insert(
+                  id: 'ev1',
+                  equipmentId: 'e1',
+                  kind: 'shared',
+                  occurredAt: now,
+                ),
+              ),
+        ),
+        isTrue,
+      );
+    });
+
     test('watchServiceKindsChanges fires', () async {
       expect(
         await fires(
@@ -505,6 +544,29 @@ void main() {
     });
   });
 
+  group('saved queries', () {
+    test('watchSavedQueriesChanges fires on a saved query write', () async {
+      expect(
+        await fires(
+          SavedQueryRepository().watchSavedQueriesChanges(),
+          () => db
+              .into(db.savedQueries)
+              .insert(
+                SavedQueriesCompanion.insert(
+                  id: 'sq-tick',
+                  subject: 'dives',
+                  name: 'x',
+                  queryJson: '{}',
+                  createdAt: now,
+                  updatedAt: now,
+                ),
+              ),
+        ),
+        isTrue,
+      );
+    });
+  });
+
   group('cylinder fills', () {
     test('watchFillsChanges fires on a fill write', () async {
       expect(
@@ -518,6 +580,39 @@ void main() {
                   passportId: 'pp-tick',
                   filledAt: now,
                   o2Percent: 21,
+                  createdAt: now,
+                  updatedAt: now,
+                ),
+              ),
+        ),
+        isTrue,
+      );
+    });
+  });
+
+  group('connection maps', () {
+    test('watchConnectionMapsChanges fires on a saved map write', () async {
+      await db
+          .into(db.divers)
+          .insert(
+            DiversCompanion.insert(
+              id: 'diver-tick',
+              name: 'Tick',
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+      expect(
+        await fires(
+          ConnectionMapRepository().watchConnectionMapsChanges(),
+          () => db
+              .into(db.connectionMaps)
+              .insert(
+                ConnectionMapsCompanion.insert(
+                  id: 'map-tick',
+                  diverId: 'diver-tick',
+                  name: 'Tick',
+                  spec: '{"kinds":["buddy"],"links":[],"min":1}',
                   createdAt: now,
                   updatedAt: now,
                 ),
@@ -575,10 +670,10 @@ void main() {
     // of a buddy link writes only dive_buddies, never the parent dive, and a
     // rename writes only buddies (#1769, #1915).
     final buddyAwareTicks = <String, Stream<void> Function()>{
-      'watchDiveListChangesWithBuddyLinks':
-          DiveRepository().watchDiveListChangesWithBuddyLinks,
-      'watchDivesChangesWithBuddyLinks':
-          DiveRepository().watchDivesChangesWithBuddyLinks,
+      'watchDiveListChangesWithBuddyLinks': () =>
+          DiveRepository().watchDiveListChangesWithBuddyLinks(),
+      'watchDivesChangesWithBuddyLinks': () =>
+          DiveRepository().watchDivesChangesWithBuddyLinks(),
     };
     for (final entry in buddyAwareTicks.entries) {
       test('${entry.key} fires on a dive_buddies write', () async {
@@ -701,6 +796,53 @@ void main() {
                   createdAt: now,
                   updatedAt: now,
                 ),
+              ),
+        ),
+        isTrue,
+      );
+    });
+
+    test('watchTripCylinderChanges fires on a slot write', () async {
+      await seedParents();
+      expect(
+        await fires(
+          TripCylinderRepository().watchTripCylinderChanges(),
+          () => db
+              .into(db.tripCylinders)
+              .insert(
+                TripCylindersCompanion.insert(
+                  id: 'slot-1',
+                  tripId: 't1',
+                  createdAt: now,
+                  updatedAt: now,
+                ),
+              ),
+        ),
+        isTrue,
+      );
+    });
+
+    test('watchTripCylinderChanges fires on a dive tank write', () async {
+      // The board's consumption side lives on dive_tanks; a sync pull that
+      // rewrites a tank never touches the dives row.
+      await seedParents();
+      await db
+          .into(db.dives)
+          .insert(
+            DivesCompanion.insert(
+              id: 'dive-tick',
+              diveDateTime: now,
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+      expect(
+        await fires(
+          TripCylinderRepository().watchTripCylinderChanges(),
+          () => db
+              .into(db.diveTanks)
+              .insert(
+                DiveTanksCompanion.insert(id: 'tank-tick', diveId: 'dive-tick'),
               ),
         ),
         isTrue,

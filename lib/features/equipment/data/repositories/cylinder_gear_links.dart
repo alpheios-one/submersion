@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/features/dive_log/data/repositories/trip_cylinder_links.dart';
 
 /// Chunk size for the `IN (...)` lists. The select binds each chunk twice,
 /// once per link column, so it must stay under half SQLite's ~999 limit.
@@ -16,13 +17,15 @@ const _chunkSize = 400;
 ///
 /// Call it inside the deleting transaction, before the items go. The schema
 /// sets both links null on delete (v202, v210), but that write reaches no
-/// peer. `dive_tanks` has no clock of its own; a pending tank is exported on
-/// its own (SyncDataSerializer.parentGatedChildEntities). The parent dive is
+/// peer. `dive_tanks` has no `updated_at`; staging a tank stamps its `hlc`,
+/// and a pending tank is exported on its own
+/// (SyncDataSerializer.parentGatedChildEntities). The parent dive is
 /// deliberately NOT staged: re-stamping it would make this device's whole
 /// dive row win under last-writer-wins and overwrite a newer edit to that
 /// dive made on another device, although the dive itself did not change.
-/// Shared by every path that deletes gear, so a bulk delete cannot skip the
-/// staging a single delete does.
+/// Trip cylinder slots holding the gear are cleared and staged too. Shared
+/// by every path that deletes gear, so a bulk delete cannot skip the staging
+/// a single delete does.
 Future<void> clearCylinderGearLinks(
   AppDatabase db,
   SyncRepository syncRepository,
@@ -55,4 +58,6 @@ Future<void> clearCylinderGearLinks(
       localUpdatedAt: now,
     );
   }
+  // Trip cylinder slots holding the gear: cleared and staged the same way.
+  await clearTripCylinderEquipmentLinks(db, syncRepository, ids, now: now);
 }

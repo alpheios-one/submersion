@@ -1126,6 +1126,12 @@ class DiveTank extends Equatable {
   /// tank editor sets it and downloads never touch it.
   final String? regulatorEquipmentId;
 
+  /// The trip cylinder slot this tank was breathed from (v232, issue
+  /// #2325). User-authored: the tank editor sets it and downloads never
+  /// touch it. Meaningless outside the dive's trip, so the repository drops
+  /// it when the dive moves.
+  final String? tripCylinderId;
+
   /// The gear item this cylinder is (the `dive_tanks.equipment_id` link the
   /// transmitter registry writes when a serial is assigned to an item).
   /// Read-only on the domain side: edit flows rebuild the tank field by
@@ -1162,6 +1168,7 @@ class DiveTank extends Equatable {
     this.transmitterSerial,
     this.sourceTankIndex,
     this.regulatorEquipmentId,
+    this.tripCylinderId,
     this.equipmentId,
     this.decoSwitchDepth,
     this.isTravelGas = false,
@@ -1196,6 +1203,9 @@ class DiveTank extends Equatable {
     String? regulatorEquipmentId,
     String? equipmentId,
     bool clearRegulatorEquipmentId = false,
+    bool clearMaterial = false,
+    String? tripCylinderId,
+    bool clearTripCylinderId = false,
     double? decoSwitchDepth,
     bool clearDecoSwitchDepth = false,
     bool? isTravelGas,
@@ -1209,7 +1219,7 @@ class DiveTank extends Equatable {
       endPressure: endPressure ?? this.endPressure,
       gasMix: gasMix ?? this.gasMix,
       role: role ?? this.role,
-      material: material ?? this.material,
+      material: clearMaterial ? null : (material ?? this.material),
       order: order ?? this.order,
       presetName: clearPresetName ? null : (presetName ?? this.presetName),
       computerId: computerId ?? this.computerId,
@@ -1222,6 +1232,9 @@ class DiveTank extends Equatable {
       regulatorEquipmentId: clearRegulatorEquipmentId
           ? null
           : (regulatorEquipmentId ?? this.regulatorEquipmentId),
+      tripCylinderId: clearTripCylinderId
+          ? null
+          : (tripCylinderId ?? this.tripCylinderId),
       equipmentId: equipmentId ?? this.equipmentId,
       decoSwitchDepth: clearDecoSwitchDepth
           ? null
@@ -1248,6 +1261,7 @@ class DiveTank extends Equatable {
     sourceTankIndex,
     regulatorEquipmentId,
     equipmentId,
+    tripCylinderId,
     decoSwitchDepth,
     isTravelGas,
   ];

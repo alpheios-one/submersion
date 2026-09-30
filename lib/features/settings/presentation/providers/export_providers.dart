@@ -1,5 +1,8 @@
+import 'package:clock/clock.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/export/excel/observations_excel_export_service.dart';
+import 'package:submersion/features/cylinder_passports/domain/entities/cylinder_fill.dart';
+import 'package:submersion/features/cylinder_passports/presentation/providers/cylinder_passport_providers.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_observation.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_arrangement_provider.dart';
@@ -20,6 +23,7 @@ import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_profile_series.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_fonts.dart';
+import 'package:submersion/core/services/pdf_templates/pdf_localization.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_template_factory.dart';
 import 'package:submersion/features/signatures/data/services/signature_storage_service.dart';
 import 'package:submersion/features/dive_log/data/repositories/series_id_chunks.dart';
@@ -513,12 +517,18 @@ class ExportNotifier extends StateNotifier<ExportState> {
         return;
       }
 
-      final pdfBytes = await _buildLogbookPdfBytes(exportOptions, dives);
+      // Read once, so the cover's stamp and the file name show the same moment.
+      final generatedAt = clock.now();
+      final pdfBytes = await _buildLogbookPdfBytes(
+        exportOptions,
+        dives,
+        generatedAt: generatedAt,
+      );
 
       // Save and share the PDF
       final path = await _exportService.sharePdfBytes(
         pdfBytes,
-        'dive_logbook_${exportOptions.template.name}_${DateFormat('yyyy-MM-dd').format(DateTime.now())}.pdf',
+        _logbookFileName(exportOptions.template, generatedAt),
       );
 
       state = state.copyWith(
@@ -537,10 +547,14 @@ class ExportNotifier extends StateNotifier<ExportState> {
   /// Build logbook PDF bytes honoring [exportOptions] (template, page size,
   /// certification cards, diver personalization). Shared by the share and
   /// save-to-file paths so both respect the selected detail level (#644).
+  ///
+  /// [generatedAt] is the moment the cover is stamped with; the caller names
+  /// the file from the same instant.
   Future<List<int>> _buildLogbookPdfBytes(
     PdfExportOptions exportOptions,
-    List<Dive> dives,
-  ) async {
+    List<Dive> dives, {
+    required DateTime generatedAt,
+  }) async {
     // Load signatures for all dives
     state = state.copyWith(
       message: _l10n.settings_export_progress_loadingSignatures,
@@ -602,6 +616,9 @@ class ExportNotifier extends StateNotifier<ExportState> {
     );
     final factory = PdfTemplateFactory();
     final builder = factory.getBuilder(exportOptions.template);
+    final localization = PdfLocalization.forLanguageCode(
+      exportOptions.languageCode ?? _l10n.localeName,
+    );
 
     // The logbook is a document the diver prints or shares, so its dates and
     // times follow the diver's preferences (#964); the file name stays ISO.
@@ -615,6 +632,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
     await _ref.read(equipmentArrangementNotifierProvider.notifier).loaded;
 
     return builder.buildPdf(
+      generatedAt: generatedAt,
       dives: dives,
       // The logbook is a document a human reads, so gear follows the diver's
       // arrangement (#1486, #1576).
@@ -627,9 +645,13 @@ class ExportNotifier extends StateNotifier<ExportState> {
       dates: PdfDateFormatter(
         dateFormat: settings.dateFormat,
         timeFormat: settings.timeFormat,
-      ),
+      ).inLanguage(localization.languageCode),
       units: UnitFormatter(settings),
-      title: _l10n.settings_export_pdfDocumentTitle,
+      // The language picked in the export sheet, or the app language when
+      // the caller offered no choice (#2252). The title follows it too, so
+      // a French logbook is not headed in English.
+      localization: localization,
+      title: localization.l10n.settings_export_pdfDocumentTitle,
       diveSignatures: diveSignatures.isNotEmpty ? diveSignatures : null,
       certifications: certifications,
       diver: diver,
@@ -966,8 +988,9 @@ class ExportNotifier extends StateNotifier<ExportState> {
   /// stays a pure sheet builder with no repository dependencies.
   Future<List<MaintenanceLogRow>> _buildMaintenanceRows() async {
     final equipment = await _ref.read(allEquipmentProvider.future);
-    final kinds = await _ref.read(serviceKindsProvider.future);
-    final kindsById = {for (final k in kinds) k.id: k};
+    // Every kind: a shared item's record can use its owner's custom kind
+    // (issue #2046).
+    final kindsById = await _ref.read(allServiceKindsByIdProvider.future);
     final recordsByItem = await _ref
         .read(serviceRecordRepositoryProvider)
         .getRecordsForEquipmentIds([for (final item in equipment) item.id]);
@@ -1274,6 +1297,111 @@ class ExportNotifier extends StateNotifier<ExportState> {
     }
   }
 
+  // ==================== CYLINDER FILLS CSV ====================
+
+  /// The active diver's fills and the cylinders they link to, for the
+  /// fills CSV (cylinder passports phase 5). Scoped through the validated
+  /// diver id like the check-ins: a shared cylinder's fills come along and
+  /// another diver's unlinked fills do not (spec section 10.8).
+  Future<({List<CylinderFill> fills, Map<String, EquipmentItem> equipmentById})>
+  _fillRows() async {
+    final diverId = await _ref.read(validatedCurrentDiverIdProvider.future);
+    if (diverId == null) {
+      return (
+        fills: const <CylinderFill>[],
+        equipmentById: const <String, EquipmentItem>{},
+      );
+    }
+    final fills = await _ref
+        .read(cylinderFillRepositoryProvider)
+        .getAllVisibleTo(diverId);
+    final equipment = await _ref.read(allEquipmentProvider.future);
+    return (fills: fills, equipmentById: {for (final e in equipment) e.id: e});
+  }
+
+  Future<void> exportFillsToCsv({
+    CsvUnitMode unitMode = CsvUnitMode.metric,
+  }) async {
+    state = state.copyWith(
+      status: ExportStatus.exporting,
+      message: _l10n.settings_export_progress_fillsCsv,
+    );
+    try {
+      final rows = await _fillRows();
+      if (rows.fills.isEmpty) {
+        state = state.copyWith(
+          status: ExportStatus.error,
+          message: _l10n.settings_export_empty_fills,
+        );
+        return;
+      }
+      final path = await _exportService.exportFillsToCsv(
+        rows.fills,
+        equipmentById: rows.equipmentById,
+        units: _csvUnits(unitMode),
+      );
+      state = state.copyWith(
+        status: ExportStatus.success,
+        message: _l10n.settings_export_success_fills,
+        filePath: path,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        status: ExportStatus.error,
+        message: _l10n.settings_data_export_failed('$e'),
+      );
+    }
+  }
+
+  /// Save cylinder fills CSV to a user-selected location.
+  Future<void> saveFillsCsvToFile({
+    CsvUnitMode unitMode = CsvUnitMode.metric,
+  }) async {
+    state = state.copyWith(
+      status: ExportStatus.exporting,
+      message: _l10n.settings_export_progress_preparingFillsCsv,
+    );
+    try {
+      final rows = await _fillRows();
+      if (rows.fills.isEmpty) {
+        state = state.copyWith(
+          status: ExportStatus.error,
+          message: _l10n.settings_export_empty_fills,
+        );
+        return;
+      }
+
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_chooseLocation,
+      );
+      final path = await _exportService.saveFillsCsvToFile(
+        rows.fills,
+        equipmentById: rows.equipmentById,
+        dialogTitle: _l10n.settings_export_saveFillsCsvDialogTitle,
+        units: _csvUnits(unitMode),
+      );
+
+      if (path == null) {
+        state = state.copyWith(
+          status: ExportStatus.idle,
+          message: _l10n.settings_export_cancelled_save,
+        );
+        return;
+      }
+
+      state = state.copyWith(
+        status: ExportStatus.success,
+        message: _l10n.settings_export_saved_fillsCsv,
+        filePath: path,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        status: ExportStatus.error,
+        message: _l10n.settings_export_saveFailed('$e'),
+      );
+    }
+  }
+
   // ==================== UDDF SAVE TO FILE ====================
 
   /// Save comprehensive UDDF to a user-selected location.
@@ -1445,14 +1573,20 @@ class ExportNotifier extends StateNotifier<ExportState> {
       // selected detail level, page size, and diver personalization are
       // honored (#644: options were previously dropped here and the legacy
       // single-layout builder produced identical PDFs for every level).
-      final pdfBytes = await _buildLogbookPdfBytes(options, dives);
+      final generatedAt = clock.now();
+      final pdfBytes = await _buildLogbookPdfBytes(
+        options,
+        dives,
+        generatedAt: generatedAt,
+      );
 
       state = state.copyWith(
         message: _l10n.settings_export_progress_chooseLocation,
       );
-      final fileName =
-          'dive_logbook_${options.template.name}_${DateFormat('yyyy-MM-dd').format(DateTime.now())}.pdf';
-      final path = await _exportService.savePdfBytesToFile(pdfBytes, fileName);
+      final path = await _exportService.savePdfBytesToFile(
+        pdfBytes,
+        _logbookFileName(options.template, generatedAt),
+      );
 
       if (path == null) {
         state = state.copyWith(
@@ -1474,6 +1608,12 @@ class ExportNotifier extends StateNotifier<ExportState> {
       );
     }
   }
+
+  /// The logbook's file name, dated in ISO so a folder of exports sorts
+  /// chronologically whatever the diver's date preference.
+  String _logbookFileName(PdfTemplate template, DateTime generatedAt) =>
+      'dive_logbook_${template.name}_'
+      '${DateFormat('yyyy-MM-dd').format(generatedAt)}.pdf';
 
   void reset() {
     state = const ExportState();

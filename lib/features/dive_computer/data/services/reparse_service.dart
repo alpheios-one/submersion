@@ -6,10 +6,13 @@ import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/profile/tank_pressure_glitches.dart';
+import 'package:submersion/core/services/sync/event_scope_tombstone.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_computer/data/services/libdc_dive_mode.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
+import 'package:submersion/features/dive_log/data/services/derived_metrics_scheduler.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart'
     as codec;
 import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart'
@@ -208,11 +211,13 @@ class ReparseService {
         await _deleteAndTombstone(
           'diveProfileEvents',
           await _idsOf(db.diveProfileEvents, diveId),
+          diveId: diveId,
         );
         if (rewritesTanks) {
           await _deleteAndTombstone(
             'gasSwitches',
             await _idsOf(db.gasSwitches, diveId),
+            diveId: diveId,
           );
           await _tankSeries.deleteForDive(diveId);
         }
@@ -241,6 +246,7 @@ class ReparseService {
         await _replaceTankPressureProfiles(
           diveId: diveId,
           computerId: computerId,
+          sourceId: sourceRow.id,
           parsed: parsed,
           tankIdsByIndex: tankIdsByIndex,
         );
@@ -306,8 +312,14 @@ class ReparseService {
         .get();
   }
 
-  /// Deletes the [entityType] rows [ids] and logs a tombstone for each.
-  Future<void> _deleteAndTombstone(String entityType, List<String> ids) async {
+  /// Deletes the [entityType] rows [ids], every one of them on [diveId], and
+  /// tombstones them: events with one scope tombstone for the dive (#1926),
+  /// anything else with one tombstone per row, written in one batch.
+  Future<void> _deleteAndTombstone(
+    String entityType,
+    List<String> ids, {
+    required String diveId,
+  }) async {
     if (ids.isEmpty) return;
     final table = switch (entityType) {
       'diveProfileEvents' => 'dive_profile_events',
@@ -323,8 +335,13 @@ class ReparseService {
         chunk,
       );
     }
-    for (final id in ids) {
-      await _sync.logDeletion(entityType: entityType, recordId: id);
+    if (entityType == 'diveProfileEvents') {
+      // The ids are every event on the dive (_idsOf), which is exactly what
+      // the dive scope covers on a peer. The re-inserted events are staged
+      // after this, so their clocks are newer and the scope keeps them.
+      await _sync.logScopedDeletion(EventScopeTombstone(diveId: diveId));
+    } else {
+      await _sync.logDeletions(entityType: entityType, recordIds: ids);
     }
   }
 
@@ -491,6 +508,7 @@ class ReparseService {
     // The re-parse rewrote the profile strands; the sensor summary is
     // derived from them (condition phase 2).
     if (sources.isNotEmpty) scheduleSensorSummaryRefresh([diveId]);
+    if (sources.isNotEmpty) scheduleDerivedMetricsRefresh([diveId]);
     return (errors: errors, profilesPreserved: profilesPreserved);
   }
 
@@ -921,6 +939,7 @@ class ReparseService {
   Future<void> _replaceTankPressureProfiles({
     required String diveId,
     required String? computerId,
+    required String sourceId,
     required pigeon.ParsedDive parsed,
     required Map<int, String> tankIdsByIndex,
   }) async {
@@ -948,6 +967,7 @@ class ReparseService {
         diveId: diveId,
         tankId: tankId,
         computerId: computerId,
+        sourceId: sourceId,
         samples: [
           for (final point in entry.value)
             TankPressureSample(
@@ -975,16 +995,18 @@ class ReparseService {
       final needEnd = parsedTank?.endPressureBar == null;
       if (!needStart && !needEnd) continue;
 
-      final sorted = [...entry.value]
-        ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+      // Signal dropouts at either end of the series must not become the
+      // recorded pressure (#2441).
+      final endpoints = cleanSeriesEndpoints([
+        for (final p in entry.value) (t: p.timestamp, bar: p.pressure),
+      ]);
+      if (endpoints == null) continue;
       await (db.update(db.diveTanks)..where((t) => t.id.equals(tankId))).write(
         DiveTanksCompanion(
           startPressure: needStart
-              ? Value(sorted.first.pressure)
+              ? Value(endpoints.start)
               : const Value.absent(),
-          endPressure: needEnd
-              ? Value(sorted.last.pressure)
-              : const Value.absent(),
+          endPressure: needEnd ? Value(endpoints.end) : const Value.absent(),
         ),
       );
     }

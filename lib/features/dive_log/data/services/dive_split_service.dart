@@ -4,12 +4,14 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/sync/event_scope_tombstone.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/domain/entities/profile_series.dart'
     as series;
+import 'package:submersion/features/dive_log/domain/services/source_bottom_time.dart';
 import 'package:submersion/features/dive_log/domain/services/unreadable_series_exception.dart';
 
 /// Splits one data source's computer data out of a dive into a new dive —
@@ -79,10 +81,12 @@ class DiveSplitService {
     final now = DateTime.now().millisecondsSinceEpoch;
 
     // Series move by computer attribution. A computer-less source cannot be
-    // attributed at the row level, so only non-primary null-computer series
-    // follow it (never user-edited isPrimary series) and no tanks,
-    // pressures, or events move. This follows the retired unlinkComputer's
-    // convention.
+    // attributed at the row level by computer, so only non-primary
+    // null-computer profile series follow it (never user-edited isPrimary
+    // series) and no tanks or events move. This follows the retired
+    // unlinkComputer's convention. Pressure series are the exception: one
+    // that names the source moves with it whatever its computer, cloning
+    // the tank it sits on (issue #2440).
 
     bool ownedByComputer(String? computerId) =>
         source.computerId != null && computerId == source.computerId;
@@ -112,9 +116,15 @@ class DiveSplitService {
         for (final s in allProfileSeries)
           if (profileBelongsToSource(s)) s,
       ];
+      // A series that names its source moves with exactly that source,
+      // computer or not (issue #2440); an unattributed one falls back to the
+      // computer rule.
       final movingPressures = [
         for (final s in allPressureSeries)
-          if (ownedByComputer(s.computerId)) s,
+          if (s.sourceId == null
+              ? ownedByComputer(s.computerId)
+              : s.sourceId == source.id)
+            s,
       ];
 
       // 1. New dive: copy the original row, attribute it to the source's
@@ -142,7 +152,17 @@ class DiveSplitService {
                   diveComputerSerial: Value(source.computerSerial),
                   maxDepth: Value(source.maxDepth ?? diveRow.maxDepth),
                   avgDepth: Value(source.avgDepth ?? diveRow.avgDepth),
-                  bottomTime: Value(source.duration ?? diveRow.bottomTime),
+                  // Derived from the series that move with the source; its
+                  // duration is the runtime it measured, never a bottom time.
+                  bottomTime: Value(
+                    sourceBottomTimeSeconds(
+                          movingProfiles,
+                          sourceId: source.id,
+                          computerId: source.computerId,
+                          runtimeSeconds: source.duration,
+                        ) ??
+                        diveRow.bottomTime,
+                  ),
                   waterTemp: Value(source.waterTemp ?? diveRow.waterTemp),
                   entryTime: Value(
                     source.entryTime?.millisecondsSinceEpoch ??
@@ -319,6 +339,7 @@ class DiveSplitService {
           diveId: newDiveId,
           tankId: tankIdMap[s.tankId] ?? s.tankId,
           computerId: s.computerId,
+          sourceId: newSourceId,
           samples: s.samples,
           now: now,
         );
@@ -349,27 +370,33 @@ class DiveSplitService {
         );
       }
 
-      // 8. Delete the originals, children before parents, tombstoning each
-      // row (the original dive survives; without explicit tombstones peers
-      // that already pulled these rows keep them forever). Gas switches
-      // never move, and only unreferenced tanks were moved.
+      // 8. Delete the originals, children before parents, and tombstone
+      // them (the original dive survives; without explicit tombstones peers
+      // that already pulled these rows keep them forever): the moved events
+      // by one scope tombstone, the rest per row. Gas switches never move,
+      // and only unreferenced tanks were moved.
       await _tankSeries.deleteByIds([for (final s in movingPressures) s.id]);
       await _profileSeries.deleteByIds([for (final s in movingProfiles) s.id]);
-      for (final row in eventRows) {
-        await _sync.logDeletion(
-          entityType: 'diveProfileEvents',
-          recordId: row.id,
-        );
-      }
       if (eventRows.isNotEmpty) {
         await (_db.delete(
           _db.diveProfileEvents,
         )..where((t) => t.id.isIn([for (final r in eventRows) r.id]))).go();
-      }
-      for (final id in movedTankIds) {
-        await _sync.logDeletion(entityType: 'diveTanks', recordId: id);
+        // One tombstone for every event this source's computer recorded on
+        // the dive, instead of one per event (#1926). eventRows is exactly
+        // that set (ownedByComputer), so the scope removes on a peer what
+        // was removed here. ownedByComputer never matches a null computer,
+        // so the id is set whenever an event moved; asserting it keeps a
+        // broken invariant from widening the scope to every event on the
+        // dive.
+        await _sync.logScopedDeletion(
+          EventScopeTombstone(diveId: diveId, computerId: source.computerId!),
+        );
       }
       if (movedTankIds.isNotEmpty) {
+        await _sync.logDeletions(
+          entityType: 'diveTanks',
+          recordIds: movedTankIds,
+        );
         await (_db.delete(
           _db.diveTanks,
         )..where((t) => t.id.isIn(movedTankIds))).go();
@@ -414,7 +441,15 @@ class DiveSplitService {
           diveComputerSerial: Value(promoted.computerSerial),
           maxDepth: Value(promoted.maxDepth ?? diveRow.maxDepth),
           avgDepth: Value(promoted.avgDepth ?? diveRow.avgDepth),
-          bottomTime: Value(promoted.duration ?? diveRow.bottomTime),
+          bottomTime: Value(
+            sourceBottomTimeSeconds(
+                  allProfileSeries.where((s) => !movingProfiles.contains(s)),
+                  sourceId: promoted.id,
+                  computerId: promoted.computerId,
+                  runtimeSeconds: promoted.duration,
+                ) ??
+                diveRow.bottomTime,
+          ),
           waterTemp: Value(promoted.waterTemp ?? diveRow.waterTemp),
           entryTime: Value(
             promoted.entryTime?.millisecondsSinceEpoch ?? diveRow.entryTime,

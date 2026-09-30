@@ -21,12 +21,14 @@ import 'package:submersion/features/data_quality/presentation/widgets/dive_ident
 import 'package:submersion/features/data_quality/presentation/widgets/quality_finding_card.dart';
 import 'package:submersion/features/data_quality/presentation/widgets/quality_finding_message.dart';
 import 'package:submersion/features/data_quality/presentation/widgets/quality_unit_formatters.dart';
+import 'package:submersion/features/dive_log/data/services/derived_metrics_scheduler.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/reassign_tank_picker.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/combine_dives_dialog.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/equipment/data/services/sensor_summary_scheduler.dart';
+import 'package:submersion/shared/widgets/forms/number_input_validation.dart';
 
 QualityUnitFormatters buildQualityUnitFormatters(WidgetRef ref) =>
     qualityUnitFormattersFor(UnitFormatter(ref.watch(settingsProvider)));
@@ -236,6 +238,7 @@ class _DataQualityInboxPageState extends ConsumerState<DataQualityInboxPage> {
               .split(diveId: diveId, sourceId: sourceId);
           scheduleQualityScan([diveId, newId]);
           scheduleSensorSummaryRefresh([diveId, newId], force: true);
+          scheduleDerivedMetricsRefresh([diveId, newId], force: true);
         } catch (e) {
           messenger.showSnackBar(
             SnackBar(content: Text(l10n.diveLog_sources_splitFailed)),
@@ -735,6 +738,7 @@ Future<({Duration offset, bool importWide})?> showTimeShiftSheet(
         : formatDecimalForInput(suggestedOffset.inHours.toDouble()),
   );
   var importWide = false;
+  final formKey = GlobalKey<FormState>();
   return showModalBottomSheet<({Duration offset, bool importWide})>(
     context: context,
     isScrollControlled: true,
@@ -752,13 +756,17 @@ Future<({Duration offset, bool importWide})?> showTimeShiftSheet(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextField(
-                controller: controller,
-                keyboardType: const TextInputType.numberWithOptions(
-                  signed: true,
-                ),
-                decoration: InputDecoration(
-                  labelText: l10n.dataQuality_repairLabel_shiftTime('h'),
+              Form(
+                key: formKey,
+                child: TextFormField(
+                  controller: controller,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    signed: true,
+                  ),
+                  validator: numberValidator(context, integer: true),
+                  decoration: InputDecoration(
+                    labelText: l10n.dataQuality_repairLabel_shiftTime('h'),
+                  ),
                 ),
               ),
               if (offerImportWide)
@@ -771,7 +779,17 @@ Future<({Duration offset, bool importWide})?> showTimeShiftSheet(
               const SizedBox(height: 12),
               FilledButton(
                 onPressed: () {
-                  final hours = parseUserInt(controller.text) ?? 0;
+                  // Unreadable hours used to apply no shift and report
+                  // success (#1900).
+                  if (!formKey.currentState!.validate()) return;
+                  final hours = switch (readNumber(
+                    controller.text,
+                    integer: true,
+                  )) {
+                    NumberValue(:final value) => value.toInt(),
+                    NumberBlank() => 0, // no shift, as before
+                    NumberInvalid() => 0, // unreachable: validated above
+                  };
                   Navigator.of(context).pop((
                     offset: Duration(hours: hours),
                     importWide: importWide,

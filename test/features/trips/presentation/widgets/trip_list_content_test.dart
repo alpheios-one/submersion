@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
@@ -271,6 +270,68 @@ void main() {
         visibleAfterFilter: 1,
       );
     });
+  });
+
+  group('a new filter', () {
+    for (final mode in [ListViewMode.detailed, ListViewMode.table]) {
+      testWidgets('keeps the checks that stay on screen (${mode.name})', (
+        tester,
+      ) async {
+        final all = <TripWithStats>[
+          _makeTrip(id: 't1', name: 'Aaa Trip'),
+          _makeTrip(id: 't2', name: 'Bbb Trip'),
+        ];
+
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        await tester.pumpWidget(
+          testApp(
+            overrides: [
+              sharedPreferencesProvider.overrideWithValue(prefs),
+              settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+              currentDiverIdProvider.overrideWith(
+                (ref) => MockCurrentDiverIdNotifier(),
+              ),
+              tripListNotifierProvider.overrideWith(
+                (ref) => _MockTripListNotifier(all),
+              ),
+              tripListViewModeProvider.overrideWith((ref) => mode),
+              tripTableConfigProvider.overrideWith(
+                (ref) => _TestTripTableConfigNotifier(_testConfig),
+              ),
+              highlightedTripIdProvider.overrideWith((ref) => null),
+              // A real id set takes a query's time, so the list has a loading
+              // frame.
+              queryFilteredTripIdsProvider.overrideWith(
+                (ref, filter) => Future.delayed(
+                  const Duration(milliseconds: 50),
+                  () => const {'t1', 't2'},
+                ),
+              ),
+            ],
+            locale: const Locale('en'),
+            child: const TripListContent(showAppBar: true),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('enter_selection')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('selection_select_all')));
+        await tester.pumpAndSettle();
+        expect(find.text('2 selected'), findsOneWidget);
+
+        // The new filter's id set loads first; the selection must survive that.
+        ProviderScope.containerOf(
+          tester.element(find.byType(TripListContent)),
+        ).read(tripFilterProvider.notifier).state = const TripFilterState(
+          equipmentId: 'e1',
+        );
+        // One frame at once, as the app draws it, before the query answers.
+        await tester.pump();
+        await tester.pumpAndSettle();
+        expect(find.text('2 selected'), findsOneWidget);
+      });
+    }
   });
 
   group('TripListContent in table mode', () {
@@ -1145,17 +1206,16 @@ void main() {
       // literally different typeface from the dive and site titles.
       //
       // Touching consoleLight lazily initializes it, which calls
-      // GoogleFonts.jetBrainsMonoTextTheme(). Disabling runtime fetching keeps
-      // that from reaching the network; the family name is carried on the
-      // TextStyle regardless of whether the font bytes ever load, which is all
-      // this test reads.
+      // GoogleFonts.jetBrainsMonoTextTheme(). The test harness turns off
+      // runtime fetching, so that never reaches the network; the family name
+      // is carried on the TextStyle regardless of whether the font bytes ever
+      // load, which is all this test reads.
       //
       // The app_theme_registry_test hardening (await GoogleFonts.pendingFonts()
       // plus a debugPrint override) does NOT transfer here, because that file
       // uses plain test(). Inside testWidgets, awaiting pendingFonts() from a
       // tear-down never completes, and reassigning debugPrint trips
       // debugAssertAllFoundationVarsUnset, which runs before tear-downs.
-      GoogleFonts.config.allowRuntimeFetching = false;
 
       final titleFamily = consoleLight.textTheme.titleMedium!.fontFamily;
       final bodyFamily = consoleLight.textTheme.bodyLarge!.fontFamily;

@@ -22,14 +22,15 @@ import 'package:submersion/core/services/export/shared/file_export_utils.dart'
 import 'package:submersion/core/services/export/uddf/uddf_export_service.dart';
 import 'package:submersion/core/services/export/uddf/uddf_full_export_service.dart';
 import 'package:submersion/core/services/export/uddf/uddf_full_import_service.dart';
-import 'package:submersion/core/services/export/uddf/uddf_import_service.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
+import 'package:submersion/core/services/pdf_templates/pdf_localization.dart';
 import 'package:submersion/core/constants/pdf_templates.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_profile_series.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/courses/domain/entities/course.dart';
+import 'package:submersion/features/cylinder_passports/domain/entities/cylinder_fill.dart';
 import 'package:submersion/features/dive_centers/domain/entities/dive_center.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_source_export.dart';
@@ -51,6 +52,7 @@ import 'package:submersion/features/equipment/domain/entities/equipment_set.dart
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/tags/domain/entities/tag.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart';
+import 'package:submersion/features/trips/domain/entities/trip_gas_record.dart';
 
 export 'package:submersion/core/services/export/models/blender_invoice_export_data.dart';
 export 'package:submersion/core/services/export/models/export_service_record.dart';
@@ -76,7 +78,6 @@ class ExportService {
   final _kml = KmlExportService();
   final _uddf = UddfExportService();
   final _uddfFull = UddfFullExportService();
-  final _uddfImport = UddfImportService();
   final _uddfFullImport = UddfFullImportService();
 
   // ==================== CSV Export ====================
@@ -208,6 +209,63 @@ class ExportService {
     required String dialogTitle,
   }) => _csv.saveObservationsCsvToFile(rows, dialogTitle: dialogTitle);
 
+  Future<String> exportFillsToCsv(
+    List<CylinderFill> fills, {
+    Map<String, EquipmentItem> equipmentById = const {},
+    CsvExportUnits units = CsvExportUnits.metric,
+  }) =>
+      _csv.exportFillsToCsv(fills, equipmentById: equipmentById, units: units);
+
+  String generateFillsCsvContent(
+    List<CylinderFill> fills, {
+    Map<String, EquipmentItem> equipmentById = const {},
+    CsvExportUnits units = CsvExportUnits.metric,
+  }) => _csv.generateFillsCsvContent(
+    fills,
+    equipmentById: equipmentById,
+    units: units,
+  );
+
+  Future<String> exportTripGasRecordToCsv(
+    TripGasRecord record, {
+    required String tripName,
+    Map<String, String> centerNames = const {},
+    CsvExportUnits units = CsvExportUnits.metric,
+    Rect? sharePositionOrigin,
+  }) => _csv.exportTripGasRecordToCsv(
+    record,
+    tripName: tripName,
+    centerNames: centerNames,
+    units: units,
+    sharePositionOrigin: sharePositionOrigin,
+  );
+
+  Future<String?> saveTripGasRecordCsvToFile(
+    TripGasRecord record, {
+    required String tripName,
+    Map<String, String> centerNames = const {},
+    required String dialogTitle,
+    CsvExportUnits units = CsvExportUnits.metric,
+  }) => _csv.saveTripGasRecordCsvToFile(
+    record,
+    tripName: tripName,
+    centerNames: centerNames,
+    dialogTitle: dialogTitle,
+    units: units,
+  );
+
+  Future<String?> saveFillsCsvToFile(
+    List<CylinderFill> fills, {
+    Map<String, EquipmentItem> equipmentById = const {},
+    required String dialogTitle,
+    CsvExportUnits units = CsvExportUnits.metric,
+  }) => _csv.saveFillsCsvToFile(
+    fills,
+    equipmentById: equipmentById,
+    dialogTitle: dialogTitle,
+    units: units,
+  );
+
   // ==================== PDF Export ====================
 
   Future<String> exportTripToPdf(
@@ -216,12 +274,14 @@ class ExportService {
     required PdfDateFormatter dates,
     required UnitFormatter units,
     TripWithStats? stats,
+    PdfLocalization? localization,
   }) => _pdf.exportTripToPdf(
     trip,
     dives,
     dates: dates,
     units: units,
     stats: stats,
+    localization: localization,
   );
 
   Future<({List<int> bytes, String fileName})> generateDivePdfBytes(
@@ -229,7 +289,7 @@ class ExportService {
     required PdfDateFormatter dates,
     required UnitFormatter units,
     PdfExportOptions options = const PdfExportOptions(),
-    String title = 'Dive Logbook',
+    String? title,
     Map<String, PdfProfileSeries>? profiles,
     List<Certification>? certifications,
     Diver? diver,
@@ -253,7 +313,7 @@ class ExportService {
     required PdfDateFormatter dates,
     required UnitFormatter units,
     PdfExportOptions options = const PdfExportOptions(),
-    String title = 'Dive Logbook',
+    String? title,
     Map<String, PdfProfileSeries>? profiles,
     List<Certification>? certifications,
     Diver? diver,
@@ -277,7 +337,7 @@ class ExportService {
     required PdfDateFormatter dates,
     required UnitFormatter units,
     PdfExportOptions options = const PdfExportOptions(),
-    String title = 'Dive Logbook',
+    String? title,
     Map<String, PdfProfileSeries>? profiles,
     List<Certification>? certifications,
     Diver? diver,
@@ -302,15 +362,18 @@ class ExportService {
   // ==================== Blender Invoice Export ====================
 
   Future<List<int>> generateBlenderInvoicePdfBytes(
-    BlenderInvoiceExportData data,
-  ) => _blenderInvoicePdf.generateBytes(data);
+    BlenderInvoiceExportData data, {
+    PdfLocalization? localization,
+  }) => _blenderInvoicePdf.generateBytes(data, localization: localization);
 
   Future<String> exportBlenderInvoiceToPdf(
     BlenderInvoiceExportData data, {
     Rect? sharePositionOrigin,
+    PdfLocalization? localization,
   }) => _blenderInvoicePdf.exportToPdf(
     data,
     sharePositionOrigin: sharePositionOrigin,
+    localization: localization,
   );
 
   List<int> generateBlenderInvoiceExcelBytes(BlenderInvoiceExportData data) =>
@@ -331,11 +394,13 @@ class ExportService {
     List<Dive> trainingDives, {
     required PdfDateFormatter dates,
     required UnitFormatter units,
+    PdfLocalization? localization,
   }) => _pdfCourse.exportCourseTrainingLogToPdf(
     course,
     trainingDives,
     dates: dates,
     units: units,
+    localization: localization,
   );
 
   // ==================== Excel Export ====================
@@ -655,10 +720,6 @@ class ExportService {
   );
 
   // ==================== UDDF Import ====================
-
-  Future<Map<String, List<Map<String, dynamic>>>> importDivesFromUddf(
-    String uddfContent,
-  ) => _uddfImport.importDivesFromUddf(uddfContent);
 
   Future<UddfImportResult> importAllDataFromUddf(String uddfContent) =>
       _uddfFullImport.importAllDataFromUddf(uddfContent);

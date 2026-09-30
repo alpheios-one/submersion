@@ -7,6 +7,7 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/suunto_cloud/suunto_cloud_client.dart';
 import 'package:submersion/core/services/suunto_cloud/suunto_dive_parser.dart';
 import 'package:submersion/core/services/suunto_cloud/suunto_session_store.dart';
+import 'package:submersion/features/dive_log/data/services/derived_metrics_scheduler.dart';
 import 'package:submersion/features/equipment/data/services/sensor_summary_scheduler.dart';
 import 'package:submersion/features/import_wizard/presentation/widgets/cloud_import_dive_summary.dart';
 import 'package:submersion/features/data_quality/data/services/quality_scan_service.dart';
@@ -354,12 +355,18 @@ class SuuntoCloudAdapter implements ImportSourceAdapter {
               consolidated++;
               importedCountByComputerId[comp.id] =
                   (importedCountByComputerId[comp.id] ?? 0) + 1;
+              // The fold keeps the target's own header, so the notes go onto
+              // the target, not the folded-away download.
+              await _fillNotes(matchResult.diveId, parsed);
             case _ConsolidateOutcome.keptStandalone:
               // The fold refused, but the download survived as its own dive,
               // so it counts as imported rather than skipped.
               imported++;
               final keptId = result.diveId;
-              if (keptId != null) importedDiveIds.add(keptId);
+              if (keptId != null) {
+                importedDiveIds.add(keptId);
+                await _fillNotes(keptId, parsed);
+              }
               importedCountByComputerId[comp.id] =
                   (importedCountByComputerId[comp.id] ?? 0) + 1;
             case _ConsolidateOutcome.skippedSameComputer:
@@ -389,6 +396,7 @@ class SuuntoCloudAdapter implements ImportSourceAdapter {
             descriptorProduct: parsed.deviceName,
           );
           updated++;
+          await _fillNotes(matchResult.diveId, parsed);
         }
       } else {
         final diveId = await _importService.importSingleDiveAsNew(
@@ -401,6 +409,7 @@ class SuuntoCloudAdapter implements ImportSourceAdapter {
         );
         imported++;
         importedDiveIds.add(diveId);
+        await _fillNotes(diveId, parsed);
         importedCountByComputerId[comp.id] =
             (importedCountByComputerId[comp.id] ?? 0) + 1;
       }
@@ -415,6 +424,7 @@ class SuuntoCloudAdapter implements ImportSourceAdapter {
 
     scheduleQualityScan(importedDiveIds);
     scheduleSensorSummaryRefresh(importedDiveIds);
+    scheduleDerivedMetricsRefresh(importedDiveIds);
 
     final numberConflict = await diveNumberConflictNotice(
       retainSourceDiveNumbers: retainSourceDiveNumbers,
@@ -429,6 +439,27 @@ class SuuntoCloudAdapter implements ImportSourceAdapter {
       importedDiveIds: importedDiveIds,
       notices: [?numberConflict],
     );
+  }
+
+  /// Brings the notes the diver wrote in the Suunto app onto [diveId]
+  /// (issue #2410), only where the dive has none, so nothing written in
+  /// Submersion is overwritten.
+  ///
+  /// The dive itself is already saved by now, so a failure here is logged
+  /// rather than thrown: losing the notes must not fail the import or stop
+  /// the dives after this one.
+  Future<void> _fillNotes(String diveId, SuuntoParsedDive parsed) async {
+    final notes = parsed.notes;
+    if (notes == null) return;
+    try {
+      await _diveRepository.fillNotesIfEmpty(diveId, notes);
+    } catch (e, st) {
+      _log.error(
+        'Could not bring Suunto notes onto dive $diveId',
+        error: e,
+        stackTrace: st,
+      );
+    }
   }
 
   // ---------------------------------------------------------------------------
