@@ -3,16 +3,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/list_view_mode.dart';
+import 'package:submersion/core/data/visibility/shared_item_policy.dart';
 import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/providers/async_value_extensions.dart';
+import 'package:submersion/core/query/domain/query_node.dart';
+import 'package:submersion/core/query/domain/query_subject.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/widgets/entity_table/entity_table_view.dart';
 import 'package:submersion/shared/widgets/list_view_mode_toggle.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
+import 'package:submersion/shared/widgets/shared_items/shared_item_dialogs.dart';
 import 'package:submersion/shared/widgets/sort_bottom_sheet.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
@@ -26,14 +31,20 @@ import 'package:submersion/shared/selection/selection_controller.dart';
 import 'package:submersion/shared/selection/selection_state.dart';
 import 'package:submersion/features/trips/domain/constants/trip_field.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart';
+import 'package:submersion/features/query/presentation/widgets/query_chips_frame.dart';
+import 'package:submersion/features/query/presentation/widgets/query_filter_sheet.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
+import 'package:submersion/features/trips/query/trip_query_entity.dart';
 import 'package:submersion/features/trips/presentation/widgets/compact_trip_list_tile.dart';
 import 'package:submersion/features/trips/presentation/widgets/dense_trip_list_tile.dart';
 import 'package:submersion/features/trips/presentation/widgets/upcoming_trip_banner.dart';
 import 'package:submersion/shared/widgets/card_icon_label.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
+import 'package:submersion/features/trips/presentation/providers/trip_list_count_provider.dart';
 
 /// Content widget for the trip list, used in master-detail layout.
+final _log = LoggerService.forClass(TripListContent);
+
 class TripListContent extends ConsumerStatefulWidget {
   final void Function(String?)? onItemSelected;
   final String? selectedId;
@@ -154,6 +165,24 @@ class _TripListContentState extends ConsumerState<TripListContent> {
     );
   }
 
+  void _setQuery(QueryNode? query) => setTripQuery(ref, query);
+
+  void _openQueryFilter() => showQueryFilterSheet(
+    context,
+    subject: QuerySubject.trips,
+    root: tripQueryEntity,
+    initial: ref.read(tripFilterProvider).query,
+    onApply: setTripQuery,
+  );
+
+  /// The list body with the query's chips above it (#2365).
+  Widget _withQueryChips(Widget child) => QueryChipsFrame(
+    root: tripQueryEntity,
+    query: ref.watch(tripFilterProvider).query,
+    onChanged: _setQuery,
+    child: child,
+  );
+
   @override
   Widget build(BuildContext context) {
     final filter = ref.watch(tripFilterProvider);
@@ -171,9 +200,9 @@ class _TripListContentState extends ConsumerState<TripListContent> {
       return tripsAsync.when(
         data: (trips) => trips.isEmpty
             ? _buildEmptyState(context, filter.hasActiveFilters)
-            : _buildTripList(context, ref, trips, filter.hasActiveFilters),
+            : _buildTripList(context, ref, trips, filter.equipmentId != null),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => _buildErrorState(context, error),
+        error: (_, _) => _buildErrorState(context),
       );
     }
 
@@ -197,7 +226,7 @@ class _TripListContentState extends ConsumerState<TripListContent> {
               selection.isActive
                   ? _buildSelectionBar(loadedTrips, SelectionBarShell.pane)
                   : _buildCompactAppBar(context),
-              Expanded(child: buildContent()),
+              Expanded(child: _withQueryChips(buildContent())),
             ],
           ),
         ),
@@ -216,6 +245,7 @@ class _TripListContentState extends ConsumerState<TripListContent> {
                   title: FeatureAppBarTitle(
                     featureId: 'trips',
                     title: context.l10n.trips_appBar_title,
+                    subtitle: tripListCountLabel(context, ref),
                   ),
                   actions: [
                     IconButton(
@@ -232,6 +262,10 @@ class _TripListContentState extends ConsumerState<TripListContent> {
                       icon: const Icon(Icons.sort),
                       tooltip: context.l10n.trips_list_tooltip_sort,
                       onPressed: () => _showSortSheet(context),
+                    ),
+                    QueryFilterButton(
+                      active: ref.watch(tripFilterProvider).query != null,
+                      onPressed: _openQueryFilter,
                     ),
                     // The only way into bulk actions: entry by long-press was removed,
                     // so nothing but this control opens selection mode on touch.
@@ -269,7 +303,7 @@ class _TripListContentState extends ConsumerState<TripListContent> {
                     ),
                   ],
                 ),
-          body: buildContent(),
+          body: _withQueryChips(buildContent()),
           floatingActionButton: selection.isActive
               ? null
               : widget.floatingActionButton,
@@ -304,11 +338,51 @@ class _TripListContentState extends ConsumerState<TripListContent> {
     final ids = _selectedIds.toList();
     if (ids.isEmpty) return BulkActionOutcome.cancelled;
 
+    // Another profile's shared trips are hidden, not deleted, and the
+    // owner's shared ones are named as going for everyone (issue #2594).
+    final sharing = await readSharingContext(ref, context);
+    if (sharing == null) return BulkActionOutcome.failed;
+    if (!mounted) return BulkActionOutcome.cancelled;
+    final trips = ref.read(tripListNotifierProvider).value ?? const [];
+    final selected = [
+      for (final t in trips)
+        if (ids.contains(t.trip.id)) t.trip,
+    ];
+    final split = splitForBulkDelete(
+      selected,
+      ownerOf: (t) => t.diverId,
+      isSharedOf: (t) => t.isShared,
+      activeDiverId: sharing.activeDiverId,
+    );
+    final deleteCount = split.destroy.length;
+    final hideCount = split.hide.length;
+    if (deleteCount + hideCount == 0) return BulkActionOutcome.cancelled;
+    final sharedDeleteCount = sharing.diverCount >= 2
+        ? split.destroy.where((t) => t.isShared).length
+        : 0;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(ctx.l10n.common_bulkDelete_title(ids.length)),
-        content: Text(ctx.l10n.common_bulkDelete_body),
+        title: Text(
+          // Counts only what is deleted: the body lines name the shared
+          // trips that are only removed from this profile.
+          deleteCount > 0
+              ? ctx.l10n.common_bulkDelete_title(deleteCount)
+              : ctx.l10n.sharedItems_bulkRemoveTitle(hideCount),
+        ),
+        content: Text(
+          [
+            ...bulkDeleteLines(
+              ctx.l10n,
+              SharedItemKind.trip,
+              deleteCount: deleteCount,
+              hideCount: hideCount,
+              sharedDeleteCount: sharedDeleteCount,
+            ),
+            if (deleteCount > 0) ctx.l10n.common_bulkDelete_body,
+          ].join('\n\n'),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -316,10 +390,16 @@ class _TripListContentState extends ConsumerState<TripListContent> {
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(ctx).colorScheme.error,
+            style: deleteCount > 0
+                ? FilledButton.styleFrom(
+                    backgroundColor: Theme.of(ctx).colorScheme.error,
+                  )
+                : null,
+            child: Text(
+              deleteCount > 0
+                  ? ctx.l10n.common_action_delete
+                  : ctx.l10n.common_action_remove,
             ),
-            child: Text(ctx.l10n.common_action_delete),
           ),
         ],
       ),
@@ -327,19 +407,45 @@ class _TripListContentState extends ConsumerState<TripListContent> {
     if (confirmed != true || !mounted) return BulkActionOutcome.cancelled;
 
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final notifier = ref.read(tripListNotifierProvider.notifier);
     _selection.exit();
 
-    for (final id in ids) {
-      await notifier.deleteTrip(id);
+    var deleted = 0;
+    var hidden = 0;
+    var failed = false;
+    // The selection is gone, so a failure part way says what was done and
+    // that the rest was not, rather than escaping unseen (issue #2682).
+    try {
+      for (final trip in split.destroy) {
+        if (await notifier.deleteTrip(trip.id)) deleted++;
+      }
+      if (split.hide.isNotEmpty) {
+        hidden = await notifier.hideTrips([for (final t in split.hide) t.id]);
+      }
+    } catch (e, stackTrace) {
+      _log.error(
+        'Could not finish the trip bulk delete',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      failed = true;
     }
 
-    if (!mounted) return BulkActionOutcome.completed;
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(context.l10n.common_bulkDelete_snackbar(ids.length)),
-      ),
-    );
+    final summary = [
+      if (deleted > 0) l10n.common_bulkDelete_snackbar(deleted),
+      if (hidden > 0) l10n.sharedItems_bulkHiddenSnackbar(hidden),
+      if (failed) l10n.common_error_tryAgain,
+    ];
+    // Nothing done (every action refused): no empty snackbar. A failure
+    // says so even once the list has closed.
+    if ((mounted || failed) && summary.isNotEmpty) {
+      // Replaces any earlier summary, as the site list's does, so the
+      // latest outcome is the one showing.
+      messenger
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text(summary.join(' · '))));
+    }
     return BulkActionOutcome.completed;
   }
 
@@ -381,7 +487,9 @@ class _TripListContentState extends ConsumerState<TripListContent> {
           // Built inside the builder so the table's own rows re-render as
           // checks change; building it outside left them on a stale
           // selectedIds while only the bar updated.
-          final tableContent = _buildTableView(context, tripsAsync, filter);
+          final tableContent = _withQueryChips(
+            _buildTableView(context, tripsAsync, filter),
+          );
 
           // Table mode has no app bar of its own, so both bars live here: the
           // contextual one while selecting, and the Select affordance while
@@ -409,7 +517,7 @@ class _TripListContentState extends ConsumerState<TripListContent> {
   ) {
     return tripsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, s) => _buildErrorState(context, e),
+      error: (_, _) => _buildErrorState(context),
       data: (trips) {
         if (trips.isEmpty) {
           return _buildEmptyState(context, filter.hasActiveFilters);
@@ -421,7 +529,8 @@ class _TripListContentState extends ConsumerState<TripListContent> {
 
         return Column(
           children: [
-            if (filter.hasActiveFilters) _buildActiveFiltersBar(context, ref),
+            if (filter.equipmentId != null)
+              _buildActiveFiltersBar(context, ref),
             Expanded(
               child: EntityTableView<TripWithStats, TripField>(
                 entities: trips,
@@ -476,6 +585,7 @@ class _TripListContentState extends ConsumerState<TripListContent> {
             child: FeatureAppBarTitle(
               featureId: 'trips',
               title: context.l10n.trips_appBar_title,
+              subtitle: tripListCountLabel(context, ref),
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
@@ -495,6 +605,11 @@ class _TripListContentState extends ConsumerState<TripListContent> {
             icon: const Icon(Icons.sort, size: 20),
             tooltip: context.l10n.trips_list_tooltip_sort,
             onPressed: () => _showSortSheet(context),
+          ),
+          QueryFilterButton(
+            active: ref.watch(tripFilterProvider).query != null,
+            compact: true,
+            onPressed: _openQueryFilter,
           ),
           // The only way into bulk actions: entry by long-press was removed,
           // so nothing but this control opens selection mode on touch.
@@ -696,6 +811,9 @@ class _TripListContentState extends ConsumerState<TripListContent> {
   }
 
   Widget _buildEmptyState(BuildContext context, bool hasActiveFilters) {
+    if (ref.watch(tripFilterProvider).query != null) {
+      return QueryNoMatchState(onClear: () => _setQuery(null));
+    }
     if (hasActiveFilters) {
       return Center(
         child: Column(
@@ -766,14 +884,15 @@ class _TripListContentState extends ConsumerState<TripListContent> {
     );
   }
 
-  Widget _buildErrorState(BuildContext context, Object error) {
+  /// The repository logs the failure; the diver gets a plain line and Retry.
+  Widget _buildErrorState(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.error_outline, size: 48, color: Colors.red),
           const SizedBox(height: 16),
-          Text(context.l10n.trips_list_error_loading('$error')),
+          Text(context.l10n.trips_list_error_loading),
           const SizedBox(height: 16),
           FilledButton(
             onPressed: () =>
@@ -1088,8 +1207,8 @@ class TripSearchDelegate extends SearchDelegate<Trip?> {
             );
           },
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) =>
-              Center(child: Text('${context.l10n.common_label_error}: $error')),
+          // The repository logs the failure; the diver gets a plain line.
+          error: (_, _) => Center(child: Text(context.l10n.trips_search_error)),
         );
       },
     );

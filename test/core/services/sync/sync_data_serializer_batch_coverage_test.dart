@@ -151,6 +151,8 @@ void main() {
           (type: 'equipmentTags', table: db.equipmentTags.actualTableName),
           (type: 'equipmentShares', table: db.equipmentShares.actualTableName),
           (type: 'tripEquipment', table: db.tripEquipment.actualTableName),
+          (type: 'tripHides', table: db.tripHides.actualTableName),
+          (type: 'siteHides', table: db.siteHides.actualTableName),
           (
             type: 'equipmentOwnershipEvents',
             table: db.equipmentOwnershipEvents.actualTableName,
@@ -269,7 +271,22 @@ void main() {
         'manual',
       );
 
-      // source missing -> defaulted to 'imported' (the true branch).
+      // source missing on a row this device holds -> its own value stays
+      // (#2553).
+      await serializer.upsertRecords('diveProfileEvents', [
+        {...seeded}..remove('source'),
+      ]);
+      expect(
+        (await serializer.fetchRecord('diveProfileEvents', 'evt-1'))?['source'],
+        'manual',
+      );
+
+      // source missing on a row new here -> defaulted to 'imported' (the
+      // true branch).
+      await db.customStatement(
+        "DELETE FROM ${db.diveProfileEvents.actualTableName} "
+        "WHERE id = 'evt-1'",
+      );
       await serializer.upsertRecords('diveProfileEvents', [
         {...seeded}..remove('source'),
       ]);

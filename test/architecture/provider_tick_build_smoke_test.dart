@@ -28,6 +28,7 @@ library;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/data/visibility/shared_item_policy.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
@@ -82,6 +83,7 @@ import 'package:submersion/features/trips/presentation/providers/trip_providers.
 import 'package:submersion/features/universal_import/presentation/providers/csv_preset_providers.dart';
 import 'package:submersion/features/query/presentation/providers/query_name_index_provider.dart';
 import 'package:submersion/features/query/presentation/providers/saved_query_providers.dart';
+import 'package:submersion/features/divers/presentation/providers/profile_hides_providers.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_equipment_providers.dart';
 
 import '../helpers/mock_providers.dart';
@@ -582,6 +584,15 @@ void main() {
     (
       name: 'equipmentTripsProvider',
       read: (c) => c.read(equipmentTripsProvider(_id).future),
+    ),
+    (
+      name: 'hiddenItemsProvider',
+      read: (c) => c.read(hiddenItemsProvider.future),
+    ),
+    (
+      name: 'isHiddenProvider',
+      read: (c) =>
+          c.read(isHiddenProvider((kind: SharedItemKind.trip, id: _id)).future),
     ),
     (
       name: 'equipmentOwnershipEventsProvider',

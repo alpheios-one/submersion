@@ -114,5 +114,52 @@ extension RungsFromV231 on AppDatabase {
       await _assertTripFillForecastColumns();
     }
     if (from < 249) await reportProgress();
+    // v250: a profile's hidden shared trips and sites (issue #2594).
+    // Table-only rung, no backfill; re-asserted in beforeOpen.
+    if (from < 250) {
+      await _assertTripHidesSchema();
+      await _assertSiteHidesSchema();
+    }
+    if (from < 250) await reportProgress();
+    // v251: dive_tanks.source_id (issue #2716), backfilled where the
+    // source is unambiguous. 250 is profile hides (#2594).
+    if (from < 251) {
+      await _assertDiveTankSourceIdColumn();
+      await _backfillDiveTankSourceIds();
+    }
+    if (from < 251) await reportProgress();
+    // v252: nav_tracks.diver_id, the route's owner (issue #2691 follow-up),
+    // backfilled from each linked route's dive. The column is re-asserted in
+    // beforeOpen; the backfill stays in the rung. 251 is
+    // dive_tanks.source_id (#2716).
+    if (from < 252) {
+      await _assertNavTrackDiverIdColumn();
+      await _backfillNavTrackDiverIds();
+    }
+    if (from < 252) await reportProgress();
+    // v253: the settings a safety review was computed from (issue #2592).
+    // Column only, no backfill; re-asserted in beforeOpen, which is what reaches a
+    // database already at 254 (#2595 merged first).
+    if (from < 253) {
+      await _assertSafetyReviewInputsHashColumn();
+    }
+    if (from < 253) await reportProgress();
+    // v254: dive_tanks.role_source, where a cylinder's role came from
+    // (issue #2595). Column only, no backfill: a stored role's origin is
+    // unknown, and a re-parse fills it. Re-asserted in beforeOpen. 253 is
+    // the safety review inputs (#2592).
+    if (from < 254) {
+      await _assertTankRoleSourceColumn();
+    }
+    if (from < 254) await reportProgress();
+    // v255: a safety stop is no decompression ceiling (issue #2550). Drops
+    // the ceilings safety stop samples carried from every stored series.
+    // Rung only: new imports no longer write them, and every reader ignores
+    // one that still arrives from an older peer. 254 is dive_tanks.role_source
+    // (#2595), 253 safety review inputs (#2592).
+    if (from < 255) {
+      await _scrubSafetyStopCeilings();
+    }
+    if (from < 255) await reportProgress();
   }
 }

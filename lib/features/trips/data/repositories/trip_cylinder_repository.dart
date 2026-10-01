@@ -46,16 +46,32 @@ class TripCylinderRepository {
   /// or the dive tanks and dives that consume them. A sync pull that
   /// rewrites a tank row never touches the dives row, so dive_tanks is
   /// watched on its own.
-  Stream<void> watchTripCylinderChanges() => _db.tableUpdates(
+  Stream<void> watchTripCylinderChanges() =>
+      _db.tableUpdates(TableUpdateQuery.allOf(_boardTables));
+
+  /// The board's changes plus the divers: the gas record names each tank's
+  /// diver, and a rename writes only the divers row. The board itself shows
+  /// no diver, so it keeps the narrower stream.
+  Stream<void> watchGasRecordChanges() => _db.tableUpdates(
     TableUpdateQuery.allOf([
-      TableUpdateQuery.onTable(_db.tripCylinders),
-      TableUpdateQuery.onTable(_db.tripCylinderEvents),
-      TableUpdateQuery.onTable(_db.diveTanks),
-      TableUpdateQuery.onTable(_db.dives),
-      // Tank uses carry the dive's site name.
-      TableUpdateQuery.onTable(_db.diveSites),
+      ..._boardTables,
+      TableUpdateQuery.onTable(_db.divers),
     ]),
   );
+
+  List<TableUpdateQuery> get _boardTables => [
+    TableUpdateQuery.onTable(_db.tripCylinders),
+    TableUpdateQuery.onTable(_db.tripCylinderEvents),
+    TableUpdateQuery.onTable(_db.diveTanks),
+    TableUpdateQuery.onTable(_db.dives),
+    // Tank uses carry the dive's site name.
+    TableUpdateQuery.onTable(_db.diveSites),
+  ];
+
+  /// Changes to the slots alone: which equipment sits on a trip's board
+  /// reads nothing else, so dive and ledger writes need not refetch it.
+  Stream<void> watchSlotChanges() =>
+      _db.tableUpdates(TableUpdateQuery.onTable(_db.tripCylinders));
 
   /// Changes to the slots or the ledger only. The ledger reads neither
   /// dives, tanks nor sites, so it need not refetch when those change.
@@ -142,6 +158,19 @@ class TripCylinderRepository {
                 ..addColumns([_db.tripCylinders.tripId])
                 ..where(_db.tripCylinders.equipmentId.equals(equipmentId)))
               .map((r) => r.read(_db.tripCylinders.tripId)!)
+              .get())
+          .toSet();
+
+  /// The equipment on [tripId]'s slots (rental slots carry none), for the
+  /// trip's gear alerts (issue #2727).
+  Future<Set<String>> equipmentIdsForTrip(String tripId) async =>
+      (await (_db.selectOnly(_db.tripCylinders)
+                ..addColumns([_db.tripCylinders.equipmentId])
+                ..where(
+                  _db.tripCylinders.tripId.equals(tripId) &
+                      _db.tripCylinders.equipmentId.isNotNull(),
+                ))
+              .map((r) => r.read(_db.tripCylinders.equipmentId)!)
               .get())
           .toSet();
 
@@ -515,15 +544,17 @@ class TripCylinderRepository {
 
   /// The dive tanks linked to a trip's slots, as the lean facts the state
   /// fold needs: no profile, no gear, no full dive. Keyed by slot id, each
-  /// list in entry order.
+  /// list in entry order. Planned dives are left out: a planned dive uses
+  /// no gas until it is logged.
   Future<Map<String, List<TripCylinderTankUse>>> getTankUsesForTrip(
     String tripId,
   ) async {
     final rows = await _db
         .customSelect(
           '''
-          -- stats-scope-exempt: the board counts every dive on the trip, the
-          -- ones excluded from statistics included, as the trip's dive list does
+          -- stats-scope-exempt: the board counts every logged dive on the
+          -- trip, the ones excluded from statistics included, as the trip's
+          -- dive list does
           SELECT t.id AS tank_id, t.dive_id,
                  COALESCE(d.entry_time, d.dive_date_time) AS entry_ms,
                  t.start_pressure, t.end_pressure, t.o2_percent, t.he_percent,
@@ -532,6 +563,7 @@ class TripCylinderRepository {
           JOIN dives d ON d.id = t.dive_id
           LEFT JOIN dive_sites s ON s.id = d.site_id
           WHERE d.trip_id = ?1
+            AND d.is_planned = 0
             AND t.trip_cylinder_id IN
                 (SELECT id FROM trip_cylinders WHERE trip_id = ?1)
           ORDER BY entry_ms ASC, t.tank_order ASC
@@ -569,15 +601,16 @@ class TripCylinderRepository {
 
   /// The trip's linked dive tanks for the gas record: the lean facts the
   /// fold reads plus the diver, the site and the tank's size. Every diver's
-  /// tanks (decided 2026-09-30), in dive order, then tank order.
+  /// tanks (decided 2026-09-30), in dive order, then tank order. Planned
+  /// dives are left out, as the board leaves them out.
   Future<List<TripGasRecordTank>> getGasRecordTanksForTrip(
     String tripId,
   ) async {
     final rows = await _db
         .customSelect(
           '''
-          -- stats-scope-exempt: the record counts every dive on the trip,
-          -- as the board does
+          -- stats-scope-exempt: the record counts every logged dive on the
+          -- trip, as the board does
           SELECT t.id AS tank_id, t.dive_id,
                  COALESCE(d.entry_time, d.dive_date_time) AS entry_ms,
                  d.diver_id, v.name AS diver_name, s.name AS site_name,
@@ -588,6 +621,7 @@ class TripCylinderRepository {
           LEFT JOIN divers v ON v.id = d.diver_id
           LEFT JOIN dive_sites s ON s.id = d.site_id
           WHERE d.trip_id = ?1
+            AND d.is_planned = 0
             AND t.trip_cylinder_id IN
                 (SELECT id FROM trip_cylinders WHERE trip_id = ?1)
           ORDER BY entry_ms ASC, t.dive_id ASC, t.tank_order ASC
@@ -639,7 +673,7 @@ class TripCylinderRepository {
           SELECT t.id AS tank_id, t.dive_id,
                  COALESCE(d.entry_time, d.dive_date_time) AS entry_ms,
                  d.diver_id, v.name AS diver_name, s.name AS site_name,
-                 t.tank_order
+                 t.tank_order, t.computer_id, t.source_id
           FROM dive_tanks t
           JOIN dives d ON d.id = t.dive_id
           LEFT JOIN divers v ON v.id = d.diver_id
@@ -674,6 +708,8 @@ class TripCylinderRepository {
           diverName: r.readNullable<String>('diver_name'),
           siteName: r.readNullable<String>('site_name'),
           tankOrder: r.read<int>('tank_order'),
+          computerId: r.readNullable<String>('computer_id'),
+          sourceId: r.readNullable<String>('source_id'),
         ),
     ];
   }
@@ -682,18 +718,19 @@ class TripCylinderRepository {
   /// wall-clock frame every dive time is stored in: the fill forecast's
   /// "dives already logged today". A shared trip carries each diver
   /// profile's own log of the same dive, so this is the most any one diver
-  /// logged that day, not the row count.
+  /// logged that day, not the row count. A planned dive is not logged yet.
   Future<int> countTripDiveRoundsOn(String tripId, DateTime day) async {
     final from = DateTime.utc(day.year, day.month, day.day);
     final to = DateTime.utc(day.year, day.month, day.day + 1);
     final row = await _db
         .customSelect(
           '''
-          -- stats-scope-exempt: the forecast counts every dive on the trip,
-          -- as the board does
+          -- stats-scope-exempt: the forecast counts every logged dive on the
+          -- trip, as the board does
           SELECT COALESCE(MAX(n), 0) AS n FROM (
             SELECT COUNT(*) AS n FROM dives
             WHERE trip_id = ?1
+              AND is_planned = 0
               AND COALESCE(entry_time, dive_date_time) >= ?2
               AND COALESCE(entry_time, dive_date_time) < ?3
             GROUP BY diver_id

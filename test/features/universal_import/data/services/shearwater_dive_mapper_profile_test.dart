@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/universal_import/data/models/import_enums.dart';
 import 'package:submersion/features/universal_import/data/models/import_warning.dart';
 import 'package:submersion/features/universal_import/data/services/shearwater_db_reader.dart';
@@ -497,6 +498,20 @@ void main() {
               decoTime: 180,
               decoDepth: 6.0,
             ),
+            pigeon.ProfileSample(
+              timeSeconds: 20,
+              depthMeters: 21.0,
+              decoType: 3,
+              decoTime: 60,
+              decoDepth: 15.0,
+            ),
+            pigeon.ProfileSample(
+              timeSeconds: 30,
+              depthMeters: 5.0,
+              decoType: 1,
+              decoTime: 180,
+              decoDepth: 5.0,
+            ),
           ],
           tanks: [],
           gasMixes: [],
@@ -511,6 +526,15 @@ void main() {
         expect(s1['decoType'], 2);
         expect(s1['ceiling'], 6.0);
         expect(s1.containsKey('ndl'), isFalse);
+        // A deep stop is a stop the computer asks for, so it is a ceiling.
+        final deep = profile[1] as Map<String, dynamic>;
+        expect(deep['decoType'], 3);
+        expect(deep['ceiling'], 15.0);
+        // A safety stop is not an obligation, so it is no ceiling (#2550).
+        final safety = profile[2] as Map<String, dynamic>;
+        expect(safety['decoType'], 1);
+        expect(safety.containsKey('ceiling'), isFalse);
+        expect(safety.containsKey('ndl'), isFalse);
       });
 
       test('extracts water temp from samples when not in metadata', () {
@@ -678,6 +702,63 @@ void main() {
         final s5 = profile[4] as Map<String, dynamic>;
         expect(s5.containsKey('allTankPressures'), isFalse);
         expect(s5.containsKey('pressure'), isFalse);
+      });
+
+      test('emits the gas switches of a deco dive', () {
+        // No transmitter was on, so the metadata lists no tanks at all.
+        final baseMap = <String, dynamic>{
+          'tanks': const <Map<String, dynamic>>[],
+          'profile': <Map<String, dynamic>>[],
+        };
+        final parsed = pigeon.ParsedDive(
+          fingerprint: '',
+          dateTimeYear: 2025,
+          dateTimeMonth: 1,
+          dateTimeDay: 1,
+          dateTimeHour: 0,
+          dateTimeMinute: 0,
+          dateTimeSecond: 0,
+          maxDepthMeters: 45,
+          avgDepthMeters: 25,
+          durationSeconds: 3000,
+          samples: [
+            pigeon.ProfileSample(
+              timeSeconds: 0,
+              depthMeters: 0.0,
+              gasMixIndex: 0,
+            ),
+            pigeon.ProfileSample(
+              timeSeconds: 1500,
+              depthMeters: 21.0,
+              gasMixIndex: 1,
+            ),
+            pigeon.ProfileSample(
+              timeSeconds: 3000,
+              depthMeters: 0.0,
+              gasMixIndex: 1,
+            ),
+          ],
+          tanks: [],
+          gasMixes: [
+            pigeon.GasMix(index: 0, o2Percent: 18.0, hePercent: 45.0),
+            pigeon.GasMix(index: 1, o2Percent: 50.0, hePercent: 0.0),
+          ],
+          events: [],
+        );
+
+        final result = ShearwaterDiveMapper.mergeWithParsedDive(
+          baseMap,
+          parsed,
+        );
+
+        final tanks = result['tanks'] as List<Map<String, dynamic>>;
+        expect(tanks.map((t) => t['gasMix']), const [
+          GasMix(o2: 18.0, he: 45.0),
+          GasMix(o2: 50.0),
+        ]);
+        expect(result['gasSwitches'], [
+          {'timestamp': 1500, 'depth': 21.0, 'tankIndex': 1},
+        ]);
       });
 
       test('defaults tankIndex to 0 when FFI sample has null tankIndex', () {

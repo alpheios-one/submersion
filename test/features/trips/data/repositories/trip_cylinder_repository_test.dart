@@ -2,7 +2,12 @@ import 'package:drift/drift.dart' show Value, Variable;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/database/database.dart'
-    show AppDatabase, DiveSitesCompanion, DivesCompanion, DiveTanksCompanion;
+    show
+        AppDatabase,
+        DiveSitesCompanion,
+        DivesCompanion,
+        DiveTanksCompanion,
+        EquipmentCompanion;
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/trips/data/repositories/trip_cylinder_repository.dart';
@@ -220,6 +225,40 @@ void main() {
       expect(await repository.getCylindersForTrip(tripId), isEmpty);
       expect(await repository.getCylindersForTrip(otherTripId), hasLength(1));
     });
+
+    test('equipmentIdsForTrip lists the gear on the trip slots', () async {
+      // The trip-side mirror of tripIdsForEquipment: the trip's service
+      // alerts cover the tanks on its board (issue #2727).
+      for (final id in ['al80', 'hp100', 'steel']) {
+        await db
+            .into(db.equipment)
+            .insert(
+              EquipmentCompanion.insert(
+                id: id,
+                name: id,
+                type: 'tank',
+                createdAt: 1,
+                updatedAt: 1,
+              ),
+            );
+      }
+      await repository.createCylinder(
+        slot(label: 'A').copyWith(equipmentId: 'al80'),
+      );
+      await repository.createCylinder(
+        slot(label: 'B').copyWith(equipmentId: 'hp100'),
+      );
+      // A rental slot carries no equipment; another trip's slot is not ours.
+      await repository.createCylinder(slot(label: 'Rental'));
+      await repository.createCylinder(
+        slot(
+          label: 'Other',
+        ).copyWith(tripId: otherTripId, equipmentId: 'steel'),
+      );
+
+      expect(await repository.equipmentIdsForTrip(tripId), {'al80', 'hp100'});
+      expect(await repository.equipmentIdsForTrip(otherTripId), {'steel'});
+    });
   });
 
   group('events', () {
@@ -340,6 +379,29 @@ void main() {
     await expectLater(fired, completes);
   });
 
+  test('the slot tick fires on a slot write and not on a dive write', () async {
+    // The trip's gear ids read only the slots (issue #2727); a dive write
+    // must not re-run every open trip's service alerts.
+    var ticks = 0;
+    final sub = repository.watchSlotChanges().listen((_) => ticks++);
+    addTearDown(sub.cancel);
+    await db
+        .into(db.dives)
+        .insert(
+          DivesCompanion.insert(
+            id: 'd1',
+            diveDateTime: 1,
+            createdAt: 1,
+            updatedAt: 1,
+          ),
+        );
+    await pumpEventQueue();
+    expect(ticks, 0);
+    await repository.createCylinder(slot());
+    await pumpEventQueue();
+    expect(ticks, greaterThan(0));
+  });
+
   test('a linked tank on a dive of another trip is not counted', () async {
     // A cross-device race: one device links the tank, the other moves the
     // dive to another trip. The board must count only this trip's dives.
@@ -356,6 +418,26 @@ void main() {
     );
 
     expect(await repository.getTankUsesForTrip(tripId), isEmpty);
+  });
+
+  test('a planned dive does not use a slot until it is logged', () async {
+    // Issue #2660: a planned dive's linked tank must not set the slot's
+    // pressure or count as a dive. Logging the dive brings it in.
+    final a = await repository.createCylinder(slot(label: 'A'));
+    await insertDiveWithTank(
+      diveId: 'd1',
+      tankId: 't1',
+      entryMillis: at.millisecondsSinceEpoch,
+      cylinderId: a.id,
+      start: 200,
+      end: 50,
+    );
+    await db.customUpdate("UPDATE dives SET is_planned = 1 WHERE id = 'd1'");
+    expect(await repository.getTankUsesForTrip(tripId), isEmpty);
+
+    await db.customUpdate("UPDATE dives SET is_planned = 0 WHERE id = 'd1'");
+    final uses = await repository.getTankUsesForTrip(tripId);
+    expect(uses[a.id]!.single.tankId, 't1');
   });
 
   test('a tank use is timed by the dive entry time when it has one', () async {

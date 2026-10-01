@@ -656,6 +656,8 @@
   "equipment_color_stone": "Stone",
   "equipment_color_zinc": "Zinc",
   "equipment_color_slate": "Slate",
+  "equipment_color_black": "Black",
+  "equipment_color_white": "White",
   "equipment_color_none": "None",
   "equipment_color_sheetTitle": "Choose a color",
   "equipment_setEdit_geofencesTitle": "Geofences",
@@ -893,14 +895,7 @@
   },
   "trips_story_generateItinerary": "Generate itinerary",
   "trips_story_openGallery": "Open trip photos",
-  "trips_story_generateItineraryError": "Couldn't generate itinerary: {error}",
-  "@trips_story_generateItineraryError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "trips_story_generateItineraryError": "Couldn't generate the itinerary. Try again.",
   "trips_dayType_diveDay": "Dive Day",
   "trips_dayType_seaDay": "Sea Day",
   "trips_dayType_portDay": "Port Day",
@@ -1720,6 +1715,27 @@
   "buddies_summary_totalBuddies": "Total Buddies",
   "buddies_summary_withCertification": "With Certification",
   "buddies_title": "Buddies",
+  "buddies_list_count": "{count, plural, =1{{count} buddy} other{{count} buddies}}",
+  "@buddies_list_count": {
+    "description": "List entry count under the title when no filter is active.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "buddies_list_countFiltered": "{shown} of {total, plural, =1{{total} buddy} other{{total} buddies}}",
+  "@buddies_list_countFiltered": {
+    "description": "List entry count under the title while a filter is active.",
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "buddies_title_add": "Add Buddy",
   "buddies_title_edit": "Edit Buddy",
   "buddies_title_singular": "Buddy",
@@ -1886,6 +1902,27 @@
   "certifications_appBar_certificationWallet": "Certification Wallet",
   "certifications_appBar_editCertification": "Edit Certification",
   "certifications_appBar_title": "Certifications",
+  "certifications_list_count": "{count, plural, =1{{count} certification} other{{count} certifications}}",
+  "@certifications_list_count": {
+    "description": "List entry count under the title when no filter is active.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "certifications_list_countFiltered": "{shown} of {total, plural, =1{{total} certification} other{{total} certifications}}",
+  "@certifications_list_countFiltered": {
+    "description": "List entry count under the title while a filter is active.",
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "certifications_detail_action_delete": "Delete",
   "certifications_detail_appBar_title": "Certification",
   "certifications_detail_courseCompleted": "Completed",
@@ -2760,6 +2797,27 @@
   "courses_summary_title": "Training Courses",
   "courses_summary_total": "Total",
   "courses_title": "Training Courses",
+  "courses_list_count": "{count, plural, =1{{count} course} other{{count} courses}}",
+  "@courses_list_count": {
+    "description": "List entry count under the title when no filter is active.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "courses_list_countFiltered": "{shown} of {total, plural, =1{{total} course} other{{total} courses}}",
+  "@courses_list_countFiltered": {
+    "description": "List entry count under the title while a filter is active.",
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "courses_title_edit": "Edit Course",
   "courses_title_new": "New Course",
   "courses_title_singular": "Course",
@@ -3501,6 +3559,27 @@
   "diveCenters_summary_totalCenters": "Total Centers",
   "diveCenters_summary_withGps": "With GPS",
   "diveCenters_title": "Dive Centers",
+  "diveCenters_list_count": "{count, plural, =1{{count} dive center} other{{count} dive centers}}",
+  "@diveCenters_list_count": {
+    "description": "List entry count under the title when no filter is active.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveCenters_list_countFiltered": "{shown} of {total, plural, =1{{total} dive center} other{{total} dive centers}}",
+  "@diveCenters_list_countFiltered": {
+    "description": "List entry count under the title while a filter is active.",
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "diveCenters_title_add": "Add Dive Center",
   "diveCenters_title_edit": "Edit Dive Center",
   "diveCenters_title_import": "Import Dive Center",
@@ -3750,6 +3829,8 @@
   "diveLog_deco_tissueSlow": "Slow",
   "diveLog_deco_title": "Deco Status",
   "diveLog_deco_totalDecoTime": "Total: {time}",
+  "diveLog_deco_withheld_ccr": "This rebreather dive has no recorded setpoint or loop ppO2, so its tissue loading, NDL and decompression cannot be calculated. Add the setpoint when editing the dive to calculate them.",
+  "diveLog_deco_withheld_scr": "This semi-closed rebreather dive has no measured loop ppO2, so its tissue loading, NDL and decompression cannot be calculated.",
   "diveLog_delete_cancel": "Cancel",
   "diveLog_delete_confirm": "This action cannot be undone. The dive and all associated data (profile, tanks, sightings) will be permanently deleted.",
   "diveLog_delete_delete": "Delete",
@@ -4324,6 +4405,27 @@
   },
   "diveLog_listPage_appBar_diveMap": "Dive Map",
   "diveLog_listPage_compactTitle": "Dives",
+  "diveLog_listPage_count": "{count, plural, =1{{count} dive} other{{count} dives}}",
+  "@diveLog_listPage_count": {
+    "description": "List entry count under the title when no filter is active.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveLog_listPage_countFiltered": "{shown} of {total, plural, =1{{total} dive} other{{total} dives}}",
+  "@diveLog_listPage_countFiltered": {
+    "description": "List entry count under the title while a filter is active.",
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "diveLog_listPage_errorLoading": "Error: {error}",
   "diveLog_listPage_bottomSheet_importFromComputer": "Import from Computer",
   "diveLog_listPage_bottomSheet_scanPaperLog": "Scan Paper Log",
@@ -6300,6 +6402,27 @@
   "diveSites_list_activeFilter_hasDives": "Has dives",
   "diveSites_list_activeFilter_region": "Region: {region}",
   "diveSites_list_appBar_title": "Dive Sites",
+  "diveSites_list_count": "{count, plural, =1{{count} site} other{{count} sites}}",
+  "@diveSites_list_count": {
+    "description": "List entry count under the title when no filter is active.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveSites_list_countFiltered": "{shown} of {total, plural, =1{{total} site} other{{total} sites}}",
+  "@diveSites_list_countFiltered": {
+    "description": "List entry count under the title while a filter is active.",
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "diveSites_list_bulkDelete_cancel": "Cancel",
   "diveSites_list_bulkDelete_confirm": "Delete",
   "diveSites_list_bulkDelete_content": "Are you sure you want to delete {count} {count, plural, =1{site} other{sites}}? This action can be undone within 5 seconds.",
@@ -7498,6 +7621,27 @@
   "enum_weightType_mixed": "Mixed/Combined",
   "enum_weightType_trimWeights": "Trim Weights",
   "equipment_appBar_title": "Equipment",
+  "equipment_list_count": "{count, plural, =1{{count} item} other{{count} items}}",
+  "@equipment_list_count": {
+    "description": "List entry count under the title when no filter is active.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipment_list_countFiltered": "{shown} of {total, plural, =1{{total} item} other{{total} items}}",
+  "@equipment_list_countFiltered": {
+    "description": "List entry count under the title while a filter is active.",
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "equipment_bulkTags_action": "Edit tags",
   "equipment_bulkTags_adding": "adding to all {total}",
   "@equipment_bulkTags_adding": {
@@ -8267,6 +8411,53 @@
     }
   },
   "cylinderConfigs_applyNothingToDo": "This dive already matches the configuration",
+  "cylinderConfigs_applyUpdated": "{count, plural, =1{updated {count}} other{updated {count}}}",
+  "@cylinderConfigs_applyUpdated": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_overwriteTitle": "Replace cylinder details?",
+  "cylinderConfigs_overwriteBody": "Applying {name} changes cylinders already on this dive:",
+  "@cylinderConfigs_overwriteBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cylinderConfigs_overwriteTank": "Tank {number} · {role}",
+  "@cylinderConfigs_overwriteTank": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "cylinderConfigs_overwriteChange": "{field}: {from} → {to}",
+  "@cylinderConfigs_overwriteChange": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "cylinderConfigs_overwriteKeepsGas": "Gas mixes and start pressures already on the dive are kept.",
+  "cylinderConfigs_overwriteConfirm": "Replace",
+  "cylinderConfigs_fieldVolume": "Volume",
+  "cylinderConfigs_fieldWorkingPressure": "Working pressure",
+  "cylinderConfigs_fieldMaterial": "Material",
   "cylinderConfigs_sectionTitle": "Configurations",
   "equipment_serviceClocks_hoursSource": "Counted from logged dive time",
   "equipment_serviceClocks_hoursLeft": "{remaining} of {total} hours left",
@@ -8765,6 +8956,9 @@
   "equipment_list_emptyState_serviceNoneOverdue": "Nothing is overdue for service.",
   "equipment_list_errorLoading": "Error loading equipment: {error}",
   "equipment_list_filterAll": "All Equipment",
+  "@equipment_list_filterAll": {"description": "Status chip that narrows by no status. On the Equipment list it shows every item, retired and sold included; in the dive gear picker, every item the picker offers."},
+  "equipment_list_filterCurrent": "Current Equipment",
+  "@equipment_list_filterCurrent": {"description": "Equipment filter status chip for the default view: every item except retired and sold gear"},
   "equipment_list_filterServiceDue": "Service Due",
   "equipment_list_filterServiceDueSoon": "Due Soon",
   "equipment_list_filterServiceOverdue": "Overdue",
@@ -11083,6 +11277,14 @@
   "media_import_review_noMatch": "No matching dive",
   "@media_import_review_noMatch": {
     "description": "Review row subtitle when no dive matches the timestamp"
+  },
+  "media_import_review_noCaptureTime": "No capture date found",
+  "@media_import_review_noCaptureTime": {
+    "description": "Review row subtitle when the file has no capture date to match a dive by"
+  },
+  "media_import_review_noMatchFileDate": "No matching dive by the file date; the file has no capture date",
+  "@media_import_review_noMatchFileDate": {
+    "description": "Review row subtitle when no dive matches and the only date was the file's modified time, because the file carries no capture date"
   },
   "media_import_review_skipped": "Not imported",
   "@media_import_review_skipped": {
@@ -15411,6 +15613,27 @@
     }
   },
   "trips_appBar_title": "Trips",
+  "trips_list_count": "{count, plural, =1{{count} trip} other{{count} trips}}",
+  "@trips_list_count": {
+    "description": "List entry count under the title when no filter is active.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_list_countFiltered": "{shown} of {total, plural, =1{{total} trip} other{{total} trips}}",
+  "@trips_list_countFiltered": {
+    "description": "List entry count under the title while a filter is active.",
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "trips_appBar_tripPhotos": "Trip Photos",
   "trips_detail_action_delete": "Delete",
   "trips_detail_action_export": "Export",
@@ -15421,6 +15644,7 @@
   "trips_detail_dialog_deleteTitle": "Delete Trip?",
   "trips_detail_dives_empty": "No dives in this trip yet",
   "trips_detail_dives_errorLoading": "Unable to load dives",
+  "trips_detail_error_loading": "Couldn't load the trip.",
   "trips_detail_dives_unknownSite": "Unknown Site",
   "trips_detail_dives_viewAll": "View All ({count})",
   "trips_detail_durationDays": "{days} days",
@@ -15435,8 +15659,8 @@
   "trips_detail_label_resort": "Resort",
   "trips_detail_scan_accessDenied": "Photo library access denied",
   "trips_detail_scan_addDivesFirst": "Add dives first to link photos",
-  "trips_detail_scan_errorLinking": "Error linking photos: {error}",
-  "trips_detail_scan_errorScanning": "Error scanning: {error}",
+  "trips_detail_scan_errorLinking": "Couldn't link the photos. Try again.",
+  "trips_detail_scan_errorScanning": "Couldn't scan for photos. Try again.",
   "trips_detail_scan_linkedPhotos": "Linked {count} photos",
   "trips_detail_scan_linkingPhotos": "Linking photos...",
   "trips_detail_sectionTitle_details": "Trip Details",
@@ -15479,14 +15703,7 @@
     }
   },
   "trips_diveScan_deselectAll": "Deselect all",
-  "trips_diveScan_error": "Error scanning for dives: {error}",
-  "@trips_diveScan_error": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "trips_diveScan_error": "Couldn't scan for dives. Try again.",
   "trips_diveScan_findButton": "Find matching dives",
   "trips_diveScan_groupOtherTrips": "On other trips ({count})",
   "@trips_diveScan_groupOtherTrips": {
@@ -15548,8 +15765,8 @@
   "trips_edit_sectionTitle_notes": "Notes",
   "trips_edit_semanticLabel_save": "Save trip",
   "trips_edit_snackBar_added": "Trip added successfully",
-  "trips_edit_snackBar_errorLoading": "Error loading trip: {error}",
-  "trips_edit_snackBar_errorSaving": "Error saving trip: {error}",
+  "trips_edit_snackBar_errorLoading": "Couldn't load the trip. Try again.",
+  "trips_edit_snackBar_errorSaving": "Couldn't save the trip. Try again.",
   "trips_edit_snackBar_updated": "Trip updated successfully",
   "trips_edit_validation_nameRequired": "Please enter a trip name",
   "trips_gallery_accessDenied": "Photo library access denied",
@@ -15559,9 +15776,9 @@
   "trips_gallery_diveSection_title": "Dive #{number} - {site}",
   "trips_gallery_empty_subtitle": "Tap the camera icon to scan your gallery",
   "trips_gallery_empty_title": "No photos in this trip",
-  "trips_gallery_errorLinking": "Error linking photos: {error}",
-  "trips_gallery_errorScanning": "Error scanning: {error}",
-  "trips_gallery_error_loading": "Error loading photos: {error}",
+  "trips_gallery_errorLinking": "Couldn't link the photos. Try again.",
+  "trips_gallery_errorScanning": "Couldn't scan for photos. Try again.",
+  "trips_gallery_error_loading": "Couldn't load the photos.",
   "trips_gallery_linkedPhotos": "Linked {count} photos",
   "trips_gallery_linkingPhotos": "Linking photos...",
   "trips_gallery_tooltip_scan": "Scan device gallery",
@@ -15580,7 +15797,7 @@
   "trips_list_empty_filtered_title": "No trips match your filters",
   "trips_list_empty_subtitle": "Create trips to group your dives by destination",
   "trips_list_empty_title": "No trips added yet",
-  "trips_list_error_loading": "Error loading trips: {error}",
+  "trips_list_error_loading": "Couldn't load your trips.",
   "trips_list_fab_addTrip": "Add Trip",
   "trips_list_filters_clearAll": "Clear all",
   "trips_list_inProgress": "In progress",
@@ -15602,7 +15819,7 @@
   "trips_picker_clearTooltip": "Clear selection",
   "trips_picker_empty_createButton": "Create Trip",
   "trips_picker_empty_title": "No trips yet",
-  "trips_picker_error": "Error loading trips: {error}",
+  "trips_picker_error": "Couldn't load your trips.",
   "trips_picker_hint": "Tap to select a trip",
   "trips_picker_newTrip": "New Trip",
   "trips_picker_noSelection": "No trip selected",
@@ -15612,6 +15829,7 @@
   "trips_search_empty_hint": "Search by name, location, or resort",
   "trips_search_fieldLabel": "Search trips...",
   "trips_search_noResults": "No trips found for \"{query}\"",
+  "trips_search_error": "Couldn't search your trips.",
   "trips_search_tooltip_back": "Back",
   "trips_search_tooltip_clear": "Clear search",
   "trips_summary_header_subtitle": "Select a trip from the list to view details",
@@ -15806,14 +16024,7 @@
   "trips_cylinders_forecast_useEstimate": "Use the estimate",
   "trips_cylinders_forecast_fewer": "Fewer dives",
   "trips_cylinders_forecast_more": "More dives",
-  "trips_cylinders_forecast_saveError": "Couldn't save the plan: {error}",
-  "@trips_cylinders_forecast_saveError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "trips_cylinders_forecast_saveError": "Couldn't save the plan. Try again.",
   "trips_cylinders_forecast_dayPlanned": "Planned by you",
   "trips_cylinders_segment_record": "Record",
   "trips_cylinders_recordEmpty": "No dives breathed from these cylinders yet.",
@@ -15875,6 +16086,7 @@
     }
   },
   "trips_cylinders_record_exported": "Gas record exported",
+  "trips_cylinders_record_exportFailed": "Couldn't export the gas record. Try again.",
   "trips_cylinders_title": "Cylinders",
   "trips_cylinders_summary": "Full {full} · Partial {partial} · Empty {empty}",
   "@trips_cylinders_summary": {
@@ -16102,6 +16314,8 @@
   "trips_itinerary_portName_label": "Port / Anchorage",
   "trips_itinerary_notes_label": "Notes",
   "trips_itinerary_noDives": "No dives",
+  "trips_itinerary_error_loading": "Couldn't load the itinerary.",
+  "trips_itinerary_daySaveError": "Couldn't save the day. Try again.",
   "trips_vesselType_catamaran": "Catamaran",
   "trips_vesselType_motorYacht": "Motor Yacht",
   "trips_vesselType_sailingYacht": "Sailing Yacht",
@@ -16127,20 +16341,6 @@
       }
     }
   },
-  "@trips_detail_scan_errorLinking": {
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
-  "@trips_detail_scan_errorScanning": {
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
   "@trips_detail_scan_linkedPhotos": {
     "placeholders": {
       "count": {
@@ -16151,20 +16351,6 @@
   "@trips_edit_durationDays": {
     "placeholders": {
       "days": {
-        "type": "Object"
-      }
-    }
-  },
-  "@trips_edit_snackBar_errorLoading": {
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
-  "@trips_edit_snackBar_errorSaving": {
-    "placeholders": {
-      "error": {
         "type": "Object"
       }
     }
@@ -16186,37 +16372,9 @@
       }
     }
   },
-  "@trips_gallery_errorLinking": {
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
-  "@trips_gallery_errorScanning": {
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
-  "@trips_gallery_error_loading": {
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
   "@trips_gallery_linkedPhotos": {
     "placeholders": {
       "count": {
-        "type": "Object"
-      }
-    }
-  },
-  "@trips_list_error_loading": {
-    "placeholders": {
-      "error": {
         "type": "Object"
       }
     }
@@ -16238,13 +16396,6 @@
   "@trips_photos_moreIndicator_semanticLabel": {
     "placeholders": {
       "count": {
-        "type": "Object"
-      }
-    }
-  },
-  "@trips_picker_error": {
-    "placeholders": {
-      "error": {
         "type": "Object"
       }
     }
@@ -18119,6 +18270,7 @@
       }
     }
   },
+  "diveComputer_scan_bluetoothUnavailable": "Bluetooth is off or unavailable. Turn it on and tap Retry, or connect with the USB Cable tab.",
   "diveComputer_scan_emptyStateInstructions": "Make sure your dive computer is:\n• Turned on\n• In Bluetooth pairing mode\n• Close to your device",
   "diveComputer_scan_knownBadge": "Known",
   "diveComputer_scan_lookingForDevicesTitle": "Looking for Devices",
@@ -19168,6 +19320,10 @@
   "dropTarget_error_unsupportedFile": "Unsupported file type",
   "dropTarget_error_wizardActive": "Finish current import first",
   "dropTarget_error_readFailed": "Could not read file",
+  "dropTarget_error_mediaNeedsDestination": "To link photos and videos, drop them on Media, a dive or a dive site",
+  "@dropTarget_error_mediaNeedsDestination": {"description": "Snackbar when photos or videos are dropped on a screen that cannot take them"},
+  "dropTarget_error_someUnreadable": "{count, plural, =1{{count} file could not be read and was skipped} other{{count} files could not be read and were skipped}}",
+  "@dropTarget_error_someUnreadable": {"description": "Snackbar after a share-sheet import that skipped files it could not read, while the rest were imported", "placeholders": {"count": {"type": "int"}}},
   "enum_cloudCover_clear": "Clear",
   "enum_cloudCover_partlyCloudy": "Partly Cloudy",
   "enum_cloudCover_mostlyCloudy": "Mostly Cloudy",
@@ -19603,6 +19759,26 @@
   "@settings_shareAll_noneToShare": {
     "description": "Message shown when there are no sites/trips to share"
   },
+  "settings_hiddenItems_empty": "Nothing is hidden from this profile.",
+  "@settings_hiddenItems_empty": {
+    "description": "Empty state of the hidden items page."
+  },
+  "settings_hiddenItems_sites": "Sites",
+  "@settings_hiddenItems_sites": {
+    "description": "Group header for hidden sites."
+  },
+  "settings_hiddenItems_title": "Hidden from this profile",
+  "@settings_hiddenItems_title": {
+    "description": "Settings row and page title listing the shared trips and sites hidden from the active profile."
+  },
+  "settings_hiddenItems_trips": "Trips",
+  "@settings_hiddenItems_trips": {
+    "description": "Group header for hidden trips."
+  },
+  "settings_hiddenItems_unhide": "Unhide",
+  "@settings_hiddenItems_unhide": {
+    "description": "Button that shows a hidden shared trip or site to the active profile again."
+  },
   "settings_sharedData_sectionTitle": "Shared data",
   "@settings_sharedData_sectionTitle": {
     "description": "Section header for shared data controls"
@@ -19656,6 +19832,196 @@
         "example": "Red Sea Liveaboard"
       }
     }
+  },
+  "sharedItems_bulkDeleteCount_sites": "{count, plural, one{{count} site will be deleted.} other{{count} sites will be deleted.}}",
+  "@sharedItems_bulkDeleteCount_sites": {
+    "description": "Bulk delete confirmation line counting sites that will be deleted.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "sharedItems_bulkDeleteCount_trips": "{count, plural, one{{count} trip will be deleted.} other{{count} trips will be deleted.}}",
+  "@sharedItems_bulkDeleteCount_trips": {
+    "description": "Bulk delete confirmation line counting trips that will be deleted.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "sharedItems_bulkHiddenSnackbar": "{count, plural, one{{count} item removed from your profile} other{{count} items removed from your profile}}",
+  "@sharedItems_bulkHiddenSnackbar": {
+    "description": "Snackbar counting the shared items a bulk action hid from the active profile.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "sharedItems_bulkHideCount_sites": "{count, plural, one{{count} shared site will be removed from your profile only.} other{{count} shared sites will be removed from your profile only.}}",
+  "@sharedItems_bulkHideCount_sites": {
+    "description": "Bulk delete confirmation line counting other profiles' shared sites that are only hidden.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "sharedItems_bulkHideCount_trips": "{count, plural, one{{count} shared trip will be removed from your profile only.} other{{count} shared trips will be removed from your profile only.}}",
+  "@sharedItems_bulkHideCount_trips": {
+    "description": "Bulk delete confirmation line counting other profiles' shared trips that are only hidden.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "sharedItems_bulkRemoveTitle": "{count, plural, one{Remove {count} item from your profile?} other{Remove {count} items from your profile?}}",
+  "@sharedItems_bulkRemoveTitle": {
+    "description": "Bulk confirmation title when every selected item is another profile's shared item and is only hidden.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "sharedItems_bulkSharedWarning_sites": "{count, plural, one{{count} of them is shared with other profiles and will be deleted for everyone.} other{{count} of them are shared with other profiles and will be deleted for everyone.}}",
+  "@sharedItems_bulkSharedWarning_sites": {
+    "description": "Bulk delete confirmation line counting the deleted sites that are shared, so deleted for every profile.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "sharedItems_bulkSharedWarning_trips": "{count, plural, one{{count} of them is shared with other profiles and will be deleted for everyone.} other{{count} of them are shared with other profiles and will be deleted for everyone.}}",
+  "@sharedItems_bulkSharedWarning_trips": {
+    "description": "Bulk delete confirmation line counting the deleted trips that are shared, so deleted for every profile.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "sharedItems_hiddenHere": "Hidden from your profile",
+  "@sharedItems_hiddenHere": {
+    "description": "Added after the Shared by line on a shared trip or site that the active profile has hidden from itself."
+  },
+  "sharedItems_mergeTooManyShared": "Only one of the selected sites can belong to another profile. Deselect the others to merge.",
+  "@sharedItems_mergeTooManyShared": {
+    "description": "Shown when a merge selection holds more than one site owned by another profile."
+  },
+  "sharedItems_notOwner_site": "Only its owner can delete this site",
+  "@sharedItems_notOwner_site": {
+    "description": "Shown when a delete of a shared site is refused because another profile owns it."
+  },
+  "sharedItems_notOwner_trip": "Only its owner can delete this trip",
+  "@sharedItems_notOwner_trip": {
+    "description": "Shown when a delete of a shared trip is refused because another profile owns it."
+  },
+  "sharedItems_otherProfilesDives_site": "{count, plural, one{{count} dive in another profile will lose this site.} other{{count} dives in other profiles will lose this site.}}",
+  "@sharedItems_otherProfilesDives_site": {
+    "description": "Owner's delete confirmation line counting other profiles' dives that lose the site.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "sharedItems_otherProfilesDives_trip": "{count, plural, one{{count} dive in another profile will lose this trip.} other{{count} dives in other profiles will lose this trip.}}",
+  "@sharedItems_otherProfilesDives_trip": {
+    "description": "Owner's delete confirmation line counting other profiles' dives that lose the trip.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "sharedItems_ownerUnknown": "another profile",
+  "@sharedItems_ownerUnknown": {
+    "description": "Stands in for the owner name when the owning profile is unknown."
+  },
+  "sharedItems_removeAction": "Remove from my profile",
+  "@sharedItems_removeAction": {
+    "description": "Menu action that hides another profile's shared trip or site from the active profile only."
+  },
+  "sharedItems_removeBody": "It stays in {owner}'s log and in every other profile. It is only hidden here.",
+  "@sharedItems_removeBody": {
+    "description": "Explains that hiding a shared item leaves it in the owner's log and every other profile.",
+    "placeholders": {
+      "owner": {
+        "type": "String",
+        "example": "Alice"
+      }
+    }
+  },
+  "sharedItems_removeOwnDives": "{count, plural, one{{count} of your dives stays linked to it.} other{{count} of your dives stay linked to it.}}",
+  "@sharedItems_removeOwnDives": {
+    "description": "Line counting the active profile's own dives that keep their link to the hidden trip or site.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "sharedItems_removeRestoreHint": "You can bring it back from Settings > Shared data.",
+  "@sharedItems_removeRestoreHint": {
+    "description": "Tells the diver where to restore a hidden shared trip or site."
+  },
+  "sharedItems_removeTitle": "Remove '{name}' from your profile?",
+  "@sharedItems_removeTitle": {
+    "description": "Title of the confirmation for hiding a shared trip or site from the active profile.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Red Sea Liveaboard"
+      }
+    }
+  },
+  "sharedItems_removedSnackbar": "Removed from your profile",
+  "@sharedItems_removedSnackbar": {
+    "description": "Snackbar after hiding a shared trip or site from the active profile."
+  },
+  "sharedItems_shareOwnerOnly": "Only {owner} can change sharing",
+  "@sharedItems_shareOwnerOnly": {
+    "description": "Helper under the disabled share switch when another profile owns the trip or site.",
+    "placeholders": {
+      "owner": {
+        "type": "String",
+        "example": "Alice"
+      }
+    }
+  },
+  "sharedItems_sharedBy": "Shared by {owner}",
+  "@sharedItems_sharedBy": {
+    "description": "Line on a shared trip or site owned by another diver profile, naming the owner.",
+    "placeholders": {
+      "owner": {
+        "type": "String",
+        "example": "Alice"
+      }
+    }
+  },
+  "sharedItems_undo": "Undo",
+  "@sharedItems_undo": {
+    "description": "Snackbar action that undoes hiding a shared trip or site."
+  },
+  "sharedItems_unhideAction": "Show in my profile",
+  "@sharedItems_unhideAction": {
+    "description": "Menu action on a shared trip or site the active profile has hidden, showing it in that profile again. The counterpart of sharedItems_removeAction."
   },
   "sites_deleteShared_title": "Delete shared site?",
   "@sites_deleteShared_title": {
@@ -20772,6 +21138,8 @@
   "safetyHub_noFly_disclaimer": "DAN/UHMS guideline intervals from your last dive. Not a substitute for your dive computer's no-fly time.",
   "diveLog_detail_altitudeMismatch_title": "Site is at altitude",
   "diveLog_detail_altitudeMismatch_subtitle": "This site records an altitude but the dive has none set, so decompression analysis assumed sea level. Set the dive's altitude to correct it.",
+  "diveLog_detail_sacSegmentsNoPressure": "Only start and end tank pressures were recorded, so gas use can't be split into segments. A breakdown needs pressure readings taken during the dive, such as from an air-integrated transmitter. The whole-dive average appears under Cylinders.",
+  "diveLog_detail_sacSegmentsNoPressure_subtitle": "No tank pressure recorded during the dive",
   "diveLog_detail_sacVolumeHint": "Add a cylinder volume to show RMV in {unit}",
   "@diveLog_detail_sacVolumeHint": {
     "placeholders": {
@@ -21609,6 +21977,8 @@
   },
   "dataQuality_neverScanned": "Your logbook has not been scanned yet",
   "dataQuality_empty_title": "All clear",
+  "dataQuality_empty_chipFiltered": "No findings in this category",
+  "dataQuality_empty_showAll": "Show all findings",
   "dataQuality_empty_subtitle": "No data quality findings. Scan your library to check imported dives for problems.",
   "dataQuality_banner_newChecks": "New quality checks are available",
   "dataQuality_banner_rescan": "Rescan",
@@ -22240,6 +22610,18 @@
     }
   },
   "common_selection_countSelected": "{count} selected",
+  "common_listCount_shownOfTotal": "{shown} of {total}",
+  "@common_listCount_shownOfTotal": {
+    "description": "A list's filtered entry count without its noun, for a header too narrow for the full one.",
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "common_selection_enterTooltip": "Select items",
   "common_selection_exitTooltip": "Exit selection",
   "common_selection_selectAllTooltip": "Select all",
@@ -24801,6 +25183,8 @@
   "diveLog_listPage_tooltip_explore": "Explore with a sentence",
   "explore_chip_favorite": "Favourite",
   "explore_chip_deco": "Decompression dive",
+  "explore_chip_fieldPeriod": "{field}: {period}",
+  "@explore_chip_fieldPeriod": {"placeholders": {"field": {"type": "String"}, "period": {"type": "String"}}},
   "explore_chip_noDeco": "No decompression",
   "explore_chip_noBuddy": "No buddy",
   "explore_chip_rating": "Rating {op} {value}",
@@ -24817,6 +25201,10 @@
   "@explore_chip_timeRange": {"placeholders": {"start": {"type": "String"}, "end": {"type": "String"}}},
   "explore_chip_timeSince": "Since {start}",
   "explore_chip_timeBefore": "Before {end}",
+  "explore_chip_viaDives": "Dives: {label}",
+  "@explore_chip_viaDives": {"placeholders": {"label": {"type": "String"}}},
+  "explore_chip_withinDays": "{days, plural, =1{{field} within {days} day} other{{field} within {days} days}}",
+  "@explore_chip_withinDays": {"placeholders": {"days": {"type": "int"}, "field": {"type": "String"}}},
   "explore_count": "{count, plural, =0{No dives} =1{1 dive} other{{count} dives}}",
   "explore_download_button": "Download the on-device model",
   "explore_download_running": "Downloading the model",
@@ -24846,6 +25234,7 @@
   "explore_field_weekday": "Weekday",
   "explore_handoff_diveList": "Open in dive list",
   "explore_handoff_insights": "Open in Insights",
+  "explore_handoff_list": "Open in list",
   "explore_hint": "Ask about your dives, for example turtles below 20 m in Bonaire",
   "explore_needsAttention_title": "Needs attention",
   "explore_op_gt": "over",
@@ -24857,12 +25246,15 @@
   "explore_op_eq": "of",
   "explore_pickCandidate_title": "Which did you mean by \"{text}\"?",
   "explore_recent_title": "Recent",
+  "explore_results_count": "{count, plural, =1{{count} result} other{{count} results}}",
+  "explore_results_subjectTitle": "Matches",
+  "explore_results_subjectTruncated": "Showing the first {count}. Open in the list for all of them.",
   "explore_results_title": "Matching dives",
   "explore_results_truncated": "Showing the first {count}. Open in the dive list for all of them.",
   "explore_shortcut_unavailable": "Explore needs the on-device model, which is not ready on this device.",
-  "explore_subjectNotSupported": "Only dives can be searched for now.",
   "explore_title": "Explore",
   "explore_understood_title": "Understood",
+  "explore_unplaced_reason_aggregateWithScope": "Can't be combined with conditions on the dives yet",
   "explore_unplaced_reason_invalid": "Could not read this value",
   "explore_unplaced_reason_noAxis": "Not searchable yet",
   "explore_unplaced_reason_outOfRange": "Value out of range",
@@ -27815,7 +28207,7 @@
   "transmitters_action_delete": "Delete transmitter",
   "transmitters_action_apply": "Apply to existing dives",
   "transmitters_apply_title": "Apply to existing dives?",
-  "transmitters_apply_content": "{tanks} cylinders on {dives} dives carry this transmitter. Empty size, material, name and gear fields will be filled, and a role still set to Back Gas will be replaced.",
+  "transmitters_apply_content": "{tanks} cylinders on {dives} dives carry this transmitter. Empty size, material, name and gear fields will be filled, and a role still set to Back Gas or read from the transmitter's name will be replaced.",
   "@transmitters_apply_content": {
     "placeholders": {
       "tanks": { "type": "int" },
@@ -27886,6 +28278,13 @@
   },
   "diveLog_tank_assignTransmitter": "Assign transmitter",
   "diveLog_tank_reassignSeries": "Reassign pressure series",
+  "diveLog_tank_roleFromTransmitterName": "{role}, read from the transmitter's name",
+  "@diveLog_tank_roleFromTransmitterName": {
+    "description": "Under a cylinder whose role the dive computer took from the name the diver gave its transmitter (a name starting with O reads as oxygen, D as diluent), so the role is unconfirmed. role is the localized tank role, e.g. O₂ Supply.",
+    "placeholders": {
+      "role": { "type": "String" }
+    }
+  },
   "diveLog_reassignSheet_title": "Pressure series",
   "diveLog_reassignSheet_swap": "Swap",
   "diveLog_reassignSheet_moveTo": "Move to",
@@ -27900,6 +28299,8 @@
   "universalImport_summary_noticeUnknownTransmitterTitle": "Unassigned transmitters",
   "universalImport_summary_noticeUnknownTransmitterBody": "One or more transmitters in this download are not assigned to a cylinder. Assign them so future downloads get the right size and role.",
   "universalImport_summary_noticeAssignTransmitters": "Assign transmitters",
+  "universalImport_summary_noticeTransmitterNameRolesTitle": "Cylinder roles read from transmitter names",
+  "universalImport_summary_noticeTransmitterNameRolesBody": "The dive computer took some oxygen and diluent roles from the names given to its transmitters: a name starting with O reads as oxygen, one starting with D as diluent. Assign the transmitters to confirm or correct those roles.",
   "universalImport_summary_noticeDiveNumberConflictTitle": "Dive numbers already in use",
   "universalImport_summary_noticeDiveNumberConflictBody": "These dives kept the number from their source, but other dives in your log already use the same numbers. Open Dive Numbering from the dive list menu to renumber them.",
   "dataQuality_detector_unknown_transmitter": "Unassigned transmitter",
@@ -28195,6 +28596,35 @@
   "navTrack_review_row_maxDepth": "Max depth",
   "navTrack_review_row_maxSpeed": "Max speed",
   "navTrack_review_leaveUnlinked": "Leave unlinked",
+  "navTrack_review_noOverlapHint": "No dive overlaps this recording's time. Nearest dives by start time:",
+  "navTrack_review_offsetBefore": "{offset} before the recording",
+  "@navTrack_review_offsetBefore": {
+    "placeholders": {
+      "offset": {
+        "type": "String"
+      }
+    }
+  },
+  "navTrack_review_offsetAfter": "{offset} after the recording",
+  "@navTrack_review_offsetAfter": {
+    "placeholders": {
+      "offset": {
+        "type": "String"
+      }
+    }
+  },
+  "navTrack_review_offsetDays": "{days}d {hours}h",
+  "@navTrack_review_offsetDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "navTrack_review_chooseAnotherDive": "Choose another dive...",
   "navTrack_list_importFailed": "Import failed: {error}",
   "@navTrack_list_importFailed": {
     "placeholders": {
@@ -28373,12 +28803,16 @@
   "diveCenters_rental_deleteConfirm": "Delete this rental note?",
   "query_buddies_certifications": "Certifications",
   "@query_buddies_certifications": {"description": "Field label in the query builder"},
+  "query_buddies_diveCount": "Dives together",
+  "@query_buddies_diveCount": {"description": "Field label in the query builder: how many counted dives the diver made with this buddy"},
   "query_buddies_dives": "Dives",
   "@query_buddies_dives": {"description": "Query builder: a buddy's dives"},
   "query_buddies_email": "Email",
   "@query_buddies_email": {"description": "Field label in the query builder"},
   "query_buddies_favorite": "Favorite",
   "@query_buddies_favorite": {"description": "Field label in the query builder"},
+  "query_buddies_lastDived": "Last dived together",
+  "@query_buddies_lastDived": {"description": "Field label in the query builder: the date of the newest counted dive with this buddy"},
   "query_buddies_name": "Name",
   "@query_buddies_name": {"description": "Field label in the query builder"},
   "query_buddies_notes": "Notes",
@@ -28393,8 +28827,12 @@
   "@query_centers_coordinates": {"description": "Query builder: whether a dive center has a map position"},
   "query_centers_country": "Country",
   "@query_centers_country": {"description": "Field label in the query builder"},
+  "query_centers_diveCount": "Dive count",
+  "@query_centers_diveCount": {"description": "Field label in the query builder: how many counted dives were made with the center"},
   "query_centers_dives": "Dives",
   "@query_centers_dives": {"description": "Query builder: dives made with a dive center"},
+  "query_centers_lastDived": "Last dived",
+  "@query_centers_lastDived": {"description": "Field label in the query builder: the date of the newest counted dive with the center"},
   "query_centers_name": "Name",
   "@query_centers_name": {"description": "Field label in the query builder"},
   "query_centers_notes": "Notes",
@@ -28643,12 +29081,18 @@
   "@query_equipment_attributes": {"description": "Field label in the query builder"},
   "query_equipment_brand": "Brand",
   "@query_equipment_brand": {"description": "Field label in the query builder"},
+  "query_equipment_diveCount": "Dives used",
+  "@query_equipment_diveCount": {"description": "Field label in the query builder: how many counted dives the item was used on"},
   "query_equipment_dives": "Dives",
   "@query_equipment_dives": {"description": "Relation label in the query builder: the dives an item was used on"},
+  "query_equipment_lastDived": "Last used",
+  "@query_equipment_lastDived": {"description": "Field label in the query builder: the date of the newest counted dive the item was used on"},
   "query_equipment_model": "Model",
   "@query_equipment_model": {"description": "Field label in the query builder"},
   "query_equipment_name": "Name",
   "@query_equipment_name": {"description": "Field label in the query builder"},
+  "query_equipment_nextServiceDue": "Next service due",
+  "@query_equipment_nextServiceDue": {"description": "Field label in the query builder: the date the item's next service falls due"},
   "query_equipment_serialNumber": "Serial number",
   "@query_equipment_serialNumber": {"description": "Field label in the query builder"},
   "query_equipment_serviceDue": "Service due",
@@ -28695,10 +29139,14 @@
   "@query_sites_country": {"description": "Field label in the query builder"},
   "query_sites_difficulty": "Difficulty",
   "@query_sites_difficulty": {"description": "Field label in the query builder"},
+  "query_sites_diveCount": "Dive count",
+  "@query_sites_diveCount": {"description": "Field label in the query builder: how many counted dives the site has"},
   "query_sites_dives": "Dives",
   "@query_sites_dives": {"description": "Relation label in the query builder: the dives at a site"},
   "query_sites_island": "Island",
   "@query_sites_island": {"description": "Field label in the query builder"},
+  "query_sites_lastDived": "Last dived",
+  "@query_sites_lastDived": {"description": "Field label in the query builder: the date of the site's newest counted dive"},
   "query_sites_maxDepth": "Max depth",
   "@query_sites_maxDepth": {"description": "Field label in the query builder"},
   "query_sites_name": "Name",
@@ -28719,10 +29167,16 @@
   "@query_species_category": {"description": "Field label in the query builder"},
   "query_species_description": "Description",
   "@query_species_description": {"description": "Query builder: a species' description"},
+  "query_species_diveCount": "Dives seen on",
+  "@query_species_diveCount": {"description": "Field label in the query builder: how many counted dives the species was seen on"},
   "query_species_dives": "Dives",
   "@query_species_dives": {"description": "Query builder: the dives a species was sighted on"},
   "query_species_expectedSites": "Expected at sites",
   "@query_species_expectedSites": {"description": "Query builder: the dive sites a species is curated as expected at (not where it was seen)"},
+  "query_species_firstSeen": "First seen",
+  "@query_species_firstSeen": {"description": "Field label in the query builder: the date of the first counted dive the species was seen on"},
+  "query_species_lastSeen": "Last seen",
+  "@query_species_lastSeen": {"description": "Field label in the query builder: the date of the newest counted dive the species was seen on"},
   "query_species_name": "Name",
   "@query_species_name": {"description": "Field label in the query builder"},
   "query_species_scientificName": "Scientific name",
@@ -28747,6 +29201,8 @@
   "@query_tanks_startPressure": {"description": "Field label in the query builder"},
   "query_tanks_volume": "Volume",
   "@query_tanks_volume": {"description": "Field label in the query builder"},
+  "query_trips_diveCount": "Dive count",
+  "@query_trips_diveCount": {"description": "Field label in the query builder: how many counted dives the trip has"},
   "query_trips_dives": "Dives",
   "@query_trips_dives": {"description": "Relation label in the query builder: the dives on a trip"},
   "query_trips_endDate": "End date",

@@ -25,6 +25,46 @@ DiveTank tankFromTripCylinder(DiveTank tank, TripCylinderState slot) {
   );
 }
 
+/// Pure. The slots [tank] cannot take because a sibling on its dive holds
+/// them. Only a sibling from the same recording counts: one recording's two
+/// tanks are two cylinders, but another recording's tank may be its copy of
+/// this very cylinder, a row consolidation did not merge, and must be able
+/// to share its slot (issue #2661).
+///
+/// A recording is the tank's computer when it names one. Otherwise it is
+/// the tank's data source when that is not the primary (issue #2716: two
+/// consolidated sources that name no computer). Otherwise the tank is the
+/// dive's own: a hand-added tank, one written before attribution, or the
+/// primary source's, all of which are the primary recording, by
+/// [primaryComputerId] (`Dive.computerId`) when the dive has one, else by
+/// [primarySourceId]. A download stamps its computer on every tank it
+/// writes, so without this a hand-added tank would pass for another
+/// recording and could share a downloaded tank's slot.
+Set<String> tripCylinderIdsTakenFor(
+  DiveTank tank,
+  List<DiveTank> tanks, {
+  required String? primaryComputerId,
+  required String? primarySourceId,
+}) {
+  final primary = primaryComputerId != null
+      ? 'computer:$primaryComputerId'
+      : 'source:$primarySourceId';
+  String recordingOf(DiveTank t) {
+    if (t.computerId case final computerId?) return 'computer:$computerId';
+    final sourceId = t.sourceId;
+    if (sourceId != null && sourceId != primarySourceId) {
+      return 'source:$sourceId';
+    }
+    return primary;
+  }
+
+  return {
+    for (final t in tanks)
+      if (t.id != tank.id && recordingOf(t) == recordingOf(tank))
+        ?t.tripCylinderId,
+  };
+}
+
 /// Pure. Links each tank in [eligibleTankIds] that has no link to the slot
 /// [suggestTripCylinder] picks for it, filled by [tankFromTripCylinder].
 /// Slots other tanks already hold, and slots given to an earlier tank in

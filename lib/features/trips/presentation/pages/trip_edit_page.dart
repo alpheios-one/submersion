@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -19,6 +20,9 @@ import 'package:submersion/shared/widgets/app_bar_text_action.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
 import 'package:submersion/shared/widgets/forms/number_field.dart';
 import 'package:submersion/shared/widgets/forms/number_input_validation.dart';
+import 'package:submersion/shared/widgets/shared_items/shared_item_dialogs.dart';
+
+const _log = LoggerService('tripEditPage');
 
 class TripEditPage extends ConsumerStatefulWidget {
   final String? tripId;
@@ -176,12 +180,13 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
           _hasChanges = false;
         });
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      _log.error('Failed to load trip', error: e, stackTrace: stackTrace);
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(context.l10n.trips_edit_snackBar_errorLoading('$e')),
+            content: Text(context.l10n.trips_edit_snackBar_errorLoading),
           ),
         );
       }
@@ -644,23 +649,38 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
                                       .l10n
                                       .common_label_shareWithAllProfiles,
                                 ),
+                                // Only the owner changes sharing (#2594).
+                                subtitle: _mayShare() != false
+                                    ? null
+                                    : Text(
+                                        context.l10n.sharedItems_shareOwnerOnly(
+                                          sharedItemOwnerName(
+                                            divers,
+                                            _originalTrip?.diverId,
+                                            context.l10n,
+                                          ),
+                                        ),
+                                      ),
                                 value: _isShared,
-                                onChanged: (v) async {
-                                  if (!v &&
-                                      isEditing &&
-                                      (_originalTrip?.isShared ?? false)) {
-                                    final confirmed =
-                                        await _showUnshareConfirmDialog(
-                                          context,
-                                        );
-                                    if (!mounted) return;
-                                    if (confirmed != true) return;
-                                  }
-                                  setState(() {
-                                    _isShared = v;
-                                    _hasChanges = true;
-                                  });
-                                },
+                                onChanged: _mayShare() != true
+                                    ? null
+                                    : (v) async {
+                                        if (!v &&
+                                            isEditing &&
+                                            (_originalTrip?.isShared ??
+                                                false)) {
+                                          final confirmed =
+                                              await _showUnshareConfirmDialog(
+                                                context,
+                                              );
+                                          if (!mounted) return;
+                                          if (confirmed != true) return;
+                                        }
+                                        setState(() {
+                                          _isShared = v;
+                                          _hasChanges = true;
+                                        });
+                                      },
                               )
                             : const SizedBox.shrink(),
                         orElse: () => const SizedBox.shrink(),
@@ -915,6 +935,17 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
 
   /// Asks the user to confirm un-sharing an existing shared trip.
   /// Returns [true] if confirmed, [false] or [null] to cancel.
+  /// Whether the active profile may change this trip's sharing: always for
+  /// a new trip, and only the owner for an existing one (issue #2594); null
+  /// while the profile is unknown, which locks it without naming an owner
+  /// (issue #2682). Read during build, so it watches the active profile.
+  bool? _mayShare() => _originalTrip == null
+      ? true
+      : canDestroySharedItemOnceKnown(
+          ref.watch(validatedCurrentDiverIdProvider),
+          ownerId: _originalTrip?.diverId,
+        );
+
   Future<bool?> _showUnshareConfirmDialog(BuildContext ctx) {
     final tripName = _nameController.text.trim().isNotEmpty
         ? _nameController.text.trim()
@@ -1126,11 +1157,12 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
           context.pop(savedId);
         }
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      _log.error('Failed to save trip', error: e, stackTrace: stackTrace);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(context.l10n.trips_edit_snackBar_errorSaving('$e')),
+            content: Text(context.l10n.trips_edit_snackBar_errorSaving),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );

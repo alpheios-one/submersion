@@ -16,6 +16,8 @@ import 'package:submersion/features/trips/domain/entities/dive_candidate.dart';
 import 'package:submersion/features/trips/presentation/widgets/dive_assignment_dialog.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
+import '../../../../helpers/shared_items_fixture.dart';
+
 /// Pumps a fresh-trip page behind a router, so the `context.pop(savedId)` that
 /// follows a successful save has somewhere to go. Creating a trip always
 /// triggers the post-save scan (`datesChanged` is `!isEditing`), which keeps
@@ -661,6 +663,8 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            // No active profile, as before sharing: every action is the owner's.
+            validatedCurrentDiverIdProvider.overrideWith((_) async => null),
             tripRepositoryProvider.overrideWithValue(
               _MockTripRepositoryWithSharedTrip(),
             ),
@@ -703,6 +707,124 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Unshare this trip?'), findsOneWidget);
+    });
+  });
+
+  group('share toggle ownership (issue #2594)', () {
+    final twoDivers = [
+      for (final (id, name) in [('d1', 'Alice'), ('d2', 'Bob')])
+        Diver(
+          id: id,
+          name: name,
+          createdAt: DateTime(2024),
+          updatedAt: DateTime(2024),
+        ),
+    ];
+
+    Future<SwitchListTile> shareSwitch(
+      WidgetTester tester, {
+      required String active,
+      GatedActiveProfile? activeProfile,
+      bool profileUnreadable = false,
+    }) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            tripRepositoryProvider.overrideWithValue(
+              _MockTripRepositoryWithOwnedSharedTrip(),
+            ),
+            tripListNotifierProvider.overrideWith((ref) {
+              return _MockTripListNotifier([]);
+            }),
+            allDiversProvider.overrideWith((_) async => twoDivers),
+            validatedCurrentDiverIdProvider.overrideWith(
+              (_) =>
+                  activeProfile?.read() ??
+                  (profileUnreadable
+                      ? Future<String?>.error(StateError('no profile'))
+                      : Future.value(active)),
+            ),
+            shareByDefaultProvider.overrideWith((_) async => true),
+          ],
+          child: const MaterialApp(
+            locale: Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: TripEditPage(tripId: 'test-shared'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Share with all dive profiles'),
+        50.0,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+      return tester.widget<SwitchListTile>(
+        find.byWidgetPredicate(
+          (w) =>
+              w is SwitchListTile &&
+              w.title is Text &&
+              (w.title as Text).data == 'Share with all dive profiles',
+        ),
+      );
+    }
+
+    testWidgets('is locked for another profile, naming the owner', (
+      tester,
+    ) async {
+      final tile = await shareSwitch(tester, active: 'd2');
+      expect(tile.onChanged, isNull);
+      expect(find.text('Only Alice can change sharing'), findsOneWidget);
+    });
+
+    testWidgets('is locked while a profile switch re-reads the profile '
+        '(issue #2677 review)', (tester) async {
+      final activeProfile = GatedActiveProfile.settled('d1');
+      final tile = await shareSwitch(
+        tester,
+        active: 'd1',
+        activeProfile: activeProfile,
+      );
+      expect(tile.onChanged, isNotNull);
+
+      ProviderScope.containerOf(
+        tester.element(find.byType(TripEditPage)),
+      ).invalidate(validatedCurrentDiverIdProvider);
+      await tester.pump();
+      final locked = tester.widget<SwitchListTile>(
+        find.byWidgetPredicate(
+          (w) =>
+              w is SwitchListTile &&
+              w.title is Text &&
+              (w.title as Text).data == 'Share with all dive profiles',
+        ),
+      );
+      expect(locked.onChanged, isNull);
+      expect(find.text('Only Alice can change sharing'), findsNothing);
+
+      activeProfile.settle('d2');
+      await tester.pumpAndSettle();
+      expect(find.text('Only Alice can change sharing'), findsOneWidget);
+    });
+
+    // Read as "no profile", the switch unlocked for another profile's trip
+    // (issue #2682). Ownership is unknown, not refused, so no owner line.
+    testWidgets('is locked while the profile cannot be read', (tester) async {
+      final tile = await shareSwitch(
+        tester,
+        active: 'd2',
+        profileUnreadable: true,
+      );
+      expect(tile.onChanged, isNull);
+      expect(find.text('Only Alice can change sharing'), findsNothing);
+    });
+
+    testWidgets('stays open for the owner', (tester) async {
+      final tile = await shareSwitch(tester, active: 'd1');
+      expect(tile.onChanged, isNotNull);
+      expect(find.text('Only Alice can change sharing'), findsNothing);
     });
   });
 
@@ -1410,7 +1532,8 @@ void main() {
       );
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
-      expect(find.textContaining('Error saving trip'), findsOneWidget);
+      expect(find.text("Couldn't save the trip. Try again."), findsOneWidget);
+      expect(find.textContaining('boom'), findsNothing);
     });
   });
 
@@ -1706,7 +1829,8 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.textContaining('Error loading trip'), findsOneWidget);
+      expect(find.text("Couldn't load the trip. Try again."), findsOneWidget);
+      expect(find.textContaining('not found'), findsNothing);
     });
   });
 
@@ -1759,6 +1883,8 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            // No active profile, as before sharing: every action is the owner's.
+            validatedCurrentDiverIdProvider.overrideWith((_) async => null),
             tripRepositoryProvider.overrideWithValue(
               _MockTripRepositoryWithSharedTrip(),
             ),
@@ -1817,6 +1943,8 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            // No active profile, as before sharing: every action is the owner's.
+            validatedCurrentDiverIdProvider.overrideWith((_) async => null),
             tripRepositoryProvider.overrideWithValue(
               _MockTripRepositoryWithSharedTrip(),
             ),
@@ -2003,10 +2131,10 @@ class _MockTripRepository implements TripRepository {
   Future<Trip> createTrip(Trip trip) async => trip;
 
   @override
-  Future<void> updateTrip(Trip trip) async {}
+  Future<void> updateTrip(Trip trip, {String? actingDiverId}) async {}
 
   @override
-  Future<void> deleteTrip(String id) async {}
+  Future<bool> deleteTrip(String id, {String? actingDiverId}) async => true;
 
   @override
   Future<Trip?> getTripById(String id) async => null;
@@ -2059,7 +2187,11 @@ class _MockTripRepository implements TripRepository {
   Future<void> assignDivesToTrip(List<String> diveIds, String tripId) async {}
 
   @override
-  Future<void> setShared(String id, bool isShared) async {}
+  Future<bool> setShared(
+    String id,
+    bool isShared, {
+    String? actingDiverId,
+  }) async => true;
 
   @override
   Future<int> shareAllForDiver(String diverId) async => 0;
@@ -2132,10 +2264,10 @@ class _MockTripRepositoryWithTrip implements TripRepository {
   Future<Trip> createTrip(Trip trip) async => trip;
 
   @override
-  Future<void> updateTrip(Trip trip) async {}
+  Future<void> updateTrip(Trip trip, {String? actingDiverId}) async {}
 
   @override
-  Future<void> deleteTrip(String id) async {}
+  Future<bool> deleteTrip(String id, {String? actingDiverId}) async => true;
 
   @override
   Future<Trip?> getTripById(String id) async {
@@ -2198,7 +2330,11 @@ class _MockTripRepositoryWithTrip implements TripRepository {
   Future<void> assignDivesToTrip(List<String> diveIds, String tripId) async {}
 
   @override
-  Future<void> setShared(String id, bool isShared) async {}
+  Future<bool> setShared(
+    String id,
+    bool isShared, {
+    String? actingDiverId,
+  }) async => true;
 
   @override
   Future<int> shareAllForDiver(String diverId) async => 0;
@@ -2208,15 +2344,31 @@ class _MockTripRepositoryWithTrip implements TripRepository {
 }
 
 /// Mock repository that returns a SHARED test trip (for unshare confirmation tests).
+/// A shared trip owned by profile `d1` (issue #2594).
+class _MockTripRepositoryWithOwnedSharedTrip
+    extends _MockTripRepositoryWithSharedTrip {
+  @override
+  Future<Trip?> getTripById(String id) async => Trip(
+    id: 'test-shared',
+    name: 'Shared Trip',
+    startDate: DateTime(2024, 1, 15),
+    endDate: DateTime(2024, 1, 22),
+    diverId: 'd1',
+    isShared: true,
+    createdAt: DateTime(2024),
+    updatedAt: DateTime(2024),
+  );
+}
+
 class _MockTripRepositoryWithSharedTrip implements TripRepository {
   @override
   Future<Trip> createTrip(Trip trip) async => trip;
 
   @override
-  Future<void> updateTrip(Trip trip) async {}
+  Future<void> updateTrip(Trip trip, {String? actingDiverId}) async {}
 
   @override
-  Future<void> deleteTrip(String id) async {}
+  Future<bool> deleteTrip(String id, {String? actingDiverId}) async => true;
 
   @override
   Future<Trip?> getTripById(String id) async {
@@ -2279,7 +2431,11 @@ class _MockTripRepositoryWithSharedTrip implements TripRepository {
   Future<void> assignDivesToTrip(List<String> diveIds, String tripId) async {}
 
   @override
-  Future<void> setShared(String id, bool isShared) async {}
+  Future<bool> setShared(
+    String id,
+    bool isShared, {
+    String? actingDiverId,
+  }) async => true;
 
   @override
   Future<int> shareAllForDiver(String diverId) async => 0;
@@ -2321,7 +2477,16 @@ class _MockTripListNotifier
   }
 
   @override
-  Future<void> deleteTrip(String id) async {}
+  Future<bool> deleteTrip(String id) async => true;
+
+  @override
+  Future<bool> hideTrip(String id) async => true;
+
+  @override
+  Future<int> hideTrips(List<String> ids) async => ids.length;
+
+  @override
+  Future<void> unhideTrip(String id) async {}
 
   @override
   Future<void> assignDiveToTrip(String diveId, String tripId) async {}
@@ -2360,7 +2525,16 @@ class _ThrowingTripListNotifier
   Future<void> updateTrip(Trip trip) async {}
 
   @override
-  Future<void> deleteTrip(String id) async {}
+  Future<bool> deleteTrip(String id) async => true;
+
+  @override
+  Future<bool> hideTrip(String id) async => true;
+
+  @override
+  Future<int> hideTrips(List<String> ids) async => ids.length;
+
+  @override
+  Future<void> unhideTrip(String id) async {}
 
   @override
   Future<void> assignDiveToTrip(String diveId, String tripId) async {}
@@ -2382,10 +2556,10 @@ class _SlowTripRepository implements TripRepository {
   Future<Trip> createTrip(Trip trip) async => trip;
 
   @override
-  Future<void> updateTrip(Trip trip) async {}
+  Future<void> updateTrip(Trip trip, {String? actingDiverId}) async {}
 
   @override
-  Future<void> deleteTrip(String id) async {}
+  Future<bool> deleteTrip(String id, {String? actingDiverId}) async => true;
 
   @override
   Future<Trip?> getTripById(String id) async {
@@ -2448,7 +2622,11 @@ class _SlowTripRepository implements TripRepository {
   Future<void> assignDivesToTrip(List<String> diveIds, String tripId) async {}
 
   @override
-  Future<void> setShared(String id, bool isShared) async {}
+  Future<bool> setShared(
+    String id,
+    bool isShared, {
+    String? actingDiverId,
+  }) async => true;
 
   @override
   Future<int> shareAllForDiver(String diverId) async => 0;
@@ -2463,10 +2641,10 @@ class _ErrorTripRepository implements TripRepository {
   Future<Trip> createTrip(Trip trip) async => trip;
 
   @override
-  Future<void> updateTrip(Trip trip) async {}
+  Future<void> updateTrip(Trip trip, {String? actingDiverId}) async {}
 
   @override
-  Future<void> deleteTrip(String id) async {}
+  Future<bool> deleteTrip(String id, {String? actingDiverId}) async => true;
 
   @override
   Future<Trip?> getTripById(String id) async {
@@ -2521,7 +2699,11 @@ class _ErrorTripRepository implements TripRepository {
   Future<void> assignDivesToTrip(List<String> diveIds, String tripId) async {}
 
   @override
-  Future<void> setShared(String id, bool isShared) async {}
+  Future<bool> setShared(
+    String id,
+    bool isShared, {
+    String? actingDiverId,
+  }) async => true;
 
   @override
   Future<int> shareAllForDiver(String diverId) async => 0;

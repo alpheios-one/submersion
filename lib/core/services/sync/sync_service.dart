@@ -12,6 +12,7 @@ import 'package:submersion/core/database/database.dart'
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/services/sync/child_column_clears.dart';
 import 'package:submersion/core/services/sync/peer_device_name_store.dart';
 import 'package:submersion/core/services/sync/sync_fact_groups.dart';
 import 'package:submersion/core/services/sync/media_resolution_hints.dart';
@@ -46,6 +47,7 @@ import 'package:submersion/core/services/sync/crypto/sync_envelope.dart';
 import 'package:submersion/core/services/sync/library_moved.dart';
 import 'package:submersion/core/services/sync/sync_clock.dart';
 import 'package:submersion/core/services/sync/sync_data_serializer.dart';
+import 'package:submersion/core/services/sync/sync_record_overlay.dart';
 import 'package:submersion/core/services/sync/tag_fill_copy_merge.dart';
 import 'package:submersion/core/services/sync/sync_initializer.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -1651,6 +1653,9 @@ class SyncService {
             records: data.tripEquipment,
             hasUpdatedAt: false,
           ),
+          // After their parents (trips, sites and divers), issue #2594.
+          (type: 'tripHides', records: data.tripHides, hasUpdatedAt: false),
+          (type: 'siteHides', records: data.siteHides, hasUpdatedAt: false),
           (
             type: 'equipmentOwnershipEvents',
             records: data.equipmentOwnershipEvents,
@@ -2585,6 +2590,8 @@ class SyncService {
     'equipmentTags': false,
     'equipmentShares': false,
     'tripEquipment': false,
+    'tripHides': false,
+    'siteHides': false,
     'equipmentOwnershipEvents': false,
     'mediaSpecies': false,
     'siteFeatures': true,
@@ -2726,6 +2733,10 @@ class SyncService {
       // sent, or has deleted, only clears the link.
       (field: 'tripCylinderId', parent: 'tripCylinders', nullable: true),
       (field: 'computerId', parent: 'diveComputers', nullable: true),
+      // v251: the data source the tank row came from (#2716); nullable, as
+      // on tank pressure series, so a source the peer deleted only clears
+      // the link.
+      (field: 'sourceId', parent: 'diveDataSources', nullable: true),
     ],
     'diveWeights': [(field: 'diveId', parent: 'dives', nullable: false)],
     'diveEquipment': [
@@ -2836,6 +2847,15 @@ class SyncService {
     'tripEquipment': [
       (field: 'tripId', parent: 'trips', nullable: false),
       (field: 'equipmentId', parent: 'equipment', nullable: false),
+    ],
+    // v250: a profile's hidden shared trips and sites (issue #2594).
+    'tripHides': [
+      (field: 'tripId', parent: 'trips', nullable: false),
+      (field: 'diverId', parent: 'divers', nullable: false),
+    ],
+    'siteHides': [
+      (field: 'siteId', parent: 'diveSites', nullable: false),
+      (field: 'diverId', parent: 'divers', nullable: false),
     ],
     'equipmentOwnershipEvents': [
       (field: 'equipmentId', parent: 'equipment', nullable: false),
@@ -3025,6 +3045,9 @@ class SyncService {
           ])
         : const <String, Map<String, dynamic>>{};
     final toUpsert = <Map<String, dynamic>>[];
+    // A parent-gated child's deliberate clears, by record id: written after
+    // the batched upsert, which drops nulls (#2644).
+    final childClears = <String, Set<String>>{};
     // Fact groups written after the batched upsert with explicit values, so
     // a peer's cleared stamp lands (the upsert drops nulls; spec 5.1).
     // [inBatch] records whether this row also went into the batched upsert,
@@ -3187,14 +3210,15 @@ class SyncService {
         if (!hasUpdatedAt) {
           final local = localById[recordId];
           var rowFromRemote = true;
+          // Parsed once: the stale-copy guard and the child clears read both.
+          final remoteHlc = clockGuarded ? _extractHlc(record) : null;
+          final localHlc = clockGuarded ? _extractHlc(local) : null;
           if (clockGuarded) {
-            final remoteHlc = _extractHlc(record);
             if (remoteHlc != null) SyncClock.instance.receive(remoteHlc);
             for (final g in factGroups) {
               final factClock = _parseHlc(record[g.clockKey]);
               if (factClock != null) SyncClock.instance.receive(factClock);
             }
-            final localHlc = _extractHlc(local);
             // A copy strictly older than the local row is stale: a peer's
             // snapshot taken before this device's newer edit to the same
             // child, which the blind upsert used to write over it. An exact
@@ -3215,13 +3239,21 @@ class SyncService {
             if (!rowFromRemote) continue;
             toUpsert.add(recordToApply);
             applied += 1;
+            final cleared = _childClears(
+              entityType,
+              recordToApply,
+              local,
+              remoteHlc: remoteHlc,
+              localHlc: localHlc,
+            );
+            if (cleared.isNotEmpty) childClears[recordId] = cleared;
             continue;
           }
           // Facts resolve per group by their own clocks (spec 5.1): a stale
           // row still hands over newer facts, and a newer row does not take
           // older ones.
           //
-          // No _overlayOntoLocal here, unlike the LWW path below, and it is
+          // No overlayOntoLocal here, unlike the LWW path below, and it is
           // not needed: these arms build their insert with nullToAbsent, so
           // a column an older peer omits is simply not written and the local
           // value stands. That is the same property writeFactGroup exists to
@@ -3283,7 +3315,7 @@ class SyncService {
             case TagFillCopyMerge.keepLocal:
               continue;
             case TagFillCopyMerge.takeRemote:
-              toUpsert.add(_overlayOntoLocal(entityType, recordToApply, local));
+              toUpsert.add(overlayOntoLocal(entityType, recordToApply, local));
               applied += 1;
               continue;
             case null:
@@ -3298,7 +3330,7 @@ class SyncService {
         // remote HLC wins; an exact tie or a local-newer HLC keeps local.
         if (localHlc != null && remoteHlc != null) {
           if (remoteHlc.compareTo(localHlc) > 0) {
-            toUpsert.add(_overlayOntoLocal(entityType, recordToApply, local));
+            toUpsert.add(overlayOntoLocal(entityType, recordToApply, local));
             applied += 1;
           }
           continue;
@@ -3325,7 +3357,7 @@ class SyncService {
         if (remoteUpdatedAt == null ||
             localUpdatedAt == null ||
             remoteUpdatedAt >= localUpdatedAt) {
-          toUpsert.add(_overlayOntoLocal(entityType, recordToApply, local));
+          toUpsert.add(overlayOntoLocal(entityType, recordToApply, local));
           applied += 1;
         }
       } catch (e, stackTrace) {
@@ -3416,6 +3448,25 @@ class SyncService {
       }
     }
 
+    // Rethrown for the same reason as the fact writes: the batch has already
+    // written each row with the peer's clock, so a swallowed failure would
+    // leave the row looking applied, the next copy would tie, and the clear
+    // would be lost for good. Throwing rolls the payload back so the
+    // changeset is re-applied next sync.
+    if (!batchFailed && childClears.isNotEmpty) {
+      try {
+        await _serializer.clearChildColumns(entityType, childClears);
+      } catch (e, stackTrace) {
+        _log.error(
+          'Failed to write cleared columns for $entityType; rolling back the '
+          'payload so the changeset is re-applied next sync',
+          error: e,
+          stackTrace: stackTrace,
+        );
+        rethrow;
+      }
+    }
+
     // After the writes, so a row the batch failed to write is not treated
     // as if it had landed. The cache is another database and outside this
     // payload's transaction: if the payload later rolls back, the only
@@ -3441,38 +3492,6 @@ class SyncService {
       conflictsFound: conflicts,
       recordsFailed: failed,
     );
-  }
-
-  /// Overlays a winning remote row onto the receiver's current row so a column
-  /// the remote payload OMITS keeps its local value, while every key the remote
-  /// actually sends -- including an explicit `null` that clears a field (#474)
-  /// -- wins. Rows are applied via `.toCompanion(false)` (so explicit nulls are
-  /// written as SQL NULL); without this overlay that would also write NULL for
-  /// every omitted column, silently clearing values a cross-version peer -- one
-  /// predating a newly-added nullable column -- never intended to touch. Same-
-  /// version peers export full rows, so the overlay is a no-op for them.
-  ///
-  /// One exception: a service clock's `anchorSetAt` (v213) says when the
-  /// diver set its baseline, and a null keeps the pre-v213 rule for it. A
-  /// pre-v213 peer that CHANGES the baseline sends no set time, and
-  /// refilling ours would stamp the peer's baseline with a time that belongs
-  /// to a different date. So a schedule payload that omits the set time but
-  /// moves the baseline lands with none; one that leaves the baseline alone
-  /// keeps ours.
-  static Map<String, dynamic> _overlayOntoLocal(
-    String entityType,
-    Map<String, dynamic> remote,
-    Map<String, dynamic>? local,
-  ) {
-    if (local == null) return remote;
-    final merged = {...local, ...remote};
-    if (entityType == 'serviceSchedules' &&
-        !remote.containsKey('anchorSetAt') &&
-        remote.containsKey('anchorDate') &&
-        remote['anchorDate'] != local['anchorDate']) {
-      merged['anchorSetAt'] = null;
-    }
-    return merged;
   }
 
   /// BLE identifiers are host-specific and must never cross the sync boundary.
@@ -3542,6 +3561,27 @@ class SyncService {
     return null;
   }
 
+  /// The keys a parent-gated child's [remote] copy clears on [local]: its
+  /// explicit nulls, when the copy's clock ([remoteHlc], against the local
+  /// row's [localHlc]) is strictly newer (#2644). Empty for anything else,
+  /// including a row this device does not have yet.
+  Set<String> _childClears(
+    String entityType,
+    Map<String, dynamic> remote,
+    Map<String, dynamic>? local, {
+    required Hlc? remoteHlc,
+    required Hlc? localHlc,
+  }) {
+    if (local == null ||
+        !SyncDataSerializer.parentGatedChildEntities.contains(entityType)) {
+      return const {};
+    }
+    if (!isNewerChildCopy(remote: remoteHlc, local: localHlc)) {
+      return const {};
+    }
+    return explicitlyClearedKeys(remote: remote, local: local);
+  }
+
   /// Parse a record's Hybrid Logical Clock, or null if absent/blank (rows
   /// written before the HLC rollout). Malformed values are treated as absent
   /// so a bad value can never crash the merge.
@@ -3584,47 +3624,12 @@ class SyncService {
   bool _orderable(Map<String, dynamic>? local, Map<String, dynamic> remote) =>
       _extractHlc(local) != null && _extractHlc(remote) != null;
 
-  /// The id the merge keys a record by: `id` for most entities, the natural
-  /// key for the handful that have none. Must agree with the id
-  /// [SyncDataSerializer.recordIdsFor] emits and [SyncDataSerializer
-  /// .deleteRecord] accepts, or the entity's rows silently fail to merge --
-  /// which is what a missing `divePlanEquipment` case did (issue #1728).
-  /// A structural test pins every composite-key table to a case here.
+  /// The id the merge keys a record by; see [syncRecordId].
   @visibleForTesting
   static String? recordIdForEntity(
     String entityType,
     Map<String, dynamic> record,
-  ) {
-    switch (entityType) {
-      case 'settings':
-        return record['key'] as String?;
-      case 'diveSafetyReviews':
-        // PK is dive_id (one marker row per dive), not id.
-        return record['diveId'] as String?;
-      case 'diveEquipment':
-        return record['id'] as String? ??
-            _compositeId(record['diveId'], record['equipmentId']);
-      case 'equipmentSetItems':
-        return record['id'] as String? ??
-            _compositeId(record['setId'], record['equipmentId']);
-      case 'divePlanEquipment':
-        // Composite (planId, equipmentId), same shape as diveEquipment. The
-        // serializer has always keyed it that way in fetchRecord,
-        // deleteRecord and allRecordIds; without this case the merge fell
-        // through to record['id'], which these rows do not have, so every
-        // incoming dive-plan gear row was counted as malformed and never
-        // applied.
-        return record['id'] as String? ??
-            _compositeId(record['planId'], record['equipmentId']);
-      default:
-        return record['id'] as String?;
-    }
-  }
-
-  static String? _compositeId(Object? left, Object? right) {
-    if (left == null || right == null) return null;
-    return '$left|$right';
-  }
+  ) => syncRecordId(entityType, record);
 
   bool _isConflictCopy(String filename) {
     final lower = filename.toLowerCase();
@@ -3704,13 +3709,16 @@ class SyncService {
           // null still clears. Clockless entities upsert with nullToAbsent, so
           // an omitted key is already preserved -- apply their map directly.
           final toApply = entityHasUpdatedAt[entityType] == true
-              ? _overlayOntoLocal(
+              ? overlayOntoLocal(
                   entityType,
                   remoteData,
                   await _serializer.fetchRecord(entityType, recordId),
                 )
               : remoteData;
           await _serializer.upsertRecord(entityType, toApply);
+          // The batch paths re-derive this in repairDanglingForeignKeys;
+          // this single-record write skips it.
+          await _serializer.alignLinkedRouteOwners();
         }
         await _syncRepository.clearConflict(
           entityType: entityType,
@@ -3731,6 +3739,7 @@ class SyncService {
         if (newId != null) {
           remoteData['id'] = newId;
           await _serializer.upsertRecord(entityType, remoteData);
+          await _serializer.alignLinkedRouteOwners();
         }
         await _syncRepository.clearConflict(
           entityType: entityType,
@@ -4501,7 +4510,11 @@ class SyncService {
           final id = recordIdForEntity(entityType, record);
           if (id == null) continue;
           (cloudIds[entityType] ??= <String>{}).add(id);
-          (restored[entityType] ??= {})[id] = record;
+          // A later copy wins for the keys it carries; a column an older
+          // build omits keeps the earlier copy's value (#2553), as the
+          // streaming path's upserts do.
+          final byId = restored[entityType] ??= {};
+          byId[id] = overlayOntoLocal(entityType, record, byId[id]);
         }
       }
     }
@@ -4525,6 +4538,7 @@ class SyncService {
         await _serializer.upsertRecord(entry.key, record);
       }
       await _landAdoptedFactClears(entry.key, entry.value.values);
+      await _landAdoptedChildClears(entry.key, entry.value.values);
     }
 
     await _serializer.repairDanglingForeignKeys();
@@ -4572,6 +4586,36 @@ class SyncService {
         if (clears) await _serializer.writeFactGroup(entityType, id, g, row);
       }
     }
+  }
+
+  /// Lands the explicit clears on parent-gated children an adopt's upsert
+  /// would drop (#2644).
+  ///
+  /// The same gap as [_landAdoptedFactClears]: without this, an adopted row
+  /// keeps a value the library cleared, under the clock of the change that
+  /// cleared it, so every later copy ties and nothing repairs it. As there,
+  /// the replay order is the resolution and there is no local side to weigh;
+  /// [SyncDataSerializer.clearChildColumns] skips the columns already null
+  /// and batches the rest. Only the keys a clear may touch are collected, and
+  /// a table with none (the tag and type links) is skipped outright, since an
+  /// adopt replays every row.
+  Future<void> _landAdoptedChildClears(
+    String entityType,
+    Iterable<Map<String, dynamic>> rows,
+  ) async {
+    final clearable = _serializer.clearableChildKeys(entityType);
+    if (clearable.isEmpty) return;
+    final clears = <String, Set<String>>{};
+    for (final row in rows) {
+      final id = recordIdForEntity(entityType, row);
+      if (id == null) continue;
+      final nulls = {
+        for (final k in clearable)
+          if (row.containsKey(k) && row[k] == null) k,
+      };
+      if (nulls.isNotEmpty) clears[id] = nulls;
+    }
+    await _serializer.clearChildColumns(entityType, clears);
   }
 
   /// Test seam: in-memory adopt of [payloads] (the parity reference). Captures
@@ -4640,6 +4684,7 @@ class SyncService {
       if (valid.isEmpty) return;
       await _serializer.upsertRecords(table, valid);
       await _landAdoptedFactClears(table, valid);
+      await _landAdoptedChildClears(table, valid);
     }
 
     // Apply units: each base file and each changeset, ascending by exportedAt

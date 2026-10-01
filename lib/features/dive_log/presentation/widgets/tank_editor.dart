@@ -70,7 +70,9 @@ class TankEditor extends ConsumerStatefulWidget {
   final List<TripCylinderState>? tripCylinderStates;
 
   /// Slots other tanks on this dive already hold: not offered, since two
-  /// tanks cannot breathe from one cylinder.
+  /// tanks cannot breathe from one cylinder. Only tanks from this tank's
+  /// computer count ([tripCylinderIdsTakenFor]): another computer's tank
+  /// may be its copy of the same cylinder (issue #2661).
   final Set<String> takenTripCylinderIds;
 
   /// The link was preselected as a suggestion, so the picker says so until
@@ -424,6 +426,9 @@ class _TankEditorState extends ConsumerState<TankEditor> {
           : null,
       gasMix: _currentGasMix(),
       role: _role,
+      // A role the diver picks here is theirs; one left alone keeps the
+      // computer's source (issue #2595).
+      roleSource: _role == widget.tank.role ? widget.tank.roleSource : null,
       material: _material,
       order: widget.tank.order,
       presetName: _selectedPreset?.name,

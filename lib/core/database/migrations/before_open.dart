@@ -7,6 +7,10 @@ part of 'app_database_migrations.dart';
 /// asserted again here.
 extension BeforeOpenBackstops on AppDatabase {
   Future<void> _beforeOpen(OpeningDetails details) async {
+    // v252 backstop: nav_tracks.diver_id. Column only; the backfill stays
+    // in the rung.
+    await _assertNavTrackDiverIdColumn();
+
     // v249 backstop: the trip fill forecast's columns.
     await _assertTripFillForecastColumns();
 
@@ -184,6 +188,10 @@ extension BeforeOpenBackstops on AppDatabase {
     // v248 backstop: trip_equipment and its item index (idempotent).
     await _assertTripEquipmentSchema();
 
+    // v250 backstop: trip_hides and site_hides (idempotent).
+    await _assertTripHidesSchema();
+    await _assertSiteHidesSchema();
+
     // v122 backstop: re-assert service ledger schema + built-in kinds.
     // The legacy backfill is NOT here (onUpgrade only) -- re-running it
     // would resurrect user-deleted schedules.
@@ -192,6 +200,8 @@ extension BeforeOpenBackstops on AppDatabase {
     // v123 backstop: re-assert safety review tables + settings columns
     // (parallel-branch collision self-heal).
     await _assertSafetyReviewSchema();
+    // v253 backstop: the review's inputs fingerprint, after the table above.
+    await _assertSafetyReviewInputsHashColumn();
 
     // v124 backstop: re-assert the equipment_attributes table (schema
     // only -- the legacy-column copy must NOT run here, it would
@@ -524,6 +534,12 @@ extension BeforeOpenBackstops on AppDatabase {
     // gets the column on this open too.
     await _assertTankSeriesSourceIdColumn();
 
+    // v251 backstop: re-assert dive_tanks.source_id (#2716; same
+    // parallel-branch version-collision self-heal). Column only; the
+    // backfill stays in the rung, and a tank with no source resolves to the
+    // dive's primary source, as before the column.
+    await _assertDiveTankSourceIdColumn();
+
     // v186 backstop: re-assert pre_dive_checklist_template_items.
     // equipment_id (same parallel-branch version-collision self-heal).
     // Safe to re-run on every open: the helper is column-only with no
@@ -576,6 +592,10 @@ extension BeforeOpenBackstops on AppDatabase {
     // or sync-adopt without the rung would throw on the first read.
     // Column only, no backfill, so it cannot touch diver data.
     await _assertTankTransmitterSerialColumn();
+
+    // v254 backstop: re-assert dive_tanks.role_source, for the same reason
+    // as transmitter_serial above. Column only, no backfill.
+    await _assertTankRoleSourceColumn();
 
     // v145 backstop: re-assert the gps_tracks provenance and trim columns.
     await _assertGpsTrackColumns();

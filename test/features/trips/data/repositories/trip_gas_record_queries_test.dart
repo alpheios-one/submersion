@@ -1,7 +1,13 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart'
-    show AppDatabase, DiversCompanion, DivesCompanion, DiveTanksCompanion;
+    show
+        AppDatabase,
+        DiveComputersCompanion,
+        DiveDataSourcesCompanion,
+        DiversCompanion,
+        DivesCompanion,
+        DiveTanksCompanion;
 import 'package:submersion/features/trips/data/repositories/trip_cylinder_repository.dart';
 import 'package:submersion/features/trips/data/repositories/trip_repository.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart';
@@ -66,6 +72,8 @@ void main() {
     String? slotId,
     int order = 0,
     double? volume,
+    String? computerId,
+    String? sourceId,
   }) => db
       .into(db.diveTanks)
       .insert(
@@ -73,6 +81,8 @@ void main() {
           tripCylinderId: Value(slotId),
           tankOrder: Value(order),
           volume: Value(volume),
+          computerId: Value(computerId),
+          sourceId: Value(sourceId),
           startPressure: const Value(200),
           endPressure: const Value(60),
           o2Percent: const Value(32),
@@ -118,6 +128,17 @@ void main() {
     expect(tanks.first.tripCylinderId, slot.id);
   });
 
+  test('record tanks skip planned dives: no gas was breathed', () async {
+    // Issue #2660: one rule for planned dives across the board, the
+    // forecast and the record. A planned dive uses no gas until logged.
+    await dive('d1', 9, diver: 'a');
+    await dive('d2', 13, diver: 'a', planned: true);
+    await tankOn('t1', 'd1', slotId: slot.id);
+    await tankOn('t2', 'd2', slotId: slot.id);
+    final tanks = await repository.getGasRecordTanksForTrip(tripId);
+    expect(tanks.map((t) => t.tankId), ['t1']);
+  });
+
   test('unlinked tanks skip planned dives, include foreign links', () async {
     await dive('d1', 9, diver: 'a');
     await dive('d3', 13, planned: true);
@@ -131,6 +152,52 @@ void main() {
     expect(gaps.map((g) => g.tankId), ['t2', 't3']);
     expect(gaps.first.diverName, 'Diver a');
     expect(gaps.first.diveId, 'd1');
+  });
+
+  test('a gap names the computer its tank row came from', () async {
+    // Issue #2661: a dive from two computers whose tank rows were not
+    // consolidated. The sheet tells the rows apart by their computer.
+    await db
+        .into(db.diveComputers)
+        .insert(
+          DiveComputersCompanion.insert(
+            id: 'perdix',
+            name: 'Perdix',
+            createdAt: 1,
+            updatedAt: 1,
+          ),
+        );
+    await dive('d1', 9, diver: 'a');
+    await tankOn('t1', 'd1');
+    await tankOn('t2', 'd1', order: 1, computerId: 'perdix');
+    final gaps = await repository.getUnlinkedTanksForTrip(tripId);
+    expect(gaps.map((g) => (g.tankId, g.computerId)), [
+      ('t1', null),
+      ('t2', 'perdix'),
+    ]);
+  });
+
+  test('a gap names the source its tank row came from (#2716)', () async {
+    await dive('d1', 9, diver: 'a');
+    for (final id in ['src-a', 'src-b']) {
+      await db
+          .into(db.diveDataSources)
+          .insert(
+            DiveDataSourcesCompanion.insert(
+              id: id,
+              diveId: 'd1',
+              importedAt: DateTime.utc(2026),
+              createdAt: DateTime.utc(2026),
+            ),
+          );
+    }
+    await tankOn('t1', 'd1', sourceId: 'src-a');
+    await tankOn('t2', 'd1', order: 1, sourceId: 'src-b');
+    final gaps = await repository.getUnlinkedTanksForTrip(tripId);
+    expect(gaps.map((g) => (g.tankId, g.sourceId)), [
+      ('t1', 'src-a'),
+      ('t2', 'src-b'),
+    ]);
   });
 
   test('a trip with no dives has an empty record', () async {

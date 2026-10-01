@@ -14,7 +14,9 @@ import 'package:submersion/core/database/legacy_sample_staging.dart';
 import 'package:submersion/core/database/profile_series_pack.dart';
 import 'package:submersion/core/database/site_type_seed.dart';
 import 'package:submersion/core/database/tag_scope_tables.dart';
+import 'package:submersion/core/services/sync/child_column_clears.dart';
 import 'package:submersion/core/services/sync/sync_fact_groups.dart';
+import 'package:submersion/core/services/sync/sync_record_overlay.dart';
 import 'package:submersion/core/services/sync/changeset_log/sync_temp_dir.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
@@ -349,6 +351,8 @@ class SyncData {
   final List<Map<String, dynamic>> equipmentTags;
   final List<Map<String, dynamic>> equipmentShares;
   final List<Map<String, dynamic>> tripEquipment;
+  final List<Map<String, dynamic>> tripHides;
+  final List<Map<String, dynamic>> siteHides;
   final List<Map<String, dynamic>> equipmentOwnershipEvents;
   final List<Map<String, dynamic>> mediaSpecies;
   final List<Map<String, dynamic>> siteFeatures;
@@ -452,6 +456,8 @@ class SyncData {
     this.equipmentTags = const [],
     this.equipmentShares = const [],
     this.tripEquipment = const [],
+    this.tripHides = const [],
+    this.siteHides = const [],
     this.equipmentOwnershipEvents = const [],
     this.mediaSpecies = const [],
     this.siteFeatures = const [],
@@ -554,6 +560,8 @@ class SyncData {
     'equipmentTags': equipmentTags,
     'equipmentShares': equipmentShares,
     'tripEquipment': tripEquipment,
+    'tripHides': tripHides,
+    'siteHides': siteHides,
     'equipmentOwnershipEvents': equipmentOwnershipEvents,
     'mediaSpecies': mediaSpecies,
     'siteFeatures': siteFeatures,
@@ -661,6 +669,8 @@ class SyncData {
       equipmentTags: _parseList(json['equipmentTags']),
       equipmentShares: _parseList(json['equipmentShares']),
       tripEquipment: _parseList(json['tripEquipment']),
+      tripHides: _parseList(json['tripHides']),
+      siteHides: _parseList(json['siteHides']),
       equipmentOwnershipEvents: _parseList(json['equipmentOwnershipEvents']),
       mediaSpecies: _parseList(json['mediaSpecies']),
       siteFeatures: _parseList(json['siteFeatures']),
@@ -1187,6 +1197,8 @@ class SyncDataSerializer {
       full: null,
     ),
     (key: 'tripEquipment', table: _db.tripEquipment, blob: false, full: null),
+    (key: 'tripHides', table: _db.tripHides, blob: false, full: null),
+    (key: 'siteHides', table: _db.siteHides, blob: false, full: null),
     (
       key: 'equipmentOwnershipEvents',
       table: _db.equipmentOwnershipEvents,
@@ -1594,6 +1606,8 @@ class SyncDataSerializer {
     'equipmentTags',
     'equipmentShares',
     'tripEquipment',
+    'tripHides',
+    'siteHides',
     'equipmentOwnershipEvents',
     'weightPresetEntries',
     'diveCenterGearNotes',
@@ -1694,33 +1708,113 @@ class SyncDataSerializer {
     );
   }
 
-  /// The sync record id of a [parentGatedChildEntities] row, in the shape
-  /// SyncService.recordIdForEntity uses (a composite key is joined with
-  /// `|`). Mirrored here rather than imported because sync_service.dart
-  /// imports this file; a test pins that the two agree.
+  /// The clearable columns of each parent-gated type (see clearableColumns),
+  /// by JSON key. Fixed by the schema, so an adopt's many batches build it
+  /// once; the table itself is looked up per call, since [_db] follows
+  /// whichever database is open.
+  final Map<String, Map<String, String>> _clearableChildColumns = {};
+
+  TableInfo<Table, Object?> _parentGatedTable(String entityType) {
+    final tableName = parentGatedTables[entityType]!;
+    return _db.allTables.firstWhere((t) => t.actualTableName == tableName);
+  }
+
+  Map<String, String> _clearableFor(String entityType) =>
+      _clearableChildColumns.putIfAbsent(
+        entityType,
+        () => clearableColumns(
+          _parentGatedTable(entityType),
+          keyColumns: _parentGatedKeyColumns[entityType] ?? const ['id'],
+        ),
+      );
+
+  /// The JSON keys a clear on [entityType] may name (see clearableColumns):
+  /// empty for a type outside [parentGatedChildEntities] or one with nothing
+  /// clearable, so a caller can skip collecting clears for it (#2644).
+  Iterable<String> clearableChildKeys(String entityType) =>
+      parentGatedTables.containsKey(entityType)
+      ? _clearableFor(entityType).keys
+      : const [];
+
+  /// Writes deliberate clears on parent-gated children (#2644).
+  ///
+  /// The upsert that applied each row builds with nullToAbsent, so a null it
+  /// carries never lands. The merge collects the keys a strictly newer copy
+  /// set to null (see isNewerChildCopy), and adopt the keys each replayed
+  /// row sets to null, and both hand them here; [clears] maps a sync record
+  /// id to those JSON keys. Only nullable, undefaulted columns outside the
+  /// row's key are written, so a malformed payload can neither fail on a
+  /// NOT NULL column nor move a row.
+  ///
+  /// Rows clearing the same columns share one statement per chunk of ids,
+  /// and a row whose columns are already null is not rewritten: an adopt
+  /// replays every row, each carrying explicit nulls, and a statement per
+  /// row made a large adopt crawl.
+  ///
+  /// A junction applied lowest-id-per-pair can keep a local id over the
+  /// remote one; its clear then matches no row. Those junctions carry no
+  /// nullable user columns worth clearing.
+  Future<void> clearChildColumns(
+    String entityType,
+    Map<String, Set<String>> clears,
+  ) async {
+    final tableName = parentGatedTables[entityType];
+    if (tableName == null || clears.isEmpty) return;
+    final table = _parentGatedTable(entityType);
+    final keys = _parentGatedKeyColumns[entityType] ?? const ['id'];
+    final clearable = _clearableFor(entityType);
+    // Rows clearing the same columns, keyed by those columns joined.
+    final groups =
+        <String, ({List<String> columns, List<List<String>> rows})>{};
+    for (final MapEntry(key: recordId, value: jsonKeys) in clears.entries) {
+      final columns = {for (final k in jsonKeys) ?clearable[k]}.toList()
+        ..sort();
+      if (columns.isEmpty) continue;
+      final keyValues = keys.length == 1 ? [recordId] : recordId.split('|');
+      if (keyValues.length != keys.length) continue;
+      (groups[columns.join(',')] ??= (
+        columns: columns,
+        rows: [],
+      )).rows.add(keyValues);
+    }
+    final keyList = keys.length == 1
+        ? '"${keys.single}"'
+        : '(${keys.map((k) => '"$k"').join(', ')})';
+    // A composite key binds a variable per column (see
+    // _fetchParentGatedChildren).
+    final perStatement = 900 ~/ keys.length;
+    for (final (:columns, :rows) in groups.values) {
+      for (var i = 0; i < rows.length; i += perStatement) {
+        final chunk = rows.sublist(i, math.min(i + perStatement, rows.length));
+        final placeholders = keys.length == 1
+            ? chunk.map((_) => '?').join(', ')
+            : 'VALUES ${chunk.map((_) => '(${keys.map((_) => '?').join(', ')})').join(', ')}';
+        // customUpdate, not customStatement, so Drift's query streams
+        // rebuild (the same reason as writeFactGroup).
+        await _db.customUpdate(
+          'UPDATE "$tableName" '
+          'SET ${columns.map((c) => '"$c" = NULL').join(', ')} '
+          'WHERE $keyList IN ($placeholders) '
+          'AND (${columns.map((c) => '"$c" IS NOT NULL').join(' OR ')})',
+          variables: [
+            for (final row in chunk)
+              for (final v in row) Variable.withString(v),
+          ],
+          updates: {table},
+          updateKind: UpdateKind.update,
+        );
+      }
+    }
+  }
+
+  /// The sync record id of a [parentGatedChildEntities] row: the
+  /// [syncRecordId] the merge keys it by (a composite key is joined with
+  /// `|`).
   @visibleForTesting
   static String? parentGatedRecordId(
     String entityType,
     Map<String, dynamic> row,
-  ) {
-    String? composite(Object? left, Object? right) =>
-        left is String && right is String ? '$left|$right' : null;
-    switch (entityType) {
-      case 'diveSafetyReviews':
-        return row['diveId'] as String?;
-      case 'diveEquipment':
-        return row['id'] as String? ??
-            composite(row['diveId'], row['equipmentId']);
-      case 'equipmentSetItems':
-        return row['id'] as String? ??
-            composite(row['setId'], row['equipmentId']);
-      case 'divePlanEquipment':
-        return row['id'] as String? ??
-            composite(row['planId'], row['equipmentId']);
-      default:
-        return row['id'] as String?;
-    }
-  }
+  ) => syncRecordId(entityType, row);
 
   /// The SQL table of each [parentGatedChildEntities] type. A test pins it
   /// to SyncRepository.hlcTargets, which stamps the same tables.
@@ -1739,6 +1833,8 @@ class SyncDataSerializer {
     'equipmentTags': 'equipment_tags',
     'equipmentShares': 'equipment_shares',
     'tripEquipment': 'trip_equipment',
+    'tripHides': 'trip_hides',
+    'siteHides': 'site_hides',
     'equipmentOwnershipEvents': 'equipment_ownership_events',
     'diveDiveTypes': 'dive_dive_types',
     'weightPresetEntries': 'weight_preset_entries',
@@ -2301,6 +2397,22 @@ class SyncDataSerializer {
           pendingChildren,
         ),
       ),
+      tripHides: await _safeExport(
+        'tripHides',
+        () async => _withPendingChildren(
+          'tripHides',
+          await _exportTripHides(hlcSince),
+          pendingChildren,
+        ),
+      ),
+      siteHides: await _safeExport(
+        'siteHides',
+        () async => _withPendingChildren(
+          'siteHides',
+          await _exportSiteHides(hlcSince),
+          pendingChildren,
+        ),
+      ),
       equipmentOwnershipEvents: await _safeExport(
         'equipmentOwnershipEvents',
         () async => _withPendingChildren(
@@ -2408,7 +2520,38 @@ class SyncDataSerializer {
   /// COMMIT and abort the whole sync. Must run inside
   /// [applyInDeferredFkTransaction] so COMMIT sees a consistent graph. Loops
   /// because deleting an orphan can in turn dangle its own children.
+  ///
+  /// Every batch apply path ends here, so it then re-derives the one value a
+  /// peer's row may not carry: a linked route's owner (see
+  /// [alignLinkedRouteOwners]).
   Future<void> repairDanglingForeignKeys() async {
+    await _repairDanglingReferences();
+    await alignLinkedRouteOwners();
+  }
+
+  /// A linked route belongs to its dive's diver (v252). A peer below v252,
+  /// still inside the compatibility floor, sends `navTracks` rows without
+  /// `diverId`, so its link would land ownerless (or keep a stale local
+  /// owner) and show to the wrong divers. Called by
+  /// [repairDanglingForeignKeys] after the FK repair, so a route whose dive
+  /// was just deleted is already unlinked and keeps its owner, and directly
+  /// by the conflict resolution's single-record writes, which skip that
+  /// repair. Not marked pending: every device derives the same owner from
+  /// the same synced dive.
+  Future<void> alignLinkedRouteOwners() async {
+    await _db.customStatement('''
+      UPDATE nav_tracks
+      SET diver_id = (
+        SELECT d.diver_id FROM dives d WHERE d.id = nav_tracks.dive_id
+      )
+      WHERE dive_id IS NOT NULL
+        AND diver_id IS NOT (
+          SELECT d.diver_id FROM dives d WHERE d.id = nav_tracks.dive_id
+        )
+    ''');
+  }
+
+  Future<void> _repairDanglingReferences() async {
     for (var pass = 0; pass < 5; pass++) {
       final violations = await _db
           .customSelect('PRAGMA foreign_key_check')
@@ -2811,6 +2954,16 @@ class SyncDataSerializer {
       case 'tripEquipment':
         final row = await (_db.select(
           _db.tripEquipment,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'tripHides':
+        final row = await (_db.select(
+          _db.tripHides,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'siteHides':
+        final row = await (_db.select(
+          _db.siteHides,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
       case 'equipmentOwnershipEvents':
@@ -3370,6 +3523,46 @@ class SyncDataSerializer {
         return {
           for (final r in rows) r.id: r.toJson(serializer: _syncBlobSerializer),
         };
+      case 'emergencyChambers':
+        final rows = await (_db.select(
+          _db.emergencyChambers,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
+      case 'incidents':
+        final rows = await (_db.select(
+          _db.incidents,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
+      case 'equipmentObservations':
+        final rows = await (_db.select(
+          _db.equipmentObservations,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
+      case 'equipmentFindings':
+        final rows = await (_db.select(
+          _db.equipmentFindings,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
+      case 'siteFeatures':
+        final rows = await (_db.select(
+          _db.siteFeatures,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
+      // The points BLOB rides as base64, matching fetchRecord.
+      case 'gpsTracks':
+        final rows = await (_db.select(
+          _db.gpsTracks,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {
+          for (final r in rows) r.id: r.toJson(serializer: _syncBlobSerializer),
+        };
+      case 'navTracks':
+        final rows = await (_db.select(
+          _db.navTracks,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {
+          for (final r in rows) r.id: r.toJson(serializer: _syncBlobSerializer),
+        };
       default:
         // Clockless / composite-key entities are never fetched by the merge;
         // fall back to per-id reads so the method is total and correct.
@@ -3874,6 +4067,41 @@ class SyncDataSerializer {
         );
   }
 
+  /// Applies one incoming `trip_hides` row (v250, issue #2594). The
+  /// (trip, profile) pair is unique: a peer's copy under another id is
+  /// reconciled to the lower id and then skipped, as
+  /// [_applyTripEquipmentRecord] does.
+  Future<void> _applyTripHideRecord(TripHideRow record) async {
+    await _reconcileJunctionIds(
+      'trip_hides',
+      parentColumn: 'trip_id',
+      childColumn: 'diver_id',
+      pairs: [(parent: record.tripId, child: record.diverId, id: record.id)],
+    );
+    await _db
+        .into(_db.tripHides)
+        .insert(
+          record,
+          onConflict: DoNothing<$TripHidesTable, TripHideRow>(target: const []),
+        );
+  }
+
+  /// As [_applyTripHideRecord], for `site_hides`.
+  Future<void> _applySiteHideRecord(SiteHideRow record) async {
+    await _reconcileJunctionIds(
+      'site_hides',
+      parentColumn: 'site_id',
+      childColumn: 'diver_id',
+      pairs: [(parent: record.siteId, child: record.diverId, id: record.id)],
+    );
+    await _db
+        .into(_db.siteHides)
+        .insert(
+          record,
+          onConflict: DoNothing<$SiteHidesTable, SiteHideRow>(target: const []),
+        );
+  }
+
   /// Applies one incoming record.
   ///
   /// HLC-bearing entities (`entityHasUpdatedAt == true`) apply via
@@ -3881,14 +4109,12 @@ class SyncDataSerializer {
   /// value -- this is what makes clearing a field (e.g. a dive name, #474)
   /// propagate.
   ///
-  /// CALLER CONTRACT for HLC entities: because `.toCompanion(false)` writes
-  /// every column, `data` MUST be a full row (its own `row.toJson()`), OR the
-  /// caller MUST overlay the remote map onto the current local row first so a
-  /// key the remote OMITS keeps its local value. `_mergeEntity` does this via
-  /// `_overlayOntoLocal` (and only ever applies a strict LWW winner, so a
-  /// stale/tied base never clobbers); the conflict-resolution `keepRemote`
-  /// branch does the same. A raw partial map passed straight through would
-  /// clear every column it omits.
+  /// A key [data] OMITS keeps the value of the row this device already holds
+  /// ([overlayOntoLocal]), so a peer on an older build, whose rows lack every
+  /// column its schema does not know, neither clears those columns nor
+  /// resets them to their schema default (#2553). Only a row new to this
+  /// device takes the default. `_mergeEntity` overlays before it calls here,
+  /// so its rows arrive full and cost no extra read.
   ///
   /// Clockless children (`entityHasUpdatedAt == false`: tanks, profiles, the
   /// junction tables, media, ...) are applied UNCONDITIONALLY by `_mergeEntity`
@@ -3897,16 +4123,20 @@ class SyncDataSerializer {
   /// omitted rather than written, preserving a value set by a non-synced direct
   /// write (e.g. the consolidation `computerId` backfill). Do NOT add
   /// `.toCompanion(false)` to a clockless case -- it reintroduces that clobber.
+  /// A parent-gated child's deliberate clear lands afterwards instead, through
+  /// [clearChildColumns]: on the merge only from a copy whose clock is
+  /// strictly newer, on adopt in replay order (#2644).
   Future<void> upsertRecord(
     String entityType,
     Map<String, dynamic> data,
   ) async {
+    data = _withRenamedKeys(
+      entityType,
+      _withoutDeviceLocalFields(data, entityType: entityType),
+    );
     data = _withSchemaDefaults(
       entityType,
-      _withRenamedKeys(
-        entityType,
-        _withoutDeviceLocalFields(data, entityType: entityType),
-      ),
+      (await _withLocalForOmitted(entityType, [data])).single,
     );
     switch (entityType) {
       case 'divers':
@@ -4226,6 +4456,10 @@ class SyncDataSerializer {
             );
         return;
       case 'navTracks':
+        // The data-class upsert leaves null columns out (nullToAbsent), so a
+        // peer below v252 that omits diverId keeps the local owner on the
+        // adopt and restore paths, which skip the merge overlay. Do not
+        // switch this to `.toCompanion(false)`: that would clear it.
         await _db
             .into(_db.navTracks)
             .insertOnConflictUpdate(
@@ -4317,6 +4551,12 @@ class SyncDataSerializer {
         return;
       case 'tripEquipment':
         await _applyTripEquipmentRecord(TripEquipmentRow.fromJson(data));
+        return;
+      case 'tripHides':
+        await _applyTripHideRecord(TripHideRow.fromJson(data));
+        return;
+      case 'siteHides':
+        await _applySiteHideRecord(SiteHideRow.fromJson(data));
         return;
       case 'equipmentOwnershipEvents':
         await _db
@@ -4736,17 +4976,16 @@ class SyncDataSerializer {
     List<Map<String, dynamic>> records,
   ) async {
     if (records.isEmpty) return;
-    records = records
-        .map(
-          (record) => _withSchemaDefaults(
-            entityType,
-            _withRenamedKeys(
-              entityType,
-              _withoutDeviceLocalFields(record, entityType: entityType),
-            ),
-          ),
-        )
-        .toList();
+    records = await _withLocalForOmitted(entityType, [
+      for (final record in records)
+        _withRenamedKeys(
+          entityType,
+          _withoutDeviceLocalFields(record, entityType: entityType),
+        ),
+    ]);
+    records = [
+      for (final record in records) _withSchemaDefaults(entityType, record),
+    ];
     switch (entityType) {
       case 'divers':
         await _db.batch(
@@ -5506,6 +5745,56 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'tripHides':
+        // DoNothing: see [_applyTripHideRecord].
+        final tripHideRows = _lowestIdPerPair(
+          records.map((r) => TripHideRow.fromJson(r)).toList(),
+          (row) => (parent: row.tripId, child: row.diverId, id: row.id),
+        );
+        await _reconcileJunctionIds(
+          'trip_hides',
+          parentColumn: 'trip_id',
+          childColumn: 'diver_id',
+          pairs: [
+            for (final row in tripHideRows)
+              (parent: row.tripId, child: row.diverId, id: row.id),
+          ],
+        );
+        await _db.batch(
+          (b) => b.insertAll(
+            _db.tripHides,
+            tripHideRows,
+            onConflict: DoNothing<$TripHidesTable, TripHideRow>(
+              target: const [],
+            ),
+          ),
+        );
+        return;
+      case 'siteHides':
+        // DoNothing: see [_applySiteHideRecord].
+        final siteHideRows = _lowestIdPerPair(
+          records.map((r) => SiteHideRow.fromJson(r)).toList(),
+          (row) => (parent: row.siteId, child: row.diverId, id: row.id),
+        );
+        await _reconcileJunctionIds(
+          'site_hides',
+          parentColumn: 'site_id',
+          childColumn: 'diver_id',
+          pairs: [
+            for (final row in siteHideRows)
+              (parent: row.siteId, child: row.diverId, id: row.id),
+          ],
+        );
+        await _db.batch(
+          (b) => b.insertAll(
+            _db.siteHides,
+            siteHideRows,
+            onConflict: DoNothing<$SiteHidesTable, SiteHideRow>(
+              target: const [],
+            ),
+          ),
+        );
+        return;
       case 'equipmentOwnershipEvents':
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
@@ -6041,6 +6330,10 @@ class SyncDataSerializer {
         return plain(_db.equipmentShares, _db.equipmentShares.id);
       case 'tripEquipment':
         return plain(_db.tripEquipment, _db.tripEquipment.id);
+      case 'tripHides':
+        return plain(_db.tripHides, _db.tripHides.id);
+      case 'siteHides':
+        return plain(_db.siteHides, _db.siteHides.id);
       case 'equipmentOwnershipEvents':
         return plain(
           _db.equipmentOwnershipEvents,
@@ -6445,6 +6738,10 @@ class SyncDataSerializer {
         return _db.equipmentShares;
       case 'tripEquipment':
         return _db.tripEquipment;
+      case 'tripHides':
+        return _db.tripHides;
+      case 'siteHides':
+        return _db.siteHides;
       case 'equipmentOwnershipEvents':
         return _db.equipmentOwnershipEvents;
       case 'diveRoles':
@@ -6924,6 +7221,16 @@ class SyncDataSerializer {
       case 'tripEquipment':
         await (_db.delete(
           _db.tripEquipment,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'tripHides':
+        await (_db.delete(
+          _db.tripHides,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'siteHides':
+        await (_db.delete(
+          _db.siteHides,
         )..where((t) => t.id.equals(recordId))).go();
         return;
       case 'equipmentOwnershipEvents':
@@ -8342,6 +8649,46 @@ class SyncDataSerializer {
     return rows.map((r) => r.toJson()).toList();
   }
 
+  /// Hidden shared trips (v250, issue #2594), gated on the parent trip's
+  /// clock like [_exportTripEquipment]. A hide travels on its own pending
+  /// mark, never by re-stamping the trip.
+  Future<List<Map<String, dynamic>>> _exportTripHides(String? hlcSince) async {
+    if (hlcSince != null) {
+      final trips = await (_db.select(
+        _db.trips,
+      )..where((t) => t.hlc.isBiggerThanValue(hlcSince))).get();
+      final tripIds = trips.map((t) => t.id).toSet();
+      if (tripIds.isEmpty) return [];
+      return _childRowsOf(
+        tripIds,
+        (chunk) => (_db.select(
+          _db.tripHides,
+        )..where((t) => t.tripId.isIn(chunk))).get(),
+      );
+    }
+    final rows = await _db.select(_db.tripHides).get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
+  /// As [_exportTripHides], for hidden shared sites.
+  Future<List<Map<String, dynamic>>> _exportSiteHides(String? hlcSince) async {
+    if (hlcSince != null) {
+      final sites = await (_db.select(
+        _db.diveSites,
+      )..where((t) => t.hlc.isBiggerThanValue(hlcSince))).get();
+      final siteIds = sites.map((s) => s.id).toSet();
+      if (siteIds.isEmpty) return [];
+      return _childRowsOf(
+        siteIds,
+        (chunk) => (_db.select(
+          _db.siteHides,
+        )..where((t) => t.siteId.isIn(chunk))).get(),
+      );
+    }
+    final rows = await _db.select(_db.siteHides).get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
   /// Equipment share and ownership events (v234, issue #2046), gated on the
   /// parent item's clock like [_exportEquipmentTags].
   Future<List<Map<String, dynamic>>> _exportEquipmentOwnershipEvents(
@@ -8609,6 +8956,75 @@ class SyncDataSerializer {
   final Map<String, List<MapEntry<String, Object? Function()>>>
   _schemaDefaultFills = {};
 
+  /// Cached JSON keys of every column a synced row of each entity type
+  /// carries, so [_withLocalForOmitted] can tell a full row from a partial
+  /// one without a read. Empty for a type with no table here.
+  final Map<String, Set<String>> _rowKeys = {};
+
+  /// Fills each key [records] omit from the row this device already holds
+  /// for the same record (#2553), before [_withSchemaDefaults] would fill
+  /// it with the column default. A peer on an older build omits every
+  /// column its schema lacks, and the default would overwrite the value the
+  /// diver set here. A record new to this device keeps the gap, so the
+  /// default still fills it there.
+  ///
+  /// Only partial rows cost a read: same-version peers send full rows, and
+  /// the merge overlays its winners before they get here.
+  Future<List<Map<String, dynamic>>> _withLocalForOmitted(
+    String entityType,
+    List<Map<String, dynamic>> records,
+  ) async {
+    final keys = _rowKeys.putIfAbsent(
+      entityType,
+      () => _buildRowKeys(entityType),
+    );
+    if (keys.isEmpty) return records;
+    final partialIds = <String>{
+      for (final record in records)
+        if (!keys.every(record.containsKey)) ?syncRecordId(entityType, record),
+    };
+    if (partialIds.isEmpty) return records;
+    final local = await fetchRecords(entityType, partialIds);
+    if (local.isEmpty) return records;
+    return [
+      for (final record in records)
+        overlayOntoLocal(
+          entityType,
+          record,
+          local[syncRecordId(entityType, record)],
+        ),
+    ];
+  }
+
+  Set<String> _buildRowKeys(String entityType) {
+    // [_upsertGearJunction] routes on whether the wire carried a clock, and
+    // writes only what the wire carried, so a missing key already keeps the
+    // local value there. Filling the clock in would hide the signal.
+    if (_gearJunctions.contains(entityType)) return const {};
+    final TableInfo<Table, dynamic> table;
+    try {
+      table = _syncTableFor(entityType);
+    } on ArgumentError {
+      // The inbound-only legacy sample entities have no table here.
+      return const {};
+    }
+    return {for (final column in table.$columns) columnJsonKey(column.name)}
+      ..removeAll(_deviceLocalKeys[entityType] ?? const <String>{});
+  }
+
+  /// Columns a synced row never carries because they belong to one device
+  /// ([_withoutDeviceLocalFields]). Their absence does not make a row
+  /// partial.
+  static const Map<String, Set<String>> _deviceLocalKeys = {
+    'diveComputers': {'bluetoothAddress'},
+  };
+
+  static const Set<String> _gearJunctions = {
+    'diveEquipment',
+    'divePlanEquipment',
+    'equipmentSetItems',
+  };
+
   /// Hydrates missing (or explicitly null) non-nullable columns in [data]
   /// with their schema defaults before the generated `fromJson` runs (#858).
   ///
@@ -8700,26 +9116,10 @@ class SyncDataSerializer {
       // defaults (e.g. currentDateAndTime) can't be evaluated here and keep
       // today's behavior.
       if (value is bool || value is num || value is String) {
-        fills.add(MapEntry(_jsonKeyForSqlColumn(column.name), () => value));
+        fills.add(MapEntry(columnJsonKey(column.name), () => value));
       }
     }
     return fills;
-  }
-
-  /// Maps a Drift SQL column name (snake_case of the Dart getter) back to the
-  /// getter name, which is the generated `fromJson`/`toJson` key. The project
-  /// has no build.yaml renames and no `named()` overrides, so the mapping is
-  /// mechanical; a wrong key would only add an ignored extra entry, never
-  /// overwrite a real one (fills skip keys already present).
-  static String _jsonKeyForSqlColumn(String sqlName) {
-    final parts = sqlName.split('_');
-    final buffer = StringBuffer(parts.first);
-    for (final part in parts.skip(1)) {
-      if (part.isEmpty) continue;
-      buffer.write(part[0].toUpperCase());
-      buffer.write(part.substring(1));
-    }
-    return buffer.toString();
   }
 
   /// Applies default values for DiverSettings fields that may be missing
