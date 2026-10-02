@@ -25,6 +25,7 @@ import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_
     show TankPressureSample;
 import 'package:submersion/features/dive_log/domain/entities/bulk_edit_request.dart'
     as domain;
+import 'package:submersion/features/dive_log/domain/entities/computer_tissue_snapshot.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
@@ -1514,6 +1515,7 @@ class DiveRepository {
                 gradientFactorHigh: Value(dive.gradientFactorHigh),
                 decoAlgorithm: Value(dive.decoAlgorithm),
                 decoConservatism: Value(dive.decoConservatism),
+                computerTissueJson: Value(dive.computerTissue?.encode()),
                 diveComputerModel: Value(dive.diveComputerModel),
                 diveComputerSerial: Value(dive.diveComputerSerial),
                 diveComputerFirmware: Value(dive.diveComputerFirmware),
@@ -1826,6 +1828,7 @@ class DiveRepository {
             gradientFactorHigh: Value(dive.gradientFactorHigh),
             decoAlgorithm: Value(dive.decoAlgorithm),
             decoConservatism: Value(dive.decoConservatism),
+            computerTissueJson: Value(dive.computerTissue?.encode()),
             diveComputerModel: Value(dive.diveComputerModel),
             diveComputerSerial: Value(dive.diveComputerSerial),
             diveComputerFirmware: Value(dive.diveComputerFirmware),
@@ -3772,6 +3775,7 @@ class DiveRepository {
       gradientFactorHigh: row.gradientFactorHigh,
       decoAlgorithm: row.decoAlgorithm,
       decoConservatism: row.decoConservatism,
+      computerTissue: ComputerTissueSnapshot.tryDecode(row.computerTissueJson),
       diveComputerModel: row.diveComputerModel,
       diveComputerSerial: row.diveComputerSerial,
       diveComputerFirmware: row.diveComputerFirmware,
@@ -4207,6 +4211,7 @@ class DiveRepository {
       gradientFactorHigh: row.gradientFactorHigh,
       decoAlgorithm: row.decoAlgorithm,
       decoConservatism: row.decoConservatism,
+      computerTissue: ComputerTissueSnapshot.tryDecode(row.computerTissueJson),
       diveComputerModel: row.diveComputerModel,
       diveComputerSerial: row.diveComputerSerial,
       diveComputerFirmware: row.diveComputerFirmware,

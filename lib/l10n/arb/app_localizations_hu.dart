@@ -2803,6 +2803,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get buddies_stat_lastDive => 'Utolsó merülés';
 
   @override
+  String get buddies_summary_mostDives => 'Most Dives';
+
+  @override
   String get buddies_summary_overview => 'Áttekintés';
 
   @override
@@ -4313,13 +4316,50 @@ class AppLocalizationsHu extends AppLocalizations {
   String get connections_selection_topConnections => 'Legerősebb kapcsolatok';
 
   @override
-  String connections_selection_firstLast(String first, String last) {
-    return 'Első $first, utolsó $last';
-  }
-
-  @override
   String get connections_selection_hint =>
       'Koppints egy csomópontra vagy vonalra a részletekhez.';
+
+  @override
+  String get connections_details_dives => 'Merülések';
+
+  @override
+  String get connections_details_connections => 'Kapcsolatok';
+
+  @override
+  String get connections_details_first => 'Első';
+
+  @override
+  String get connections_details_last => 'Utolsó';
+
+  @override
+  String get connections_kindOne_buddy => 'Búvártárs';
+
+  @override
+  String get connections_kindOne_site => 'Merülőhely';
+
+  @override
+  String get connections_kindOne_trip => 'Út';
+
+  @override
+  String get connections_kindOne_diveCenter => 'Búvárközpont';
+
+  @override
+  String get connections_kindOne_equipment => 'Felszerelés';
+
+  @override
+  String get connections_kindOne_species => 'Faj';
+
+  @override
+  String get connections_kindOne_tag => 'Címke';
+
+  @override
+  String get connections_kindOne_diveType => 'Merüléstípus';
+
+  @override
+  String get connections_kindOne_diveComputer => 'Búvárcomputer';
+
+  @override
+  String get connections_kindOne_course => 'Tanfolyam';
 
   @override
   String get connections_empty_noDives =>
@@ -11207,9 +11247,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveSites_list_menu_import => 'Importálás';
 
   @override
-  String get diveSites_list_menu_select => 'Merülőhelyek kiválasztása';
-
-  @override
   String get diveSites_list_menu_fillLocationDetails =>
       'Hiányzó helyadatok kitöltése';
 
@@ -15180,6 +15217,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String equipment_figure_itemLabelUnnumbered(String type, String name) {
+    return '$type, $name';
+  }
+
+  @override
   String equipment_figure_summary(String name, int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -19088,6 +19130,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
+    return 'A hígítógáz meghaladja a Dil-MOD-ot $depth mélységben (ppO₂ $value bar)';
+  }
+
+  @override
   String get plannerCanvas_issue_noBailout =>
       'A CCR dekompressziós terv nem tartalmaz bailout gázt';
 
@@ -21155,6 +21202,9 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_data_header_backupSync =>
       'Biztonsági mentés és szinkronizálás';
+
+  @override
+  String get settings_data_header_import => 'Importálás';
 
   @override
   String get settings_data_header_storage => 'Tárolás';

@@ -2767,6 +2767,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get buddies_stat_lastDive => 'Last Dive';
 
   @override
+  String get buddies_summary_mostDives => 'Most Dives';
+
+  @override
   String get buddies_summary_overview => 'Overview';
 
   @override
@@ -4250,13 +4253,50 @@ class AppLocalizationsEn extends AppLocalizations {
   String get connections_selection_topConnections => 'Top connections';
 
   @override
-  String connections_selection_firstLast(String first, String last) {
-    return 'First $first, last $last';
-  }
-
-  @override
   String get connections_selection_hint =>
       'Tap a node or a line to see details.';
+
+  @override
+  String get connections_details_dives => 'Dives';
+
+  @override
+  String get connections_details_connections => 'Connections';
+
+  @override
+  String get connections_details_first => 'First';
+
+  @override
+  String get connections_details_last => 'Last';
+
+  @override
+  String get connections_kindOne_buddy => 'Buddy';
+
+  @override
+  String get connections_kindOne_site => 'Site';
+
+  @override
+  String get connections_kindOne_trip => 'Trip';
+
+  @override
+  String get connections_kindOne_diveCenter => 'Dive center';
+
+  @override
+  String get connections_kindOne_equipment => 'Equipment';
+
+  @override
+  String get connections_kindOne_species => 'Species';
+
+  @override
+  String get connections_kindOne_tag => 'Tag';
+
+  @override
+  String get connections_kindOne_diveType => 'Dive type';
+
+  @override
+  String get connections_kindOne_diveComputer => 'Dive computer';
+
+  @override
+  String get connections_kindOne_course => 'Course';
 
   @override
   String get connections_empty_noDives =>
@@ -11044,9 +11084,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveSites_list_menu_import => 'Import';
 
   @override
-  String get diveSites_list_menu_select => 'Select sites';
-
-  @override
   String get diveSites_list_menu_fillLocationDetails =>
       'Fill in missing location details';
 
@@ -15002,6 +15039,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String equipment_figure_itemLabelUnnumbered(String type, String name) {
+    return '$type, $name';
+  }
+
+  @override
   String equipment_figure_summary(String name, int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -18858,6 +18900,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
+    return 'Diluent exceeds its Dil MOD at $depth (ppO₂ $value bar)';
+  }
+
+  @override
   String get plannerCanvas_issue_noBailout =>
       'CCR decompression plan carries no bailout gas';
 
@@ -20888,6 +20935,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_data_header_backupSync => 'Backup & Sync';
+
+  @override
+  String get settings_data_header_import => 'Import';
 
   @override
   String get settings_data_header_storage => 'Storage';

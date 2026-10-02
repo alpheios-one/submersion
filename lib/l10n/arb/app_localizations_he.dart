@@ -2755,6 +2755,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get buddies_stat_lastDive => 'צלילה אחרונה';
 
   @override
+  String get buddies_summary_mostDives => 'Most Dives';
+
+  @override
   String get buddies_summary_overview => 'סקירה כללית';
 
   @override
@@ -4220,12 +4223,49 @@ class AppLocalizationsHe extends AppLocalizations {
   String get connections_selection_topConnections => 'קשרים מובילים';
 
   @override
-  String connections_selection_firstLast(String first, String last) {
-    return 'ראשונה $first, אחרונה $last';
-  }
+  String get connections_selection_hint => 'הקישו על צומת או על קו לפרטים.';
 
   @override
-  String get connections_selection_hint => 'הקישו על צומת או על קו לפרטים.';
+  String get connections_details_dives => 'צלילות';
+
+  @override
+  String get connections_details_connections => 'קשרים';
+
+  @override
+  String get connections_details_first => 'ראשונה';
+
+  @override
+  String get connections_details_last => 'אחרונה';
+
+  @override
+  String get connections_kindOne_buddy => 'שותף';
+
+  @override
+  String get connections_kindOne_site => 'אתר';
+
+  @override
+  String get connections_kindOne_trip => 'טיול';
+
+  @override
+  String get connections_kindOne_diveCenter => 'מרכז צלילה';
+
+  @override
+  String get connections_kindOne_equipment => 'ציוד';
+
+  @override
+  String get connections_kindOne_species => 'מין';
+
+  @override
+  String get connections_kindOne_tag => 'תגית';
+
+  @override
+  String get connections_kindOne_diveType => 'סוג צלילה';
+
+  @override
+  String get connections_kindOne_diveComputer => 'מחשב צלילה';
+
+  @override
+  String get connections_kindOne_course => 'קורס';
 
   @override
   String get connections_empty_noDives =>
@@ -10964,9 +11004,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveSites_list_menu_import => 'ייבא';
 
   @override
-  String get diveSites_list_menu_select => 'בחירת אתרים';
-
-  @override
   String get diveSites_list_menu_fillLocationDetails =>
       'השלמת פרטי מיקום חסרים';
 
@@ -14905,6 +14942,11 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String equipment_figure_itemLabelUnnumbered(String type, String name) {
+    return '$type, $name';
+  }
+
+  @override
   String equipment_figure_summary(String name, int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -18717,6 +18759,11 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
+    return 'המדלל חורג מ-MOD מדלל ב-$depth (ppO₂ $value bar)';
+  }
+
+  @override
   String get plannerCanvas_issue_noBailout =>
       'תוכנית דקומפרסיה CCR ללא גז חילוץ (bailout)';
 
@@ -20723,6 +20770,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_data_header_backupSync => 'גיבוי וסנכרון';
+
+  @override
+  String get settings_data_header_import => 'ייבוא';
 
   @override
   String get settings_data_header_storage => 'אחסון';

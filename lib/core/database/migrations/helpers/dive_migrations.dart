@@ -2,6 +2,12 @@ part of '../app_database_migrations.dart';
 
 /// Dives, dive tanks and the values derived from a dive.
 extension DiveMigrations on AppDatabase {
+  /// v256: dives.computer_tissue_json. Idempotent, so it is safe to call
+  /// from both onUpgrade and the beforeOpen backstop, and a no-op when the
+  /// table does not exist yet.
+  Future<void> _assertComputerTissueColumn() =>
+      _addColumnIfMissing('dives', 'computer_tissue_json', 'TEXT');
+
   /// Idempotent DDL for dive_tanks.source_tank_index (v200, issue #1314).
   Future<void> _assertDiveTankSourceIndexColumn() async {
     final cols = await customSelect("PRAGMA table_info('dive_tanks')").get();

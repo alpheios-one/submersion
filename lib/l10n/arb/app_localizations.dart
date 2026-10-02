@@ -4399,6 +4399,12 @@ abstract class AppLocalizations {
   /// **'Last Dive'**
   String get buddies_stat_lastDive;
 
+  /// No description provided for @buddies_summary_mostDives.
+  ///
+  /// In en, this message translates to:
+  /// **'Most Dives'**
+  String get buddies_summary_mostDives;
+
   /// No description provided for @buddies_summary_overview.
   ///
   /// In en, this message translates to:
@@ -6807,17 +6813,95 @@ abstract class AppLocalizations {
   /// **'Top connections'**
   String get connections_selection_topConnections;
 
-  /// No description provided for @connections_selection_firstLast.
-  ///
-  /// In en, this message translates to:
-  /// **'First {first}, last {last}'**
-  String connections_selection_firstLast(String first, String last);
-
   /// No description provided for @connections_selection_hint.
   ///
   /// In en, this message translates to:
   /// **'Tap a node or a line to see details.'**
   String get connections_selection_hint;
+
+  /// No description provided for @connections_details_dives.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives'**
+  String get connections_details_dives;
+
+  /// No description provided for @connections_details_connections.
+  ///
+  /// In en, this message translates to:
+  /// **'Connections'**
+  String get connections_details_connections;
+
+  /// No description provided for @connections_details_first.
+  ///
+  /// In en, this message translates to:
+  /// **'First'**
+  String get connections_details_first;
+
+  /// No description provided for @connections_details_last.
+  ///
+  /// In en, this message translates to:
+  /// **'Last'**
+  String get connections_details_last;
+
+  /// No description provided for @connections_kindOne_buddy.
+  ///
+  /// In en, this message translates to:
+  /// **'Buddy'**
+  String get connections_kindOne_buddy;
+
+  /// No description provided for @connections_kindOne_site.
+  ///
+  /// In en, this message translates to:
+  /// **'Site'**
+  String get connections_kindOne_site;
+
+  /// No description provided for @connections_kindOne_trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip'**
+  String get connections_kindOne_trip;
+
+  /// No description provided for @connections_kindOne_diveCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive center'**
+  String get connections_kindOne_diveCenter;
+
+  /// No description provided for @connections_kindOne_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment'**
+  String get connections_kindOne_equipment;
+
+  /// No description provided for @connections_kindOne_species.
+  ///
+  /// In en, this message translates to:
+  /// **'Species'**
+  String get connections_kindOne_species;
+
+  /// No description provided for @connections_kindOne_tag.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag'**
+  String get connections_kindOne_tag;
+
+  /// No description provided for @connections_kindOne_diveType.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive type'**
+  String get connections_kindOne_diveType;
+
+  /// No description provided for @connections_kindOne_diveComputer.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive computer'**
+  String get connections_kindOne_diveComputer;
+
+  /// No description provided for @connections_kindOne_course.
+  ///
+  /// In en, this message translates to:
+  /// **'Course'**
+  String get connections_kindOne_course;
 
   /// No description provided for @connections_empty_noDives.
   ///
@@ -18087,12 +18171,6 @@ abstract class AppLocalizations {
   /// **'Import'**
   String get diveSites_list_menu_import;
 
-  /// No description provided for @diveSites_list_menu_select.
-  ///
-  /// In en, this message translates to:
-  /// **'Select sites'**
-  String get diveSites_list_menu_select;
-
   /// No description provided for @diveSites_list_menu_fillLocationDetails.
   ///
   /// In en, this message translates to:
@@ -24740,6 +24818,12 @@ abstract class AppLocalizations {
   /// **'{number}, {type}, {name}'**
   String equipment_figure_itemLabel(int number, String type, String name);
 
+  /// Screen-reader label of an item on a diver figure drawn without numbers: the item's type, then its name.
+  ///
+  /// In en, this message translates to:
+  /// **'{type}, {name}'**
+  String equipment_figure_itemLabelUnnumbered(String type, String name);
+
   /// No description provided for @equipment_figure_summary.
   ///
   /// In en, this message translates to:
@@ -30764,6 +30848,12 @@ abstract class AppLocalizations {
   /// **'Tank ends below the rock-bottom minimum of {pressure}'**
   String plannerCanvas_issue_minGas(String pressure);
 
+  /// No description provided for @plannerCanvas_issue_diluentModExceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Diluent exceeds its Dil MOD at {depth} (ppO₂ {value} bar)'**
+  String plannerCanvas_issue_diluentModExceeded(String depth, String value);
+
   /// No description provided for @plannerCanvas_issue_noBailout.
   ///
   /// In en, this message translates to:
@@ -34042,6 +34132,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Backup & Sync'**
   String get settings_data_header_backupSync;
+
+  /// No description provided for @settings_data_header_import.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get settings_data_header_import;
 
   /// No description provided for @settings_data_header_storage.
   ///

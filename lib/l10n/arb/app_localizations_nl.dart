@@ -2788,6 +2788,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get buddies_stat_lastDive => 'Laatste duik';
 
   @override
+  String get buddies_summary_mostDives => 'Most Dives';
+
+  @override
   String get buddies_summary_overview => 'Overzicht';
 
   @override
@@ -4292,13 +4295,50 @@ class AppLocalizationsNl extends AppLocalizations {
   String get connections_selection_topConnections => 'Sterkste verbindingen';
 
   @override
-  String connections_selection_firstLast(String first, String last) {
-    return 'Eerste $first, laatste $last';
-  }
-
-  @override
   String get connections_selection_hint =>
       'Tik op een knooppunt of lijn voor details.';
+
+  @override
+  String get connections_details_dives => 'Duiken';
+
+  @override
+  String get connections_details_connections => 'Verbindingen';
+
+  @override
+  String get connections_details_first => 'Eerste';
+
+  @override
+  String get connections_details_last => 'Laatste';
+
+  @override
+  String get connections_kindOne_buddy => 'Buddy';
+
+  @override
+  String get connections_kindOne_site => 'Duikplek';
+
+  @override
+  String get connections_kindOne_trip => 'Reis';
+
+  @override
+  String get connections_kindOne_diveCenter => 'Duikcentrum';
+
+  @override
+  String get connections_kindOne_equipment => 'Uitrusting';
+
+  @override
+  String get connections_kindOne_species => 'Soort';
+
+  @override
+  String get connections_kindOne_tag => 'Label';
+
+  @override
+  String get connections_kindOne_diveType => 'Duiktype';
+
+  @override
+  String get connections_kindOne_diveComputer => 'Duikcomputer';
+
+  @override
+  String get connections_kindOne_course => 'Cursus';
 
   @override
   String get connections_empty_noDives =>
@@ -11140,9 +11180,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveSites_list_menu_import => 'Importeren';
 
   @override
-  String get diveSites_list_menu_select => 'Duikstekken selecteren';
-
-  @override
   String get diveSites_list_menu_fillLocationDetails =>
       'Ontbrekende locatiegegevens aanvullen';
 
@@ -15118,6 +15155,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String equipment_figure_itemLabelUnnumbered(String type, String name) {
+    return '$type, $name';
+  }
+
+  @override
   String equipment_figure_summary(String name, int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -19016,6 +19058,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
+    return 'Diluent overschrijdt de Dil-MOD op $depth (ppO₂ $value bar)';
+  }
+
+  @override
   String get plannerCanvas_issue_noBailout =>
       'CCR-decompressieplan heeft geen bailoutgas aan boord';
 
@@ -21066,6 +21113,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_data_header_backupSync => 'Back-up & synchronisatie';
+
+  @override
+  String get settings_data_header_import => 'Importeren';
 
   @override
   String get settings_data_header_storage => 'Opslag';

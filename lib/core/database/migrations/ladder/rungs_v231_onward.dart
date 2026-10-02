@@ -161,5 +161,11 @@ extension RungsFromV231 on AppDatabase {
       await _scrubSafetyStopCeilings();
     }
     if (from < 255) await reportProgress();
+    // v256: dives.computer_tissue_json (issue #1977). Column-only rung, no
+    // backfill: null reads as "the computer reported no tissue state".
+    if (from < 256) {
+      await _assertComputerTissueColumn();
+    }
+    if (from < 256) await reportProgress();
   }
 }

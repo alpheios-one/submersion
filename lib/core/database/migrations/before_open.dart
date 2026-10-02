@@ -445,6 +445,10 @@ extension BeforeOpenBackstops on AppDatabase {
     // arrives by restore or sync-adopt without them would throw on the
     // first read.
     await _assertBuddyProfileDiveLinkColumns();
+    // v256 backstop: re-assert dives.computer_tissue_json. Every dive
+    // read selects the whole row, so a database that arrives by restore
+    // or sync-adopt without it would throw on the first read.
+    await _assertComputerTissueColumn();
     // v182 backstop: re-assert the packed profile series tables, then
     // pack any dive that still has legacy rows and no series row. A
     // schema-version collision with a parallel branch skips the rung on

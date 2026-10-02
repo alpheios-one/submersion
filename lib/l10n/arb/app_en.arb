@@ -1707,6 +1707,7 @@
   "buddies_stat_favoriteSite": "Favorite Site",
   "buddies_stat_firstDive": "First Dive",
   "buddies_stat_lastDive": "Last Dive",
+  "buddies_summary_mostDives": "Most Dives",
   "buddies_summary_overview": "Overview",
   "buddies_summary_quickActions": "Quick Actions",
   "buddies_summary_recentBuddies": "Recent Buddies",
@@ -2681,9 +2682,21 @@
   "connections_selection_dives": "{count, plural, =1{1 dive} other{{count} dives}}",
   "@connections_selection_dives": {"placeholders": {"count": {"type": "int"}}},
   "connections_selection_topConnections": "Top connections",
-  "connections_selection_firstLast": "First {first}, last {last}",
-  "@connections_selection_firstLast": {"placeholders": {"first": {"type": "String"}, "last": {"type": "String"}}},
   "connections_selection_hint": "Tap a node or a line to see details.",
+  "connections_details_dives": "Dives",
+  "connections_details_connections": "Connections",
+  "connections_details_first": "First",
+  "connections_details_last": "Last",
+  "connections_kindOne_buddy": "Buddy",
+  "connections_kindOne_site": "Site",
+  "connections_kindOne_trip": "Trip",
+  "connections_kindOne_diveCenter": "Dive center",
+  "connections_kindOne_equipment": "Equipment",
+  "connections_kindOne_species": "Species",
+  "connections_kindOne_tag": "Tag",
+  "connections_kindOne_diveType": "Dive type",
+  "connections_kindOne_diveComputer": "Dive computer",
+  "connections_kindOne_course": "Course",
   "connections_empty_noDives": "No dives yet. Connections appear once your log has dives in it.",
   "connections_empty_buddies": "No buddies are linked to dives yet. Add buddies to your dives, or convert legacy buddy names in Settings, Data Tools.",
   "connections_empty_sites": "No dives have a site yet.",
@@ -6443,7 +6456,6 @@
   "diveSites_list_error_loadingSites": "Error loading sites: {error}",
   "diveSites_list_error_retry": "Retry",
   "diveSites_list_menu_import": "Import",
-  "diveSites_list_menu_select": "Select sites",
   "diveSites_list_menu_fillLocationDetails": "Fill in missing location details",
   "diveSites_backfill_confirm_title": "Fill in missing location details?",
   "diveSites_backfill_confirm_body": "{count, plural, =1{1 site with coordinates has an empty country, region, town or body of water.} other{{count} sites with coordinates have an empty country, region, town or body of water.}} Submersion will look each one up on OpenStreetMap and fill only the empty fields. This takes about {minutes, plural, =1{1 minute} other{{minutes} minutes}}.",
@@ -8925,6 +8937,14 @@
   "@equipment_figure_itemLabel": {
     "placeholders": {
       "number": {"type": "int"},
+      "type": {"type": "String"},
+      "name": {"type": "String"}
+    }
+  },
+  "equipment_figure_itemLabelUnnumbered": "{type}, {name}",
+  "@equipment_figure_itemLabelUnnumbered": {
+    "description": "Screen-reader label of an item on a diver figure drawn without numbers: the item's type, then its name.",
+    "placeholders": {
       "type": {"type": "String"},
       "name": {"type": "String"}
     }
@@ -11993,6 +12013,17 @@
       }
     }
   },
+  "plannerCanvas_issue_diluentModExceeded": "Diluent exceeds its Dil MOD at {depth} (ppO₂ {value} bar)",
+  "@plannerCanvas_issue_diluentModExceeded": {
+    "placeholders": {
+      "depth": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "plannerCanvas_issue_noBailout": "CCR decompression plan carries no bailout gas",
   "plannerCanvas_issue_noDecoGas": "Decompression required but no deco gas carried",
   "plannerCanvas_range_base": "Base",
@@ -12922,6 +12953,7 @@
   "settings_data_export_exporting": "Exporting...",
   "settings_data_export_failed": "Export failed: {error}",
   "settings_data_header_backupSync": "Backup & Sync",
+  "settings_data_header_import": "Import",
   "settings_data_header_storage": "Storage",
   "settings_data_import_completed": "Operation completed",
   "settings_data_import_failed": "Operation failed: {error}",

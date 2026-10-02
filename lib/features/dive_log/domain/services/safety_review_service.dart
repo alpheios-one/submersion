@@ -21,7 +21,10 @@ class SafetyReviewService {
   /// v3: rebreather dives are graded on the loop, never on the first
   /// cylinder breathed as open circuit; one whose loop cannot be modelled has
   /// no tissue loading to grade (issue #2593).
-  static const int engineVersion = 3;
+  /// v4: with the NDL source set to the dive computer, a sample at the
+  /// computer's deco stop reads as in deco instead of taking the calculated
+  /// NDL, which can change the missed deco stop rule's answer (#2551).
+  static const int engineVersion = 4;
 
   const SafetyReviewService();
 

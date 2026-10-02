@@ -396,6 +396,7 @@ class UddfFullExportService {
           components: components,
           gearLinkDives: dives,
           diveBuddies: diveBuddies,
+          computerTissueDives: dives,
         );
 
         // The UDDF specification places <divecomputercontrol> last, so this

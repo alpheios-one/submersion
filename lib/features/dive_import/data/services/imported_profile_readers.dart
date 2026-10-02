@@ -29,6 +29,11 @@ DiveProfilePoint profilePointFromImport(
   o2Sensor4: asDoubleOrNull(p['o2Sensor4']),
   o2Sensor5: asDoubleOrNull(p['o2Sensor5']),
   o2Sensor6: asDoubleOrNull(p['o2Sensor6']),
+  // Computer-reported tissue loading, whole percents. Parsers that have
+  // them (FIT n2_load, Shearwater/UDDF GF99) set these keys; the rest leave
+  // them absent.
+  gf99: p['gf99'] as int?,
+  n2Load: p['n2Load'] as int?,
   o2SensorMv1: p['o2SensorMv1'] as int?,
   o2SensorMv2: p['o2SensorMv2'] as int?,
   o2SensorMv3: p['o2SensorMv3'] as int?,

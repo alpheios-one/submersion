@@ -5,7 +5,10 @@ import 'package:submersion/core/constants/enums.dart' as enums;
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/export/models/uddf_import_result.dart';
 import 'package:submersion/core/services/export/uddf/uddf_buddy_roles.dart';
+import 'package:submersion/core/services/export/uddf/uddf_computer_tissue.dart';
+import 'package:submersion/core/services/export/uddf/uddf_dive_custom_fields.dart';
 import 'package:submersion/core/services/export/uddf/uddf_dump_codec.dart';
+import 'package:submersion/core/services/export/uddf/uddf_gradient_factor.dart';
 import 'package:submersion/core/services/export/uddf/uddf_import_parsers.dart';
 import 'package:submersion/features/universal_import/data/services/import_site_location.dart';
 import 'package:submersion/core/services/export/uddf/uddf_normalizer.dart';
@@ -553,6 +556,19 @@ class UddfFullImportService {
               declaredBuddies: buddyMap.keys.toSet(),
               declaredRoleIds: declaredRoleIds,
             );
+          }
+        }
+
+        // The tissue state each dive's computer reported (issue #2557),
+        // matched the same way.
+        final computerTissueSection = submersionElement
+            .findElements(UddfComputerTissue.sectionName)
+            .firstOrNull;
+        if (computerTissueSection != null) {
+          final byDive = UddfComputerTissue.parse(computerTissueSection);
+          for (final dive in dives) {
+            final data = byDive[dive['sourceUuid']];
+            if (data != null) UddfComputerTissue.apply(dive, data);
           }
         }
 
@@ -1381,6 +1397,12 @@ class UddfFullImportService {
           waterType,
           enums.WaterType.values,
         );
+      }
+
+      // User-defined key:value fields, as both Submersion writers put them.
+      final customFields = UddfDiveCustomFields.parse(afterElement);
+      if (customFields.isNotEmpty) {
+        diveData[UddfDiveCustomFields.mapKey] = customFields;
       }
 
       final currentDir = UddfImportParsers.getElementText(
@@ -2572,6 +2594,16 @@ class UddfFullImportService {
         );
         if (ndlText != null) {
           point['ndl'] = UddfImportParsers.parseUddfInt(ndlText);
+        }
+
+        // Shearwater Cloud and Subsurface write the computer's GF99 on each
+        // waypoint. Only set when present, so a sample without one carries
+        // no key rather than a null.
+        final gf99 = parseUddfGradientFactorPercent(
+          UddfImportParsers.getElementText(waypoint, 'gradientfactor'),
+        );
+        if (gf99 != null) {
+          point['gf99'] = gf99;
         }
 
         final decoStop = waypoint.findElements('decostop').firstOrNull;

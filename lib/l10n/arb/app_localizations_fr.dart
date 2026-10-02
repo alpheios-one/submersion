@@ -2815,6 +2815,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get buddies_stat_lastDive => 'Dernière plongée';
 
   @override
+  String get buddies_summary_mostDives => 'Most Dives';
+
+  @override
   String get buddies_summary_overview => 'Vue d\'ensemble';
 
   @override
@@ -4327,13 +4330,50 @@ class AppLocalizationsFr extends AppLocalizations {
   String get connections_selection_topConnections => 'Connexions principales';
 
   @override
-  String connections_selection_firstLast(String first, String last) {
-    return 'Première $first, dernière $last';
-  }
-
-  @override
   String get connections_selection_hint =>
       'Touchez un nœud ou une ligne pour voir les détails.';
+
+  @override
+  String get connections_details_dives => 'Plongées';
+
+  @override
+  String get connections_details_connections => 'Connexions';
+
+  @override
+  String get connections_details_first => 'Première';
+
+  @override
+  String get connections_details_last => 'Dernière';
+
+  @override
+  String get connections_kindOne_buddy => 'Binôme';
+
+  @override
+  String get connections_kindOne_site => 'Site';
+
+  @override
+  String get connections_kindOne_trip => 'Voyage';
+
+  @override
+  String get connections_kindOne_diveCenter => 'Centre de plongée';
+
+  @override
+  String get connections_kindOne_equipment => 'Équipement';
+
+  @override
+  String get connections_kindOne_species => 'Espèce';
+
+  @override
+  String get connections_kindOne_tag => 'Étiquette';
+
+  @override
+  String get connections_kindOne_diveType => 'Type de plongée';
+
+  @override
+  String get connections_kindOne_diveComputer => 'Ordinateur de plongée';
+
+  @override
+  String get connections_kindOne_course => 'Cours';
 
   @override
   String get connections_empty_noDives =>
@@ -11270,9 +11310,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveSites_list_menu_import => 'Importer';
 
   @override
-  String get diveSites_list_menu_select => 'Sélectionner des sites';
-
-  @override
   String get diveSites_list_menu_fillLocationDetails =>
       'Compléter les informations de lieu manquantes';
 
@@ -15268,6 +15305,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String equipment_figure_itemLabelUnnumbered(String type, String name) {
+    return '$type, $name';
+  }
+
+  @override
   String equipment_figure_summary(String name, int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -19211,6 +19253,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
+    return 'Le diluant dépasse sa MOD Dil à $depth (ppO₂ $value bar)';
+  }
+
+  @override
   String get plannerCanvas_issue_noBailout =>
       'Le plan de décompression CCR n\'emporte aucun gaz de bailout';
 
@@ -21282,6 +21329,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_data_header_backupSync => 'Sauvegarde et synchronisation';
+
+  @override
+  String get settings_data_header_import => 'Importation';
 
   @override
   String get settings_data_header_storage => 'Stockage';

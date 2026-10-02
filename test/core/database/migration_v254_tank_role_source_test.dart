@@ -22,8 +22,9 @@ void main() {
   );
 
   test('v254 is at or below the current schema version and in the ladder', () {
-    // Relaxed once v255 (safety stop ceilings, #2550) landed on top; the
-    // newest rung owns the exact assertions.
+    // Relaxed once v255 (safety stop ceilings, #2550) and v256 (computer
+    // tissue, #1977) landed on top; the newest rung owns the exact
+    // assertions.
     expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(254));
     expect(AppDatabase.migrationVersions, contains(254));
     // 253 (safety review inputs, #2592) sits directly below, and 252

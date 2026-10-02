@@ -7,6 +7,7 @@ import 'package:xml/xml.dart';
 
 import 'package:submersion/core/services/export/models/uddf_export_options.dart';
 import 'package:submersion/core/services/export/shared/file_export_utils.dart';
+import 'package:submersion/core/services/export/uddf/uddf_dive_custom_fields.dart';
 import 'package:submersion/core/services/export/uddf/uddf_dives_extras.dart';
 import 'package:submersion/core/services/export/uddf/uddf_dump_codec.dart';
 import 'package:submersion/core/services/export/uddf/uddf_export_builders.dart';
@@ -469,6 +470,15 @@ class UddfExportService {
                                         }
                                       }
                                     }
+                                    // Computer-reported GF99, as Shearwater
+                                    // Cloud writes it, so a round trip keeps
+                                    // the recorded value.
+                                    if (point.gf99 != null) {
+                                      builder.element(
+                                        'gradientfactor',
+                                        nest: point.gf99.toString(),
+                                      );
+                                    }
                                   },
                                 );
                               }
@@ -622,21 +632,7 @@ class UddfExportService {
                                 diveBuddies[dive.id] ?? const [],
                               );
                             }
-                            if (dive.customFields.isNotEmpty) {
-                              builder.element(
-                                'applicationdata',
-                                nest: () {
-                                  builder.element('name', nest: 'Submersion');
-                                  for (final field in dive.customFields) {
-                                    builder.element(
-                                      'customfield',
-                                      attributes: {'key': field.key},
-                                      nest: field.value,
-                                    );
-                                  }
-                                },
-                              );
-                            }
+                            UddfDiveCustomFields.write(builder, dive);
                           },
                         );
                       },
@@ -659,6 +655,7 @@ class UddfExportService {
           omitPurchaseDetails: true,
           components: components,
           gearLinkDives: gearLinkDives,
+          computerTissueDives: dives,
           diveBuddies: diveBuddies,
           customDiveRoles: customRoles,
           dataSources: sources,

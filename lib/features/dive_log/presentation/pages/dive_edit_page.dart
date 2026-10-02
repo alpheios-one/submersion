@@ -3276,7 +3276,17 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               dense: true,
               onChanged: (mode) {
                 _markDirty();
-                setState(() => _diveMode = mode);
+                setState(() {
+                  // Entering CCR with no setpoints logged yet starts from
+                  // the diver's own CCR ppO2 limits. Seeded into state, not
+                  // just shown in the panel, so a dive saved without
+                  // touching the panel keeps what the panel displayed.
+                  if (mode == DiveMode.ccr && _diveMode != DiveMode.ccr) {
+                    _setpointLow ??= ref.read(ccrSetpointLowProvider);
+                    _setpointHigh ??= ref.read(ccrSetpointHighProvider);
+                  }
+                  _diveMode = mode;
+                });
               },
             ),
           ),
@@ -3363,8 +3373,13 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       return Padding(
         padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
         child: CcrSettingsPanel(
-          setpointLow: _setpointLow,
-          setpointHigh: _setpointHigh,
+          // Switching to CCR seeds these from the diver's own CCR ppO2
+          // limits (see the mode selector). A dive already logged as CCR
+          // with no setpoints shows those limits too, rather than the
+          // panel's hardcoded 0.70/1.30 literals, which the diver may not
+          // actually dive.
+          setpointLow: _setpointLow ?? ref.read(ccrSetpointLowProvider),
+          setpointHigh: _setpointHigh ?? ref.read(ccrSetpointHighProvider),
           setpointDeco: _setpointDeco,
           diluentGas: _diluentGas,
           scrubberType: _scrubberType,
@@ -5784,6 +5799,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         decoConservatism: _existingDive?.decoConservatism,
         gradientFactorLow: _existingDive?.gradientFactorLow,
         gradientFactorHigh: _existingDive?.gradientFactorHigh,
+        computerTissue: _existingDive?.computerTissue,
         weatherCode: _existingDive?.weatherCode,
         importId: _existingDive?.importId,
         surfaceInterval: _existingDive?.surfaceInterval,

@@ -18,6 +18,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/dive_log/data/services/profile_analysis_service.dart';
+import 'package:submersion/features/dive_log/domain/codecs/deco_type.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
 import 'package:submersion/features/dive_log/domain/entities/gas_switch.dart';
@@ -485,6 +486,24 @@ ProfileAnalysisService _resolveAnalysisService(
   );
 }
 
+/// The NDL the calculated curve holds while in deco (see
+/// [BuhlmannAlgorithm.calculateNdl]); the chart, tooltip and safety review
+/// all read a negative NDL as a deco obligation.
+const int _ndlInDeco = -1;
+
+/// Whether the computer reported a mandatory deco stop at [point].
+///
+/// Computers report a no-stop time only while out of deco; at a stop the
+/// sample carries the stop instead, so its stored NDL is null (or zero, from
+/// Subsurface and Diving Log imports). Such a sample is in deco by the
+/// computer's own model, which may disagree with the calculated one (VPM,
+/// RGBM, other gradient factors), so it must not fall back to the calculated
+/// NDL (#2551). Safety and deep stops are not deco: deep stops are
+/// recommended stops that also occur on no-deco dives, and the statistics
+/// deco scan does not count them either.
+bool _isComputerDecoSample(DiveProfilePoint point) =>
+    point.decoType == kDecoTypeDecoStop;
+
 /// Overlays computer-reported decompression data onto a calculated
 /// [ProfileAnalysis].
 ///
@@ -492,7 +511,8 @@ ProfileAnalysisService _resolveAnalysisService(
 /// controlled by its own [MetricDataSource] parameter. When a source is
 /// [MetricDataSource.computer] and computer data exists in the profile,
 /// those values take priority over the Buhlmann-calculated values. Points
-/// without computer data fall back to the calculated values.
+/// without computer data fall back to the calculated values, except that a
+/// computer NDL sample at a deco stop reads as in deco.
 ///
 /// The deco stop band ([decoStopSource]) resolves against the incoming
 /// (calculated) [ProfileAnalysis.decoStopCurve] rather than against the
@@ -522,6 +542,9 @@ ProfileAnalysisService _resolveAnalysisService(
   // leaving a stop depth of zero through a stop and a no-stop time of zero
   // for the rest of the dive.
   final hasComputerNdl = profile.any((p) => p.ndl != null && p.ndl! > 0);
+  // A deco flag is a reading in its own right: some sources (DAN DL7, Diving
+  // Log, the Cressi Leonardo) record the obligation but no NDL numbers.
+  final hasComputerDeco = profile.any(_isComputerDecoSample);
   final hasComputerCeiling = profile.any(
     (p) => p.ceiling != null && p.ceiling! > 0,
   );
@@ -531,7 +554,9 @@ ProfileAnalysisService _resolveAnalysisService(
   // seconds); a null sample is the computer blanking its display.
   final hasComputerGtr = profile.any((p) => p.rbt != null);
 
-  final useNdl = ndlSource == MetricDataSource.computer && hasComputerNdl;
+  final useNdl =
+      ndlSource == MetricDataSource.computer &&
+      (hasComputerNdl || hasComputerDeco);
   final useCeiling =
       ceilingSource == MetricDataSource.computer && hasComputerCeiling;
   final useTts = ttsSource == MetricDataSource.computer && hasComputerTts;
@@ -587,12 +612,19 @@ ProfileAnalysisService _resolveAnalysisService(
 
   final overlaid = analysis.copyWith(
     ndlCurve: useNdl
-        ? List<int>.generate(
-            profile.length,
-            (i) =>
-                profile[i].ndl ??
-                (i < analysis.ndlCurve.length ? analysis.ndlCurve[i] : 0),
-          )
+        ? List<int>.generate(profile.length, (i) {
+            final ndl = profile[i].ndl;
+            if (_isComputerDecoSample(profile[i]) &&
+                (ndl == null || ndl <= 0)) {
+              return _ndlInDeco;
+            }
+            final calculated = i < analysis.ndlCurve.length
+                ? analysis.ndlCurve[i]
+                : 0;
+            // Without one positive reading the stored NDLs are zero
+            // placeholders, not readings, so only the deco flag is taken.
+            return hasComputerNdl ? ndl ?? calculated : calculated;
+          })
         : null,
     ceilingCurve: useCeiling
         ? List<double>.generate(

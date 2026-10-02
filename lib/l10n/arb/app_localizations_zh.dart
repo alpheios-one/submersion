@@ -2661,6 +2661,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get buddies_stat_lastDive => '最近潜水';
 
   @override
+  String get buddies_summary_mostDives => 'Most Dives';
+
+  @override
   String get buddies_summary_overview => '概览';
 
   @override
@@ -4100,12 +4103,49 @@ class AppLocalizationsZh extends AppLocalizations {
   String get connections_selection_topConnections => '主要关联';
 
   @override
-  String connections_selection_firstLast(String first, String last) {
-    return '首次 $first，最近 $last';
-  }
+  String get connections_selection_hint => '点击节点或连线查看详情。';
 
   @override
-  String get connections_selection_hint => '点击节点或连线查看详情。';
+  String get connections_details_dives => '潜水';
+
+  @override
+  String get connections_details_connections => '关联';
+
+  @override
+  String get connections_details_first => '首次';
+
+  @override
+  String get connections_details_last => '最近';
+
+  @override
+  String get connections_kindOne_buddy => '潜伴';
+
+  @override
+  String get connections_kindOne_site => '潜点';
+
+  @override
+  String get connections_kindOne_trip => '行程';
+
+  @override
+  String get connections_kindOne_diveCenter => '潜店';
+
+  @override
+  String get connections_kindOne_equipment => '装备';
+
+  @override
+  String get connections_kindOne_species => '物种';
+
+  @override
+  String get connections_kindOne_tag => '标签';
+
+  @override
+  String get connections_kindOne_diveType => '潜水类型';
+
+  @override
+  String get connections_kindOne_diveComputer => '潜水电脑';
+
+  @override
+  String get connections_kindOne_course => '课程';
 
   @override
   String get connections_empty_noDives => '还没有潜水记录。日志中有潜水后会显示关联。';
@@ -10700,9 +10740,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_list_menu_import => '导入';
 
   @override
-  String get diveSites_list_menu_select => '选择潜水点';
-
-  @override
   String get diveSites_list_menu_fillLocationDetails => '补全缺失的地点信息';
 
   @override
@@ -14550,6 +14587,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String equipment_figure_itemLabelUnnumbered(String type, String name) {
+    return '$type, $name';
+  }
+
+  @override
   String equipment_figure_summary(String name, int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -18256,6 +18298,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
+    return '稀释气在 $depth 处超过其 MOD（ppO₂ $value bar）';
+  }
+
+  @override
   String get plannerCanvas_issue_noBailout => 'CCR 减压计划未携带逃生气体';
 
   @override
@@ -20176,6 +20223,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_data_header_backupSync => '备份与同步';
+
+  @override
+  String get settings_data_header_import => '导入';
 
   @override
   String get settings_data_header_storage => '存储';

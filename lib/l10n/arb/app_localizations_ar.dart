@@ -2765,6 +2765,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get buddies_stat_lastDive => 'آخر غطسة';
 
   @override
+  String get buddies_summary_mostDives => 'Most Dives';
+
+  @override
   String get buddies_summary_overview => 'نظرة عامة';
 
   @override
@@ -4238,12 +4241,49 @@ class AppLocalizationsAr extends AppLocalizations {
   String get connections_selection_topConnections => 'أقوى الروابط';
 
   @override
-  String connections_selection_firstLast(String first, String last) {
-    return 'الأولى $first، الأخيرة $last';
-  }
+  String get connections_selection_hint => 'انقر على عقدة أو خط لعرض التفاصيل.';
 
   @override
-  String get connections_selection_hint => 'انقر على عقدة أو خط لعرض التفاصيل.';
+  String get connections_details_dives => 'الغوصات';
+
+  @override
+  String get connections_details_connections => 'الروابط';
+
+  @override
+  String get connections_details_first => 'الأولى';
+
+  @override
+  String get connections_details_last => 'الأخيرة';
+
+  @override
+  String get connections_kindOne_buddy => 'رفيق';
+
+  @override
+  String get connections_kindOne_site => 'موقع';
+
+  @override
+  String get connections_kindOne_trip => 'رحلة';
+
+  @override
+  String get connections_kindOne_diveCenter => 'مركز غوص';
+
+  @override
+  String get connections_kindOne_equipment => 'معدات';
+
+  @override
+  String get connections_kindOne_species => 'نوع';
+
+  @override
+  String get connections_kindOne_tag => 'وسم';
+
+  @override
+  String get connections_kindOne_diveType => 'نوع الغوص';
+
+  @override
+  String get connections_kindOne_diveComputer => 'كمبيوتر غوص';
+
+  @override
+  String get connections_kindOne_course => 'دورة';
 
   @override
   String get connections_empty_noDives =>
@@ -11016,9 +11056,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveSites_list_menu_import => 'استيراد';
 
   @override
-  String get diveSites_list_menu_select => 'تحديد المواقع';
-
-  @override
   String get diveSites_list_menu_fillLocationDetails =>
       'إكمال تفاصيل الموقع الناقصة';
 
@@ -15008,6 +15045,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String equipment_figure_itemLabelUnnumbered(String type, String name) {
+    return '$type، $name';
+  }
+
+  @override
   String equipment_figure_summary(String name, int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -18858,6 +18900,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
+    return 'يتجاوز غاز التخفيف حد MOD الخاص به عند $depth (ppO₂ $value bar)';
+  }
+
+  @override
   String get plannerCanvas_issue_noBailout =>
       'خطة تخفيف الضغط CCR لا تتضمن غاز إنقاذ (bailout)';
 
@@ -20888,6 +20935,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_data_header_backupSync => 'النسخ الاحتياطي والمزامنة';
+
+  @override
+  String get settings_data_header_import => 'الاستيراد';
 
   @override
   String get settings_data_header_storage => 'التخزين';
