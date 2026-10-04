@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/cylinder_passports/domain/services/passport_resolver.dart';
 import 'package:submersion/features/cylinder_passports/presentation/utils/import_tag_fill.dart';
 import 'package:submersion/features/cylinder_passports/presentation/utils/scan_cylinder_tag.dart';
@@ -10,13 +11,21 @@ import 'package:submersion/features/equipment/domain/entities/equipment_item.dar
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
+const _log = LoggerService('showBlenderCylinderPicker');
+
 /// Which of the diver's cylinders a blend is for: a tank from their gear, or
 /// its tag scanned. Only an own cylinder can be logged or filled in, so a
 /// foreign tag or text that is not a tag says so and resolves null.
+///
+/// [allowScan] hides the "Scan tag" choice: a scan imports the tag's newest
+/// fill into the cylinder's history as a side effect (spec section 11), which
+/// fits picking the start cylinder or logging a fill, but not a spot that
+/// only wants the water volume or working pressure for a cost line.
 Future<EquipmentItem?> showBlenderCylinderPicker(
   BuildContext context,
-  WidgetRef ref,
-) async {
+  WidgetRef ref, {
+  bool allowScan = true,
+}) async {
   final l10n = context.l10n;
   final tanks = [
     for (final e in await ref.read(activeEquipmentProvider.future))
@@ -42,12 +51,13 @@ Future<EquipmentItem?> showBlenderCylinderPicker(
             title: Text(tank.name),
             onTap: () => Navigator.pop(sheetContext, tank),
           ),
-        ListTile(
-          key: const Key('blender-scan-tag'),
-          leading: const Icon(Icons.qr_code_scanner),
-          title: Text(l10n.gasCalculators_blender_scanTag),
-          onTap: () => Navigator.pop(sheetContext, _scan),
-        ),
+        if (allowScan)
+          ListTile(
+            key: const Key('blender-scan-tag'),
+            leading: const Icon(Icons.qr_code_scanner),
+            title: Text(l10n.gasCalculators_blender_scanTag),
+            onTap: () => Navigator.pop(sheetContext, _scan),
+          ),
       ],
     ),
   );
@@ -79,3 +89,41 @@ Future<EquipmentItem?> showBlenderCylinderPicker(
 
 /// The picker's Scan tag choice, told apart from a tank.
 const _scan = #scan;
+
+/// Picks one of the diver's own tanks for its water volume and working
+/// pressure (issue #2926), without the tag scan: a spot that only wants a
+/// number for a cost line or a billed gas, not a fill to log. Handles the
+/// picker's failure and the "no volume recorded" case itself, with the same
+/// snackbar wording at every call site, and resolves null when nothing
+/// usable was picked.
+Future<EquipmentItem?> pickBlenderCylinderSpecs(
+  BuildContext context,
+  WidgetRef ref,
+) async {
+  final messenger = ScaffoldMessenger.maybeOf(context);
+  final l10n = context.l10n;
+  EquipmentItem? tank;
+  try {
+    tank = await showBlenderCylinderPicker(context, ref, allowScan: false);
+  } catch (e, stackTrace) {
+    _log.error(
+      'Failed to choose a cylinder for a cost line',
+      error: e,
+      stackTrace: stackTrace,
+    );
+    messenger?.showSnackBar(
+      SnackBar(content: Text(l10n.gasCalculators_blender_cylinderFailed)),
+    );
+    return null;
+  }
+  if (tank == null || !context.mounted) return null;
+  if (tank.volumeL == null) {
+    messenger?.showSnackBar(
+      SnackBar(
+        content: Text(l10n.gasCalculators_blender_cylinderNoVolume(tank.name)),
+      ),
+    );
+    return null;
+  }
+  return tank;
+}

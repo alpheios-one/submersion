@@ -15333,6 +15333,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'Kan die fles niet openen. Probeer het opnieuw.';
 
   @override
+  String gasCalculators_blender_cylinderNoVolume(String name) {
+    return '$name has no recorded water volume';
+  }
+
+  @override
   String gasCalculators_blender_filledFrom(String name, String mix) {
     return '$name: $mix';
   }
@@ -15504,15 +15509,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_blender_cylinderVolume => 'Waterinhoud van de fles';
 
   @override
-  String get gasCalculators_blender_cylinderPresets => 'Voorinstellingen';
-
-  @override
   String gasCalculators_blender_unitPrice(String unit) {
     return 'Prijs per 100 $unit';
   }
-
-  @override
-  String get gasCalculators_blender_manageCylinderSizes => 'Flesmaten beheren';
 
   @override
   String get gasCalculators_blender_costTotal => 'Totaal';

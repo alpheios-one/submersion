@@ -15096,6 +15096,11 @@ class AppLocalizationsHe extends AppLocalizations {
       'לא ניתן לפתוח את הבלון הזה. נסו שוב.';
 
   @override
+  String gasCalculators_blender_cylinderNoVolume(String name) {
+    return '$name has no recorded water volume';
+  }
+
+  @override
   String gasCalculators_blender_filledFrom(String name, String mix) {
     return '$name: $mix';
   }
@@ -15265,15 +15270,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_blender_cylinderVolume => 'נפח המים של הבלון';
 
   @override
-  String get gasCalculators_blender_cylinderPresets => 'הגדרות מוכנות';
-
-  @override
   String gasCalculators_blender_unitPrice(String unit) {
     return 'מחיר ל-100 $unit';
   }
-
-  @override
-  String get gasCalculators_blender_manageCylinderSizes => 'ניהול גדלי בלונים';
 
   @override
   String get gasCalculators_blender_costTotal => 'סה\"כ';

@@ -15441,6 +15441,11 @@ class AppLocalizationsIt extends AppLocalizations {
       'Impossibile aprire quella bombola. Riprova.';
 
   @override
+  String gasCalculators_blender_cylinderNoVolume(String name) {
+    return '$name has no recorded water volume';
+  }
+
+  @override
   String gasCalculators_blender_filledFrom(String name, String mix) {
     return '$name: $mix';
   }
@@ -15613,16 +15618,9 @@ class AppLocalizationsIt extends AppLocalizations {
       'Volume d\'acqua della bombola';
 
   @override
-  String get gasCalculators_blender_cylinderPresets => 'Preimpostazioni';
-
-  @override
   String gasCalculators_blender_unitPrice(String unit) {
     return 'Prezzo per 100 $unit';
   }
-
-  @override
-  String get gasCalculators_blender_manageCylinderSizes =>
-      'Gestisci le dimensioni delle bombole';
 
   @override
   String get gasCalculators_blender_costTotal => 'Totale';

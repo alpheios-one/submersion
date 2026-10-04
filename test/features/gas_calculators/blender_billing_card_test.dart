@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/equipment/domain/constants/equipment_attribute_catalog.dart';
+import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
+import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_billing_card.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
-import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
-import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
-import '../../helpers/test_app.dart';
 import '../../support/fake_app_settings_repository.dart';
 
 class _TestSettingsNotifier extends StateNotifier<AppSettings>
@@ -21,28 +21,22 @@ class _TestSettingsNotifier extends StateNotifier<AppSettings>
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-/// Stands in for the diver's real tank presets (issue #1335 follow-up: the
-/// cylinder dropdown reads the global preset list now, not a blender-only
-/// vault). Working pressure and material are set but never read by the
-/// blender, which only wants a label and a water volume.
-List<TankPresetEntity> _presets() => [
-  TankPresetEntity.create(
-    id: 'preset-al80',
-    name: 'al80',
-    displayName: 'AL80',
-    volumeLiters: 11.1,
-    workingPressureBar: 207,
-    material: TankMaterial.aluminum,
-  ),
-  TankPresetEntity.create(
-    id: 'preset-deco',
-    name: 'deco3',
-    displayName: 'Deco bottle',
-    volumeLiters: 3,
-    workingPressureBar: 200,
-    material: TankMaterial.aluminum,
-  ),
-];
+/// A tank from the diver's own gear (issue #2926: the cost card reads a
+/// cylinder's own equipment entry now, not the global tank presets).
+EquipmentItem _tank(String id, String name, {double? volumeL}) => EquipmentItem(
+  id: id,
+  name: name,
+  type: EquipmentType.tank,
+  attributes: [
+    if (volumeL != null)
+      EquipmentAttribute(
+        id: '',
+        equipmentId: id,
+        key: EquipmentAttrKeys.volumeL,
+        valueNum: volumeL,
+      ),
+  ],
+);
 
 // The Riverpod `Override` type is sealed and not re-exported, so overrides
 // are threaded through as `dynamic` and cast at the `ProviderScope` boundary
@@ -50,7 +44,7 @@ List<TankPresetEntity> _presets() => [
 Future<WidgetRef> _pump(
   WidgetTester tester, {
   List<dynamic> overrides = const [],
-  List<TankPresetEntity>? presets,
+  List<EquipmentItem>? gear,
 }) async {
   late WidgetRef captured;
   await tester.pumpWidget(
@@ -60,7 +54,14 @@ Future<WidgetRef> _pump(
           (ref) =>
               _TestSettingsNotifier(const AppSettings(defaultCurrency: 'CHF')),
         ),
-        tankPresetsProvider.overrideWith((ref) async => presets ?? _presets()),
+        activeEquipmentProvider.overrideWith(
+          (ref) async =>
+              gear ??
+              [
+                _tank('al80', 'AL80', volumeL: 11.1),
+                _tank('deco', 'Deco bottle', volumeL: 3),
+              ],
+        ),
         ...overrides,
       ].cast(),
       child: MaterialApp(
@@ -145,107 +146,59 @@ void main() {
     );
   });
 
-  testWidgets('a cylinder preset fills the volume field', (tester) async {
+  // Issue #2926: the cost card reads a cylinder from the diver's own gear
+  // (same picker as the start cylinder and "Log this fill"), not the global
+  // tank presets. The free-text field stays, for a customer's cylinder that
+  // has no equipment entry of its own.
+  testWidgets('choosing a cylinder fills the volume field', (tester) async {
     final ref = await _pump(tester);
-    await tester.tap(find.byKey(const Key('blender-cylinder-presets')));
+    await tester.tap(find.byKey(const Key('blender-billing-choose-cylinder')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Deco bottle (3 L)'));
+    await tester.tap(find.text('Deco bottle'));
     await tester.pumpAndSettle();
 
     expect(ref.read(blenderCylinderLitersProvider), closeTo(3, 0.01));
   });
 
-  testWidgets('the preset list offers exactly the diver-managed sizes', (
+  testWidgets('the picker offers exactly the diver-owned tanks', (
     tester,
   ) async {
     await _pump(tester);
-    await tester.tap(find.byKey(const Key('blender-cylinder-presets')));
+    await tester.tap(find.byKey(const Key('blender-billing-choose-cylinder')));
     await tester.pumpAndSettle();
-    for (final label in ['AL80 (11.1 L)', 'Deco bottle (3 L)']) {
+    for (final label in ['AL80', 'Deco bottle']) {
       expect(find.text(label), findsOneWidget);
     }
   });
 
-  testWidgets("the dropdown reflects the diver's tank presets exactly", (
-    tester,
-  ) async {
-    // Issue #1335 follow-up: the blender's own cylinder-size vault is gone,
-    // so a different set of tank presets fully replaces what the dropdown
-    // offers.
-    final ref = await _pump(
-      tester,
-      presets: [
-        TankPresetEntity.create(
-          id: 'preset-twinset',
-          name: 'twinset',
-          displayName: 'Twinset',
-          volumeLiters: 24,
-          workingPressureBar: 200,
-          material: TankMaterial.steel,
-        ),
-      ],
-    );
-
-    await tester.tap(find.byKey(const Key('blender-cylinder-presets')));
+  testWidgets('the picker never offers a tag scan here', (tester) async {
+    // A scan would import the tag's fill into the cylinder's history (spec
+    // section 11), a side effect this card only wants the water volume from.
+    await _pump(tester);
+    await tester.tap(find.byKey(const Key('blender-billing-choose-cylinder')));
     await tester.pumpAndSettle();
-    expect(find.textContaining('Twinset'), findsOneWidget);
-    expect(find.text('AL80 (11.1 L)'), findsNothing);
-
-    await tester.tap(find.textContaining('Twinset'));
-    await tester.pumpAndSettle();
-    expect(ref.read(blenderCylinderLitersProvider), closeTo(24, 0.01));
+    expect(find.byKey(const Key('blender-scan-tag')), findsNothing);
   });
 
-  testWidgets(
-    'the cylinder-sizes link, last in the presets dropdown, navigates to '
-    'the global tank presets',
-    (tester) async {
-      // Issue #1335 follow-up review: moved from its own header button into
-      // the dropdown it manages, as the last entry.
-      late String location;
-      final router = GoRouter(
-        initialLocation: '/gas-calculators',
-        routes: [
-          GoRoute(
-            path: '/gas-calculators',
-            builder: (context, state) => const Scaffold(
-              body: SingleChildScrollView(child: BlenderBillingCard()),
-            ),
-          ),
-          GoRoute(
-            path: '/tank-presets',
-            builder: (context, state) {
-              location = GoRouterState.of(context).uri.toString();
-              return const Scaffold(body: Text('Tank Presets'));
-            },
-          ),
-        ],
-      );
+  testWidgets('a tank with no recorded volume says so and keeps the field', (
+    tester,
+  ) async {
+    final ref = await _pump(tester, gear: [_tank('spare', 'Spare 12')]);
+    ref.read(blenderCylinderLitersProvider.notifier).state = 11.1;
+    await tester.tap(find.byKey(const Key('blender-billing-choose-cylinder')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Spare 12'));
+    await tester.pumpAndSettle();
 
-      await tester.pumpWidget(
-        testAppRouter(
-          locale: const Locale('en'),
-          router: router,
-          overrides: [
-            settingsProvider.overrideWith(
-              (ref) => _TestSettingsNotifier(
-                const AppSettings(defaultCurrency: 'CHF'),
-              ),
-            ),
-            tankPresetsProvider.overrideWith((ref) async => _presets()),
-          ],
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(const Key('blender-cylinder-presets')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('blender-cylinder-sizes-link')));
-      await tester.pumpAndSettle();
-
-      expect(location, '/tank-presets');
-    },
-  );
+    final l10n = AppLocalizations.of(
+      tester.element(find.byType(BlenderBillingCard)),
+    );
+    expect(
+      find.text(l10n.gasCalculators_blender_cylinderNoVolume('Spare 12')),
+      findsOneWidget,
+    );
+    expect(ref.read(blenderCylinderLitersProvider), closeTo(11.1, 0.01));
+  });
 
   testWidgets('submitting a typed cylinder volume saves the preferences', (
     tester,

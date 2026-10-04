@@ -15207,6 +15207,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'تعذر فتح هذه الأسطوانة. حاول مرة أخرى.';
 
   @override
+  String gasCalculators_blender_cylinderNoVolume(String name) {
+    return '$name has no recorded water volume';
+  }
+
+  @override
   String gasCalculators_blender_filledFrom(String name, String mix) {
     return '$name: $mix';
   }
@@ -15377,16 +15382,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_cylinderVolume => 'السعة المائية للأسطوانة';
 
   @override
-  String get gasCalculators_blender_cylinderPresets => 'الإعدادات المسبقة';
-
-  @override
   String gasCalculators_blender_unitPrice(String unit) {
     return 'السعر لكل 100 $unit';
   }
-
-  @override
-  String get gasCalculators_blender_manageCylinderSizes =>
-      'إدارة أحجام الأسطوانات';
 
   @override
   String get gasCalculators_blender_costTotal => 'الإجمالي';

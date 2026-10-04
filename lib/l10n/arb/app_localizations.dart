@@ -25047,6 +25047,12 @@ abstract class AppLocalizations {
   /// **'Could not open that cylinder. Try again.'**
   String get gasCalculators_blender_cylinderFailed;
 
+  /// Choosing a cylinder whose equipment entry has no volume attribute, in a spot that only reads the volume (the cost card, a billed line).
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has no recorded water volume'**
+  String gasCalculators_blender_cylinderNoVolume(String name);
+
   /// After Choose cylinder: the cylinder chosen and the mix of its last fill, now what is in it.
   ///
   /// In en, this message translates to:
@@ -25323,23 +25329,11 @@ abstract class AppLocalizations {
   /// **'Cylinder water capacity'**
   String get gasCalculators_blender_cylinderVolume;
 
-  /// No description provided for @gasCalculators_blender_cylinderPresets.
-  ///
-  /// In en, this message translates to:
-  /// **'Presets'**
-  String get gasCalculators_blender_cylinderPresets;
-
   /// No description provided for @gasCalculators_blender_unitPrice.
   ///
   /// In en, this message translates to:
   /// **'Price per 100 {unit}'**
   String gasCalculators_blender_unitPrice(String unit);
-
-  /// No description provided for @gasCalculators_blender_manageCylinderSizes.
-  ///
-  /// In en, this message translates to:
-  /// **'Manage cylinder sizes'**
-  String get gasCalculators_blender_manageCylinderSizes;
 
   /// No description provided for @gasCalculators_blender_costTotal.
   ///
