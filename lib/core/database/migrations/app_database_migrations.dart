@@ -24,6 +24,7 @@ import 'package:submersion/core/database/site_classification_uniqueness.dart';
 import 'package:submersion/core/database/site_type_seed.dart';
 import 'package:submersion/core/database/equipment_share_uniqueness.dart';
 import 'package:submersion/core/database/tag_uniqueness.dart';
+import 'package:submersion/core/database/tank_shared_computer_backfill.dart';
 import 'package:submersion/core/constants/enums.dart';
 
 part 'before_open.dart';
@@ -40,6 +41,7 @@ part 'helpers/equipment_migrations.dart';
 part 'helpers/equipment_condition_migrations.dart';
 part 'helpers/media_migrations.dart';
 part 'helpers/pre_dive_migrations.dart';
+part 'helpers/profile_series_history_migrations.dart';
 part 'helpers/quality_migrations.dart';
 part 'helpers/query_migrations.dart';
 part 'helpers/safety_migrations.dart';

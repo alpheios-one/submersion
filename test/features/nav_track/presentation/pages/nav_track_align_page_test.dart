@@ -81,20 +81,20 @@ Future<_RecordingNavTrackRepository> _pump(
   final overrides = await getBaseOverrides(settingsNotifier: settingsNotifier);
   final repository = _RecordingNavTrackRepository();
   final router = GoRouter(
-    initialLocation: '/nav-routes/${route.id}',
+    initialLocation: '/tracks/underwater/${route.id}',
     routes: [
       GoRoute(
-        path: '/nav-routes/:id',
+        path: '/tracks/underwater/:id',
         builder: (context, state) =>
             const Scaffold(body: Text('ROUTE_DETAIL_PAGE')),
       ),
       GoRoute(
-        path: '/nav-routes/:id/align',
+        path: '/tracks/underwater/:id/align',
         builder: (context, state) =>
             NavTrackAlignPage(routeId: state.pathParameters['id']!),
       ),
       GoRoute(
-        path: '/nav-routes/:id/3d',
+        path: '/tracks/underwater/:id/3d',
         builder: (context, state) =>
             const Scaffold(body: Text('ROUTE_3D_PAGE')),
       ),
@@ -121,7 +121,7 @@ Future<_RecordingNavTrackRepository> _pump(
       ),
     ),
   );
-  router.push('/nav-routes/${route.id}/align');
+  router.push('/tracks/underwater/${route.id}/align');
   await tester.pumpAndSettle();
   return repository;
 }
@@ -974,7 +974,7 @@ void main() {
     await _pump(tester, route: degraded);
 
     expect(tester.takeException(), isNull);
-    expect(find.text('Could not load this route.'), findsOneWidget);
+    expect(find.text('Could not load this track.'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('nav-track-align-trust-slider')),
       findsNothing,
@@ -1062,6 +1062,42 @@ void main() {
 
       expect(after.latitude, closeTo(before.latitude, 1e-9));
       expect(after.longitude, closeTo(before.longitude, 1e-9));
+    });
+  });
+
+  group('when the track cannot be shown', () {
+    Future<void> pumpAlign(
+      WidgetTester tester,
+      Future<NavTrack?> Function() load,
+    ) async {
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            navTrackByIdProvider('r1').overrideWith((ref) => load()),
+          ],
+          child: const MaterialApp(
+            locale: Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: NavTrackAlignPage(routeId: 'r1'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('a failed load says the track could not be loaded', (
+      tester,
+    ) async {
+      await pumpAlign(tester, () async => throw StateError('database locked'));
+      expect(find.text('Could not load this track.'), findsOneWidget);
+    });
+
+    testWidgets('a missing track says the track was not found', (tester) async {
+      await pumpAlign(tester, () async => null);
+      expect(find.text('Track not found.'), findsOneWidget);
     });
   });
 }

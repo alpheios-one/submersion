@@ -44,6 +44,28 @@ void main() {
     expect(isTripDiveDay(row(9, DayType.embark)), isFalse);
   });
 
+  test('a day\'s own plan decides it, whatever its type (#2845)', () {
+    // A Travel day the diver plans to dive counts; a dive day planned at
+    // none does not.
+    expect(
+      isTripDiveDay(row(9, DayType.travel).copyWith(plannedDives: 2)),
+      isTrue,
+    );
+    expect(
+      isTripDiveDay(row(9, DayType.diveDay).copyWith(plannedDives: 0)),
+      isFalse,
+    );
+    expect(isTripDiveDay(row(9, DayType.travel)), isFalse);
+    expect(
+      tripDiveDayCount(
+        start: start,
+        end: end,
+        itinerary: [row(9, DayType.travel).copyWith(plannedDives: 2)],
+      ),
+      7,
+    );
+  });
+
   test('rows outside the trip are ignored', () {
     expect(
       tripDiveDayCount(
@@ -58,6 +80,9 @@ void main() {
   group('isBarePlanDay', () {
     test('a dive day with no port, position or notes is bare', () {
       expect(isBarePlanDay(row(9, DayType.diveDay)), isTrue);
+      // The board writes a day planned at 0 as Rest (#2658): still only a
+      // plan, so a date edit must prune it like a dive day (#2663).
+      expect(isBarePlanDay(row(9, DayType.rest)), isTrue);
       // A planned count is the plan itself, not content.
       expect(
         isBarePlanDay(row(9, DayType.diveDay).copyWith(plannedDives: 3)),

@@ -20,6 +20,7 @@ import 'package:submersion/features/equipment/presentation/widgets/equipment_pic
 import 'package:submersion/features/equipment/presentation/widgets/service_status_indicator.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/max_width_fraction.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/shared_gear_note_line.dart';
 
 /// Equipment picker bottom sheet
 class EquipmentPickerSheet extends ConsumerWidget {
@@ -37,6 +38,18 @@ class EquipmentPickerSheet extends ConsumerWidget {
   final bool hideSpare;
   final void Function(EquipmentItem) onEquipmentSelected;
 
+  /// Replaces the default "Select Equipment" title, for a caller whose pick
+  /// means something more specific (filling a tank from a cylinder).
+  final String? title;
+
+  /// A line under the header saying what picking does, when that is not
+  /// simply "add it to the dive".
+  final String? hint;
+
+  /// A note per item that is also on another profile's overlapping dive
+  /// (issue #2853). Only the dive editor passes it.
+  final String? Function(String equipmentId)? overlapNote;
+
   const EquipmentPickerSheet({
     super.key,
     required this.scrollController,
@@ -44,6 +57,9 @@ class EquipmentPickerSheet extends ConsumerWidget {
     this.typeFilter,
     this.hideSpare = false,
     required this.onEquipmentSelected,
+    this.title,
+    this.hint,
+    this.overlapNote,
   });
 
   /// The caller's own constraints on what may be offered, before the
@@ -67,7 +83,8 @@ class EquipmentPickerSheet extends ConsumerWidget {
       ...parts,
     ];
     final text = all.isEmpty ? null : Text(all.join(' · '));
-    if (!showOwner) return text;
+    final note = overlapNote?.call(item.id);
+    if (!showOwner && note == null) return text;
     // Another profile's shared gear names its owner (issue #2046). Below the
     // text, as on the equipment list, so the width-capped trailing column
     // keeps only the service indicator (issue #1981).
@@ -76,10 +93,18 @@ class EquipmentPickerSheet extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         ?text,
-        Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: EquipmentOwnerChip(ownerId: item.diverId),
-        ),
+        if (showOwner)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: EquipmentOwnerChip(ownerId: item.diverId),
+          ),
+        if (note != null)
+          SharedGearNoteLine(
+            note,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
       ],
     );
   }
@@ -108,7 +133,7 @@ class EquipmentPickerSheet extends ConsumerWidget {
               // 362px in French, whose title is 23 characters.
               Flexible(
                 child: Text(
-                  context.l10n.diveLog_equipmentPicker_title,
+                  title ?? context.l10n.diveLog_equipmentPicker_title,
                   style: Theme.of(context).textTheme.titleLarge,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -145,6 +170,16 @@ class EquipmentPickerSheet extends ConsumerWidget {
             ],
           ),
         ),
+        if (hint case final hint?)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Text(
+              hint,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
         const Divider(height: 1),
         Expanded(
           child: equipmentAsync.when(

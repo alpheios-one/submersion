@@ -274,11 +274,23 @@ void main() {
     });
 
     group('regenerateForTrip', () {
+      test('types the days for the trip, not for a boat', () async {
+        final result = await repository.regenerateForTrip(
+          testTripId,
+          DateTime(2025, 3, 1),
+          DateTime(2025, 3, 5),
+          tripType: TripType.resort,
+        );
+        expect(result.first.dayType, DayType.travel);
+        expect(result.last.dayType, DayType.travel);
+      });
+
       test('should generate correct days for date range', () async {
         final result = await repository.regenerateForTrip(
           testTripId,
           DateTime(2025, 3, 1),
           DateTime(2025, 3, 5),
+          tripType: TripType.liveaboard,
         );
 
         expect(result, hasLength(5));
@@ -312,6 +324,7 @@ void main() {
             testTripId,
             DateTime(2025, 3, 1),
             DateTime(2025, 3, 5),
+            tripType: TripType.liveaboard,
           );
 
           // Customize day 2 (March 2) and day 3 (March 3)
@@ -334,6 +347,7 @@ void main() {
             testTripId,
             DateTime(2025, 3, 2),
             DateTime(2025, 3, 6),
+            tripType: TripType.liveaboard,
           );
 
           expect(result, hasLength(5));
@@ -368,6 +382,7 @@ void main() {
           testTripId,
           DateTime(2025, 3, 1),
           DateTime(2025, 3, 3),
+          tripType: TripType.liveaboard,
         );
 
         expect(result, hasLength(3));
@@ -382,6 +397,7 @@ void main() {
           testTripId,
           DateTime(2025, 3, 1),
           DateTime(2025, 3, 7),
+          tripType: TripType.liveaboard,
         );
         final initial = await repository.getByTripId(testTripId);
         expect(initial, hasLength(7));
@@ -391,6 +407,7 @@ void main() {
           testTripId,
           DateTime(2025, 3, 1),
           DateTime(2025, 3, 3),
+          tripType: TripType.liveaboard,
         );
         final regenerated = await repository.getByTripId(testTripId);
         expect(regenerated, hasLength(3));
@@ -479,6 +496,81 @@ void main() {
         expect(days.single.plannedDives, 4);
       });
 
+      test('a day with no row planned at 0 is typed Rest (#2658)', () async {
+        await repository.setPlannedDives(
+          tripId: testTripId,
+          date: DateTime(2025, 3, 3),
+          plannedDives: 0,
+        );
+        final day = (await repository.getByTripId(testTripId)).single;
+        expect(day.dayType, DayType.rest);
+        expect(day.plannedDives, 0);
+      });
+
+      test('a dive day planned at 0 becomes a Rest day', () async {
+        await repository.saveAll([
+          createTestDay(dayNumber: 3, date: DateTime(2025, 3, 3)),
+        ]);
+        await repository.setPlannedDives(
+          tripId: testTripId,
+          date: DateTime(2025, 3, 3),
+          plannedDives: 0,
+        );
+        final day = (await repository.getByTripId(testTripId)).single;
+        expect(day.dayType, DayType.rest);
+      });
+
+      test('a Rest day planned at 2 becomes a dive day again (R1)', () async {
+        await repository.saveAll([
+          createTestDay(
+            dayNumber: 3,
+            date: DateTime(2025, 3, 3),
+            dayType: DayType.rest,
+          ),
+        ]);
+        await repository.setPlannedDives(
+          tripId: testTripId,
+          date: DateTime(2025, 3, 3),
+          plannedDives: 2,
+        );
+        final day = (await repository.getByTripId(testTripId)).single;
+        expect(day.dayType, DayType.diveDay);
+        expect(day.plannedDives, 2);
+      });
+
+      test('a Rest day returned to the estimate is a dive day again', () async {
+        await repository.setPlannedDives(
+          tripId: testTripId,
+          date: DateTime(2025, 3, 3),
+          plannedDives: 0,
+        );
+        await repository.setPlannedDives(
+          tripId: testTripId,
+          date: DateTime(2025, 3, 3),
+          plannedDives: null,
+        );
+        final day = (await repository.getByTripId(testTripId)).single;
+        expect(day.dayType, DayType.diveDay);
+        expect(day.plannedDives, isNull);
+      });
+
+      test('a port day planned at 0 keeps its type', () async {
+        await repository.saveAll([
+          createTestDay(
+            dayNumber: 4,
+            date: DateTime(2025, 3, 4),
+            dayType: DayType.portDay,
+          ),
+        ]);
+        await repository.setPlannedDives(
+          tripId: testTripId,
+          date: DateTime(2025, 3, 4),
+          plannedDives: 0,
+        );
+        final day = (await repository.getByTripId(testTripId)).single;
+        expect(day.dayType, DayType.portDay);
+      });
+
       test('saveAll, updateDay and regenerateForTrip keep the plan', () async {
         await repository.saveAll([
           createTestDay(
@@ -495,7 +587,12 @@ void main() {
           2,
         );
 
-        await repository.regenerateForTrip(testTripId, startDate, endDate);
+        await repository.regenerateForTrip(
+          testTripId,
+          startDate,
+          endDate,
+          tripType: TripType.liveaboard,
+        );
         final regenerated = await repository.getByTripId(testTripId);
         final third = regenerated.firstWhere(
           (d) => d.date == DateTime(2025, 3, 3),

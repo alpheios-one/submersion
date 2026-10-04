@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
+import 'package:submersion/core/router/track_locations.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/site_picker_sheet.dart';
@@ -56,12 +57,6 @@ bool navTrackAnchorShouldFollowSiteChange(
   return (write: true, anchor: newSiteLocation);
 }
 
-/// Returned by the site picker's "New Dive Site" button in place of a
-/// [DiveSite], so the caller can tell "create a new one" apart from "picked
-/// this existing one" (the sheet resolves to null when merely dismissed).
-/// Mirrors `_createNewSiteSentinel` in `dive_edit_page.dart`.
-const _createNewSiteSentinel = '__create_new__';
-
 /// One route: stats, an inline map when anchored, its dive link, correction
 /// status, and 3D (spec 2026-09-10-underwater-nav-track-design.md, "The
 /// routes area", detail page).
@@ -80,7 +75,7 @@ class NavTrackDetailPage extends ConsumerWidget {
     final newName = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.navTrack_detail_renameTitle),
+        title: Text(l10n.navTrack_detail_renameTrackTitle),
         content: TextField(controller: controller, autofocus: true),
         actions: [
           TextButton(
@@ -113,7 +108,7 @@ class NavTrackDetailPage extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.navTrack_detail_deleteTitle),
+        title: Text(l10n.navTrack_detail_deleteTrackTitle),
         content: Text(l10n.navTrack_detail_deleteMessage),
         actions: [
           TextButton(
@@ -142,9 +137,23 @@ class NavTrackDetailPage extends ConsumerWidget {
       routeStartSeconds: route.startTime ~/ 1000,
       dives: dives,
     );
+    // Pre-selects the one dive a sweep would suggest (#2394: a sole
+    // time-overlapping dive used to be linked silently instead of offered as
+    // a choice), so confirming it is a single tap rather than hunting it
+    // down in the proximity-sorted list below. Computed from the [dives]
+    // already fetched above, through the same rule a sweep uses, rather than
+    // through another sweep() call that would re-fetch the same dive list.
+    final suggestedDiveId = NavTrackMatcher.soleCandidateFor(
+      routeStartSeconds: route.startTime ~/ 1000,
+      routeEndSeconds: route.endTime ~/ 1000,
+      dives: dives,
+    )?.id;
     if (!context.mounted) return;
-    // Only an unlinked route offers "Choose dive", so nothing is marked.
-    final chosen = await showNavTrackDiveChoiceSheet(context, dives: nearest);
+    final chosen = await showNavTrackDiveChoiceSheet(
+      context,
+      dives: nearest,
+      selectedDiveId: suggestedDiveId,
+    );
     if (chosen == null) return;
     await ref
         .read(navTrackRepositoryProvider)
@@ -173,36 +182,12 @@ class NavTrackDetailPage extends ConsumerWidget {
               .then((s) => s?.location);
     if (!context.mounted) return;
 
-    final chosen = await showModalBottomSheet<Object>(
-      context: context,
-      isScrollControlled: true,
-      builder: (sheetContext) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        expand: false,
-        builder: (sheetContext, scrollController) => SitePickerSheet(
-          scrollController: scrollController,
-          selectedSiteId: oldSiteId,
-          onSiteSelected: (site) => Navigator.of(sheetContext).pop(site),
-          onCreateNewSite: () =>
-              Navigator.of(sheetContext).pop(_createNewSiteSentinel),
-        ),
-      ),
+    final site = await pickOrCreateSite(
+      context,
+      ref,
+      selectedSiteId: oldSiteId,
+      newSiteSeedLocation: route.anchor,
     );
-
-    DiveSite? site;
-    if (chosen is DiveSite) {
-      site = chosen;
-    } else if (chosen == _createNewSiteSentinel) {
-      if (!context.mounted) return;
-      final newSiteId = await context.push<String>(
-        '/sites/new',
-        extra: route.anchor,
-      );
-      if (newSiteId == null || !context.mounted) return;
-      site = await ref.read(siteProvider(newSiteId).future);
-    }
     if (site == null || !context.mounted) return;
 
     final anchorChange = navTrackAnchorChangeForSite(
@@ -239,12 +224,13 @@ class NavTrackDetailPage extends ConsumerWidget {
     return routeAsync.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, _) =>
-          Scaffold(body: Center(child: Text(l10n.navTrack_common_loadError))),
+      error: (e, _) => Scaffold(
+        body: Center(child: Text(l10n.navTrack_common_trackLoadError)),
+      ),
       data: (route) {
         if (route == null) {
           return Scaffold(
-            body: Center(child: Text(l10n.navTrack_common_notFound)),
+            body: Center(child: Text(l10n.navTrack_common_trackNotFound)),
           );
         }
         final stats = NavTrackStats.of(route.points);
@@ -253,20 +239,22 @@ class NavTrackDetailPage extends ConsumerWidget {
             title: Text(
               route.name ??
                   route.sourceRef ??
-                  l10n.navTrack_detail_defaultTitle,
+                  l10n.navTrack_detail_defaultTrackTitle,
             ),
             actions: [
               IconButton(
                 key: const ValueKey('nav-track-align'),
                 icon: const Icon(Icons.tune),
                 tooltip: l10n.navTrack_align_title,
-                onPressed: () => context.push('/nav-routes/${route.id}/align'),
+                onPressed: () =>
+                    context.push(underwaterTrackAlignLocation(route.id)),
               ),
               IconButton(
                 key: const ValueKey('nav-track-open-3d'),
                 icon: const Icon(Icons.view_in_ar),
                 tooltip: l10n.navTrack_common_open3dTooltip,
-                onPressed: () => context.push('/nav-routes/${route.id}/3d'),
+                onPressed: () =>
+                    context.push(underwaterTrackSeascapeLocation(route.id)),
               ),
               PopupMenuButton<String>(
                 onSelected: (value) async {

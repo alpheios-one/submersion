@@ -95,23 +95,34 @@ BleIoStream* ble_io_stream_new(void) {
     return stream;
 }
 
-// Get a string property from a BlueZ D-Bus object.
-static gchar* get_string_property(GDBusConnection* conn,
-                                  const gchar* path,
-                                  const gchar* interface,
-                                  const gchar* property) {
+// Get a property from a BlueZ D-Bus object, unwrapped from its variant, or
+// NULL if it cannot be read within |timeout_ms| (-1 for the D-Bus default).
+// The caller unrefs the result.
+static GVariant* get_property(GDBusConnection* conn, const gchar* path,
+                              const gchar* interface, const gchar* property,
+                              gint timeout_ms) {
     g_autoptr(GError) error = NULL;
     GVariant* result = g_dbus_connection_call_sync(
         conn, "org.bluez", path,
         "org.freedesktop.DBus.Properties", "Get",
         g_variant_new("(ss)", interface, property),
         G_VARIANT_TYPE("(v)"),
-        G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error);
+        G_DBUS_CALL_FLAGS_NONE, timeout_ms, NULL, &error);
     if (!result) return NULL;
 
     GVariant* value = NULL;
     g_variant_get(result, "(v)", &value);
     g_variant_unref(result);
+    return value;
+}
+
+// Get a string property from a BlueZ D-Bus object.
+static gchar* get_string_property(GDBusConnection* conn,
+                                  const gchar* path,
+                                  const gchar* interface,
+                                  const gchar* property) {
+    GVariant* value = get_property(conn, path, interface, property, -1);
+    if (!value) return NULL;
 
     const gchar* str = g_variant_get_string(value, NULL);
     gchar* ret = g_strdup(str);
@@ -119,21 +130,27 @@ static gchar* get_string_property(GDBusConnection* conn,
     return ret;
 }
 
+// Whether BlueZ still reports the device connected. FALSE when the property
+// cannot be read within |timeout_ms|, which is the answer a dropped link or a
+// wedged BlueZ gives.
+static gboolean device_connected(GDBusConnection* conn,
+                                 const gchar* device_path, gint timeout_ms) {
+    GVariant* value = get_property(conn, device_path, "org.bluez.Device1",
+                                   "Connected", timeout_ms);
+    if (!value) return FALSE;
+
+    gboolean connected = g_variant_is_of_type(value, G_VARIANT_TYPE_BOOLEAN) &&
+                         g_variant_get_boolean(value);
+    g_variant_unref(value);
+    return connected;
+}
+
 // Check if a characteristic has a specific flag (e.g., "write", "notify").
 static gboolean has_flag(GDBusConnection* conn, const gchar* char_path,
                          const gchar* flag) {
-    g_autoptr(GError) error = NULL;
-    GVariant* result = g_dbus_connection_call_sync(
-        conn, "org.bluez", char_path,
-        "org.freedesktop.DBus.Properties", "Get",
-        g_variant_new("(ss)", "org.bluez.GattCharacteristic1", "Flags"),
-        G_VARIANT_TYPE("(v)"),
-        G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error);
-    if (!result) return FALSE;
-
-    GVariant* value = NULL;
-    g_variant_get(result, "(v)", &value);
-    g_variant_unref(result);
+    GVariant* value = get_property(conn, char_path,
+                                   "org.bluez.GattCharacteristic1", "Flags", -1);
+    if (!value) return FALSE;
 
     gboolean found = FALSE;
     GVariantIter iter;
@@ -827,6 +844,22 @@ static int ble_write(void* userdata, const void* data, size_t size,
                       &opts),
         NULL, G_DBUS_CALL_FLAGS_NONE,
         stream->timeout_ms, NULL, &error);
+
+    // A read-poll computer's reply is fetched by a read whatever the write
+    // completion said, so a rejection on a live link is reported as sent and
+    // the read decides (issue #1454). The Seac Tablet answers its 7-byte
+    // commands with ATT 0x0D, and Subsurface, the only client known to
+    // download it over BLE, never looks at a write's status. Mirrors
+    // ReadPollPolicy.writeOutcome on Android and darwin.
+    if (error && stream->read_poller &&
+        device_connected(stream->connection, stream->device_path,
+                         MIN(stream->timeout_ms, 10000))) {
+        g_warning("BleIoStream: the computer rejected a %zu-byte command (%s); "
+                  "treating it as sent and reading the reply",
+                  size, error->message);
+        if (actual) *actual = size;
+        return LIBDC_STATUS_SUCCESS;
+    }
 
     if (error) {
         g_warning("BleIoStream: WriteValue failed: %s", error->message);

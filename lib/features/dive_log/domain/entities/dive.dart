@@ -1155,6 +1155,14 @@ class DiveTank extends Equatable {
   /// user edits never rewrite it.
   final int? sourceTankIndex;
 
+  /// The other computers on a consolidated dive that logged this same
+  /// cylinder (v260): consolidation keeps one row per physical cylinder,
+  /// attributed to [computerId], and lists here the computers merged into
+  /// it. Empty when that was recorded and found nobody; null when it was
+  /// never recorded (tank_shared_computers.dart). Computer-owned identity,
+  /// like [computerId]: user edits never rewrite it.
+  final List<String>? sharedComputerIds;
+
   /// The regulator this cylinder was breathed through (v202), so high-O2
   /// contact reaches the regulator's service clocks. User-authored: the
   /// tank editor sets it and downloads never touch it.
@@ -1172,6 +1180,13 @@ class DiveTank extends Equatable {
   /// field and never write it, like [computerId], so a rebuild that forgot
   /// it cannot wipe what the registry recorded.
   final String? equipmentId;
+
+  /// How long this cylinder was breathed, as the source log recorded it
+  /// (v259, issue #1496). MacDive logs one per tank with no gas-switch
+  /// times, so it says how long but not when. Per-cylinder SAC uses it as
+  /// the breathing time when the dive has no gas switches. Import-owned,
+  /// like [transmitterSerial]: edit flows never write it.
+  final Duration? usageDuration;
 
   /// Deco gas-switch depth override in meters (planning only); null = auto
   /// (MOD at the deco pO2). Subsurface per-cylinder "Deco switch at", v120.
@@ -1203,12 +1218,21 @@ class DiveTank extends Equatable {
     this.transmitterSerial,
     this.sourceId,
     this.sourceTankIndex,
+    this.sharedComputerIds,
     this.regulatorEquipmentId,
     this.tripCylinderId,
     this.equipmentId,
+    this.usageDuration,
     this.decoSwitchDepth,
     this.isTravelGas = false,
   });
+
+  /// Whether [computer] breathed this cylinder: it owns it, shares it, or
+  /// the tank belongs to the whole dive (unattributed).
+  bool isUsedBy(String computer) =>
+      computerId == null ||
+      computerId == computer ||
+      (sharedComputerIds?.contains(computer) ?? false);
 
   /// Pressure consumed during dive
   double? get pressureUsed {
@@ -1239,8 +1263,11 @@ class DiveTank extends Equatable {
     String? sourceId,
     int? sourceTankIndex,
     bool clearSourceTankIndex = false,
+    List<String>? sharedComputerIds,
     String? regulatorEquipmentId,
     String? equipmentId,
+    Duration? usageDuration,
+    bool clearUsageDuration = false,
     bool clearRegulatorEquipmentId = false,
     bool clearMaterial = false,
     String? tripCylinderId,
@@ -1270,6 +1297,7 @@ class DiveTank extends Equatable {
       sourceTankIndex: clearSourceTankIndex
           ? null
           : (sourceTankIndex ?? this.sourceTankIndex),
+      sharedComputerIds: sharedComputerIds ?? this.sharedComputerIds,
       regulatorEquipmentId: clearRegulatorEquipmentId
           ? null
           : (regulatorEquipmentId ?? this.regulatorEquipmentId),
@@ -1277,6 +1305,9 @@ class DiveTank extends Equatable {
           ? null
           : (tripCylinderId ?? this.tripCylinderId),
       equipmentId: equipmentId ?? this.equipmentId,
+      usageDuration: clearUsageDuration
+          ? null
+          : (usageDuration ?? this.usageDuration),
       decoSwitchDepth: clearDecoSwitchDepth
           ? null
           : (decoSwitchDepth ?? this.decoSwitchDepth),
@@ -1302,9 +1333,11 @@ class DiveTank extends Equatable {
     transmitterSerial,
     sourceId,
     sourceTankIndex,
+    sharedComputerIds,
     regulatorEquipmentId,
     equipmentId,
     tripCylinderId,
+    usageDuration,
     decoSwitchDepth,
     isTravelGas,
   ];

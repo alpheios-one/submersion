@@ -1,11 +1,18 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
+
+import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/explore/data/channel_nl_engine.dart';
 import 'package:submersion/features/explore/domain/nl_engine.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 final nlEngineProvider = Provider<NlEngine>((ref) => ChannelNlEngine());
+
+/// How far a model download started here has got, 0 to 1; null when no
+/// download from this run is reporting (none started, or one the platform
+/// was already running).
+final exploreDownloadProgressProvider = StateProvider<double?>((ref) => null);
 
 /// Synchronous platform gate, separate from the async probe so an entry
 /// point is never enabled transiently while the probe loads (the iCloud tile
@@ -20,16 +27,27 @@ final explorePlatformSupportedProvider = Provider<bool>((ref) {
   };
 });
 
-/// The model's answer for the active app locale. 'system' resolves to the
-/// device locale tag.
+/// Reads the device's locale at the moment it is called, since the device
+/// language can change while the app runs; a provider so tests can set it.
+final exploreDeviceLocaleProvider = Provider<Locale Function()>(
+  (ref) =>
+      () => PlatformDispatcher.instance.locale,
+);
+
+/// The language tag of the app's [locale] setting: 'system', the default,
+/// resolves to the [device]'s language now.
+String exploreLocaleTag(String locale, Locale Function() device) =>
+    locale == 'system' ? device().toLanguageTag() : locale;
+
+/// The model's answer for the active app locale.
 final exploreAvailabilityProvider = FutureProvider<NlAvailability>((ref) async {
   if (!ref.watch(explorePlatformSupportedProvider)) {
     return NlAvailability.unsupportedPlatform;
   }
-  final locale = ref.watch(localeProvider);
-  final tag = locale == 'system'
-      ? PlatformDispatcher.instance.locale.toLanguageTag()
-      : locale;
+  final tag = exploreLocaleTag(
+    ref.watch(localeProvider),
+    ref.watch(exploreDeviceLocaleProvider),
+  );
   return ref.watch(nlEngineProvider).availability(tag);
 });
 

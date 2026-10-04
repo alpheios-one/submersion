@@ -10,6 +10,7 @@ A trip groups related dives together:
 - Liveaboard expedition
 - Weekend dive trip
 - Training course
+- A single local dive (use the **Day Trip** type)
 
 ## Creating Trips
 
@@ -60,11 +61,18 @@ For live-aboard trips:
 
 ### Day Trip
 
-For single-day excursions:
+For single-day excursions, including a single local dive:
 
-- Same start/end date
+- Choosing **Day Trip** sets the end date to the start date and locks it:
+  moving the start date moves the end date with it, and choosing another
+  type makes the end date editable again
 - Location = departure point
 - Quick organization
+
+<div class="tip">
+<strong>Tip:</strong> A trip does not have to mean travel. If you dive one
+weekend morning at a local site, a Day Trip is the place to put it.
+</div>
 
 ## Linking Dives
 
@@ -119,13 +127,13 @@ All dives on the trip:
 - Quick access to details
 - Day-by-day grouping
 
-### Trip Map
+### Day Maps
 
-Visual overview:
+Each day of the story has its own map:
 
-- All dive sites on map
-- Route of travel (liveaboard)
-- Geographic spread
+- One numbered pin per dive, and the day's itinerary location
+- Tap a pin to highlight its dive below the map
+- Open the map fullscreen to pan and zoom
 
 ## Trip Organization
 
@@ -209,23 +217,41 @@ Generate trip summary:
 
 ## Planning Future Trips
 
-### Placeholder Trips
+Every trip, whatever its type, has the same six tabs: Overview, Itinerary,
+Gear, Checklist, Dives and Photos.
 
-Create trips before traveling:
+### Before departure
 
-1. Add trip with future dates
-2. Link dives as you log them
-3. Easy organization
+Until the first day the Overview is a preparation page: the countdown, then
+one card with a row for each thing to get ready (to-dos, gear, itinerary,
+plan), each opening its tab, and your notes.
 
-### Pre-Trip Info
+### Itinerary
 
-Use notes for:
+Generate fills the trip's dates with a travel day at each end and dive days
+between (embark and disembark on a liveaboard). Tap a day to set its type
+(Travel, Dive day, Rest; plus Embark, Disembark, Sea day and Port day on a
+boat), its location, notes and the number of dives you plan that day, which
+the cylinder forecast uses. A day planned at no dives is a rest day.
 
-- Flight information
-- Accommodation details
-- Emergency contacts
-- Rental gear notes
-- Visa requirements
+### Gear
+
+One list of what you'll dive with: the gear you pack from your equipment
+(service clocks falling due before the trip show on the item) and the
+cylinders you'll hold, rental or your own. Add offers all three ways in.
+Tapping a cylinder opens the board; once the trip starts, the cylinders also
+show their fill state.
+
+### Checklist
+
+Your to-dos for the trip, with templates, and the pre-dive checklist runs.
+
+### During and after the trip
+
+From the first day the Overview tells the story: a card per day with its own
+map of that day's dives (tap a pin to find the dive, or open the map
+fullscreen), the day's dives, photos and sightings. While the trip is under
+way a cylinders line sits under the heading.
 
 ## Trip Best Practices
 

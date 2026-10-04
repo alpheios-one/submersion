@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
@@ -9,6 +10,7 @@ import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/performance/perf_timer.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/dive_stats_scope.dart';
+import 'package:submersion/core/util/wall_clock_utc.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/event_scope_tombstone.dart';
@@ -28,6 +30,7 @@ import 'package:submersion/features/dive_log/domain/entities/bulk_edit_request.d
 import 'package:submersion/features/dive_log/domain/entities/computer_tissue_snapshot.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
+import 'package:submersion/features/dive_log/domain/entities/tank_shared_computers.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_source_export.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
@@ -39,6 +42,7 @@ import 'package:submersion/features/dive_log/domain/entities/gas_switch.dart';
 import 'package:submersion/features/dive_import/data/services/imported_file_reclaimer.dart';
 import 'package:submersion/features/dive_sites/data/mappers/dive_site_row_mapper.dart';
 import 'package:submersion/features/dive_log/domain/entities/profile_series.dart';
+import 'package:submersion/features/dive_log/domain/entities/profile_series_revision.dart';
 import 'package:submersion/features/dive_log/domain/entities/source_profile.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/profile_event.dart';
@@ -80,6 +84,7 @@ import 'package:submersion/features/buddies/domain/entities/buddy.dart'
     as domain;
 import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_observation_repository.dart';
+import 'package:submersion/features/data_quality/data/services/quality_scan_service.dart';
 
 /// A dive that a conditions fetch can still do something for: its site carries
 /// coordinates and at least one weather column is empty.
@@ -1058,10 +1063,25 @@ class DiveRepository {
   Future<void> saveEditedProfile(
     String diveId,
     List<domain.DiveProfilePoint> editedPoints,
-  ) async {
+  ) => saveEditedProfileWithKind(
+    diveId: diveId,
+    editedPoints: editedPoints,
+    editKind: 'profile_editor',
+  );
+
+  /// Saves an edited profile and records the edit source in revision history.
+  ///
+  /// Revision kind is persisted as `Edit: <editKind>` (for example
+  /// `Edit: profile_editor` or `Edit: data_quality_repair`).
+  Future<void> saveEditedProfileWithKind({
+    required String diveId,
+    required List<domain.DiveProfilePoint> editedPoints,
+    required String editKind,
+  }) async {
     try {
       _log.info('Saving edited profile for dive: $diveId');
       final now = DateTime.now().millisecondsSinceEpoch;
+      final revisionKind = _composeEditRevisionKind(editKind);
 
       await _db.transaction(() async {
         // The edit belongs to whichever source is primary right now: it is a
@@ -1075,6 +1095,9 @@ class DiveRepository {
                   )
                   ..limit(1))
                 .getSingleOrNull();
+        final parentSeriesId = await _profileSeries.primarySeriesIdForDive(
+          diveId,
+        );
 
         // Demote every series, then the edit becomes the one primary series
         // of the dive: no computer (a manual correction), owned by the source
@@ -1085,6 +1108,8 @@ class DiveRepository {
             diveId: diveId,
             sourceId: primarySource?.id,
             isPrimary: true,
+            parentSeriesId: parentSeriesId,
+            revisionKind: revisionKind,
             samples: [
               for (final point in editedPoints) profileSampleFromPoint(point),
             ],
@@ -1136,6 +1161,12 @@ class DiveRepository {
       );
       rethrow;
     }
+  }
+
+  static String _composeEditRevisionKind(String editKind) {
+    final normalized = editKind.trim().toLowerCase();
+    if (normalized.isEmpty) return 'edit';
+    return 'Edit: $normalized';
   }
 
   /// Collapses [rows] so at most one dive_data_sources row survives per
@@ -1283,26 +1314,45 @@ class DiveRepository {
 
   /// Restore the original profile as primary.
   ///
-  /// Deletes the edited (currently primary, computerId=null) profiles and
-  /// promotes the original profiles back to primary.
+  /// Activates the previous profile state.
   ///
-  /// For multi-computer dives the primary [DiveDataSources] row identifies
-  /// which computer was the original primary source.  Only that computer's
-  /// profile rows are restored to isPrimary=true; the other computers' rows
-  /// remain demoted so the profile chart continues to show a single trace.
+  /// When history has a parent for the active profile, that parent is
+  /// activated directly (no blob copy) and the undone edit is deleted. If the
+  /// active profile has no parent, the legacy ownership-based fallback
+  /// deletes the edited primary row and picks the original source rows.
   ///
-  /// For single-computer dives (or when no primary computer reading exists)
-  /// all remaining profile rows are promoted to primary as before.
+  /// The undone edit must not survive as a demoted series: it still has no
+  /// computer and is owned by the primary source, so
+  /// [ProfileSeriesRepository.promoteWinnerOwnedBy] would rank it first and
+  /// a later primary-source swap would bring the undone edit back.
   Future<void> restoreOriginalProfile(String diveId) async {
     try {
       _log.info('Restoring original profile for dive: $diveId');
+      final now = DateTime.now().millisecondsSinceEpoch;
 
       await _db.transaction(() async {
-        // Delete user-edited series (isPrimary=true, computerId=null).
-        // The computerId null filter is critical: without it, computer-
-        // sourced series that were promoted to isPrimary=true by
-        // setPrimaryDataSource would be permanently deleted.
+        final activeSeriesId = await _profileSeries.primarySeriesIdForDive(
+          diveId,
+        );
+        final parentSeriesId = activeSeriesId == null
+            ? null
+            : await _profileSeries.parentSeriesIdOf(activeSeriesId);
+
+        if (parentSeriesId != null) {
+          await _profileSeries.activateSeriesForDive(
+            diveId: diveId,
+            seriesId: parentSeriesId,
+            now: now,
+          );
+          await _profileSeries.deleteUndoneEdit(activeSeriesId!);
+          return;
+        }
+
+        // Legacy / root fallback: remove the manual edited primary row first.
+        // Without this, restore can re-promote the same edited series and
+        // become a no-op for dives without parent-linked history.
         await _profileSeries.deleteEditedSeries(diveId);
+        await _profileSeries.demoteAll(diveId, now: now);
 
         // Find the primary computer from dive_data_sources
         final primaryReading =
@@ -1322,22 +1372,26 @@ class DiveRepository {
         // data-quality prefilters all silently skip it. That is reachable
         // whenever the primary source names a computer that owns no samples
         // (a metadata-only source, or one whose samples a consolidation
-        // re-stamped onto a different computer). setPrimaryDataSource and
-        // DiveComputerRepository.setPrimaryProfile guard their own
-        // demote-then-promote pairs the same way (issue #1149).
+        // re-stamped onto a different computer). setPrimaryDataSource
+        // guards its own demote-then-promote pair the same way (issue
+        // #1149).
         if (primaryComputerId != null &&
             await _profileSeries.ownsComputer(diveId, primaryComputerId)) {
           // Multi-computer dive: only the previously-primary computer's
           // series come back.
-          await _profileSeries.promoteByComputer(diveId, primaryComputerId);
+          await _profileSeries.promoteByComputer(
+            diveId,
+            primaryComputerId,
+            now: now,
+          );
         } else {
           // Single-computer dive (or no computer reading, or a primary
           // computer that owns nothing): everything left is the live profile.
-          await _profileSeries.promoteAll(diveId);
+          await _profileSeries.promoteAll(diveId, now: now);
         }
       });
 
-      SyncEventBus.notifyLocalChange();
+      await _refreshDiveAfterProfileSwitch(diveId, now: now);
       _log.info('Restored original profile for dive: $diveId');
     } catch (e, stackTrace) {
       _log.error(
@@ -1347,6 +1401,59 @@ class DiveRepository {
       );
       rethrow;
     }
+  }
+
+  /// Metadata-only profile history for [diveId], newest first.
+  Future<List<ProfileSeriesRevision>> getProfileHistory(String diveId) {
+    return _profileSeries.getRevisionsForDive(diveId);
+  }
+
+  /// Makes [seriesId] the active profile for [diveId] without copying blobs.
+  Future<void> setActiveProfileSeries(String diveId, String seriesId) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _profileSeries.activateSeriesForDive(
+      diveId: diveId,
+      seriesId: seriesId,
+      now: now,
+    );
+    await _refreshDiveAfterProfileSwitch(diveId, now: now);
+  }
+
+  /// Brings the dive in line with a profile that a restore or a revision
+  /// switch just made live, as [saveEditedProfileWithKind] does for an edit:
+  /// depth stats from the live samples, the safety review dropped so it
+  /// recomputes, and the dive stamped for sync.
+  Future<void> _refreshDiveAfterProfileSwitch(
+    String diveId, {
+    required int now,
+  }) async {
+    final points = await getDiveProfile(diveId);
+    if (points.isNotEmpty) {
+      var maxDepth = 0.0;
+      var depthSum = 0.0;
+      for (final point in points) {
+        if (point.depth > maxDepth) maxDepth = point.depth;
+        depthSum += point.depth;
+      }
+      await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
+        DivesCompanion(
+          maxDepth: Value(maxDepth),
+          avgDepth: Value(depthSum / points.length),
+          updatedAt: Value(now),
+        ),
+      );
+    }
+    await SafetyFindingsRepository.clearReviewForDive(
+      _db,
+      _syncRepository,
+      diveId,
+    );
+    await _syncRepository.markRecordPending(
+      entityType: 'dives',
+      recordId: diveId,
+      localUpdatedAt: now,
+    );
+    SyncEventBus.notifyLocalChange();
   }
 
   /// Load downsampled profile points for multiple dives in a single query.
@@ -1619,6 +1726,11 @@ class DiveRepository {
                   validTripCylinderLink(tank.tripCylinderId, validSlots),
                 ),
                 sourceTankIndex: Value(tank.sourceTankIndex),
+                sharedComputerIds: Value(
+                  encodeSharedComputerIds(tank.sharedComputerIds),
+                ),
+                // What the source log recorded (issue #1496).
+                usageDuration: Value(tank.usageDuration?.inSeconds),
               ),
             );
           }
@@ -1928,7 +2040,8 @@ class DiveRepository {
                 // computerId and transmitterSerial are computer-owned identity
                 // and deliberately not written here: edit flows rebuild the
                 // tank field by field, and a rebuild that forgot them must not
-                // wipe what the download recorded.
+                // wipe what the download recorded. The recorded usage
+                // duration (#1496) is import-owned for the same reason.
                 // The regulator link is user-authored, unlike the two above,
                 // so an edit does write it.
                 regulatorEquipmentId: Value(tank.regulatorEquipmentId),
@@ -1974,6 +2087,10 @@ class DiveRepository {
                       validTripCylinderLink(tank.tripCylinderId, validSlots),
                     ),
                     sourceTankIndex: Value(tank.sourceTankIndex),
+                    sharedComputerIds: Value(
+                      encodeSharedComputerIds(tank.sharedComputerIds),
+                    ),
+                    usageDuration: Value(tank.usageDuration?.inSeconds),
                   ),
                 );
             await _syncRepository.markRecordPending(
@@ -3134,10 +3251,25 @@ class DiveRepository {
           : '$whereClause $fBare';
       vars.addAll(filterVars);
 
+      // This calendar year as a half-open [Jan 1, next Jan 1) range, built in
+      // UTC because dive_date_time stores wall clock encoded as UTC; the same
+      // bounds getYearStats uses, so this count matches the year-in-review
+      // card. Its placeholders precede the WHERE clause's, so they go first.
+      final year = clock.now().year;
+      final yearVars = <Variable<Object>>[
+        Variable<int>(DateTime.utc(year).millisecondsSinceEpoch),
+        Variable<int>(DateTime.utc(year + 1).millisecondsSinceEpoch),
+      ];
+
       // Basic stats
-      final stats = await _db.customSelect('''
+      final stats = await _db
+          .customSelect(
+            '''
       SELECT
         COUNT(*) as total_dives,
+        COALESCE(SUM(
+          CASE WHEN dive_date_time >= ? AND dive_date_time < ? THEN 1 ELSE 0 END
+        ), 0) as dives_this_year,
         SUM(COALESCE(runtime, bottom_time)) as total_time,
         MAX(max_depth) as max_depth,
         AVG(max_depth) as avg_max_depth,
@@ -3146,7 +3278,10 @@ class DiveRepository {
         MIN(dive_date_time) as first_dive_date
       FROM dives
       $basicWhere
-    ''', variables: vars).getSingle();
+    ''',
+            variables: [...yearVars, ...vars],
+          )
+          .getSingle();
 
       // Dives by month (last 12 months)
       final monthlyWhereClause = diverId != null
@@ -3280,6 +3415,7 @@ class DiveRepository {
         avgTemperature: stats.data['avg_temp'] as double?,
         totalSites: stats.data['total_sites'] as int? ?? 0,
         firstDiveDate: firstDiveDate,
+        divesThisYear: stats.data['dives_this_year'] as int? ?? 0,
         divesByMonth: divesByMonth,
         depthDistribution: depthDistribution,
         topSites: topSites,
@@ -3856,6 +3992,10 @@ class DiveRepository {
               tripCylinderId: t.tripCylinderId,
               equipmentId: t.equipmentId,
               sourceTankIndex: t.sourceTankIndex,
+              sharedComputerIds: decodeSharedComputerIds(t.sharedComputerIds),
+              usageDuration: t.usageDuration != null
+                  ? Duration(seconds: t.usageDuration!)
+                  : null,
             ),
           )
           .toList(),
@@ -4292,6 +4432,10 @@ class DiveRepository {
           tripCylinderId: t.tripCylinderId,
           equipmentId: t.equipmentId,
           sourceTankIndex: t.sourceTankIndex,
+          sharedComputerIds: decodeSharedComputerIds(t.sharedComputerIds),
+          usageDuration: t.usageDuration != null
+              ? Duration(seconds: t.usageDuration!)
+              : null,
         );
       }).toList(),
       profile: seriesProfile,
@@ -4704,6 +4848,7 @@ class DiveRepository {
         tankId: gs.tankId,
         depth: gs.depth,
         createdAt: DateTime.fromMillisecondsSinceEpoch(gs.createdAt),
+        computerId: gs.computerId,
       ),
       tankName: tank.tankName ?? 'Tank ${tank.tankOrder + 1}',
       gasMix: _formatGasMixName(tank.o2Percent, tank.hePercent),
@@ -4733,6 +4878,7 @@ class DiveRepository {
               tankId: Value(gasSwitch.tankId),
               depth: Value(gasSwitch.depth),
               createdAt: Value(now),
+              computerId: Value(gasSwitch.computerId),
             ),
           );
 
@@ -4852,6 +4998,7 @@ class DiveRepository {
                 tankId: Value(gs.tankId),
                 depth: Value(gs.depth),
                 createdAt: Value(now),
+                computerId: Value(gs.computerId),
               ),
             );
         await _syncRepository.markRecordPending(
@@ -6404,7 +6551,12 @@ class DiveRepository {
       }
       if (touched.isNotEmpty) await _bumpDives(touched, now);
     });
-    if (touched.isNotEmpty) SyncEventBus.notifyLocalChange();
+    if (touched.isNotEmpty) {
+      SyncEventBus.notifyLocalChange();
+      // The gear changed without a save, so queue the rescan a save would
+      // (issue #2853): a shared gear overlap can appear or go with it.
+      scheduleQualityScan(touched);
+    }
     return touched.length;
   }
 
@@ -6617,11 +6769,21 @@ class DiveRepository {
     // template copied from a linked tank must not stamp that cylinder onto
     // every dive it lands on, so only a restore writes it.
     equipmentId: withLink ? Value(t.equipmentId) : const Value.absent(),
+    // Names the computers of the dive the tank came from, so a template
+    // must not carry it either.
+    sharedComputerIds: withLink
+        ? Value(encodeSharedComputerIds(t.sharedComputerIds))
+        : const Value.absent(),
     // The data source the row came from (v251, issue #2716): written by the
     // import and download paths, so a template never carries one, and a
     // restore puts back only a source the dive still has.
     sourceId: withLink
         ? Value(validSources.contains(t.sourceId) ? t.sourceId : null)
+        : const Value.absent(),
+    // How long the source log says this cylinder was breathed (#1496):
+    // true of one dive only, so a template never carries it.
+    usageDuration: withLink
+        ? Value(t.usageDuration?.inSeconds)
         : const Value.absent(),
   );
 
@@ -8002,6 +8164,10 @@ class DiveStatistics {
   final double? avgTemperature;
   final int totalSites;
   final DateTime? firstDiveDate;
+
+  /// Dives dated in the current calendar year, so the lifetime per-year
+  /// average is never the only per-year figure on screen (issue #2600).
+  final int divesThisYear;
   final List<MonthlyDiveCount> divesByMonth;
   final List<DepthRangeStat> depthDistribution;
   final List<TopSiteStat> topSites;
@@ -8014,6 +8180,7 @@ class DiveStatistics {
     this.avgTemperature,
     required this.totalSites,
     this.firstDiveDate,
+    this.divesThisYear = 0,
     this.divesByMonth = const [],
     this.depthDistribution = const [],
     this.topSites = const [],
@@ -8035,7 +8202,9 @@ class DiveStatistics {
   double? get monthsSinceFirstDive {
     final first = firstDiveDate;
     if (first == null) return null;
-    final now = DateTime.now();
+    // firstDiveDate is wall clock encoded as UTC, so "now" must be too, or
+    // the tenure is off by the device's UTC offset.
+    final now = asWallClockUtc(clock.now());
     if (first.isAfter(now)) return null;
     final months = now.difference(first).inDays / _daysPerMonth;
     return months < 1 ? null : months;

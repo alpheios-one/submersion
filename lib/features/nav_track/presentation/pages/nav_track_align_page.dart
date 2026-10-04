@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
+import 'package:submersion/core/router/track_locations.dart';
 import 'package:submersion/core/utils/geo_math.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
@@ -229,7 +230,7 @@ class _NavTrackAlignPageState extends ConsumerState<NavTrackAlignPage> {
   Future<void> _openIn3d(NavTrack route) async {
     await _persistCorrection(route);
     if (!mounted) return;
-    context.push('/nav-routes/${route.id}/3d');
+    context.push(underwaterTrackSeascapeLocation(route.id));
   }
 
   void _startPlacing(_Placing target) => setState(() => _placing = target);
@@ -279,12 +280,13 @@ class _NavTrackAlignPageState extends ConsumerState<NavTrackAlignPage> {
     return routeAsync.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, _) =>
-          Scaffold(body: Center(child: Text(l10n.navTrack_common_loadError))),
+      error: (e, _) => Scaffold(
+        body: Center(child: Text(l10n.navTrack_common_trackLoadError)),
+      ),
       data: (route) {
         if (route == null) {
           return Scaffold(
-            body: Center(child: Text(l10n.navTrack_common_notFound)),
+            body: Center(child: Text(l10n.navTrack_common_trackNotFound)),
           );
         }
         // The repository hands back an empty points list for a synced blob
@@ -292,7 +294,7 @@ class _NavTrackAlignPageState extends ConsumerState<NavTrackAlignPage> {
         if (route.points.length < 2) {
           return Scaffold(
             appBar: AppBar(title: Text(l10n.navTrack_align_title)),
-            body: Center(child: Text(l10n.navTrack_common_loadError)),
+            body: Center(child: Text(l10n.navTrack_common_trackLoadError)),
           );
         }
         _initFromRoute(route);

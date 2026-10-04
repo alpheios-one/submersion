@@ -1,10 +1,14 @@
 import 'dart:io';
 
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:submersion/core/database/local_cache_database.dart';
+import 'package:submersion/core/models/log_entry.dart';
+import 'package:submersion/core/query/domain/query_node.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/explore/data/recent_query_repository.dart';
 import 'package:submersion/features/explore/domain/query_model.dart';
 
@@ -30,7 +34,7 @@ void main() {
     await repo.record('b', 'en', parsed, diverId: 'ana');
     final list = await repo.list(diverId: 'ana', locale: 'en');
     expect(list.map((r) => r.sentence), ['b', 'a']);
-    expect(list.first.parsed.subject, ParsedSubject.dives);
+    expect(list.first.parsed!.subject, ParsedSubject.dives);
   });
 
   test(
@@ -65,6 +69,34 @@ void main() {
         .customSelect('SELECT COUNT(*) AS n FROM recent_queries')
         .getSingle();
     expect(rows.read<int>('n'), 0);
+  });
+
+  test('a row parsed by an older prompt keeps its sentence but not its '
+      'parse (#2838)', () async {
+    // Before version 4 the model invented a time for most sentences, so a
+    // replayed parse would keep that window: the sentence is asked again.
+    await repo.record(
+      'deep dives',
+      'en',
+      const ParsedQuery(
+        subject: ParsedSubject.dives,
+        time: QueryTime('this year'),
+      ),
+      diverId: 'ana',
+    );
+    await db.customStatement(
+      'UPDATE recent_queries '
+      'SET schema_version = ${kMinReplayableQuerySchemaVersion - 1}',
+    );
+    final list = await repo.list(diverId: 'ana', locale: 'en');
+    expect(list.single.sentence, 'deep dives');
+    expect(list.single.parsed, isNull);
+  });
+
+  test('a row parsed by the current prompt replays its parse', () async {
+    await repo.record('deep dives', 'en', parsed, diverId: 'ana');
+    final list = await repo.list(diverId: 'ana', locale: 'en');
+    expect(list.single.parsed, isNotNull);
   });
 
   test('each diver sees only their own sentences', () async {
@@ -141,5 +173,169 @@ void main() {
       (await repo.list(diverId: 'ana', locale: 'en')).map((r) => r.sentence),
       ['turtles'],
     );
+  });
+  test('typed and asked recents keep their kind and do not collide', () async {
+    final repo = RecentQueryRepository();
+    await repo.record(
+      'manta',
+      'en',
+      const ParsedQuery(subject: ParsedSubject.dives),
+      diverId: 'ana',
+    );
+    await repo.recordTyped(
+      'manta',
+      TextNode(['manta']),
+      locale: 'en',
+      diverId: 'ana',
+    );
+    final rows = await repo.list(diverId: 'ana', locale: 'en');
+    expect(rows.map((r) => r.kind).toSet(), {
+      RecentQueryKind.typed,
+      RecentQueryKind.asked,
+    });
+    final typed = rows.singleWhere((r) => r.kind == RecentQueryKind.typed);
+    expect(typed.node, TextNode(['manta']));
+    expect(typed.sentence, 'manta');
+  });
+
+  test('a typed recent survives a list read', () async {
+    final repo = RecentQueryRepository();
+    await repo.recordTyped(
+      'depth > 30m',
+      ConditionNode(
+        FieldPath(['depth']),
+        QueryOp.gt,
+        const NumberValue(30, null),
+      ),
+      locale: 'en',
+      diverId: 'ana',
+    );
+    await repo.list(diverId: 'ana', locale: 'en');
+    expect(await repo.list(diverId: 'ana', locale: 'en'), hasLength(1));
+  });
+
+  test('another diver or language never sees a typed recent', () async {
+    final repo = RecentQueryRepository();
+    await repo.recordTyped(
+      'manta',
+      TextNode(['manta']),
+      locale: 'en',
+      diverId: 'ana',
+    );
+    expect(await repo.list(diverId: 'ben', locale: 'en'), isEmpty);
+    expect(await repo.list(diverId: 'ana', locale: 'de'), isEmpty);
+  });
+
+  // Review: typed rows were keyed by their printed text, labels included,
+  // so a rename split one search into two rows that print alike.
+  test('a typed search keeps one row across a rename', () async {
+    QueryNode site(String label) =>
+        ConditionNode(FieldPath(['site']), QueryOp.eq, RefValue('s1', label));
+    await repo.recordTyped(
+      'site = "Bari Reef"',
+      site('Bari Reef'),
+      locale: 'en',
+      diverId: 'ana',
+    );
+    await Future<void>.delayed(const Duration(milliseconds: 2));
+    await repo.recordTyped(
+      'site = "Bari Reef North"',
+      site('Bari Reef North'),
+      locale: 'en',
+      diverId: 'ana',
+    );
+    final rows = await repo.list(diverId: 'ana', locale: 'en');
+    expect(rows, hasLength(1));
+    expect(rows.single.sentence, 'site = "Bari Reef North"');
+  });
+
+  test('typed words differing only in case are one row', () async {
+    await repo.recordTyped(
+      'Manta',
+      TextNode(['Manta']),
+      locale: 'en',
+      diverId: 'ana',
+    );
+    await repo.recordTyped(
+      'manta',
+      TextNode(['manta']),
+      locale: 'en',
+      diverId: 'ana',
+    );
+    expect(await repo.list(diverId: 'ana', locale: 'en'), hasLength(1));
+  });
+
+  // Review: a dropped typed row left no trace.
+  test('an unreadable typed row is dropped with a warning', () async {
+    await db
+        .into(db.recentQueries)
+        .insert(
+          RecentQueriesCompanion.insert(
+            diverId: 'ana',
+            key: 'typed:x',
+            sentence: 'x',
+            locale: 'en',
+            parsedJson: '{"version":1,"node":{"t":"bogus"}}',
+            schemaVersion: 0,
+            subject: 'dives',
+            lastUsedAt: 1,
+            kind: const Value('typed'),
+          ),
+        );
+    final seen = <LogEntry>[];
+    final sub = LoggerService.logStream.listen(seen.add);
+    addTearDown(sub.cancel);
+    expect(await repo.list(diverId: 'ana', locale: 'en'), isEmpty);
+    await Future<void>.delayed(Duration.zero);
+    expect(seen.where((e) => e.level == LogLevel.warning), isNotEmpty);
+    expect(await db.select(db.recentQueries).get(), isEmpty);
+  });
+
+  test('a rename inside a list or a scoped group keeps one row', () async {
+    QueryNode buddies(String label) => ScopedNode(
+      FieldPath(['buddies']),
+      ConditionNode(
+        FieldPath(['buddy']),
+        QueryOp.inList,
+        ListValue([RefValue('b1', label), const StringValue('x')]),
+      ),
+    );
+    await repo.recordTyped(
+      'before',
+      buddies('Ana'),
+      locale: 'en',
+      diverId: 'ana',
+    );
+    await repo.recordTyped(
+      'after',
+      buddies('Ana Lee'),
+      locale: 'en',
+      diverId: 'ana',
+    );
+    expect(await repo.list(diverId: 'ana', locale: 'en'), hasLength(1));
+  });
+
+  test('a typed row that is not JSON is dropped with a warning', () async {
+    await db
+        .into(db.recentQueries)
+        .insert(
+          RecentQueriesCompanion.insert(
+            diverId: 'ana',
+            key: 'typed:y',
+            sentence: 'y',
+            locale: 'en',
+            parsedJson: 'not json',
+            schemaVersion: 0,
+            subject: 'dives',
+            lastUsedAt: 1,
+            kind: const Value('typed'),
+          ),
+        );
+    final seen = <LogEntry>[];
+    final sub = LoggerService.logStream.listen(seen.add);
+    addTearDown(sub.cancel);
+    expect(await repo.list(diverId: 'ana', locale: 'en'), isEmpty);
+    await Future<void>.delayed(Duration.zero);
+    expect(seen.where((e) => e.level == LogLevel.warning), isNotEmpty);
   });
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:submersion/core/utils/local_day_changes.dart';
 import 'package:submersion/core/constants/dive_search.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
@@ -22,6 +23,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
 import 'package:submersion/features/dive_log/domain/entities/source_profile.dart'
     as domain;
+import 'package:submersion/features/dive_log/domain/entities/profile_series_revision.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
 import 'package:submersion/features/dive_log/query/dive_filter_query.dart';
@@ -311,6 +313,17 @@ final sourceProfilesProvider =
       return repository.getProfilesByDataSource(diveId);
     });
 
+/// Metadata-only profile revision history for one dive, newest first.
+final profileSeriesHistoryProvider =
+    FutureProvider.family<List<ProfileSeriesRevision>, String>((
+      ref,
+      diveId,
+    ) async {
+      final repository = ref.watch(diveRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchAnalysisInputChanges());
+      return repository.getProfileHistory(diveId);
+    });
+
 /// Batch profile cache for mini charts in the dive list.
 ///
 /// Stores downsampled (~20 points) profiles keyed by dive ID. Populated in
@@ -332,6 +345,8 @@ final diveStatisticsProvider = FutureProvider<DiveStatistics>((ref) async {
   final repository = ref.watch(diveRepositoryProvider);
   final currentDiverId = ref.watch(currentDiverIdProvider);
   ref.invalidateSelfWhen(repository.watchDivesChanges());
+  // divesThisYear reads the clock once per build (#2600).
+  ref.invalidateSelfWhen(localDayChanges());
   return repository.getStatistics(diverId: currentDiverId);
 });
 
@@ -707,6 +722,10 @@ class PaginatedDiveListNotifier
   /// a time means each reads a snapshot that is still current when it writes.
   Future<void> _pagingQueue = Future<void>.value();
 
+  /// Counts filter changes, so only the newest queued first-page load for
+  /// them runs; each reads the filter when it runs, so the others repeat it.
+  int _filterLoads = 0;
+
   PaginatedDiveListNotifier(this._repository, this._ref)
     : super(const AsyncValue.loading()) {
     _currentDiverId = _ref.read(currentDiverIdProvider);
@@ -720,7 +739,23 @@ class PaginatedDiveListNotifier
     _ref.listen<DiveFilterState>(diveFilterProvider, (previous, next) {
       if (previous != next) {
         _followFilterTicks(next);
-        loadFirstPage();
+        // The search row re-runs the list on every typing pause (#2773):
+        // keep the rows on screen until the new ones arrive.
+        final searchOnly =
+            previous != null &&
+            previous.copyWith(
+                  query: next.query,
+                  clearQuery: next.query == null,
+                  axesSuspended: next.axesSuspended,
+                ) ==
+                next;
+        final load = ++_filterLoads;
+        _enqueuePaging(() async {
+          // A later change is queued too: it runs the same latest filter,
+          // so this one would only repeat the query.
+          if (load != _filterLoads) return;
+          await _loadFirstPage(quiet: searchOnly);
+        });
       }
     });
     _followFilterTicks(_ref.read(diveFilterProvider));
@@ -810,12 +845,14 @@ class PaginatedDiveListNotifier
         hold: false,
       );
 
-  Future<void> _loadFirstPage() async {
+  /// A [quiet] load keeps the current rows until the new first page lands,
+  /// instead of showing a spinner.
+  Future<void> _loadFirstPage({bool quiet = false}) async {
     // Queued work can reach its turn after the notifier is gone: this provider
     // is invalidated from half a dozen places (imports, merges, renumbering),
     // and writing state on a disposed StateNotifier throws.
     if (!mounted) return;
-    state = const AsyncValue.loading();
+    if (!quiet || !state.hasValue) state = const AsyncValue.loading();
     _currentOffset = 0;
     try {
       final filter = _ref.read(diveFilterProvider);

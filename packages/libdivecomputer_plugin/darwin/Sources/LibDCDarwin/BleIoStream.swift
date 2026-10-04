@@ -503,6 +503,22 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
                 }
                 return Int32(LIBDC_STATUS_TIMEOUT)
             }
+            // A read-poll computer's reply is fetched by a read whatever the
+            // write completion said, so a rejection on a live link is reported
+            // as sent and the read decides (issue #1454,
+            // ReadPollPolicy.writeOutcome).
+            if let error = lastWriteError, readCharacteristic != nil,
+               ReadPollPolicy.writeOutcome(accepted: false,
+                                           linkUp: peripheral.state == .connected)
+                == .sentDespiteRejection {
+                NativeLogger.w("BleIoStream", category: "BLE",
+                    "write: the computer rejected a \(size)-byte command on"
+                        + " \(characteristic.uuid.uuidString)"
+                        + " (\(error.localizedDescription));"
+                        + " treating it as sent and reading the reply")
+                actual.pointee = size
+                return Int32(LIBDC_STATUS_SUCCESS)
+            }
             if let error = lastWriteError {
                 NativeLogger.e("BleIoStream", category: "BLE",
                     "write withResponse failed for \(characteristic.uuid.uuidString):"

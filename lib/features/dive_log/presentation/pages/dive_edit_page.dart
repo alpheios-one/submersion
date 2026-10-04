@@ -73,6 +73,9 @@ import 'package:submersion/features/trips/domain/entities/trip_cylinder_state.da
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_prefill.dart';
 import 'package:submersion/features/media/presentation/providers/photo_picker_providers.dart';
+import 'package:submersion/features/nav_track/application/dive_route_link_applier.dart';
+import 'package:submersion/features/nav_track/domain/dive_route_link_draft.dart';
+import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_custom_field.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_weight.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
@@ -88,6 +91,8 @@ import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/experience_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/gas_gear_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/rare_sections.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/route_link_sheet.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/route_row.dart';
 import 'package:submersion/features/cylinder_configs/domain/entities/cylinder_config.dart';
 import 'package:submersion/features/cylinder_configs/domain/services/dive_tank_config_adapter.dart';
 import 'package:submersion/features/cylinder_configs/presentation/widgets/apply_configuration_confirm_dialog.dart';
@@ -128,6 +133,7 @@ import 'package:submersion/shared/widgets/forms/add_section_row.dart';
 import 'package:submersion/shared/widgets/forms/edit_form_scaffold.dart';
 import 'package:submersion/shared/widgets/forms/enum_picker_row.dart';
 import 'package:submersion/shared/widgets/forms/form_append_row.dart';
+import 'package:submersion/shared/widgets/forms/form_caption.dart';
 import 'package:submersion/shared/widgets/forms/form_empty_row.dart';
 import 'package:submersion/shared/widgets/forms/form_overline.dart';
 import 'package:submersion/shared/widgets/forms/form_row.dart';
@@ -148,8 +154,8 @@ import 'package:submersion/core/utils/log_failure.dart';
 import 'package:submersion/features/weight_planner/presentation/widgets/weight_enum_display.dart';
 import 'package:submersion/features/dive_log/presentation/formatters/altitude_group_label.dart';
 import 'package:submersion/features/tides/data/services/dive_tide_recorder.dart';
+import 'package:submersion/features/dive_log/presentation/providers/shared_gear_overlap_providers.dart';
 
-const _createNewSiteSentinel = '__create_new__';
 const _createNewDiveCenterSentinel = '__create_new_dive_center__';
 const _createNewTripSentinel = '__create_new_trip__';
 
@@ -316,6 +322,15 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   /// through and the set applied (issue #1487). Read through [_gearRows].
   List<GearProvenance> _gearProvenance = [];
   List<BuddyWithRole> _selectedBuddies = [];
+
+  /// The dive's staged underwater route links, applied on Save. Null until
+  /// an existing dive's current links have loaded, so the row stays inert
+  /// and a Save can never read "not loaded" as "every route removed".
+  DiveRouteLinkDraft? _routeDraft;
+
+  /// The dive's current links could not be read, so the route row says so
+  /// and stays inert instead of claiming the dive has none.
+  bool _routeLinksFailed = false;
   Set<String> _originalBuddyIds = {};
   String? _diverRoleId;
 
@@ -497,6 +512,51 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     return entry.add(Duration(minutes: runtimeMinutes));
   }
 
+  /// The form's dive, with its unsaved times, for the shared gear note
+  /// (issue #2853): a new dive has no id yet, and the note follows time
+  /// edits before the save.
+  SharedGearOverlapQuery _sharedGearQuery(String? activeDiverId) => (
+    diveId: widget.diveId,
+    // A new dive is saved under the active profile; an existing dive keeps
+    // its own, and one without a profile is paired with nobody, as the
+    // scan would.
+    diverId: widget.diveId == null ? activeDiverId : _existingDive?.diverId,
+    entry: _currentEntryTime(),
+    exit: _currentDiveEndTime() ?? _entryPlusBottomTime(),
+  );
+
+  /// Entry plus the bottom time field, the scan's last resort for a dive
+  /// with no exit or runtime (`sharedGearExit`); null while it is blank.
+  DateTime? _entryPlusBottomTime() {
+    final minutes = switch (readNumber(
+      _durationController.text,
+      integer: true,
+    )) {
+      NumberValue(:final value) => value.toInt(),
+      NumberBlank() || NumberInvalid() => null,
+    };
+    if (minutes == null || minutes <= 0) return null;
+    return _currentEntryTime().add(Duration(minutes: minutes));
+  }
+
+  /// "Also on Anna's dive, 10:02" for gear on another profile's overlapping
+  /// dive, or null. The time is the other dive's UTC wall clock, formatted
+  /// in the diver's 12h/24h preference.
+  String? Function(String equipmentId) _sharedGearNotes(
+    Map<String, SharedGearNote> notes,
+  ) {
+    final units = UnitFormatter(ref.read(settingsProvider));
+    final l10n = context.l10n;
+    return (equipmentId) {
+      final note = notes[equipmentId];
+      if (note == null) return null;
+      return l10n.diveLog_gear_alsoOnDive(
+        note.diverName,
+        units.formatTime(note.entry),
+      );
+    };
+  }
+
   void _markDirty() {
     if (_suppressDirty || _hasUnsavedChanges) return;
     _hasUnsavedChanges = true;
@@ -559,6 +619,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     } else if (widget.isEditing) {
       logFailure(_loadExistingDive(), _DiveEditPageState, 'load existing dive');
     } else {
+      // A new dive has no links yet, so its draft is ready immediately.
+      _routeDraft = DiveRouteLinkDraft.initial(const []);
       // For new dives, capture GPS in the background to suggest nearby sites
       _captureLocationForNearby();
       _isPlanned = widget.prefill?.isPlanned ?? false;
@@ -975,7 +1037,11 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           _loopO2Avg = dive.loopO2Avg;
         });
         // Load existing sightings and buddies
-        await Future.wait([_loadSightings(), _loadBuddies()]);
+        await Future.wait([
+          _loadSightings(),
+          _loadBuddies(),
+          _loadRouteLinks(),
+        ]);
       }
     } finally {
       if (mounted) {
@@ -1029,6 +1095,38 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         _originalBuddyIds = buddies.map((b) => b.buddy.id).toSet();
       });
     }
+  }
+
+  Future<void> _loadRouteLinks() async {
+    final diveId = widget.diveId;
+    if (diveId == null) return;
+    try {
+      final linked = await ref.read(navTracksForDiveProvider(diveId).future);
+      if (mounted) {
+        setState(() => _routeDraft = DiveRouteLinkDraft.initial(linked));
+      }
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to load route links for dive $diveId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      if (mounted) setState(() => _routeLinksFailed = true);
+    }
+  }
+
+  Future<void> _openRouteSheet() async {
+    final draft = _routeDraft;
+    if (draft == null) return;
+    await showRouteLinkSheet(
+      context,
+      draft: draft,
+      entryTime: _currentEntryTime(),
+      onChanged: (next) {
+        setState(() => _routeDraft = next);
+        _markDirty();
+      },
+    );
   }
 
   @override
@@ -2394,6 +2492,14 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         _markDirty();
         setState(() => _assignSite(null));
       },
+      // A planned dive has no recording to link (spec 2026-10-02, section 1).
+      routeRow: _isPlanned
+          ? null
+          : RouteRow(
+              draft: _routeDraft,
+              loadFailed: _routeLinksFailed,
+              onTap: _openRouteSheet,
+            ),
       maxDepthSuggestion: hasProfile
           ? _depthSuggestion(
               units,
@@ -2656,43 +2762,18 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
 
   Future<void> _showSitePicker() async {
     final anchor = _existingDive?.entryLocation ?? _existingDive?.exitLocation;
-    final result = await showModalBottomSheet<String>(
-      context: context,
-      isScrollControlled: true,
-      builder: (sheetContext) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        expand: false,
-        builder: (sheetContext, scrollController) => SitePickerSheet(
-          scrollController: scrollController,
-          selectedSiteId: _selectedSite?.id,
-          currentLocation: _currentLocation,
-          diveLocation: anchor,
-          onSiteSelected: (site) {
-            _markDirty();
-            setState(() => _assignSite(site));
-            _reevaluateGeofenceForSite();
-            Navigator.of(sheetContext).pop();
-          },
-          onCreateNewSite: () {
-            Navigator.of(sheetContext).pop(_createNewSiteSentinel);
-          },
-        ),
-      ),
+    final site = await pickOrCreateSite(
+      context,
+      ref,
+      selectedSiteId: _selectedSite?.id,
+      currentLocation: _currentLocation,
+      diveLocation: anchor,
+      newSiteSeedLocation: anchor,
     );
-
-    if (result == _createNewSiteSentinel && mounted) {
-      final siteId = await context.push<String>('/sites/new', extra: anchor);
-      if (siteId != null && mounted) {
-        final repo = ref.read(siteRepositoryProvider);
-        final site = await repo.getSiteById(siteId);
-        if (site != null && mounted) {
-          _markDirty();
-          setState(() => _assignSite(site));
-          _reevaluateGeofenceForSite();
-        }
-      }
+    if (site != null && mounted) {
+      _markDirty();
+      setState(() => _assignSite(site));
+      _reevaluateGeofenceForSite();
     }
   }
 
@@ -3338,9 +3419,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             },
             onRemove: _tanks.length > 1 ? () => _removeTank(i) : null,
             canRemove: _tanks.length > 1,
-            // A scanned own cylinder joins this dive's gear; the tank row
-            // itself never links to it (issue #2335).
-            onCylinderScanned: (item) => _addGear([item]),
+            // An own cylinder, scanned (issue #2335) or picked from My
+            // cylinders (issue #2599), joins this dive's gear; the tank row
+            // itself never links to it.
+            onOwnCylinderUsed: (item) => _addGear([item]),
             onScanPending: _trackTankScan,
           ),
       ],
@@ -3833,6 +3915,11 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             ),
           ],
         ),
+        // A Tank item here counts toward its dives and service but feeds no
+        // gas data; the tank rows above do that (issue #2599). A gauge dive
+        // shows no tank rows, so there is nothing to tell apart.
+        if (_diveMode != DiveMode.gauge)
+          FormCaption(context.l10n.diveLog_edit_equipmentCaption),
         if (_geofenceSuggestion != null)
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 4, 14, 0),
@@ -3868,6 +3955,24 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                 // pointless reordering of dive_equipment on every save.
                 DiveGearTreeView(
                   links: gearLinksFor(_selectedEquipment, _gearRows),
+                  overlapNote: widget.isBulk
+                      ? null
+                      : _sharedGearNotes(
+                          ref
+                                  .watch(
+                                    sharedGearOverlapProvider(
+                                      _sharedGearQuery(
+                                        ref
+                                            .watch(
+                                              validatedCurrentDiverIdProvider,
+                                            )
+                                            .value,
+                                      ),
+                                    ),
+                                  )
+                                  .value ??
+                              const {},
+                        ),
                   ownerReferenceDiverId:
                       _existingDive?.diverId ??
                       ref.watch(validatedCurrentDiverIdProvider).value,
@@ -3938,8 +4043,9 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   /// a set) is not left out of the saved dive.
   Future<void>? _pendingGearAdd;
 
-  /// Tank tag scans still resolving. Save waits for them before the gear
-  /// adds, since a scan's gear add only starts once its lookup finishes.
+  /// Tank tag scans and My cylinders picks still resolving. Save waits for
+  /// them before the gear adds, since their gear add only starts once their
+  /// lookup finishes.
   final Set<Future<void>> _pendingTankScans = {};
 
   void _trackTankScan(Future<void> scan) {
@@ -4037,14 +4143,30 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         minChildSize: 0.5,
         maxChildSize: 0.95,
         expand: false,
-        builder: (context, scrollController) => EquipmentPickerSheet(
-          scrollController: scrollController,
-          selectedEquipmentIds: _selectedEquipment.map((e) => e.id).toSet(),
-          hideSpare: true,
-          onEquipmentSelected: (equipment) {
-            Navigator.of(context).pop();
-            _addGear([equipment]);
-          },
+        // A Consumer, so the shared gear note (issue #2853) loads while the
+        // sheet is open.
+        builder: (context, scrollController) => Consumer(
+          builder: (context, ref, _) => EquipmentPickerSheet(
+            scrollController: scrollController,
+            selectedEquipmentIds: _selectedEquipment.map((e) => e.id).toSet(),
+            hideSpare: true,
+            overlapNote: _sharedGearNotes(
+              ref
+                      .watch(
+                        sharedGearOverlapProvider(
+                          _sharedGearQuery(
+                            ref.watch(validatedCurrentDiverIdProvider).value,
+                          ),
+                        ),
+                      )
+                      .value ??
+                  const {},
+            ),
+            onEquipmentSelected: (equipment) {
+              Navigator.of(context).pop();
+              _addGear([equipment]);
+            },
+          ),
         ),
       ),
     );
@@ -5943,6 +6065,44 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           ref.invalidate(divesForBuddyProvider(buddyId));
         }
         ref.invalidate(allBuddiesWithDiveCountProvider);
+      }
+
+      // Apply the staged underwater route links. A planned dive has no
+      // recording, so a draft left from before the switch was turned on is
+      // dropped. A failure is reported but never undoes the dive save.
+      final routeDraft = _routeDraft;
+      if (savedDiveId != null &&
+          !_isPlanned &&
+          routeDraft != null &&
+          routeDraft.hasChanges) {
+        try {
+          final skipped = await applyDiveRouteLinkDraft(
+            ref.read(navTrackRepositoryProvider),
+            diveId: savedDiveId,
+            draft: routeDraft,
+          );
+          if (skipped.isNotEmpty) {
+            _log.warning(
+              'Routes already linked elsewhere, left as is: $skipped',
+            );
+          }
+        } catch (e, stackTrace) {
+          _log.error(
+            'Failed to apply route links for dive $savedDiveId',
+            error: e,
+            stackTrace: stackTrace,
+          );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  context.l10n.navTrack_editRow_tracksSaveFailed(e.toString()),
+                ),
+              ),
+            );
+          }
+        }
+        ref.invalidate(navTracksForDiveProvider(savedDiveId));
       }
 
       // Invalidate course providers if course association changed

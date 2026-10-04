@@ -167,5 +167,35 @@ extension RungsFromV231 on AppDatabase {
       await _assertComputerTissueColumn();
     }
     if (from < 256) await reportProgress();
+    // v257: metadata-only profile revision history over existing
+    // dive_profile_series rows (#1197). One history row per series id,
+    // no sample/blob duplication. Re-asserted in beforeOpen.
+    if (from < 257) {
+      await _assertProfileSeriesHistorySchema();
+      await _backfillProfileSeriesHistoryRows();
+    }
+    if (from < 257) await reportProgress();
+    // v258: gas_switches.computer_id (issue #2582), backfilled from each
+    // switch's cylinder as the column is added. Sits below 259, which main
+    // shipped first, so the beforeOpen backstop is what reaches a database
+    // already at 259, backfill included.
+    if (from < 258) {
+      await _assertGasSwitchComputerIdColumn();
+    }
+    if (from < 258) await reportProgress();
+    // v259: dive_tanks.usage_duration (issue #1496). Column only, no
+    // backfill: only a re-import can supply what the source recorded.
+    // Re-asserted in beforeOpen. 258 is held by an open branch (#2828).
+    if (from < 259) {
+      await _assertTankUsageDurationColumn();
+    }
+    if (from < 259) await reportProgress();
+    // v260: dive_tanks.shared_computer_ids (issue #2560), then infer the
+    // shared cylinders of dives consolidated before the fold recorded them.
+    // beforeOpen repeats both on every open for dives that arrive later.
+    if (from < 260) {
+      await _assertTankSharedComputerIds();
+    }
+    if (from < 260) await reportProgress();
   }
 }
