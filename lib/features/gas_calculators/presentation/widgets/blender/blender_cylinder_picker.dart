@@ -90,13 +90,18 @@ Future<EquipmentItem?> showBlenderCylinderPicker(
 /// The picker's Scan tag choice, told apart from a tank.
 const _scan = #scan;
 
+/// A tank [pickBlenderCylinderSpecs] resolved, with its water volume
+/// guaranteed present -- the one field every call site needs, carried in the
+/// type instead of a convention callers have to trust.
+typedef BlenderCylinderSpecs = ({EquipmentItem tank, double volumeL});
+
 /// Picks one of the diver's own tanks for its water volume and working
 /// pressure (issue #2926), without the tag scan: a spot that only wants a
 /// number for a cost line or a billed gas, not a fill to log. Handles the
 /// picker's failure and the "no volume recorded" case itself, with the same
 /// snackbar wording at every call site, and resolves null when nothing
 /// usable was picked.
-Future<EquipmentItem?> pickBlenderCylinderSpecs(
+Future<BlenderCylinderSpecs?> pickBlenderCylinderSpecs(
   BuildContext context,
   WidgetRef ref,
 ) async {
@@ -117,7 +122,8 @@ Future<EquipmentItem?> pickBlenderCylinderSpecs(
     return null;
   }
   if (tank == null || !context.mounted) return null;
-  if (tank.volumeL == null) {
+  final volumeL = tank.volumeL;
+  if (volumeL == null) {
     messenger?.showSnackBar(
       SnackBar(
         content: Text(l10n.gasCalculators_blender_cylinderNoVolume(tank.name)),
@@ -125,5 +131,5 @@ Future<EquipmentItem?> pickBlenderCylinderSpecs(
     );
     return null;
   }
-  return tank;
+  return (tank: tank, volumeL: volumeL);
 }

@@ -608,7 +608,10 @@ class _BlenderLineEditSheetState extends ConsumerState<BlenderLineEditSheet> {
       trailing: TextButton.icon(
         key: const Key('blender-line-choose-cylinder'),
         icon: const Icon(Icons.propane_tank_outlined, size: 18),
-        label: Text(context.l10n.gasCalculators_blender_chooseCylinder),
+        label: Text(
+          context.l10n.gasCalculators_blender_chooseCylinder,
+          overflow: TextOverflow.ellipsis,
+        ),
         onPressed: () => _chooseCylinder(context, settings, units),
       ),
     );
@@ -622,9 +625,9 @@ class _BlenderLineEditSheetState extends ConsumerState<BlenderLineEditSheet> {
     AppSettings settings,
     UnitFormatter units,
   ) async {
-    final tank = await pickBlenderCylinderSpecs(context, ref);
-    if (tank == null) return;
-    final litres = tank.volumeL!;
+    final picked = await pickBlenderCylinderSpecs(context, ref);
+    if (picked == null) return;
+    final litres = picked.volumeL;
     setState(() {
       _pickedLiters = litres;
       _cylinder.text = formatRoundedForInput(
@@ -636,7 +639,7 @@ class _BlenderLineEditSheetState extends ConsumerState<BlenderLineEditSheet> {
       // blend reaches it. Cleared rather than left as-is when the tank has
       // none recorded, so a stale reading from a previous pick is never
       // mistaken for this one's.
-      _endPressure.text = switch (tank.workingPressureBar) {
+      _endPressure.text = switch (picked.tank.workingPressureBar) {
         final pressure? => formatRoundedForInput(
           units.convertPressure(pressure),
           2,

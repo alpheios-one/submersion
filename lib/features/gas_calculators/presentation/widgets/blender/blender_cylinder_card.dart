@@ -64,7 +64,10 @@ class BlenderCylinderCard extends ConsumerWidget {
               trailing: TextButton.icon(
                 key: const Key('blender-choose-cylinder'),
                 icon: const Icon(Icons.propane_tank_outlined, size: 18),
-                label: Text(context.l10n.gasCalculators_blender_chooseCylinder),
+                label: Text(
+                  context.l10n.gasCalculators_blender_chooseCylinder,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 onPressed: () => _chooseCylinder(context, ref),
               ),
             ),

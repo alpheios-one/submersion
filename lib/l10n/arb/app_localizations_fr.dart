@@ -15484,7 +15484,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String gasCalculators_blender_cylinderNoVolume(String name) {
-    return '$name has no recorded water volume';
+    return 'Aucun volume d\'eau enregistré pour $name';
   }
 
   @override

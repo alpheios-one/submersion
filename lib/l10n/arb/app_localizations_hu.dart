@@ -15392,7 +15392,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String gasCalculators_blender_cylinderNoVolume(String name) {
-    return '$name has no recorded water volume';
+    return 'Nincs rögzített vízűrtartalom ehhez: $name';
   }
 
   @override

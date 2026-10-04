@@ -172,7 +172,10 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
       trailing: TextButton.icon(
         key: const Key('blender-billing-choose-cylinder'),
         icon: const Icon(Icons.propane_tank_outlined, size: 18),
-        label: Text(context.l10n.gasCalculators_blender_chooseCylinder),
+        label: Text(
+          context.l10n.gasCalculators_blender_chooseCylinder,
+          overflow: TextOverflow.ellipsis,
+        ),
         onPressed: () => _chooseCylinder(context, settings),
       ),
     );
@@ -185,9 +188,9 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     BuildContext context,
     AppSettings settings,
   ) async {
-    final tank = await pickBlenderCylinderSpecs(context, ref);
-    if (tank == null) return;
-    final litres = tank.volumeL!;
+    final picked = await pickBlenderCylinderSpecs(context, ref);
+    if (picked == null) return;
+    final litres = picked.volumeL;
     ref.read(blenderCylinderLitersProvider.notifier).state = litres;
     _cylinder.text = formatRoundedForInput(
       litersToDisplayVolume(litres, settings),
