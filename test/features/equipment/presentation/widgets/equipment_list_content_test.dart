@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/equipment/domain/entities/equipment_location.dart';
+import 'package:submersion/features/equipment/presentation/providers/equipment_location_providers.dart';
+import 'package:submersion/features/equipment/presentation/widgets/equipment_location_group_header.dart';
 import 'package:submersion/core/query/domain/query_node.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/features/cylinder_passports/presentation/widgets/passport_scan_sheet.dart';
@@ -83,6 +86,7 @@ EquipmentItem _makeEquipment({
   String? brand,
   String? model,
   EquipmentStatus status = EquipmentStatus.active,
+  bool isActive = true,
 }) {
   return EquipmentItem(
     id: id,
@@ -91,6 +95,7 @@ EquipmentItem _makeEquipment({
     brand: brand,
     model: model,
     status: status,
+    isActive: isActive,
   );
 }
 
@@ -736,6 +741,62 @@ void main() {
 
       expect(notifier.retired, ['e1', 'e2']);
       expect(notifier.reactivated, isEmpty);
+    });
+
+    testWidgets('reactivate is not offered for wishlist gear (#2025)', (
+      tester,
+    ) async {
+      final widget = await host([
+        _makeEquipment(
+          id: 'w1',
+          name: 'Dream Wing',
+          status: EquipmentStatus.wanted,
+          isActive: false,
+        ),
+      ]);
+      await tester.pumpWidget(widget);
+      await tester.pumpAndSettle();
+
+      await enterSelectionViaMenu(tester);
+      await tester.tap(find.byKey(const ValueKey('selection_select_all')));
+      await tester.pumpAndSettle();
+
+      // Buying it is not reactivating it: Mark as purchased does that.
+      expect(
+        tester
+            .widget<IconButton>(
+              find.byKey(const ValueKey('selection_action_reactivate')),
+            )
+            .onPressed,
+        isNull,
+      );
+    });
+
+    testWidgets('retire is not offered for wishlist gear left active (#2025)', (
+      tester,
+    ) async {
+      final widget = await host([
+        _makeEquipment(
+          id: 'w2',
+          name: 'Imported Wish',
+          status: EquipmentStatus.wanted,
+        ),
+      ]);
+      await tester.pumpWidget(widget);
+      await tester.pumpAndSettle();
+
+      await enterSelectionViaMenu(tester);
+      await tester.tap(find.byKey(const ValueKey('selection_select_all')));
+      await tester.pumpAndSettle();
+
+      expect(
+        tester
+            .widget<IconButton>(
+              find.byKey(const ValueKey('selection_action_retire')),
+            )
+            .onPressed,
+        isNull,
+      );
     });
 
     testWidgets('cancelling deletes nothing and keeps the selection', (
@@ -1596,6 +1657,120 @@ void main() {
     });
   });
 
+  group('group by location (Equipment page only)', () {
+    EquipmentLocation place(
+      String id,
+      String name,
+      EquipmentLocationKind kind, {
+      bool archived = false,
+    }) => EquipmentLocation(
+      id: id,
+      name: name,
+      kind: kind,
+      isArchived: archived,
+      createdAt: DateTime(2026),
+      updatedAt: DateTime(2026),
+    );
+
+    final garage = place('garage', 'Garage', EquipmentLocationKind.storage);
+    final shop = place(
+      'shop',
+      "Joe's Scuba",
+      EquipmentLocationKind.serviceShop,
+    );
+    final items = [
+      _makeEquipment(
+        id: 'e1',
+        name: 'Alpha Reg',
+        type: EquipmentType.regulator,
+      ),
+      _makeEquipment(id: 'e2', name: 'Bravo BCD', type: EquipmentType.bcd),
+      _makeEquipment(
+        id: 'e3',
+        name: 'Charlie Reg',
+        type: EquipmentType.regulator,
+      ),
+      _makeEquipment(id: 'e4', name: 'Delta Suit', type: EquipmentType.wetsuit),
+    ];
+
+    Future<void> pumpList(
+      WidgetTester tester, {
+      required bool groupByLocation,
+      EquipmentArrangement arrangement = EquipmentArrangement.defaults,
+    }) async {
+      tester.view.physicalSize = const Size(800, 2000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      final overrides = await _buildPhoneOverrides(
+        items: items,
+        arrangement: arrangement,
+      );
+      await tester.pumpWidget(
+        testApp(
+          locale: const Locale('en'),
+          overrides: [
+            ...overrides,
+            equipmentGroupByLocationProvider.overrideWith(
+              (ref) async => groupByLocation,
+            ),
+            currentEquipmentLocationsProvider.overrideWith(
+              (ref) async => {'e1': shop, 'e2': garage, 'e3': garage},
+            ),
+          ],
+          child: const EquipmentListContent(showAppBar: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    List<String?> placeHeadings(WidgetTester tester) => tester
+        .widgetList<EquipmentLocationGroupHeader>(
+          find.byType(EquipmentLocationGroupHeader),
+        )
+        .map((h) => h.location?.name)
+        .toList();
+
+    List<String> rowNames(WidgetTester tester) => tester
+        .widgetList<EquipmentListTile>(find.byType(EquipmentListTile))
+        .map((t) => t.item.name)
+        .toList();
+
+    testWidgets('one heading per place, storage first, no location last, '
+        'with type sub-headings inside', (tester) async {
+      await pumpList(tester, groupByLocation: true);
+      expect(placeHeadings(tester), ['Garage', "Joe's Scuba", null]);
+      expect(rowNames(tester), [
+        'Bravo BCD',
+        'Charlie Reg',
+        'Alpha Reg',
+        'Delta Suit',
+      ]);
+      // Regulators head a run under both the garage and the shop.
+      expect(find.byType(EquipmentGroupHeader), findsNWidgets(4));
+      expect(find.text('2 items'), findsOneWidget);
+    });
+
+    testWidgets('type grouping off leaves only the place headings', (
+      tester,
+    ) async {
+      await pumpList(
+        tester,
+        groupByLocation: true,
+        arrangement: EquipmentArrangement.defaults.copyWith(groupByType: false),
+      );
+      expect(placeHeadings(tester), ['Garage', "Joe's Scuba", null]);
+      expect(find.byType(EquipmentGroupHeader), findsNothing);
+    });
+
+    testWidgets('switched off, the list is grouped by type as before', (
+      tester,
+    ) async {
+      await pumpList(tester, groupByLocation: false);
+      expect(find.byType(EquipmentLocationGroupHeader), findsNothing);
+      expect(find.byType(EquipmentGroupHeader), findsNWidgets(3));
+    });
+  });
+
   group('group by type (shared gear arrangement)', () {
     final items = [
       _makeEquipment(
@@ -1942,13 +2117,13 @@ void main() {
       final english = orderIn(const Locale('en'));
       final german = orderIn(const Locale('de'));
       // A type the switch moves several rows, so the viewport (about five
-      // rows) no longer shows it, while it stays within the first dozen rows
-      // in both languages: this checks that the list re-scrolls, not how
-      // far the row-height estimate drifts deep into a long list.
+      // rows) no longer shows it, while it stays near the top in both
+      // languages: this checks that the list re-scrolls, not how far the
+      // row-height estimate drifts deep into a long list.
       int shift(EquipmentType t) =>
           (german.indexOf(t) - english.indexOf(t)).abs();
       final candidates = english.where(
-        (t) => english.indexOf(t) <= 12 && german.indexOf(t) <= 12,
+        (t) => english.indexOf(t) <= 14 && german.indexOf(t) <= 14,
       );
       final type = candidates.reduce((a, b) => shift(a) >= shift(b) ? a : b);
       expect(

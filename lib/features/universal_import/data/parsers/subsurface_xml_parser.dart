@@ -542,10 +542,12 @@ class SubsurfaceXmlParser implements ImportParser {
     }
   }
 
-  /// Turns a dive's `<suit>` into gear the dive wore when the text says
-  /// which suit it is (issue #1824), so it can reach the Suit Thickness
-  /// statistic. An unclear suit adds nothing and stays in the notes only,
-  /// as before; the notes line is kept either way (see [_parseDive]).
+  /// Turns a dive's `<suit>` into gear the dive wore, one item per name, so
+  /// the import loses no suit (issue #633). Text that says which suit it is
+  /// is typed from it ([classifySuitGear], issue #1824) and can reach the
+  /// Suit Thickness statistic. Unclear text becomes Other, which claims no
+  /// suit kind, for the diver to retype. The notes line is kept either way
+  /// (see [_parseDive]).
   void _collectSuit(
     XmlElement diveElement,
     Map<String, dynamic> diveData,
@@ -553,8 +555,8 @@ class SubsurfaceXmlParser implements ImportParser {
   ) {
     final name = diveElement.findElements('suit').firstOrNull?.innerText.trim();
     if (name == null || name.isEmpty) return;
-    final suit = classifySuit(name);
-    if (suit == null) return;
+    final suit =
+        classifySuitGear(name) ?? (type: EquipmentType.other, thickness: null);
     allSuits.putIfAbsent(
       name,
       () => {
@@ -1213,17 +1215,37 @@ class SubsurfaceXmlParser implements ImportParser {
   }
 
   /// Parses `<weightsystem>` elements into weight maps with [WeightType] values.
+  ///
+  /// The description is the weight's name in Subsurface (issue #956), except
+  /// its stock placement names, which only set the type: a stock 'belt' row
+  /// would otherwise read "belt · Weight Belt".
   List<Map<String, dynamic>> _parseWeights(XmlElement dive) {
     final weights = <Map<String, dynamic>>[];
     for (final ws in dive.findElements('weightsystem')) {
       final amount = _parseDouble(ws.getAttribute('weight'));
       if (amount == null) continue;
-      final description = ws.getAttribute('description') ?? '';
-      final weightType = _mapWeightType(description);
-      weights.add({'amount': amount, 'type': weightType, 'notes': description});
+      final description = (ws.getAttribute('description') ?? '').trim();
+      final isStock = _stockWeightDescriptions.contains(
+        description.toLowerCase(),
+      );
+      weights.add({
+        'amount': amount,
+        'type': _mapWeightType(description),
+        'label': isStock ? '' : description,
+      });
     }
     return weights;
   }
+
+  /// Subsurface's built-in weight system names, current and older spellings.
+  static const _stockWeightDescriptions = {
+    'integrated',
+    'belt',
+    'ankle',
+    'backplate',
+    'backplate weight',
+    'clip-on',
+  };
 
   static WeightType _mapWeightType(String description) {
     final lower = description.toLowerCase();

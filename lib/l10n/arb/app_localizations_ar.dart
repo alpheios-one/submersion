@@ -53,6 +53,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count غوصة مشتركة على الأقل',
+      many: '$count غوصة مشتركة على الأقل',
+      few: '$count غوصات مشتركة على الأقل',
+      two: 'غوصتان مشتركتان على الأقل',
       one: 'غوصة مشتركة واحدة على الأقل',
     );
     return '$_temp0';
@@ -146,7 +149,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count عنصرًا',
+      other: '$count عنصر',
+      many: '$count عنصرًا',
+      few: '$count عناصر',
+      two: 'عنصران',
       one: 'عنصر واحد',
     );
     return '$_temp0';
@@ -161,6 +167,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$a و$b، $count غوصة',
+      many: '$a و$b، $count غوصة',
+      few: '$a و$b، $count غوصات',
+      two: '$a و$b، غوصتان',
       one: '$a و$b، غوصة واحدة',
     );
     return '$_temp0';
@@ -168,6 +177,103 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get connections_summary_strongestPair => 'أقوى ثنائي';
+
+  @override
+  String get connections_insight_newest => 'أحدث ارتباط';
+
+  @override
+  String get connections_insight_drifting => 'يتباعدان';
+
+  @override
+  String get connections_insight_groups => 'المجموعات';
+
+  @override
+  String connections_insight_groupsValue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مجموعة',
+      many: '$count مجموعة',
+      few: '$count مجموعات',
+      two: 'مجموعتان',
+      one: 'مجموعة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String connections_insight_pair(String a, String b) {
+    return '$a و$b';
+  }
+
+  @override
+  String connections_insight_since(String label, String date) {
+    return '$label، منذ $date';
+  }
+
+  @override
+  String connections_insight_last(String label, String date) {
+    return '$label، آخر مرة $date';
+  }
+
+  @override
+  String connections_insight_closestValue(String label, String together) {
+    return '$label، $together';
+  }
+
+  @override
+  String get connections_highlight_title => 'التلوين حسب';
+
+  @override
+  String get connections_highlight_byKind => 'النوع';
+
+  @override
+  String get connections_highlight_groups => 'المجموعات';
+
+  @override
+  String get connections_highlight_recency => 'الحداثة';
+
+  @override
+  String get connections_legend_group => 'اللون: المجموعة';
+
+  @override
+  String get connections_legend_recent => 'حديث';
+
+  @override
+  String get connections_legend_old => 'قديم';
+
+  @override
+  String get connections_yearPlay_play => 'تشغيل الأعوام';
+
+  @override
+  String get connections_yearPlay_pause => 'إيقاف مؤقت';
+
+  @override
+  String get connections_share_tooltip => 'مشاركة الصورة';
+
+  @override
+  String get connections_share_sheetTitle => 'مشاركة صورة الخريطة';
+
+  @override
+  String get connections_share_saveTitle => 'حفظ صورة الخريطة';
+
+  @override
+  String get connections_share_failed => 'تعذّر إنشاء الصورة';
+
+  @override
+  String connections_share_aroundName(String label) {
+    return 'حول $label';
+  }
+
+  @override
+  String connections_share_allDives(int first, int last) {
+    return 'كل الغوصات، من $first إلى $last';
+  }
+
+  @override
+  String connections_share_details(String range, String counts) {
+    return '$range. $counts';
+  }
 
   @override
   String get connections_summary_title => 'الملخص';
@@ -261,7 +367,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم نقل $count عناصر إلى $name',
+      other: 'تم نقل $count عنصر إلى $name',
+      many: 'تم نقل $count عنصرًا إلى $name',
+      few: 'تم نقل $count عناصر إلى $name',
+      two: 'تم نقل عنصرين إلى $name',
       one: 'تم نقل $count عنصر إلى $name',
     );
     return '$_temp0';
@@ -272,7 +381,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم نقل $count عناصر إلى $name',
+      other: 'تم نقل $count عنصر إلى $name',
+      many: 'تم نقل $count عنصرًا إلى $name',
+      few: 'تم نقل $count عناصر إلى $name',
+      two: 'تم نقل عنصرين إلى $name',
       one: 'تم نقل $count عنصر إلى $name',
     );
     return '$_temp0، وتم تخطي $skipped لا تملكها';
@@ -286,7 +398,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تمت مشاركة $count عناصر',
+      other: 'تمت مشاركة $count عنصر',
+      many: 'تمت مشاركة $count عنصرًا',
+      few: 'تمت مشاركة $count عناصر',
+      two: 'تمت مشاركة عنصرين',
       one: 'تمت مشاركة عنصر واحد',
     );
     return '$_temp0';
@@ -297,7 +412,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تمت مشاركة $count عناصر',
+      other: 'تمت مشاركة $count عنصر',
+      many: 'تمت مشاركة $count عنصرًا',
+      few: 'تمت مشاركة $count عناصر',
+      two: 'تمت مشاركة عنصرين',
       one: 'تمت مشاركة عنصر واحد',
     );
     return '$_temp0، وتم تخطي $skipped لا تملكها';
@@ -308,14 +426,20 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       deleted,
       locale: localeName,
-      other: 'تم حذف $deleted عناصر',
+      other: 'تم حذف $deleted عنصر',
+      many: 'تم حذف $deleted عنصرًا',
+      few: 'تم حذف $deleted عناصر',
+      two: 'تم حذف عنصرين',
       one: 'تم حذف عنصر واحد',
     );
     String _temp1 = intl.Intl.pluralLogic(
       skipped,
       locale: localeName,
-      other:
-          'تم الإبقاء على $skipped عناصر مُشارَكة: يمكن لمالكيها وحدهم حذفها',
+      other: 'تم الإبقاء على $skipped عنصر مُشارَك: يمكن لمالكيها وحدهم حذفها',
+      many:
+          'تم الإبقاء على $skipped عنصرًا مُشارَكًا: يمكن لمالكيها وحدهم حذفها',
+      few: 'تم الإبقاء على $skipped عناصر مُشارَكة: يمكن لمالكيها وحدهم حذفها',
+      two: 'تم الإبقاء على عنصرين مُشارَكين: يمكن لمالكيهما وحدهم حذفهما',
       one: 'تم الإبقاء على عنصر مُشارَك واحد: يمكن لمالكه وحده حذفه',
     );
     return '$_temp0. $_temp1';
@@ -350,7 +474,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غطسات',
+      other: '$count غطسة',
+      many: '$count غطسة',
+      few: '$count غطسات',
+      two: 'غطستان',
       one: 'غطسة واحدة',
     );
     return '$_temp0';
@@ -395,7 +522,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'المهمة: $count مشكلات',
+      other: 'المهمة: $count مشكلة',
+      many: 'المهمة: $count مشكلة',
+      few: 'المهمة: $count مشكلات',
+      two: 'المهمة: مشكلتان',
       one: 'المهمة: $count مشكلة',
     );
     return '$_temp0';
@@ -867,6 +997,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'شارك عناصرك الـ $count مع الملفات التي تختارها.',
+      many: 'شارك عناصرك الـ $count مع الملفات التي تختارها.',
+      few: 'شارك عناصرك الـ $count مع الملفات التي تختارها.',
+      two: 'شارك عنصريك مع الملفات التي تختارها.',
       one: 'شارك عنصرك الوحيد مع الملفات التي تختارها.',
     );
     return '$_temp0';
@@ -892,7 +1025,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count مكوّنات',
+      other: '$count مكوّن',
+      many: '$count مكوّنًا',
+      few: '$count مكوّنات',
+      two: 'مكوّنان',
       one: 'مكوّن واحد',
     );
     return '$_temp0';
@@ -918,7 +1054,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       total,
       locale: localeName,
-      other: '$count من $total مكوّنات',
+      other: '$count من $total مكوّن',
+      many: '$count من $total مكوّنًا',
+      few: '$count من $total مكوّنات',
+      two: '$count من مكوّنين',
       one: '$count من مكوّن واحد',
     );
     return '$_temp0';
@@ -944,7 +1083,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تحديث $count غطسات أيضًا',
+      other: 'تحديث $count غطسة أيضًا',
+      many: 'تحديث $count غطسة أيضًا',
+      few: 'تحديث $count غطسات أيضًا',
+      two: 'تحديث غطستين أيضًا',
       one: 'تحديث غطسة واحدة أيضًا',
     );
     return '$_temp0';
@@ -970,7 +1112,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'هذه التجميعة موجودة في $count غطسات مسجلة.',
+      other: 'هذه التجميعة موجودة في $count غطسة مسجلة.',
+      many: 'هذه التجميعة موجودة في $count غطسة مسجلة.',
+      few: 'هذه التجميعة موجودة في $count غطسات مسجلة.',
+      two: 'هذه التجميعة موجودة في غطستين مسجلتين.',
       one: 'هذه التجميعة موجودة في غطسة مسجلة واحدة.',
     );
     return '$_temp0';
@@ -989,7 +1134,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'جزء من $count تجميعات',
+      other: 'جزء من $count تجميعة',
+      many: 'جزء من $count تجميعة',
+      few: 'جزء من $count تجميعات',
+      two: 'جزء من تجميعتين',
       one: 'جزء من تجميعة واحدة',
     );
     return '$_temp0';
@@ -1009,6 +1157,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'إضافة $count',
+      many: 'إضافة $count',
+      few: 'إضافة $count',
+      two: 'إضافة $count',
       one: 'إضافة 1',
       zero: 'إضافة',
     );
@@ -1373,6 +1524,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get o2Toxicity_thisDive => 'هذه الغطسة';
 
   @override
+  String get o2Toxicity_lastDive => 'الغطسة الأخيرة';
+
+  @override
+  String o2Toxicity_lastDiveStart(String percent) {
+    return 'قبل الغطسة الأخيرة: $percent%';
+  }
+
+  @override
+  String o2Toxicity_lastDiveDelta(String percent) {
+    return 'الغطسة الأخيرة: +$percent%';
+  }
+
+  @override
   String get o2Toxicity_weekly => 'أسبوعي';
 
   @override
@@ -1396,7 +1560,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: '$days أيام حتى المغادرة',
+      other: '$days يوم حتى المغادرة',
+      many: '$days يومًا حتى المغادرة',
+      few: '$days أيام حتى المغادرة',
+      two: 'يومان حتى المغادرة',
       one: 'يوم واحد حتى المغادرة',
     );
     return '$_temp0';
@@ -1453,7 +1620,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غطسات سابقة هنا',
+      other: '$count غطسة سابقة هنا',
+      many: '$count غطسة سابقة هنا',
+      few: '$count غطسات سابقة هنا',
+      two: 'غطستان سابقتان هنا',
       one: 'غطسة سابقة واحدة هنا',
     );
     return '$_temp0';
@@ -1483,6 +1653,19 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String trips_story_dayMap_divePin(int number) {
     return 'غوصة $number';
+  }
+
+  @override
+  String trips_story_dayMap_diveGroup(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غوصة هنا',
+      many: '$count غوصة هنا',
+      few: '$count غوصات هنا',
+      two: 'غوصتان هنا',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1593,7 +1776,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غطسات محددة لا تحتوي على أسطوانات وسيتم تخطيها.',
+      other: '$count غطسة محددة لا تحتوي على أسطوانات وسيتم تخطيها.',
+      many: '$count غطسة محددة لا تحتوي على أسطوانات وسيتم تخطيها.',
+      few: '$count غطسات محددة لا تحتوي على أسطوانات وسيتم تخطيها.',
+      two: 'غطستان محددتان لا تحتويان على أسطوانات وسيتم تخطيهما.',
       one: 'غطسة واحدة محددة لا تحتوي على أسطوانات وسيتم تخطيها.',
     );
     return '$_temp0';
@@ -1611,6 +1797,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'إضافة إلى كل الـ $count غطسة',
+      many: 'إضافة إلى كل الـ $count غطسة',
+      few: 'إضافة إلى كل الـ $count غطسات',
+      two: 'إضافة إلى الغطستين',
       one: 'إضافة إلى غطسة واحدة',
     );
     return '$_temp0';
@@ -1622,6 +1811,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'إزالة من كل الـ $count غطسة',
+      many: 'إزالة من كل الـ $count غطسة',
+      few: 'إزالة من كل الـ $count غطسات',
+      two: 'إزالة من الغطستين',
       one: 'إزالة من غطسة واحدة',
     );
     return '$_temp0';
@@ -2425,6 +2617,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count غطسة',
+      many: '$count غطسة',
+      few: '$count غطسات',
+      two: 'غطستان',
       one: 'غطسة واحدة',
     );
     return '$_temp0';
@@ -2458,6 +2653,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'ربط $count',
+      many: 'ربط $count',
+      few: 'ربط $count',
+      two: 'ربط $count',
       one: 'ربط 1',
     );
     return '$_temp0';
@@ -2469,6 +2667,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'تم ربط $count رفيق',
+      many: 'تم ربط $count رفيقًا',
+      few: 'تم ربط $count رفاق',
+      two: 'تم ربط رفيقين',
       one: 'تم ربط رفيق واحد',
     );
     return '$_temp0';
@@ -2502,6 +2703,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'ربط $count غطسة',
+      many: 'ربط $count غطسة',
+      few: 'ربط $count غطسات',
+      two: 'ربط غطستين',
       one: 'ربط غطسة واحدة',
     );
     return '$_temp0';
@@ -2513,6 +2717,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'تم ربط الرفاق في $count غطسة',
+      many: 'تم ربط الرفاق في $count غطسة',
+      few: 'تم ربط الرفاق في $count غطسات',
+      two: 'تم ربط الرفاق في غطستين',
       one: 'تم ربط الرفاق في غطسة واحدة',
     );
     return '$_temp0';
@@ -2528,6 +2735,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count غطسة',
+      many: '$count غطسة',
+      few: '$count غطسات',
+      two: 'غطستان',
       one: 'غطسة واحدة',
     );
     return '$_temp0';
@@ -2539,6 +2749,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count رفيق موجود',
+      many: '$count رفيقًا موجودًا',
+      few: '$count رفاق موجودون',
+      two: 'رفيقان موجودان',
       one: 'رفيق موجود واحد',
     );
     return '$_temp0';
@@ -2550,6 +2763,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count رفيق جديد',
+      many: '$count رفيقًا جديدًا',
+      few: '$count رفاق جدد',
+      two: 'رفيقان جديدان',
       one: 'رفيق جديد واحد',
     );
     return '$_temp0';
@@ -2591,6 +2807,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count رفيق باسم $name',
+      many: '$count رفيقًا باسم $name',
+      few: '$count رفاق باسم $name',
+      two: 'رفيقان باسم $name',
       one: 'رفيق واحد باسم $name',
     );
     return '$_temp0';
@@ -2801,7 +3020,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count رفاق',
+      other: '$count رفيق',
+      many: '$count رفيقًا',
+      few: '$count رفاق',
+      two: 'رفيقان',
       one: 'رفيق واحد',
     );
     return '$_temp0';
@@ -2812,7 +3034,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       total,
       locale: localeName,
-      other: '$total رفاق',
+      other: '$total رفيق',
+      many: '$total رفيقًا',
+      few: '$total رفاق',
+      two: 'رفيقين',
       one: 'رفيق واحد',
     );
     return '$shown من $_temp0';
@@ -2842,10 +3067,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'رفاق',
-      one: 'رفيق',
+      other: '$count رفيق',
+      many: '$count رفيقًا',
+      few: '$count رفاق',
+      two: 'رفيقين',
+      one: 'رفيق واحد',
     );
-    return 'تم دمج $count $_temp0';
+    return 'تم دمج $_temp0';
   }
 
   @override
@@ -2862,10 +3090,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'رفاق',
-      one: 'رفيق',
+      other: '$count رفيق',
+      many: '$count رفيقًا',
+      few: '$count رفاق',
+      two: 'رفيقين',
+      one: 'رفيق واحد',
     );
-    return 'هل أنت متأكد من حذف $count $_temp0؟ لا يمكن التراجع عن هذا الإجراء.';
+    return 'هل أنت متأكد من حذف $_temp0؟ لا يمكن التراجع عن هذا الإجراء.';
   }
 
   @override
@@ -2879,10 +3110,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'رفاق',
-      one: 'رفيق',
+      other: '$count رفيق',
+      many: '$count رفيقًا',
+      few: '$count رفاق',
+      two: 'رفيقين',
+      one: 'رفيق واحد',
     );
-    return 'تم حذف $count $_temp0';
+    return 'تم حذف $_temp0';
   }
 
   @override
@@ -2938,7 +3172,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count شهادات',
+      other: '$count شهادة',
+      many: '$count شهادة',
+      few: '$count شهادات',
+      two: 'شهادتان',
       one: 'شهادة واحدة',
     );
     return '$_temp0';
@@ -2949,11 +3186,132 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       total,
       locale: localeName,
-      other: '$total شهادات',
+      other: '$total شهادة',
+      many: '$total شهادة',
+      few: '$total شهادات',
+      two: 'شهادتين',
       one: 'شهادة واحدة',
     );
     return '$shown من $_temp0';
   }
+
+  @override
+  String get certifications_list_filter_needsAttention => 'يحتاج إلى انتباه';
+
+  @override
+  String get certifications_list_filter_clear => 'مسح';
+
+  @override
+  String get certifications_list_needsAttention_empty =>
+      'لا توجد شهادات تحتاج إلى انتباه';
+
+  @override
+  String get certifications_list_needsAttention_emptySubtitle =>
+      'جميع الشهادات سارية أو مكتومة.';
+
+  @override
+  String get currencyRule_padi_reactivate_name => 'تنشيط PADI (ReActivate)';
+
+  @override
+  String get currencyRule_ssi_skills_update_name => 'SSI Scuba Skills Update';
+
+  @override
+  String get currencyRule_generic_refresher_name => 'دورة تنشيطية';
+
+  @override
+  String get currencyRule_first_aid_24mo_name =>
+      'تجديد الإسعافات الأولية والإنعاش القلبي الرئوي';
+
+  @override
+  String get currencyRule_pro_membership_annual_name => 'تجديد العضوية المهنية';
+
+  @override
+  String get currencyRule_gue_revalidation_name => 'إعادة تصديق GUE';
+
+  @override
+  String get currencyRule_ffessm_licence_annual_name =>
+      'رخصة FFESSM والشهادة الطبية';
+
+  @override
+  String get currencyRule_cave_currency_name => 'الممارسة في الكهوف';
+
+  @override
+  String get currencyRule_rebreather_currency_name =>
+      'الممارسة بجهاز إعادة التنفس';
+
+  @override
+  String get currencyRule_deco_currency_name => 'ممارسة تخفيف الضغط';
+
+  @override
+  String get currencyRule_card_expiry_name => 'انتهاء صلاحية البطاقة';
+
+  @override
+  String get currencyRule_padi_reactivate_advisory =>
+      'تقترح PADI دورة ReActivate التنشيطية بعد ستة إلى اثني عشر شهرًا بعيدًا عن الماء.';
+
+  @override
+  String get currencyRule_ssi_skills_update_advisory =>
+      'تقترح SSI دورة Scuba Skills Update بعد ستة إلى اثني عشر شهرًا دون غوص.';
+
+  @override
+  String get currencyRule_generic_refresher_advisory =>
+      'تقترح معظم الوكالات دورة تنشيطية بعد ستة إلى اثني عشر شهرًا دون غوص.';
+
+  @override
+  String get currencyRule_first_aid_advisory =>
+      'تُجدَّد شهادات الإسعافات الأولية والإنعاش القلبي الرئوي ومزود الأكسجين عادةً كل عامين.';
+
+  @override
+  String get currencyRule_pro_membership_advisory =>
+      'تُجدَّد العضويات المهنية عادةً كل عام للحفاظ على صفة التدريس نشطة.';
+
+  @override
+  String get currencyRule_gue_revalidation_advisory =>
+      'يُعاد تصديق تصنيفات GUE عادةً كل ثلاث سنوات.';
+
+  @override
+  String get currencyRule_ffessm_licence_advisory =>
+      'تُجدَّد رخصة FFESSM وشهادتها الطبية كل عام.';
+
+  @override
+  String get currencyRule_cave_currency_advisory =>
+      'تتلاشى مهارات الكهوف دون ممارسة؛ ويُنصح عادةً بغطسة تقييم بعد عام من الانقطاع.';
+
+  @override
+  String get currencyRule_rebreather_currency_advisory =>
+      'تتلاشى مهارات جهاز إعادة التنفس بسرعة؛ وتنصح وكالات كثيرة بدورة تنشيطية بعد ستة أشهر من الانقطاع.';
+
+  @override
+  String get currencyRule_deco_currency_advisory =>
+      'يُوصى عادةً بتنشيط إجراءات تخفيف الضغط بعد عام دون غطسة تخفيف ضغط.';
+
+  @override
+  String get currencyRule_card_expiry_advisory =>
+      'تاريخ انتهاء الصلاحية المطبوع على هذه البطاقة.';
+
+  @override
+  String get certifications_currency_status_current => 'ساري';
+
+  @override
+  String get certifications_currency_status_dueSoon => 'مستحق قريبًا';
+
+  @override
+  String get certifications_currency_status_lapsed => 'منتهي';
+
+  @override
+  String get certifications_currency_eventType_refresher => 'دورة تنشيطية';
+
+  @override
+  String get certifications_currency_eventType_renewal => 'تجديد';
+
+  @override
+  String get certifications_currency_eventType_revalidation => 'إعادة تصديق';
+
+  @override
+  String get certifications_currency_eventType_skillsUpdate => 'تحديث المهارات';
+
+  @override
+  String get certifications_currency_eventType_other => 'أخرى';
 
   @override
   String get certifications_detail_action_delete => 'حذف';
@@ -3040,6 +3398,138 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get certifications_detail_sectionTitle_dates => 'التواريخ';
+
+  @override
+  String get certifications_detail_sectionTitle_currency => 'الصلاحية';
+
+  @override
+  String certifications_currency_dueOn(String date) {
+    return 'مستحق في $date';
+  }
+
+  @override
+  String certifications_currency_lapsedSince(String date) {
+    return 'منتهي منذ $date';
+  }
+
+  @override
+  String certifications_currency_anchor_lastDive(String date) {
+    return 'آخر غطسة $date';
+  }
+
+  @override
+  String certifications_currency_anchor_lastQualifyingDive(String date) {
+    return 'آخر غطسة مؤهلة $date';
+  }
+
+  @override
+  String certifications_currency_anchor_cardExpiry(String date) {
+    return 'انتهاء البطاقة $date';
+  }
+
+  @override
+  String certifications_currency_anchor_cardIssue(String date) {
+    return 'صدرت في $date';
+  }
+
+  @override
+  String certifications_currency_anchor_ledgerEvent(String event, String date) {
+    return 'تم تسجيل $event في $date';
+  }
+
+  @override
+  String certifications_currency_alsoCovers(String names) {
+    return 'يشمل أيضًا $names';
+  }
+
+  @override
+  String get certifications_currency_muted => 'مكتوم';
+
+  @override
+  String get certifications_currency_noCountedDive =>
+      'لم تُسجَّل غطسة محتسبة بعد';
+
+  @override
+  String get certifications_currency_action_log => 'تسجيل دورة تنشيطية';
+
+  @override
+  String get certifications_currency_action_interval => 'تعديل الفترة';
+
+  @override
+  String get certifications_currency_action_mapping => 'الغطسات المحتسبة';
+
+  @override
+  String get certifications_currency_action_mute => 'كتم';
+
+  @override
+  String get certifications_currency_action_unmute => 'إلغاء الكتم';
+
+  @override
+  String get certifications_currency_history => 'سجل الصلاحية';
+
+  @override
+  String get certifications_currency_deleteEvent_title => 'حذف الإدخال؟';
+
+  @override
+  String certifications_currency_deleteEvent_content(
+    String event,
+    String date,
+  ) {
+    return 'سيؤدي هذا إلى إزالة $event المسجل في $date.';
+  }
+
+  @override
+  String get certifications_currency_eventDialog_title =>
+      'تسجيل تنشيط أو تجديد';
+
+  @override
+  String get certifications_currency_eventDialog_type => 'النوع';
+
+  @override
+  String get certifications_currency_eventDialog_date => 'التاريخ';
+
+  @override
+  String get certifications_currency_eventDialog_provider =>
+      'المركز أو النادي أو المدرب';
+
+  @override
+  String get certifications_currency_eventDialog_notes => 'ملاحظات';
+
+  @override
+  String get certifications_currency_intervalDialog_title => 'الفترة';
+
+  @override
+  String get certifications_currency_intervalDialog_lapse => 'تنتهي بعد (أيام)';
+
+  @override
+  String get certifications_currency_intervalDialog_lead =>
+      'التنبيه قبل هذا العدد من الأيام';
+
+  @override
+  String certifications_currency_intervalDialog_inheritHint(String days) {
+    return 'اتركه فارغًا لاستخدام قيمة القاعدة ($days)';
+  }
+
+  @override
+  String get certifications_currency_intervalDialog_leadTooLong =>
+      'لا يمكن أن يبدأ التنبيه قبل بدء الفترة';
+
+  @override
+  String get certifications_currency_mappingDialog_title => 'الغطسات المحتسبة';
+
+  @override
+  String get certifications_currency_mappingDialog_types => 'أنواع الغطس';
+
+  @override
+  String get certifications_currency_mappingDialog_modes => 'أنماط الغطس';
+
+  @override
+  String get certifications_currency_mappingDialog_anyHint =>
+      'عدم تحديد أي شيء يعني احتساب أي غطسة';
+
+  @override
+  String get certifications_currency_mappingDialog_reset =>
+      'استخدام الإعداد الافتراضي للقاعدة';
 
   @override
   String get certifications_detail_sectionTitle_details => 'تفاصيل الشهادة';
@@ -3199,6 +3689,125 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get certifications_edit_label_agency => 'الجهة المانحة *';
+
+  @override
+  String get certificationAgencies_unknownAgency => 'جهة مانحة غير معروفة';
+
+  @override
+  String get certificationAgencies_unknownCertification => 'شهادة غير معروفة';
+
+  @override
+  String get certificationAgencies_addCustomAgency =>
+      'إضافة جهة مانحة مخصصة...';
+
+  @override
+  String get certificationAgencies_addCustomCertification =>
+      'إضافة شهادة مخصصة...';
+
+  @override
+  String get certificationAgencies_dialog_newAgencyTitle => 'جهة مانحة جديدة';
+
+  @override
+  String get certificationAgencies_dialog_editAgencyTitle =>
+      'تعديل الجهة المانحة';
+
+  @override
+  String get certificationAgencies_dialog_newCertificationTitle =>
+      'شهادة جديدة';
+
+  @override
+  String get certificationAgencies_dialog_editCertificationTitle =>
+      'تعديل الشهادة';
+
+  @override
+  String get certificationAgencies_dialog_nameLabel => 'الاسم';
+
+  @override
+  String get certificationAgencies_dialog_colorLabel => 'لون البطاقة';
+
+  @override
+  String get certificationAgencies_dialog_specialty => 'تخصص';
+
+  @override
+  String get certificationAgencies_error_nameRequired => 'أدخل اسمًا';
+
+  @override
+  String get certificationAgencies_error_nameTaken => 'هذا الاسم مستخدم بالفعل';
+
+  @override
+  String get settings_manage_certificationAgencies => 'جهات منح الشهادات';
+
+  @override
+  String get settings_manage_certificationAgencies_subtitle =>
+      'إدارة الجهات المانحة والشهادات المخصصة';
+
+  @override
+  String get certificationAgencies_section_yours => 'جهاتك المانحة';
+
+  @override
+  String get certificationAgencies_section_builtIn => 'الجهات المانحة المضمّنة';
+
+  @override
+  String get certificationAgencies_addAgency => 'إضافة جهة مانحة';
+
+  @override
+  String certificationAgencies_sharedBy(String name) {
+    return 'مشاركة من $name';
+  }
+
+  @override
+  String get certificationAgencies_editor_addCertification => 'إضافة شهادة';
+
+  @override
+  String get certificationAgencies_editor_builtInHint =>
+      'لا يمكن تغيير الشهادات المضمّنة. يمكنك إضافة شهاداتك الخاصة.';
+
+  @override
+  String certificationAgencies_delete_confirmTitle(String name) {
+    return 'حذف $name؟';
+  }
+
+  @override
+  String get certificationAgencies_delete_refusedTitle =>
+      'ما زال قيد الاستخدام';
+
+  @override
+  String certificationAgencies_delete_refusedBody(String usage) {
+    return 'مستخدم في $usage. غيّرها أولًا.';
+  }
+
+  @override
+  String certificationAgencies_usage_certifications(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count شهادة',
+      many: '$count شهادة',
+      few: '$count شهادات',
+      two: 'شهادتان',
+      one: 'شهادة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String certificationAgencies_usage_courses(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count دورة',
+      many: '$count دورة',
+      few: '$count دورات',
+      two: 'دورتان',
+      one: 'دورة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String certificationAgencies_usage_and(String first, String second) {
+    return '$first و$second';
+  }
 
   @override
   String get certifications_edit_addRecognition => 'إضافة اعتراف آخر';
@@ -3538,6 +4147,11 @@ class AppLocalizationsAr extends AppLocalizations {
       locale: localeName,
       other:
           'هل تريد حذف جميع العناصر البالغ عددها $count من قائمة التحقق هذه؟ لن تتأثر القوالب.',
+      many:
+          'هل تريد حذف جميع العناصر البالغ عددها $count من قائمة التحقق هذه؟ لن تتأثر القوالب.',
+      few:
+          'هل تريد حذف جميع العناصر البالغ عددها $count من قائمة التحقق هذه؟ لن تتأثر القوالب.',
+      two: 'هل تريد حذف العنصرين من قائمة التحقق هذه؟ لن تتأثر القوالب.',
       one: 'هل تريد حذف العنصر الوحيد من قائمة التحقق هذه؟ لن تتأثر القوالب.',
     );
     return '$_temp0';
@@ -3551,7 +4165,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تمت إزالة $count عناصر',
+      other: 'تمت إزالة $count عنصر',
+      many: 'تمت إزالة $count عنصرًا',
+      few: 'تمت إزالة $count عناصر',
+      two: 'تمت إزالة عنصرين',
       one: 'تمت إزالة عنصر واحد',
     );
     return '$_temp0';
@@ -3569,7 +4186,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count عناصر',
+      other: '$count عنصر',
+      many: '$count عنصرًا',
+      few: '$count عناصر',
+      two: 'عنصران',
       one: 'عنصر واحد',
     );
     return '$_temp0';
@@ -3580,13 +4200,19 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       added,
       locale: localeName,
-      other: 'سيتم إضافة $added عناصر',
+      other: 'سيتم إضافة $added عنصر',
+      many: 'سيتم إضافة $added عنصرًا',
+      few: 'سيتم إضافة $added عناصر',
+      two: 'سيتم إضافة عنصرين',
       one: 'سيتم إضافة عنصر واحد',
     );
     String _temp1 = intl.Intl.pluralLogic(
       skipped,
       locale: localeName,
-      other: 'مع تخطي $skipped عناصر مكررة',
+      other: 'مع تخطي $skipped عنصر مكرر',
+      many: 'مع تخطي $skipped عنصرًا مكررًا',
+      few: 'مع تخطي $skipped عناصر مكررة',
+      two: 'مع تخطي عنصرين مكررين',
       one: 'مع تخطي عنصر مكرر واحد',
       zero: 'دون تخطي أي عناصر مكررة',
     );
@@ -3598,7 +4224,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تمت إضافة $count عناصر',
+      other: 'تمت إضافة $count عنصر',
+      many: 'تمت إضافة $count عنصرًا',
+      few: 'تمت إضافة $count عناصر',
+      two: 'تمت إضافة عنصرين',
       one: 'تمت إضافة عنصر واحد',
       zero: 'لم تتم إضافة أي عناصر جديدة',
     );
@@ -4118,7 +4747,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count رابطًا',
+      other: '$count رابط',
+      many: '$count رابطًا',
+      few: '$count روابط',
+      two: 'رابطان',
       one: 'رابط واحد',
     );
     return '$_temp0';
@@ -4130,6 +4762,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count عقدة أخرى غير معروضة',
+      many: '$count عقدة أخرى غير معروضة',
+      few: '$count عقد أخرى غير معروضة',
+      two: 'عقدتان أخريان غير معروضتين',
       one: 'عقدة أخرى غير معروضة',
     );
     return '$_temp0';
@@ -4161,6 +4796,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count غوصة معًا',
+      many: '$count غوصة معًا',
+      few: '$count غوصات معًا',
+      two: 'غوصتان معًا',
       one: 'غوصة واحدة معًا',
     );
     return '$_temp0';
@@ -4172,6 +4810,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
       one: 'غوصة واحدة',
     );
     return '$_temp0';
@@ -4595,7 +5236,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count دورات',
+      other: '$count دورة',
+      many: '$count دورة',
+      few: '$count دورات',
+      two: 'دورتان',
       one: 'دورة واحدة',
     );
     return '$_temp0';
@@ -4606,7 +5250,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       total,
       locale: localeName,
-      other: '$total دورات',
+      other: '$total دورة',
+      many: '$total دورة',
+      few: '$total دورات',
+      two: 'دورتين',
       one: 'دورة واحدة',
     );
     return '$shown من $_temp0';
@@ -4714,7 +5361,9 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count عناصر متأخرة عن الصيانة',
+      other: '$count عنصر متأخر عن الصيانة',
+      many: '$count عنصرًا متأخرًا عن الصيانة',
+      few: '$count عناصر متأخرة عن الصيانة',
       two: 'عنصران متأخران عن الصيانة',
       one: 'عنصر واحد متأخر عن الصيانة',
     );
@@ -4726,7 +5375,9 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count عناصر تحتاج صيانة خلال $days يوم',
+      other: '$count عنصر يحتاج صيانة خلال $days يوم',
+      many: '$count عنصرًا يحتاج صيانة خلال $days يوم',
+      few: '$count عناصر تحتاج صيانة خلال $days يوم',
       two: 'عنصران يحتاجان صيانة خلال $days يوم',
       one: 'عنصر واحد يحتاج صيانة خلال $days يوم',
     );
@@ -4867,7 +5518,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_homeChips_lastDive => 'حداثة الغطس';
 
   @override
-  String get settings_homeChips_certifications => 'انتهاء الشهادات';
+  String get settings_homeChips_certifications => 'صلاحية الشهادات';
 
   @override
   String get settings_homeChips_trip => 'الرحلة القادمة';
@@ -4891,8 +5542,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_homeChips_dataQuality => 'جودة البيانات';
 
   @override
-  String dashboard_gauges_certsExpiring(int count) {
-    return '$count شهادات على وشك الانتهاء';
+  String dashboard_gauges_certsNeedAttention(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count شهادة تحتاج إلى انتباه',
+      many: '$count شهادة تحتاج إلى انتباه',
+      few: '$count شهادات تحتاج إلى انتباه',
+      two: 'شهادتان تحتاجان إلى انتباه',
+      one: 'شهادة واحدة تحتاج إلى انتباه',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -4937,7 +5597,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count مشاكل في البيانات',
+      other: '$count مشكلة في البيانات',
+      many: '$count مشكلة في البيانات',
+      few: '$count مشاكل في البيانات',
+      two: 'مشكلتان في البيانات',
       one: 'مشكلة واحدة في البيانات',
     );
     return '$_temp0';
@@ -5210,6 +5873,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count غطسة مسجلة',
+      many: '$count غطسة مسجلة',
+      few: '$count غطسات مسجلة',
+      two: 'غطستان مسجلتان',
       one: 'غطسة واحدة مسجلة',
     );
     return '$_temp0';
@@ -5227,6 +5893,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'ستبقى $count غطسة بدون مركز غوص.',
+      many: 'ستبقى $count غطسة بدون مركز غوص.',
+      few: 'ستبقى $count غطسات بدون مركز غوص.',
+      two: 'ستبقى غطستان بدون مركز غوص.',
       one: 'ستبقى غطسة واحدة بدون مركز غوص.',
     );
     return '$_temp0';
@@ -5417,6 +6086,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count غطسة',
+      many: '$count غطسة',
+      few: '$count غطسات',
+      two: 'غطستان',
       one: 'غطسة واحدة',
     );
     return '$_temp0';
@@ -5576,7 +6248,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count مراكز غوص',
+      other: '$count مركز غوص',
+      many: '$count مركز غوص',
+      few: '$count مراكز غوص',
+      two: 'مركزا غوص',
       one: 'مركز غوص واحد',
     );
     return '$_temp0';
@@ -5587,7 +6262,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       total,
       locale: localeName,
-      other: '$total مراكز غوص',
+      other: '$total مركز غوص',
+      many: '$total مركز غوص',
+      few: '$total مراكز غوص',
+      two: 'مركزي غوص',
       one: 'مركز غوص واحد',
     );
     return '$shown من $_temp0';
@@ -5664,10 +6342,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'غوصات',
-      one: 'غوصة',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتين',
+      one: 'غوصة واحدة',
     );
-    return 'هل أنت متأكد أنك تريد حذف $count $_temp0؟ لا يمكن التراجع عن هذا الإجراء.';
+    return 'هل أنت متأكد أنك تريد حذف $_temp0؟ لا يمكن التراجع عن هذا الإجراء.';
   }
 
   @override
@@ -5678,10 +6359,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'غوصات',
-      one: 'غوصة',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتين',
+      one: 'غوصة واحدة',
     );
-    return 'تم حذف $count $_temp0';
+    return 'تم حذف $_temp0';
   }
 
   @override
@@ -5712,10 +6396,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'غوصات',
-      one: 'غوصة',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتين',
+      one: 'غوصة واحدة',
     );
-    return 'تم تصدير $count $_temp0 بنجاح';
+    return 'تم تصدير $_temp0 بنجاح';
   }
 
   @override
@@ -5723,10 +6410,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'غوصات',
-      one: 'غوصة',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتين',
+      one: 'غوصة واحدة',
     );
-    return 'تصدير $count $_temp0';
+    return 'تصدير $_temp0';
   }
 
   @override
@@ -5820,6 +6510,18 @@ class AppLocalizationsAr extends AppLocalizations {
       'الغوصات المحددة تخص غواصين مختلفين ولا يمكن دمجها.';
 
   @override
+  String get diveLog_combine_modeJoin => 'ربط في غوصة واحدة';
+
+  @override
+  String get diveLog_combine_modeJoinShort => 'ربط';
+
+  @override
+  String get diveLog_combine_modeMerge => 'دمج ككمبيوتر إضافي';
+
+  @override
+  String get diveLog_combine_modeMergeShort => 'دمج';
+
+  @override
   String get diveLog_combine_profilePreview => 'الملف المدمج';
 
   @override
@@ -5841,10 +6543,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'غوصات',
-      one: 'غوصة',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتين',
+      one: 'غوصة واحدة',
     );
-    return 'تم دمج $count $_temp0';
+    return 'تم دمج $_temp0';
   }
 
   @override
@@ -5858,6 +6563,26 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_computerSource_badge_primary => 'أساسي';
+
+  @override
+  String get diveLog_consolidate_alignBestFit => 'أفضل تطابق';
+
+  @override
+  String get diveLog_consolidate_alignStarts => 'محاذاة البدايات';
+
+  @override
+  String get diveLog_consolidate_alignStartsShort => 'البدايات';
+
+  @override
+  String get diveLog_consolidate_alignmentLabel => 'محاذاة السجلات حسب';
+
+  @override
+  String get diveLog_consolidate_clockNote =>
+      'هذه السجلات لا تتداخل زمنيًا، لذا ربما تكون ساعة أحد أجهزة الكمبيوتر خاطئة. تحتفظ الغوصة بوقت الكمبيوتر الأساسي.';
+
+  @override
+  String get diveLog_consolidate_clockNoteShort =>
+      'ربما تكون ساعة أحد أجهزة الكمبيوتر خاطئة.';
 
   @override
   String get diveLog_consolidate_confirm =>
@@ -5874,6 +6599,14 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get diveLog_consolidate_error_sameComputer =>
       'هاتان الغوصتان من نفس كمبيوتر الغوص ولا يمكن دمجهما بهذه الطريقة.';
+
+  @override
+  String get diveLog_consolidate_noProfileFallback =>
+      'أحد السجلات لا يحتوي على ملف عمق للمطابقة، لذا تتم محاذاة بدايته مع بداية الأساسي.';
+
+  @override
+  String get diveLog_consolidate_sameDiveHint =>
+      'تبدو هذه الملفات كأنها الغوصة نفسها سجّلها جهازا كمبيوتر.';
 
   @override
   String get diveLog_consolidate_selectPrimary => 'كمبيوتر الغوص الأساسي';
@@ -6010,10 +6743,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'زملاء غوص',
-      one: 'زميل غوص',
+      other: '$count زميل غوص',
+      many: '$count زميل غوص',
+      few: '$count زملاء غوص',
+      two: 'زميلا غوص',
+      one: 'زميل غوص واحد',
     );
-    return '$count $_temp0';
+    return '$_temp0';
   }
 
   @override
@@ -6032,8 +6768,11 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count fields',
-      one: '1 field',
+      other: '$count حقل',
+      many: '$count حقلًا',
+      few: '$count حقول',
+      two: 'حقلان',
+      one: 'حقل واحد',
     );
     return '$_temp0';
   }
@@ -6043,10 +6782,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'عناصر',
-      one: 'عنصر',
+      other: '$count عنصر',
+      many: '$count عنصرًا',
+      few: '$count عناصر',
+      two: 'عنصران',
+      one: 'عنصر واحد',
     );
-    return '$count $_temp0';
+    return '$_temp0';
   }
 
   @override
@@ -6169,6 +6911,41 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_detail_section_customFields => 'Custom Fields';
 
   @override
+  String get diveLog_gasSwitches_title => 'تبديلات الغاز';
+
+  @override
+  String get diveLog_gasSwitches_onTime => 'جميع تبديلات الغاز في وقتها';
+
+  @override
+  String diveLog_gasSwitches_lateRow(
+    String actual,
+    String ideal,
+    String delay,
+  ) {
+    return 'تم التبديل عند $actual بدلاً من $ideal، بتأخير $delay';
+  }
+
+  @override
+  String diveLog_gasSwitches_missedRow(String ideal) {
+    return 'لم يتم التبديل (المثالي عند $ideal)';
+  }
+
+  @override
+  String diveLog_gasSwitches_extraDeco(String extra) {
+    return '+$extra تخفيف ضغط';
+  }
+
+  @override
+  String diveLog_gasSwitches_total(String extra) {
+    return 'إجمالي تخفيف الضغط الإضافي: $extra';
+  }
+
+  @override
+  String diveLog_gasSwitches_lateRowTime(String delay, String actual) {
+    return 'تم التبديل بتأخير $delay عند $actual';
+  }
+
+  @override
   String get diveLog_detail_section_decoStatus => 'حالة الديكو';
 
   @override
@@ -6249,7 +7026,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count صور',
+      other: '$count صورة',
+      many: '$count صورة',
+      few: '$count صور',
+      two: 'صورتان',
       one: 'صورة واحدة',
     );
     return '$_temp0';
@@ -6309,10 +7089,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'وسوم',
-      one: 'وسم',
+      other: '$count وسم',
+      many: '$count وسمًا',
+      few: '$count وسوم',
+      two: 'وسمان',
+      one: 'وسم واحد',
     );
-    return '$count $_temp0';
+    return '$_temp0';
   }
 
   @override
@@ -6533,6 +7316,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_edit_label_waterType => 'نوع المياه';
 
   @override
+  String get diveLog_edit_label_weightName => 'الاسم (اختياري)';
+
+  @override
+  String get diveLog_edit_hint_weightName => 'مثال: الجيب العلوي';
+
+  @override
   String get diveLog_edit_marineLifeHint => 'انقر \"إضافة\" لتسجيل المشاهدات';
 
   @override
@@ -6571,7 +7360,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم اكتشاف $count قيم شاذة محتملة',
+      other: 'تم اكتشاف $count قيمة شاذة محتملة',
+      many: 'تم اكتشاف $count قيمة شاذة محتملة',
+      few: 'تم اكتشاف $count قيم شاذة محتملة',
+      two: 'تم اكتشاف قيمتين شاذتين محتملتين',
       one: 'تم اكتشاف قيمة شاذة محتملة واحدة',
     );
     return '$_temp0';
@@ -6582,7 +7374,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count نقاط',
+      other: '$count نقطة',
+      many: '$count نقطة',
+      few: '$count نقاط',
+      two: 'نقطتان',
       one: 'نقطة واحدة',
     );
     return '$_temp0';
@@ -6590,6 +7385,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_edit_row_addSite => 'إضافة موقع';
+
+  @override
+  String get diveLog_edit_row_course => 'الدورة';
 
   @override
   String get diveLog_edit_row_diveCenter => 'مركز الغوص';
@@ -6626,10 +7424,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'عناصر',
-      one: 'عنصر',
+      other: '$count عنصر',
+      many: '$count عنصرًا',
+      few: '$count عناصر',
+      two: 'عنصرين',
+      one: 'عنصر واحد',
     );
-    return 'حفظ $count $_temp0 كطقم معدات جديد.';
+    return 'حفظ $_temp0 كطقم معدات جديد.';
   }
 
   @override
@@ -6744,7 +7545,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count عناصر',
+      other: '$count عنصر',
+      many: '$count عنصرًا',
+      few: '$count عناصر',
+      two: 'عنصران',
       one: 'عنصر واحد',
     );
     return '$_temp0';
@@ -6758,7 +7562,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count أنواع',
+      other: '$count نوع',
+      many: '$count نوعًا',
+      few: '$count أنواع',
+      two: 'نوعان',
       one: 'نوع واحد',
     );
     return '$_temp0';
@@ -6769,7 +7576,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count أسطوانات',
+      other: '$count أسطوانة',
+      many: '$count أسطوانة',
+      few: '$count أسطوانات',
+      two: 'أسطوانتان',
       one: 'أسطوانة واحدة',
     );
     return '$_temp0';
@@ -6834,7 +7644,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count أوزان · $total',
+      other: '$count وزن · $total',
+      many: '$count وزنًا · $total',
+      few: '$count أوزان · $total',
+      two: 'وزنان · $total',
       one: 'وزن واحد · $total',
     );
     return '$_temp0';
@@ -6929,7 +7742,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count عناصر',
+      other: '$count عنصر',
+      many: '$count عنصرًا',
+      few: '$count عناصر',
+      two: 'عنصران',
       one: 'عنصر واحد',
     );
     return '$_temp0: $names';
@@ -7086,6 +7902,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_filter_clearWeekdays => 'مسح أيام الأسبوع';
 
   @override
+  String get diveLog_filter_clearSite => 'مسح مرشح الموقع';
+
+  @override
   String get diveLog_filter_dateSeparator => 'إلى';
 
   @override
@@ -7135,9 +7954,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_filter_searchComputersHint => 'اكتب للبحث عن حواسيب الغوص';
-
-  @override
-  String get diveLog_filter_searchSitesHint => 'اكتب للبحث عن المواقع';
 
   @override
   String get diveLog_filter_searchTypesHint => 'اكتب للبحث عن الأنواع';
@@ -7215,6 +8031,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_legend_label_gasDensity => 'كثافة الغاز';
+
+  @override
+  String get diveLog_legend_label_lateGasSwitches => 'تبديلات الغاز المتأخرة';
 
   @override
   String get diveLog_legend_label_gasSwitches => 'تبديلات الغاز';
@@ -7325,7 +8144,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غوصات',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
       one: 'غوصة واحدة',
     );
     return '$_temp0';
@@ -7336,7 +8158,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       total,
       locale: localeName,
-      other: '$total غوصات',
+      other: '$total غوصة',
+      many: '$total غوصة',
+      few: '$total غوصات',
+      two: 'غوصتين',
       one: 'غوصة واحدة',
     );
     return '$shown من $_temp0';
@@ -7409,7 +8234,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تنقص الظروف في $count غطسات.',
+      other: 'تنقص الظروف في $count غطسة.',
+      many: 'تنقص الظروف في $count غطسة.',
+      few: 'تنقص الظروف في $count غطسات.',
+      two: 'تنقص الظروف في غطستين.',
       one: 'تنقص الظروف في غطسة واحدة.',
     );
     return '$_temp0 تُملأ الحقول الفارغة فقط، ولن يتغير أي شيء أدخلته من قبل.';
@@ -7438,7 +8266,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم تحديث $count غطسات',
+      other: 'تم تحديث $count غطسة',
+      many: 'تم تحديث $count غطسة',
+      few: 'تم تحديث $count غطسات',
+      two: 'تم تحديث غطستين',
       one: 'تم تحديث غطسة واحدة',
     );
     return '$_temp0';
@@ -7449,7 +8280,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'لا تتوفر بيانات لـ $count غطسات',
+      other: 'لا تتوفر بيانات لـ $count غطسة',
+      many: 'لا تتوفر بيانات لـ $count غطسة',
+      few: 'لا تتوفر بيانات لـ $count غطسات',
+      two: 'لا تتوفر بيانات لغطستين',
       one: 'لا تتوفر بيانات لغطسة واحدة',
     );
     return '$_temp0';
@@ -7460,7 +8294,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'لا يوجد ما يُملأ في $count غطسات',
+      other: 'لا يوجد ما يُملأ في $count غطسة',
+      many: 'لا يوجد ما يُملأ في $count غطسة',
+      few: 'لا يوجد ما يُملأ في $count غطسات',
+      two: 'لا يوجد ما يُملأ في غطستين',
       one: 'لا يوجد ما يُملأ في غطسة واحدة',
     );
     return '$_temp0';
@@ -7471,7 +8308,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'توقّف مبكرًا؛ تمت معالجة $count غطسات.',
+      other: 'توقّف مبكرًا؛ تمت معالجة $count غطسة.',
+      many: 'توقّف مبكرًا؛ تمت معالجة $count غطسة.',
+      few: 'توقّف مبكرًا؛ تمت معالجة $count غطسات.',
+      two: 'توقّف مبكرًا؛ تمت معالجة غطستين.',
       one: 'توقّف مبكرًا؛ تمت معالجة غطسة واحدة.',
     );
     return '$_temp0';
@@ -7651,7 +8491,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count مشاكل',
+      other: '$count مشكلة',
+      many: '$count مشكلة',
+      few: '$count مشاكل',
+      two: 'مشكلتان',
       one: 'مشكلة واحدة',
     );
     return '$_temp0';
@@ -7888,6 +8731,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get setup_units_altitude => 'الارتفاع';
 
   @override
+  String get setup_units_distance => 'المسافة';
+
+  @override
   String get setup_units_dateFormat => 'تنسيق التاريخ';
 
   @override
@@ -8005,7 +8851,12 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other:
+          'يستخدم $count موقع \"$name\". سيؤدي حذفه إلى إزالته من تلك المواقع.',
+      many:
+          'يستخدم $count موقعًا \"$name\". سيؤدي حذفه إلى إزالته من تلك المواقع.',
+      few:
           'يستخدم $count مواقع \"$name\". سيؤدي حذفه إلى إزالته من تلك المواقع.',
+      two: 'يستخدم موقعان \"$name\". سيؤدي حذفه إلى إزالته من هذين الموقعين.',
       one: 'يستخدم موقع واحد \"$name\". سيؤدي حذفه إلى إزالته من ذلك الموقع.',
     );
     return '$_temp0';
@@ -8037,7 +8888,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count مواقع',
+      other: '$count موقع',
+      many: '$count موقعًا',
+      few: '$count مواقع',
+      two: 'موقعان',
       one: 'موقع واحد',
       zero: 'لا توجد مواقع',
     );
@@ -8202,7 +9056,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غوصات',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
       one: 'غوصة واحدة',
     );
     return '$_temp0';
@@ -8264,7 +9121,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count عوامل',
+      other: '$count عامل',
+      many: '$count عاملًا',
+      few: '$count عوامل',
+      two: 'عاملان',
       one: 'عامل واحد',
     );
     return '$_temp0';
@@ -8275,7 +9135,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'عرض $count غوصات',
+      other: 'عرض $count غوصة',
+      many: 'عرض $count غوصة',
+      few: 'عرض $count غوصات',
+      two: 'عرض غوصتين',
       one: 'عرض غوصة واحدة',
     );
     return '$_temp0';
@@ -8439,10 +9302,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'غوصات',
-      one: 'غوصة',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
+      one: 'غوصة واحدة',
     );
-    return '$count $_temp0 بدون أرقام';
+    return '$_temp0 بدون أرقام';
   }
 
   @override
@@ -8804,10 +9670,27 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'غوصات',
-      one: 'غوصة',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
+      one: 'غوصة واحدة',
     );
-    return '$count $_temp0';
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_summary_filteredBanner(int shown, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$total غوصة',
+      many: '$total غوصة',
+      few: '$total غوصات',
+      two: 'غوصتين',
+      one: 'غوصة واحدة',
+    );
+    return 'مُصفّى: ملخص $shown من $_temp0';
   }
 
   @override
@@ -9055,6 +9938,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_tooltip_tts => 'TTS';
 
   @override
+  String get diveLog_tooltip_lateSwitch => 'تبديل متأخر';
+
+  @override
+  String get diveLog_tooltip_missedSwitch => 'تبديل فائت';
+
+  @override
+  String get diveLog_tooltip_switchDelay => 'التأخير';
+
+  @override
+  String get diveLog_tooltip_extraDeco => 'تخفيف ضغط إضافي';
+
+  @override
   String get diveLog_tooltip_gtr => 'GTR';
 
   @override
@@ -9090,6 +9985,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count دقيقة',
+      many: '$count دقيقة',
+      few: '$count دقائق',
+      two: 'دقيقتان',
       one: 'دقيقة واحدة',
     );
     return '$_temp0';
@@ -9154,7 +10052,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تمت استعادة $count غوصات',
+      other: 'تمت استعادة $count غوصة',
+      many: 'تمت استعادة $count غوصة',
+      few: 'تمت استعادة $count غوصات',
+      two: 'تمت استعادة غوصتين',
       one: 'تمت استعادة غوصة واحدة',
     );
     return '$_temp0';
@@ -9435,6 +10336,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'ستبقى $count غطسة بدون موقع.',
+      many: 'ستبقى $count غطسة بدون موقع.',
+      few: 'ستبقى $count غطسات بدون موقع.',
+      two: 'ستبقى غطستان بدون موقع.',
       one: 'ستبقى غطسة واحدة بدون موقع.',
     );
     return '$_temp0';
@@ -9446,6 +10350,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'ستبقى $count خطة محفوظة بدون موقع.',
+      many: 'ستبقى $count خطة محفوظة بدون موقع.',
+      few: 'ستبقى $count خطط محفوظة بدون موقع.',
+      two: 'ستبقى خطتان محفوظتان بدون موقع.',
       one: 'ستبقى خطة محفوظة واحدة بدون موقع.',
     );
     return '$_temp0';
@@ -9624,6 +10531,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'عرض كل الغطسات ($count)',
+      many: 'عرض كل الغطسات ($count)',
+      few: 'عرض كل الغطسات ($count)',
+      two: 'عرض الغطستين',
       one: 'عرض غطسة واحدة',
     );
     return '$_temp0';
@@ -9697,6 +10607,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'غطساتك الـ$count هنا: دخول $entry، خروج $exit',
+      many: 'غطساتك الـ$count هنا: دخول $entry، خروج $exit',
+      few: 'غطساتك الـ$count هنا: دخول $entry، خروج $exit',
+      two: 'غطستاك هنا: دخول $entry، خروج $exit',
       one: 'غطستك هنا: دخول $entry، خروج $exit',
     );
     return '$_temp0';
@@ -9711,6 +10624,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'غطساتك الـ$count هنا: دخول $entry',
+      many: 'غطساتك الـ$count هنا: دخول $entry',
+      few: 'غطساتك الـ$count هنا: دخول $entry',
+      two: 'غطستاك هنا: دخول $entry',
       one: 'غطستك هنا: دخول $entry',
     );
     return '$_temp0';
@@ -9902,10 +10818,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'نجوم',
-      one: 'نجمة',
+      other: '$count نجمة',
+      many: '$count نجمة',
+      few: '$count نجوم',
+      two: 'نجمتان',
+      one: 'نجمة واحدة',
     );
-    return '$count $_temp0';
+    return '$_temp0';
   }
 
   @override
@@ -10214,7 +11133,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count مواقع',
+      other: '$count موقع',
+      many: '$count موقعًا',
+      few: '$count مواقع',
+      two: 'موقعان',
       one: 'موقع واحد',
     );
     return '$_temp0';
@@ -10225,7 +11147,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       total,
       locale: localeName,
-      other: '$total مواقع',
+      other: '$total موقع',
+      many: '$total موقعًا',
+      few: '$total مواقع',
+      two: 'موقعين',
       one: 'موقع واحد',
     );
     return '$shown من $_temp0';
@@ -10242,10 +11167,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'مواقع',
-      one: 'موقع',
+      other: '$count موقع',
+      many: '$count موقعًا',
+      few: '$count مواقع',
+      two: 'موقعين',
+      one: 'موقع واحد',
     );
-    return 'هل أنت متأكد من حذف $count $_temp0؟ يمكن التراجع عن هذا الإجراء خلال 5 ثوانٍ.';
+    return 'هل أنت متأكد من حذف $_temp0؟ يمكن التراجع عن هذا الإجراء خلال 5 ثوانٍ.';
   }
 
   @override
@@ -10256,10 +11184,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'مواقع',
-      one: 'موقع',
+      other: '$count موقع',
+      many: '$count موقعًا',
+      few: '$count مواقع',
+      two: 'موقعين',
+      one: 'موقع واحد',
     );
-    return 'تم حذف $count $_temp0';
+    return 'تم حذف $_temp0';
   }
 
   @override
@@ -10276,10 +11207,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'مواقع',
-      one: 'موقع',
+      other: '$count موقع',
+      many: '$count موقعًا',
+      few: '$count مواقع',
+      two: 'موقعين',
+      one: 'موقع واحد',
     );
-    return 'تم دمج $count $_temp0';
+    return 'تم دمج $_temp0';
   }
 
   @override
@@ -10333,14 +11267,22 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other:
+          '$count موقع غوص لها إحداثيات ينقصها البلد أو المنطقة أو البلدة أو المسطح المائي.',
+      many:
+          '$count موقع غوص لها إحداثيات ينقصها البلد أو المنطقة أو البلدة أو المسطح المائي.',
+      few:
           '$count مواقع غوص لها إحداثيات ينقصها البلد أو المنطقة أو البلدة أو المسطح المائي.',
+      two:
+          'موقعا غوص لهما إحداثيات ينقصهما البلد أو المنطقة أو البلدة أو المسطح المائي.',
       one:
           'موقع غوص واحد له إحداثيات ينقصه البلد أو المنطقة أو البلدة أو المسطح المائي.',
     );
     String _temp1 = intl.Intl.pluralLogic(
       minutes,
       locale: localeName,
-      other: '$minutes دقائق',
+      other: '$minutes دقيقة',
+      many: '$minutes دقيقة',
+      few: '$minutes دقائق',
       two: 'دقيقتين',
       one: 'دقيقة واحدة',
     );
@@ -10389,13 +11331,19 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'سيتم البحث من جديد عن $count مواقع غوص لها إحداثيات.',
+      other: 'سيتم البحث من جديد عن $count موقع غوص لها إحداثيات.',
+      many: 'سيتم البحث من جديد عن $count موقع غوص لها إحداثيات.',
+      few: 'سيتم البحث من جديد عن $count مواقع غوص لها إحداثيات.',
+      two: 'سيتم البحث من جديد عن موقعي غوص لهما إحداثيات.',
       one: 'سيتم البحث من جديد عن موقع غوص واحد له إحداثيات.',
     );
     String _temp1 = intl.Intl.pluralLogic(
       minutes,
       locale: localeName,
-      other: '$minutes دقائق',
+      other: '$minutes دقيقة',
+      many: '$minutes دقيقة',
+      few: '$minutes دقائق',
+      two: 'دقيقتين',
       one: 'دقيقة واحدة',
     );
     return '$_temp0 وستُستبدل الدولة والمنطقة والمدينة والمسطح المائي حيثما اختلفت عن لغة أسماء الأماكن ($language)، بما في ذلك القيم التي أدخلتها بنفسك. يستغرق ذلك نحو $_temp1.';
@@ -10437,11 +11385,44 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveSites_list_sort_title => 'ترتيب المواقع';
 
   @override
+  String get diveSites_group_noCountry => 'بلا دولة';
+
+  @override
+  String diveSites_group_siteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count موقع',
+      many: '$count موقعًا',
+      few: '$count مواقع',
+      two: 'موقعان',
+      one: 'موقع واحد',
+      zero: 'لا مواقع',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_picker_nearby => 'قريب';
+
+  @override
+  String get diveSites_list_groupBy => 'التجميع حسب';
+
+  @override
+  String get diveSites_list_groupBy_location => 'الدولة والمنطقة';
+
+  @override
+  String get diveSites_list_groupBy_none => 'بلا';
+
+  @override
   String diveSites_list_tile_diveCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غوصات',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
       one: 'غوصة واحدة',
     );
     return '$_temp0';
@@ -10560,7 +11541,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غوصات',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
       one: 'غوصة واحدة',
     );
     return '$_temp0';
@@ -10872,7 +11856,7 @@ class AppLocalizationsAr extends AppLocalizations {
       other: 'تم العثور على $count غوصة',
       many: 'تم العثور على $count غوصة',
       few: 'تم العثور على $count غوصات',
-      two: 'تم العثور على $count غوصتين',
+      two: 'تم العثور على غوصتين',
       one: 'تم العثور على $count غوصة',
       zero: 'لم يتم العثور على أي غوصة',
     );
@@ -10887,7 +11871,7 @@ class AppLocalizationsAr extends AppLocalizations {
       other: '$count صورة للاستيراد',
       many: '$count صورة للاستيراد',
       few: '$count صور للاستيراد',
-      two: '$count صورتان للاستيراد',
+      two: 'صورتان للاستيراد',
       one: '$count صورة للاستيراد',
       zero: 'لا توجد صور لاستيرادها',
     );
@@ -10918,7 +11902,7 @@ class AppLocalizationsAr extends AppLocalizations {
       other: 'تعذّر سرد صور $count غوصة.',
       many: 'تعذّر سرد صور $count غوصة.',
       few: 'تعذّر سرد صور $count غوصات.',
-      two: 'تعذّر سرد صور $count غوصتين.',
+      two: 'تعذّر سرد صور غوصتين.',
       one: 'تعذّر سرد صور $count غوصة.',
     );
     return '$_temp0';
@@ -10939,7 +11923,7 @@ class AppLocalizationsAr extends AppLocalizations {
       other: 'تعذّرت قراءة $count غوصة وسيتم تخطيها.',
       many: 'تعذّرت قراءة $count غوصة وسيتم تخطيها.',
       few: 'تعذّرت قراءة $count غوصات وسيتم تخطيها.',
-      two: 'تعذّرت قراءة $count غوصتين وسيتم تخطيهما.',
+      two: 'تعذّرت قراءة غوصتين وسيتم تخطيهما.',
       one: 'تعذّرت قراءة $count غوصة وسيتم تخطيها.',
     );
     return '$_temp0';
@@ -11193,6 +12177,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_certificationAgency_ffessm => 'FFESSM';
 
   @override
+  String get enum_certificationAgency_acuc => 'ACUC';
+
+  @override
+  String get enum_certificationAgency_dan => 'DAN';
+
+  @override
   String get enum_certificationAgency_gue => 'GUE';
 
   @override
@@ -11272,6 +12262,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_certificationLevel_techDiver => 'غواص تقني';
+
+  @override
+  String get enum_certificationLevel_firstAid =>
+      'الإسعافات الأولية / الإنعاش القلبي الرئوي';
+
+  @override
+  String get enum_certificationLevel_oxygenProvider =>
+      'مزود الأكسجين في حالات الطوارئ';
 
   @override
   String get enum_certificationLevel_trimix => 'ترايمكس';
@@ -11435,6 +12433,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_entryMethod_boat => 'دخول من القارب';
 
   @override
+  String get enum_entryMethod_frontRoll => 'دحرجة أمامية';
+
+  @override
   String get enum_entryMethod_giantStride => 'خطوة عملاقة';
 
   @override
@@ -11478,6 +12479,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_equipmentStatus_spare => 'احتياطي';
+
+  @override
+  String get enum_equipmentStatus_wanted => 'مرغوب';
 
   @override
   String get enum_equipmentType_backplate => 'لوحة ظهر';
@@ -11525,6 +12529,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_equipmentType_gearPocket => 'جيب المعدات';
 
   @override
+  String get enum_equipmentType_bag => 'حقيبة';
+
+  @override
   String get enum_equipmentType_hose => 'خرطوم';
 
   @override
@@ -11535,6 +12542,24 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_equipmentType_strobe => 'فلاش';
+
+  @override
+  String get enum_equipmentType_lens => 'عدسة';
+
+  @override
+  String get enum_equipmentType_port => 'منفذ العدسة';
+
+  @override
+  String get enum_equipmentType_trayHandle => 'حامل / مقبض';
+
+  @override
+  String get enum_equipmentType_armClamp => 'ذراع / مشبك';
+
+  @override
+  String get enum_equipmentType_videoLight => 'مصباح فيديو';
+
+  @override
+  String get enum_equipmentType_floatArm => 'ذراع طفو / عوامة';
 
   @override
   String get enum_equipmentType_undersuit => 'بدلة داخلية';
@@ -11604,6 +12629,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_eventSeverity_alert => 'تنبيه';
+
+  @override
+  String get enum_eventSeverity_info => 'معلومة';
 
   @override
   String get enum_eventSeverity_warning => 'تحذير';
@@ -12102,7 +13130,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count قطع',
+      other: '$count قطعة',
+      many: '$count قطعة',
+      few: '$count قطع',
+      two: 'قطعتان',
       one: 'قطعة واحدة',
     );
     return '$_temp0';
@@ -12113,7 +13144,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       total,
       locale: localeName,
-      other: '$total قطع',
+      other: '$total قطعة',
+      many: '$total قطعة',
+      few: '$total قطع',
+      two: 'قطعتين',
       one: 'قطعة واحدة',
     );
     return '$shown من $_temp0';
@@ -12285,7 +13319,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count تعبئات منذ آخر اختبار هيدروستاتيكي',
+      other: '$count تعبئة منذ آخر اختبار هيدروستاتيكي',
+      many: '$count تعبئة منذ آخر اختبار هيدروستاتيكي',
+      few: '$count تعبئات منذ آخر اختبار هيدروستاتيكي',
+      two: 'تعبئتان منذ آخر اختبار هيدروستاتيكي',
       one: '$count تعبئة منذ آخر اختبار هيدروستاتيكي',
       zero: 'لا تعبئات منذ آخر اختبار هيدروستاتيكي',
     );
@@ -13260,6 +14297,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_detail_retiredChip => 'متقاعد';
 
   @override
+  String get equipment_detail_markPurchased => 'تحديد كمُشترى';
+
+  @override
   String get equipment_detail_serialNumberLabel => 'الرقم التسلسلي';
 
   @override
@@ -13365,7 +14405,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تمت إضافة $count أسطوانات',
+      other: 'تمت إضافة $count أسطوانة',
+      many: 'تمت إضافة $count أسطوانة',
+      few: 'تمت إضافة $count أسطوانات',
+      two: 'تمت إضافة أسطوانتين',
       one: 'تمت إضافة أسطوانة واحدة',
     );
     return '$_temp0';
@@ -13377,6 +14420,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'مع الإبقاء على $count',
+      many: 'مع الإبقاء على $count',
+      few: 'مع الإبقاء على $count',
+      two: 'مع الإبقاء على اثنتين',
       one: 'مع الإبقاء على واحدة',
     );
     return '$_temp0';
@@ -13392,6 +14438,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'مع تحديث $count',
+      many: 'مع تحديث $count',
+      few: 'مع تحديث $count',
+      two: 'مع تحديث اثنتين',
       one: 'مع تحديث واحدة',
     );
     return '$_temp0';
@@ -13646,6 +14695,10 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'خلال $count غوصة',
+      many: 'خلال $count غوصة',
+      few: 'خلال $count غوصات',
+      two: 'خلال غوصتين',
+      one: 'خلال غوصة واحدة',
     );
     return '$_temp0';
   }
@@ -13666,6 +14719,10 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'خلال $count غطسة في الماء البارد',
+      many: 'خلال $count غطسة في الماء البارد',
+      few: 'خلال $count غطسات في الماء البارد',
+      two: 'خلال غطستين في الماء البارد',
+      one: 'خلال غطسة واحدة في الماء البارد',
     );
     return '$_temp0';
   }
@@ -13681,6 +14738,10 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'خلال $count غطسة عميقة',
+      many: 'خلال $count غطسة عميقة',
+      few: 'خلال $count غطسات عميقة',
+      two: 'خلال غطستين عميقتين',
+      one: 'خلال غطسة عميقة واحدة',
     );
     return '$_temp0';
   }
@@ -13691,6 +14752,10 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'خلال $count دورة بطارية',
+      many: 'خلال $count دورة بطارية',
+      few: 'خلال $count دورات بطارية',
+      two: 'خلال دورتي بطارية',
+      one: 'خلال دورة بطارية واحدة',
     );
     return '$_temp0';
   }
@@ -13846,6 +14911,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_edit_purchasePriceLabel => 'سعر الشراء';
 
   @override
+  String get equipment_edit_expectedPriceLabel => 'السعر المتوقع';
+
+  @override
   String get equipment_edit_remindMeBeforeServiceDue =>
       'ذكّرني قبل موعد الصيانة:';
 
@@ -13942,7 +15010,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count عناصر',
+      other: '$count عنصر',
+      many: '$count عنصرًا',
+      few: '$count عناصر',
+      two: 'عنصران',
       one: 'عنصر واحد',
     );
     return '$name، $_temp0';
@@ -14072,6 +15143,264 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_filter_section_category => 'الفئة';
 
   @override
+  String get equipment_location_kind_storage => 'تخزين';
+
+  @override
+  String get equipment_location_kind_serviceShop => 'ورشة صيانة';
+
+  @override
+  String get equipment_location_kind_person => 'شخص';
+
+  @override
+  String get equipment_location_kind_other => 'أخرى';
+
+  @override
+  String get equipment_location_noLocation => 'بلا موقع';
+
+  @override
+  String get equipment_location_picker_title => 'اختر مكانًا';
+
+  @override
+  String get equipment_location_picker_search => 'البحث عن أماكن';
+
+  @override
+  String get equipment_location_picker_newPlace => 'مكان جديد';
+
+  @override
+  String equipment_location_move_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'نقل $count عنصر',
+      many: 'نقل $count عنصرًا',
+      few: 'نقل $count عناصر',
+      two: 'نقل عنصرين',
+      one: 'نقل عنصر واحد',
+      zero: 'نقل $count عنصر',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_move_to => 'إلى';
+
+  @override
+  String get equipment_location_move_choose => 'اختر مكانًا';
+
+  @override
+  String get equipment_location_move_date => 'التاريخ';
+
+  @override
+  String get equipment_location_move_time => 'الوقت';
+
+  @override
+  String get equipment_location_move_note => 'ملاحظة';
+
+  @override
+  String get equipment_location_move_noteHint =>
+      'مثال: الصيانة السنوية لمنظم الهواء';
+
+  @override
+  String get equipment_location_move_confirm => 'نقل';
+
+  @override
+  String get equipment_location_parts_title => 'نقل الأجزاء أيضًا؟';
+
+  @override
+  String equipment_location_parts_body(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'هل تنقل $count من أجزائه أيضًا إلى المكان نفسه؟',
+      many: 'هل تنقل $count من أجزائه أيضًا إلى المكان نفسه؟',
+      few: 'هل تنقل $count من أجزائه أيضًا إلى المكان نفسه؟',
+      two: 'هل تنقل جزأيه أيضًا إلى المكان نفسه؟',
+      one: 'هل تنقل جزأه أيضًا إلى المكان نفسه؟',
+      zero: 'هل تنقل أجزاءه أيضًا إلى المكان نفسه؟',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_parts_yes => 'نقل الأجزاء';
+
+  @override
+  String get equipment_location_parts_no => 'هذا فقط';
+
+  @override
+  String get equipment_location_status_title => 'تحديث الحالة؟';
+
+  @override
+  String equipment_location_status_body(int count, String status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'وضع الحالة $status على $count عنصر أيضًا؟',
+      many: 'وضع الحالة $status على $count عنصرًا أيضًا؟',
+      few: 'وضع الحالة $status على $count عناصر أيضًا؟',
+      two: 'وضع الحالة $status على عنصرين أيضًا؟',
+      one: 'وضع الحالة $status على عنصر واحد أيضًا؟',
+      zero: 'وضع الحالة $status على $count عنصر أيضًا؟',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_status_yes => 'تحديث';
+
+  @override
+  String get equipment_location_status_no => 'الإبقاء على الحالة';
+
+  @override
+  String equipment_location_moved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم نقل $count عنصر',
+      many: 'تم نقل $count عنصرًا',
+      few: 'تم نقل $count عناصر',
+      two: 'تم نقل عنصرين',
+      one: 'تم نقل عنصر واحد',
+      zero: 'لم يُنقل أي عنصر',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_card_title => 'الموقع';
+
+  @override
+  String get equipment_location_none => 'لم يُحدَّد موقع';
+
+  @override
+  String equipment_location_since(String date) {
+    return 'منذ $date';
+  }
+
+  @override
+  String get equipment_location_moveButton => 'نقل';
+
+  @override
+  String get equipment_location_showAll => 'عرض الكل';
+
+  @override
+  String get equipment_location_history_cleared => 'تم مسح الموقع';
+
+  @override
+  String get equipment_location_editMove_title => 'تعديل النقل';
+
+  @override
+  String get equipment_location_editMove_delete => 'حذف النقل';
+
+  @override
+  String get equipment_location_deleteMoveConfirm =>
+      'حذف هذا الإدخال من السجل؟ يُحسب موقع العنصر من جديد من التنقلات المتبقية.';
+
+  @override
+  String get equipment_location_bulkAction => 'نقل إلى موقع';
+
+  @override
+  String equipment_location_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count عنصر',
+      many: '$count عنصرًا',
+      few: '$count عناصر',
+      two: 'عنصران',
+      one: 'عنصر واحد',
+      zero: 'لا عناصر',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_activeFilter => 'الموقع';
+
+  @override
+  String get equipment_filter_section_location => 'الموقع';
+
+  @override
+  String get equipment_arrange_groupByLocation => 'التجميع حسب الموقع';
+
+  @override
+  String get equipment_arrange_groupByLocationSubtitle =>
+      'عنوان لكل مكان، في هذه الصفحة فقط';
+
+  @override
+  String get equipment_edit_locationLabel => 'الموقع';
+
+  @override
+  String get equipment_edit_locationNone => 'غير محدد';
+
+  @override
+  String get equipment_edit_locationFailed =>
+      'تم الحفظ، لكن تعذّر تعيين موقعه. استخدم «نقل» على العنصر لتعيينه.';
+
+  @override
+  String get equipment_locations_title => 'المواقع';
+
+  @override
+  String get equipment_locations_empty =>
+      'لا توجد أماكن بعد. أضف مكانًا لتتبع مكان معداتك.';
+
+  @override
+  String get equipment_locations_add => 'إضافة مكان';
+
+  @override
+  String equipment_locations_archivedSection(int count) {
+    return 'المؤرشفة ($count)';
+  }
+
+  @override
+  String get equipment_locations_archive => 'أرشفة';
+
+  @override
+  String get equipment_locations_restore => 'استعادة';
+
+  @override
+  String get equipment_locations_delete => 'حذف';
+
+  @override
+  String equipment_locations_deleteConfirm(String name) {
+    return 'حذف $name؟';
+  }
+
+  @override
+  String get equipment_locations_itemsHere => 'العناصر هنا';
+
+  @override
+  String get equipment_locations_noItemsHere => 'لا يوجد شيء هنا حاليًا.';
+
+  @override
+  String get equipment_locations_moveItems => 'نقل العناصر الموجودة هنا';
+
+  @override
+  String get equipment_locations_newTitle => 'مكان جديد';
+
+  @override
+  String get equipment_locations_editTitle => 'تعديل المكان';
+
+  @override
+  String get equipment_locations_nameLabel => 'الاسم';
+
+  @override
+  String get equipment_locations_nameRequired => 'أدخل اسمًا';
+
+  @override
+  String get equipment_locations_duplicateWarning =>
+      'لديك مكان بهذا الاسم بالفعل';
+
+  @override
+  String get equipment_locations_kindLabel => 'النوع';
+
+  @override
+  String get equipment_locations_notesLabel => 'ملاحظات';
+
+  @override
+  String get equipment_locations_notesHint => 'العنوان، الهاتف، رقم الخزانة';
+
+  @override
   String get equipment_list_retryButton => 'إعادة المحاولة';
 
   @override
@@ -14098,6 +15427,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'تغيير نوع $count عنصر',
+      many: 'تغيير نوع $count عنصرًا',
+      few: 'تغيير نوع $count عناصر',
+      two: 'تغيير نوع عنصرين',
       one: 'تغيير نوع عنصر واحد',
     );
     return '$_temp0';
@@ -14134,6 +15466,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'تعذر تغيير نوع $count عنصر',
+      many: 'تعذر تغيير نوع $count عنصرًا',
+      few: 'تعذر تغيير نوع $count عناصر',
+      two: 'تعذر تغيير نوع عنصرين',
       one: 'تعذر تغيير نوع عنصر واحد',
     );
     return '$_temp0';
@@ -14149,6 +15484,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'تم تغيير نوع $count عنصر',
+      many: 'تم تغيير نوع $count عنصرًا',
+      few: 'تم تغيير نوع $count عناصر',
+      two: 'تم تغيير نوع عنصرين',
       one: 'تم تغيير نوع عنصر واحد',
     );
     return '$_temp0';
@@ -14170,6 +15508,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'تعذرت استعادة $count عنصر',
+      many: 'تعذرت استعادة $count عنصرًا',
+      few: 'تعذرت استعادة $count عناصر',
+      two: 'تعذرت استعادة عنصرين',
       one: 'تعذرت استعادة عنصر واحد',
     );
     return '$_temp0';
@@ -14181,6 +15522,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'تغير $count عنصر منذ ذلك الحين وتُركت كما هي',
+      many: 'تغير $count عنصرًا منذ ذلك الحين وتُركت كما هي',
+      few: 'تغيرت $count عناصر منذ ذلك الحين وتُركت كما هي',
+      two: 'تغير عنصران منذ ذلك الحين وتُركا كما هما',
       one: 'تغير عنصر واحد منذ ذلك الحين وتُرك كما هو',
     );
     return '$_temp0';
@@ -14397,7 +15741,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'إظهار $count عناصر إضافية',
+      other: 'إظهار $count عنصر إضافي',
+      many: 'إظهار $count عنصرًا إضافيًا',
+      few: 'إظهار $count عناصر إضافية',
+      two: 'إظهار عنصرين إضافيين',
       one: 'إظهار عنصر واحد إضافي',
     );
     return '$_temp0';
@@ -14632,6 +15979,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_snackbar_reactivated => 'تم إعادة تفعيل المعدات';
 
   @override
+  String get equipment_snackbar_purchased => 'تم النقل إلى معداتك النشطة';
+
+  @override
   String get equipment_snackbar_retired => 'تم إيقاف المعدات';
 
   @override
@@ -14678,6 +16028,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String equipment_summary_totalValue(String currency) {
     return 'القيمة الإجمالية ($currency)';
+  }
+
+  @override
+  String equipment_summary_wantedValue(String currency) {
+    return 'القيمة المرغوبة ($currency)';
   }
 
   @override
@@ -15207,6 +16562,15 @@ class AppLocalizationsAr extends AppLocalizations {
       'تعذر فتح هذه الأسطوانة. حاول مرة أخرى.';
 
   @override
+  String gasCalculators_blender_cylinderNoVolume(String name) {
+    return 'لا يوجد حجم ماء مسجَّل لـ $name';
+  }
+
+  @override
+  String get gasCalculators_blender_noCylinders =>
+      'لا توجد أسطوانات في معداتك بعد. أدخل السعة المائية بدلًا من ذلك.';
+
+  @override
   String gasCalculators_blender_filledFrom(String name, String mix) {
     return '$name: $mix';
   }
@@ -15377,16 +16741,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_cylinderVolume => 'السعة المائية للأسطوانة';
 
   @override
-  String get gasCalculators_blender_cylinderPresets => 'الإعدادات المسبقة';
-
-  @override
   String gasCalculators_blender_unitPrice(String unit) {
     return 'السعر لكل 100 $unit';
   }
-
-  @override
-  String get gasCalculators_blender_manageCylinderSizes =>
-      'إدارة أحجام الأسطوانات';
 
   @override
   String get gasCalculators_blender_costTotal => 'الإجمالي';
@@ -15790,10 +17147,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'مشاهدات',
-      one: 'مشاهدة',
+      other: '$count مشاهدة',
+      many: '$count مشاهدة',
+      few: '$count مشاهدات',
+      two: 'مشاهدتان',
+      one: 'مشاهدة واحدة',
     );
-    return '$count $_temp0';
+    return '$_temp0';
   }
 
   @override
@@ -16003,7 +17363,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count مشاهدات',
+      other: '$count مشاهدة',
+      many: '$count مشاهدة',
+      few: '$count مشاهدات',
+      two: 'مشاهدتان',
       one: 'مشاهدة واحدة',
     );
     return '$_temp0';
@@ -16046,7 +17409,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تمت إضافة $count صور',
+      other: 'تمت إضافة $count صورة',
+      many: 'تمت إضافة $count صورة',
+      few: 'تمت إضافة $count صور',
+      two: 'تمت إضافة صورتين',
       one: 'تمت إضافة صورة واحدة',
     );
     return '$_temp0';
@@ -16058,6 +17424,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'تم تخطي $count',
+      many: 'تم تخطي $count',
+      few: 'تم تخطي $count',
+      two: 'تم تخطي صورتين',
       one: 'تم تخطي صورة واحدة',
     );
     return '$_temp0';
@@ -16069,6 +17438,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'فشل $count',
+      many: 'فشل $count',
+      few: 'فشل $count',
+      two: 'فشلت صورتان',
       one: 'فشلت صورة واحدة',
     );
     return '$_temp0';
@@ -16093,7 +17465,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'وسم $count صور',
+      other: 'وسم $count صورة',
+      many: 'وسم $count صورة',
+      few: 'وسم $count صور',
+      two: 'وسم صورتين',
       one: 'وسم صورة واحدة',
     );
     return '$_temp0';
@@ -16104,7 +17479,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم وسم $count صور',
+      other: 'تم وسم $count صورة',
+      many: 'تم وسم $count صورة',
+      few: 'تم وسم $count صور',
+      two: 'تم وسم صورتين',
       one: 'تم وسم صورة واحدة',
     );
     return '$_temp0';
@@ -16147,7 +17525,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count أنواع',
+      other: '$count نوع',
+      many: '$count نوعًا',
+      few: '$count أنواع',
+      two: 'نوعان',
       one: 'نوع واحد',
     );
     return '$_temp0';
@@ -16158,7 +17539,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count مشاهدات',
+      other: '$count مشاهدة',
+      many: '$count مشاهدة',
+      few: '$count مشاهدات',
+      two: 'مشاهدتان',
       one: 'مشاهدة واحدة',
     );
     return '$_temp0';
@@ -16169,7 +17553,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غوصات',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
       one: 'غوصة واحدة',
     );
     return '$_temp0';
@@ -16337,6 +17724,12 @@ class AppLocalizationsAr extends AppLocalizations {
       locale: localeName,
       other:
           'يحتوي $count منها على تعليق أو علامة مفضلة محفوظة في Submersion، وستُفقد هذه التفاصيل.',
+      many:
+          'يحتوي $count منها على تعليق أو علامة مفضلة محفوظة في Submersion، وستُفقد هذه التفاصيل.',
+      few:
+          'يحتوي $count منها على تعليق أو علامة مفضلة محفوظة في Submersion، وستُفقد هذه التفاصيل.',
+      two:
+          'يحتوي اثنان منها على تعليق أو علامة مفضلة محفوظة في Submersion، وستُفقد هذه التفاصيل.',
       one:
           'يحتوي واحد منها على تعليق أو علامة مفضلة محفوظة في Submersion، وستُفقد هذه التفاصيل.',
     );
@@ -16348,6 +17741,101 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_siteMediaSection_addPhotos => 'إضافة صور أو مقاطع فيديو';
+
+  @override
+  String get media_siteAttachment_categoryAccess => 'الوصول والدخول';
+
+  @override
+  String get media_siteAttachment_categoryAnchorage => 'المرسى والربط';
+
+  @override
+  String get media_siteAttachment_categoryGeneral => 'عام';
+
+  @override
+  String get media_siteAttachment_categoryLabel => 'الفئة';
+
+  @override
+  String get media_siteAttachment_categoryNone => 'بدون فئة';
+
+  @override
+  String get media_siteAttachment_categoryParking => 'موقف السيارات';
+
+  @override
+  String get media_siteAttachment_categorySiteMap => 'خريطة الموقع';
+
+  @override
+  String get media_siteAttachment_categoryUnderwater => 'تحت الماء';
+
+  @override
+  String get media_siteAttachment_detailsTitle => 'تفاصيل المرفق';
+
+  @override
+  String get media_siteAttachment_editDetails => 'تعديل التفاصيل';
+
+  @override
+  String media_siteAttachment_groupHeading(String category, int count) {
+    return '$category ($count)';
+  }
+
+  @override
+  String get media_siteAttachment_moreOptions => 'خيارات إضافية';
+
+  @override
+  String media_siteAttachment_pageCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صفحة',
+      many: '$count صفحة',
+      few: '$count صفحات',
+      two: '$count صفحتان',
+      one: '$count صفحة',
+      zero: '$count صفحة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_siteAttachment_saveError(Object error) {
+    return 'تعذر الحفظ: $error';
+  }
+
+  @override
+  String get media_siteAttachment_setCategory => 'تعيين الفئة';
+
+  @override
+  String media_siteAttachment_setCategoryError(Object error) {
+    return 'فشل في تعيين الفئة: $error';
+  }
+
+  @override
+  String media_siteAttachment_setCategorySuccess(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تحديث $count عنصر',
+      many: 'تم تحديث $count عنصرًا',
+      few: 'تم تحديث $count عناصر',
+      two: 'تم تحديث $count عنصرين',
+      one: 'تم تحديث $count عنصر',
+      zero: 'تم تحديث $count عنصر',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_siteAttachment_sizeDefault(String size) {
+    return 'افتراضي ($size)';
+  }
+
+  @override
+  String get media_siteAttachment_sizeLabel => 'حجم العرض';
+
+  @override
+  String get media_siteAttachment_sizeLarge => 'كبير';
+
+  @override
+  String get media_siteAttachment_sizeTile => 'مصغّر';
 
   @override
   String get media_siteMediaSection_addDocument => 'إضافة مستند';
@@ -16411,10 +17899,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count صور',
-      one: 'صورة واحدة',
+      other: '$count صورة بالقرب من هذه الغوصة. هل تريد ربطها؟',
+      many: '$count صورة بالقرب من هذه الغوصة. هل تريد ربطها؟',
+      few: '$count صور بالقرب من هذه الغوصة. هل تريد ربطها؟',
+      two: 'صورتين بالقرب من هذه الغوصة. هل تريد ربطهما؟',
+      one: 'صورة واحدة بالقرب من هذه الغوصة. هل تريد ربطها؟',
     );
-    return 'تم العثور على $_temp0 بالقرب من هذه الغوصة. هل تريد ربطها؟';
+    return 'تم العثور على $_temp0';
   }
 
   @override
@@ -16426,6 +17917,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'الصور',
+      many: 'الصور',
+      few: 'الصور',
+      two: 'الصورتين',
       one: 'الصورة',
     );
     return 'ربط $_temp0';
@@ -16464,6 +17958,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'صور',
+      many: 'صور',
+      few: 'صور',
+      two: 'صورتين',
       one: 'صورة',
     );
     return 'فشل في استيراد $_temp0';
@@ -16480,6 +17977,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count صورة مرتبطة بالفعل بهذه الغوصة',
+      many: '$count صورة مرتبطة بالفعل بهذه الغوصة',
+      few: '$count صور مرتبطة بالفعل بهذه الغوصة',
+      two: 'صورتان مرتبطتان بالفعل بهذه الغوصة',
       one: 'صورة واحدة مرتبطة بالفعل بهذه الغوصة',
     );
     return '$_temp0';
@@ -16496,6 +17996,9 @@ class AppLocalizationsAr extends AppLocalizations {
       imported,
       locale: localeName,
       other: 'تم استيراد $imported صورة',
+      many: 'تم استيراد $imported صورة',
+      few: 'تم استيراد $imported صور',
+      two: 'تم استيراد صورتين',
       one: 'تم استيراد صورة واحدة',
     );
     return '$_temp0 ($skipped مرتبطة بالفعل)';
@@ -16506,10 +18009,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'صور',
-      one: 'صورة',
+      other: '$count صورة',
+      many: '$count صورة',
+      few: '$count صور',
+      two: 'صورتين',
+      one: 'صورة واحدة',
     );
-    return 'تم استيراد $count $_temp0';
+    return 'تم استيراد $_temp0';
   }
 
   @override
@@ -16517,10 +18023,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'صور',
-      one: 'صورة',
+      other: '$count صورة',
+      many: '$count صورة',
+      few: '$count صور',
+      two: 'صورتين',
+      one: 'صورة واحدة',
     );
-    return 'جارٍ استيراد $count $_temp0...';
+    return 'جارٍ استيراد $_temp0...';
   }
 
   @override
@@ -16635,7 +18144,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'ربط $count عناصر',
+      other: 'ربط $count عنصر',
+      many: 'ربط $count عنصرًا',
+      few: 'ربط $count عناصر',
+      two: 'ربط عنصرين',
       one: 'ربط عنصر واحد',
     );
     return '$_temp0';
@@ -16646,7 +18158,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'إرفاق $count عناصر بهذا الموقع',
+      other: 'إرفاق $count عنصر بهذا الموقع',
+      many: 'إرفاق $count عنصرًا بهذا الموقع',
+      few: 'إرفاق $count عناصر بهذا الموقع',
+      two: 'إرفاق عنصرين بهذا الموقع',
       one: 'إرفاق عنصر واحد بهذا الموقع',
     );
     return '$_temp0';
@@ -16661,13 +18176,19 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       fileCount,
       locale: localeName,
-      other: '$fileCount ملفات',
+      other: '$fileCount ملف',
+      many: '$fileCount ملفًا',
+      few: '$fileCount ملفات',
+      two: 'ملفان',
       one: 'ملف واحد',
     );
     String _temp1 = intl.Intl.pluralLogic(
       diveCount,
       locale: localeName,
-      other: '$diveCount غوصات',
+      other: '$diveCount غوصة',
+      many: '$diveCount غوصة',
+      few: '$diveCount غوصات',
+      two: 'غوصتان',
       one: 'غوصة واحدة',
     );
     return '$_temp0، $_temp1، $unmatchedCount غير مطابق';
@@ -16678,7 +18199,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count عناصر',
+      other: '$count عنصر',
+      many: '$count عنصرًا',
+      few: '$count عناصر',
+      two: 'عنصران',
       one: 'عنصر واحد',
     );
     return '$_temp0';
@@ -16694,7 +18218,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count ملفات',
+      other: '$count ملف',
+      many: '$count ملفًا',
+      few: '$count ملفات',
+      two: 'ملفان',
       one: 'ملف واحد',
     );
     return '$_temp0';
@@ -16709,6 +18236,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'إضافة كل الـ $count إلى هذه الغوصة',
+      many: 'إضافة كل الـ $count إلى هذه الغوصة',
+      few: 'إضافة كل الـ $count إلى هذه الغوصة',
+      two: 'إضافة العنصرين إلى هذه الغوصة',
       one: 'إضافة عنصر واحد إلى هذه الغوصة',
     );
     return '$_temp0';
@@ -16782,7 +18312,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم ربط $count عناصر',
+      other: 'تم ربط $count عنصر',
+      many: 'تم ربط $count عنصرًا',
+      few: 'تم ربط $count عناصر',
+      two: 'تم ربط عنصرين',
       one: 'تم ربط عنصر واحد',
     );
     return '$_temp0';
@@ -16793,7 +18326,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم إرفاق $count عناصر بهذا الموقع',
+      other: 'تم إرفاق $count عنصر بهذا الموقع',
+      many: 'تم إرفاق $count عنصرًا بهذا الموقع',
+      few: 'تم إرفاق $count عناصر بهذا الموقع',
+      two: 'تم إرفاق عنصرين بهذا الموقع',
       one: 'تم إرفاق عنصر واحد بهذا الموقع',
     );
     return '$_temp0';
@@ -17387,7 +18923,9 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count عناصر في $place',
+      other: '$count عنصر في $place',
+      many: '$count عنصرًا في $place',
+      few: '$count عناصر في $place',
       two: 'عنصران في $place',
       one: 'عنصر واحد في $place',
     );
@@ -17414,7 +18952,9 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count عناصر',
+      other: '$count عنصر',
+      many: '$count عنصرًا',
+      few: '$count عناصر',
       two: 'عنصران',
       one: 'عنصر واحد',
     );
@@ -17426,7 +18966,9 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count عناصر بلا موقع',
+      other: '$count عنصر بلا موقع',
+      many: '$count عنصرًا بلا موقع',
+      few: '$count عناصر بلا موقع',
       two: 'عنصران بلا موقع',
       one: 'عنصر واحد بلا موقع',
     );
@@ -17435,6 +18977,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_viewer_goToDive => 'الانتقال إلى الغطسة';
+
+  @override
+  String get media_viewer_enterFullscreen => 'ملء الشاشة';
+
+  @override
+  String get media_viewer_exitFullscreen => 'الخروج من ملء الشاشة';
+
+  @override
+  String get media_viewer_moreOptions => 'المزيد من الخيارات';
 
   @override
   String get nav_home => 'الرئيسية';
@@ -17537,7 +19088,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count مشكلات',
+      other: '$count مشكلة',
+      many: '$count مشكلة',
+      few: '$count مشكلات',
+      two: 'مشكلتان',
       one: 'مشكلة واحدة',
     );
     return '$_temp0';
@@ -17932,6 +19486,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'عرض علامات لتبديل الغازات';
 
   @override
+  String get settings_appearance_lateGasSwitches => 'تبديلات الغاز المتأخرة';
+
+  @override
+  String get settings_appearance_lateGasSwitches_subtitle =>
+      'تظليل تبديلات غاز تخفيف الضغط المتأخرة والفائتة على المخطط';
+
+  @override
   String get settings_appearance_gasTimeline => 'الجدول الزمني للغاز';
 
   @override
@@ -18023,7 +19584,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count ملاحظات',
+      other: '$count ملاحظة',
+      many: '$count ملاحظة',
+      few: '$count ملاحظات',
+      two: 'ملاحظتان',
       one: 'ملاحظة واحدة',
     );
     return '$_temp0';
@@ -18053,6 +19617,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String safetyReview_highSurfaceGf_title(String gf, String gfHigh) {
     return 'الصعود إلى السطح بعامل تدرج $gf، أعلى من $gfHigh المُعد';
   }
+
+  @override
+  String safetyReview_lateGasSwitch_title(String extra) {
+    return 'أضاف تبديل غاز متأخر أو فائت $extra من تخفيف الضغط';
+  }
+
+  @override
+  String get safetyReview_lateGasSwitch_noCost_title =>
+      'تأخر تبديل الغاز لكنه لم يضف أي تخفيف ضغط';
 
   @override
   String safetyReview_timeRange(String start, String end) {
@@ -18101,7 +19674,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم تجاهل $count ملاحظات',
+      other: 'تم تجاهل $count ملاحظة',
+      many: 'تم تجاهل $count ملاحظة',
+      few: 'تم تجاهل $count ملاحظات',
+      two: 'تم تجاهل ملاحظتين',
       one: 'تم تجاهل ملاحظة واحدة',
       zero: 'لا توجد ملاحظات لتجاهلها',
     );
@@ -18113,14 +19689,20 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم تجاهل $count ملاحظات',
+      other: 'تم تجاهل $count ملاحظة',
+      many: 'تم تجاهل $count ملاحظة',
+      few: 'تم تجاهل $count ملاحظات',
+      two: 'تم تجاهل ملاحظتين',
       one: 'تم تجاهل ملاحظة واحدة',
       zero: 'لم يتم تجاهل أي ملاحظة',
     );
     String _temp1 = intl.Intl.pluralLogic(
       failed,
       locale: localeName,
-      other: 'تعذّر تحديث $failed غطسات',
+      other: 'تعذّر تحديث $failed غطسة',
+      many: 'تعذّر تحديث $failed غطسة',
+      few: 'تعذّر تحديث $failed غطسات',
+      two: 'تعذّر تحديث غطستين',
       one: 'تعذّر تحديث غطسة واحدة',
     );
     return '$_temp0، $_temp1';
@@ -18144,7 +19726,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count ملاحظات سلامة',
+      other: '$count ملاحظة سلامة',
+      many: '$count ملاحظة سلامة',
+      few: '$count ملاحظات سلامة',
+      two: 'ملاحظتا سلامة',
       one: 'ملاحظة سلامة واحدة',
     );
     return '$_temp0';
@@ -18177,6 +19762,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get safetySettings_rule_sawtoothProfile => 'ملفات بنمط سن المنشار';
 
   @override
+  String get safetySettings_rule_lateGasSwitch => 'تبديل غاز متأخر';
+
+  @override
   String get safetySettings_rule_highSurfaceGf => 'عامل تدرج مرتفع عند الصعود';
 
   @override
@@ -18199,7 +19787,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تعذّر تحليل $count غوصات',
+      other: 'تعذّر تحليل $count غوصة',
+      many: 'تعذّر تحليل $count غوصة',
+      few: 'تعذّر تحليل $count غوصات',
+      two: 'تعذّر تحليل غوصتين',
       one: 'تعذّر تحليل غوصة واحدة',
     );
     return 'اكتمل التحليل — $_temp0';
@@ -18210,7 +19801,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'إظهار $count ملاحظات متجاهلة',
+      other: 'إظهار $count ملاحظة متجاهلة',
+      many: 'إظهار $count ملاحظة متجاهلة',
+      few: 'إظهار $count ملاحظات متجاهلة',
+      two: 'إظهار ملاحظتين متجاهلتين',
       one: 'إظهار ملاحظة متجاهلة واحدة',
     );
     return '$_temp0';
@@ -18259,14 +19853,17 @@ class AppLocalizationsAr extends AppLocalizations {
       'أحوال المياه عبر الأقمار الصناعية في تاريخ الغطسة';
 
   @override
-  String get diveDetailSection_surfaceGps_name => 'GPS السطح';
+  String get diveDetailSection_surfaceGps_name => 'الموقع الجغرافي';
 
   @override
   String get diveDetailSection_surfaceGps_description =>
-      'نقاط الدخول/الخروج عبر GPS وانجراف السطح';
+      'خريطة موقع الغوص ونقاط الدخول/الخروج عبر GPS وانجراف السطح';
 
   @override
   String get diveLog_detail_section_surfaceGps => 'GPS السطح';
+
+  @override
+  String get diveLog_detail_section_location => 'الموقع الجغرافي';
 
   @override
   String get diveLog_detail_surfaceGps_entry => 'الدخول';
@@ -18298,6 +19895,7 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count نقطة',
+      many: '$count نقطة',
       few: '$count نقاط',
       two: 'نقطتان',
       one: 'نقطة واحدة',
@@ -18520,6 +20118,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get siteDetailSection_location_description =>
       'الدولة، المنطقة، المسطح المائي، إحداثيات GPS';
+
+  @override
+  String get siteDetailSection_seascape_description =>
+      'عرض ثلاثي الأبعاد للتضاريس تحت الماء حول الموقع';
 
   @override
   String get siteDetailSection_depth_description =>
@@ -18817,7 +20419,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count عناصر تحتاج اهتمامًا',
+      other: '$count عنصر يحتاج اهتمامًا',
+      many: '$count عنصرًا يحتاج اهتمامًا',
+      few: '$count عناصر تحتاج اهتمامًا',
+      two: 'عنصران يحتاجان اهتمامًا',
       one: 'عنصر واحد يحتاج اهتمامًا',
     );
     return '$_temp0';
@@ -18877,7 +20482,12 @@ class AppLocalizationsAr extends AppLocalizations {
       diveCount,
       locale: localeName,
       other:
-          'تُمحى مكتبة السحابة ويحل محلها $diveCount غوصات الموجودة على هذا الجهاز.',
+          'تُمحى مكتبة السحابة ويحل محلها $diveCount غوصة موجودة على هذا الجهاز.',
+      many:
+          'تُمحى مكتبة السحابة ويحل محلها $diveCount غوصة موجودة على هذا الجهاز.',
+      few:
+          'تُمحى مكتبة السحابة ويحل محلها $diveCount غوصات موجودة على هذا الجهاز.',
+      two: 'تُمحى مكتبة السحابة ويحل محلها الغوصتان الموجودتان على هذا الجهاز.',
       one:
           'تُمحى مكتبة السحابة ويحل محلها الغوص الواحد الموجود على هذا الجهاز.',
     );
@@ -18890,7 +20500,13 @@ class AppLocalizationsAr extends AppLocalizations {
       peerCount,
       locale: localeName,
       other:
+          'سيُطلب من $peerCount جهاز آخر اعتمادها؛ وحتى ذلك الحين لن تُدمج تغييراتها.',
+      many:
+          'سيُطلب من $peerCount جهازًا آخر اعتمادها؛ وحتى ذلك الحين لن تُدمج تغييراتها.',
+      few:
           'سيُطلب من $peerCount أجهزة أخرى اعتمادها؛ وحتى ذلك الحين لن تُدمج تغييراتها.',
+      two:
+          'سيُطلب من جهازين آخرين اعتمادها؛ وحتى ذلك الحين لن تُدمج تغييراتهما.',
       one:
           'سيُطلب من جهاز واحد آخر اعتمادها؛ وحتى ذلك الحين لن تُدمج تغييراته.',
       zero: 'لا يوجد جهاز آخر يتزامن بعد، لذا لا يوجد ما يمكن اعتماده.',
@@ -19007,7 +20623,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count تغييرات معلقة',
+      other: '$count تغيير معلق',
+      many: '$count تغييرًا معلقًا',
+      few: '$count تغييرات معلقة',
+      two: 'تغييران معلقان',
       one: 'تغيير معلق واحد',
     );
     return '$_temp0';
@@ -19261,7 +20880,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'منذ $count أيام',
+      other: 'منذ $count يوم',
+      many: 'منذ $count يومًا',
+      few: 'منذ $count أيام',
+      two: 'منذ يومين',
       one: 'منذ يوم واحد',
     );
     return '$_temp0';
@@ -19272,7 +20894,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'منذ $count ساعات',
+      other: 'منذ $count ساعة',
+      many: 'منذ $count ساعة',
+      few: 'منذ $count ساعات',
+      two: 'منذ ساعتين',
       one: 'منذ ساعة واحدة',
     );
     return '$_temp0';
@@ -19286,7 +20911,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'منذ $count دقائق',
+      other: 'منذ $count دقيقة',
+      many: 'منذ $count دقيقة',
+      few: 'منذ $count دقائق',
+      two: 'منذ دقيقتين',
       one: 'منذ دقيقة واحدة',
     );
     return '$_temp0';
@@ -19299,7 +20927,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_conflict_cancel => 'إلغاء';
 
   @override
-  String get settings_conflict_chooseResolution => 'اختر الحل';
+  String get settings_conflict_changed => 'تغيّر';
+
+  @override
+  String get settings_conflict_chooseVersion =>
+      'اختر النسخة التي تريد الاحتفاظ بها.';
 
   @override
   String get settings_conflict_close => 'إغلاق';
@@ -19308,8 +20940,44 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_conflict_close_tooltip => 'إغلاق نافذة التعارضات';
 
   @override
+  String get settings_conflict_consequence_deleteHere =>
+      'يحذف السجل على هذا الجهاز أيضًا.';
+
+  @override
+  String settings_conflict_consequence_keep(
+    String kept,
+    String discarded,
+    String fields,
+  ) {
+    return 'يحتفظ بنسخة $kept. تُتجاهل قيم $discarded لهذه الحقول: $fields.';
+  }
+
+  @override
+  String settings_conflict_consequence_keepBoth(String local, String remote) {
+    return 'يحتفظ بنسخة $local ويضيف نسخة $remote كنسخة منفصلة.';
+  }
+
+  @override
+  String settings_conflict_consequence_keepRecord(String device) {
+    return 'يحتفظ بالسجل بقيم $device.';
+  }
+
+  @override
+  String get settings_conflict_consequence_nothingLost =>
+      'النسختان متطابقتان، فلا يضيع شيء.';
+
+  @override
+  String get settings_conflict_consequence_staysDeleted =>
+      'يبقى السجل محذوفًا على هذا الجهاز.';
+
+  @override
   String settings_conflict_counterLabel(Object current, Object total) {
     return 'التعارض $current من $total';
+  }
+
+  @override
+  String settings_conflict_deletedValues(String device) {
+    return 'السجل كما هو على $device:';
   }
 
   @override
@@ -19318,20 +20986,1931 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get settings_conflict_fieldHeader => 'الحقل';
+
+  @override
+  String get settings_conflict_field_accentListIcons => 'أيقونات قوائم ملونة';
+
+  @override
+  String get settings_conflict_field_accentNavIcons => 'أيقونات تنقل ملونة';
+
+  @override
+  String get settings_conflict_field_accentSectionHeaders =>
+      'عناوين أقسام ملونة';
+
+  @override
+  String get settings_conflict_field_accessNotes => 'ملاحظات الوصول';
+
+  @override
+  String get settings_conflict_field_accountIdentifier => 'الحساب';
+
+  @override
+  String get settings_conflict_field_additionalCredentials => 'مؤهلات إضافية';
+
+  @override
+  String get settings_conflict_field_advisoryKey => 'النصيحة المدمجة';
+
+  @override
+  String get settings_conflict_field_airBreakBreakSeconds =>
+      'مدة استراحة الهواء';
+
+  @override
+  String get settings_conflict_field_airBreakO2Seconds =>
+      'وقت الأكسجين بين استراحات الهواء';
+
+  @override
+  String get settings_conflict_field_allergies => 'الحساسية';
+
+  @override
+  String get settings_conflict_field_altitudeUnit => 'وحدة الارتفاع';
+
+  @override
+  String get settings_conflict_field_amountKg => 'الوزن';
+
+  @override
+  String get settings_conflict_field_analyzedHe => 'الهيليوم المقاس';
+
+  @override
+  String get settings_conflict_field_analyzedO2 => 'الأكسجين المقاس';
+
+  @override
+  String get settings_conflict_field_analyzer => 'جهاز التحليل';
+
+  @override
+  String get settings_conflict_field_anchorDate => 'العد بدءًا من';
+
+  @override
+  String get settings_conflict_field_anchorLatitude => 'خط عرض بداية المسار';
+
+  @override
+  String get settings_conflict_field_anchorLongitude => 'خط طول بداية المسار';
+
+  @override
+  String get settings_conflict_field_anchorSetAt => 'تاريخ البدء محدد';
+
+  @override
+  String get settings_conflict_field_applicableTypes => 'مقترح لـ';
+
+  @override
+  String get settings_conflict_field_appliesToDives => 'متاح للغوصات';
+
+  @override
+  String get settings_conflict_field_appliesToEquipment => 'متاح للمعدات';
+
+  @override
+  String get settings_conflict_field_appliesToSites => 'متاح لمواقع الغوص';
+
+  @override
+  String get settings_conflict_field_applyDefaultTankToImports =>
+      'الأسطوانة الافتراضية للغوصات المستوردة';
+
+  @override
+  String get settings_conflict_field_ascentGasSet => 'غازات الصعود';
+
+  @override
+  String get settings_conflict_field_ascentRate => 'سرعة الصعود';
+
+  @override
+  String get settings_conflict_field_ascentRateCritical => 'سرعة الصعود الحرجة';
+
+  @override
+  String get settings_conflict_field_ascentRateWarning => 'تحذير سرعة الصعود';
+
+  @override
+  String get settings_conflict_field_assumedVo2 => 'استهلاك الأكسجين المفترض';
+
+  @override
+  String get settings_conflict_field_attrKey => 'الخاصية';
+
+  @override
+  String get settings_conflict_field_autoApplyOnComputerImport =>
+      'يُطبَّق عند الاستيراد من حاسوب الغوص';
+
+  @override
+  String get settings_conflict_field_autoAttach => 'مجدول تلقائيًا';
+
+  @override
+  String get settings_conflict_field_autoTagImports => 'وسم الغوصات المستوردة';
+
+  @override
+  String get settings_conflict_field_avgSpeed => 'متوسط السرعة';
+
+  @override
+  String get settings_conflict_field_batteryReserveFraction =>
+      'احتياطي البطارية';
+
+  @override
+  String get settings_conflict_field_bboxHeight => 'ارتفاع الإطار';
+
+  @override
+  String get settings_conflict_field_bboxWidth => 'عرض الإطار';
+
+  @override
+  String get settings_conflict_field_bboxX => 'الحافة اليسرى للإطار';
+
+  @override
+  String get settings_conflict_field_bboxY => 'الحافة العليا للإطار';
+
+  @override
+  String get settings_conflict_field_bearingDeg => 'الاتجاه بالدرجات';
+
+  @override
+  String get settings_conflict_field_bestMixEndMeters =>
+      'العمق المخدر لأفضل خليط';
+
+  @override
+  String get settings_conflict_field_bloodType => 'فصيلة الدم';
+
+  @override
+  String get settings_conflict_field_bluetoothAddress => 'عنوان البلوتوث';
+
+  @override
+  String get settings_conflict_field_boatCaptain => 'قبطان القارب';
+
+  @override
+  String get settings_conflict_field_boatName => 'اسم القارب';
+
+  @override
+  String get settings_conflict_field_bookmarkRef => 'الوصول إلى الملف';
+
+  @override
+  String get settings_conflict_field_bottleLabel => 'رقم الأسطوانة';
+
+  @override
+  String get settings_conflict_field_buddyListViewMode => 'عرض قائمة الرفاق';
+
+  @override
+  String get settings_conflict_field_builtinKey => 'قالب مدمج';
+
+  @override
+  String get settings_conflict_field_buoyancyKg => 'الطفو';
+
+  @override
+  String get settings_conflict_field_byteCount => 'حجم الملف بالبايت';
+
+  @override
+  String get settings_conflict_field_bytes => 'محتوى الملف';
+
+  @override
+  String get settings_conflict_field_cabinType => 'نوع المقصورة';
+
+  @override
+  String get settings_conflict_field_capacity => 'السعة';
+
+  @override
+  String get settings_conflict_field_caption => 'التعليق';
+
+  @override
+  String get settings_conflict_field_cardColorGradientEnd =>
+      'نهاية تدرج ألوان البطاقات';
+
+  @override
+  String get settings_conflict_field_cardColorGradientPreset =>
+      'تدرج ألوان البطاقات';
+
+  @override
+  String get settings_conflict_field_cardColorGradientStart =>
+      'بداية تدرج ألوان البطاقات';
+
+  @override
+  String get settings_conflict_field_ccrDiluentModPpO2 =>
+      'ppO2 لأقصى عمق تشغيل لمخفف CCR';
+
+  @override
+  String get settings_conflict_field_ccrSetpointHigh => 'نقطة ضبط CCR العليا';
+
+  @override
+  String get settings_conflict_field_ccrSetpointLow => 'نقطة ضبط CCR الدنيا';
+
+  @override
+  String get settings_conflict_field_channelIndex => 'القناة';
+
+  @override
+  String get settings_conflict_field_checklistTemplateItems_category => 'الفئة';
+
+  @override
+  String get settings_conflict_field_city => 'المدينة';
+
+  @override
+  String get settings_conflict_field_cloudAssetId => 'صورة في السحابة';
+
+  @override
+  String get settings_conflict_field_cns => 'CNS';
+
+  @override
+  String get settings_conflict_field_cnsWarningThreshold => 'حد تحذير CNS';
+
+  @override
+  String get settings_conflict_field_codecVersion => 'إصدار التنسيق';
+
+  @override
+  String get settings_conflict_field_coldWaterThresholdC => 'حد المياه الباردة';
+
+  @override
+  String get settings_conflict_field_color => 'اللون';
+
+  @override
+  String get settings_conflict_field_commonName => 'الاسم الشائع';
+
+  @override
+  String get settings_conflict_field_completedAt => 'اكتمل';
+
+  @override
+  String get settings_conflict_field_compressedLevel => 'الضغط';
+
+  @override
+  String get settings_conflict_field_compressedSizeBytes =>
+      'الحجم المضغوط بالبايت';
+
+  @override
+  String get settings_conflict_field_computerModel => 'طراز حاسوب الغوص';
+
+  @override
+  String get settings_conflict_field_computerSerial =>
+      'الرقم التسلسلي لحاسوب الغوص';
+
+  @override
+  String get settings_conflict_field_computerTissueJson =>
+      'بيانات الأنسجة من حاسوب الغوص';
+
+  @override
+  String get settings_conflict_field_conditionDisabledRules =>
+      'فحوصات المعدات المعطلة';
+
+  @override
+  String get settings_conflict_field_conditionEngineEnabled =>
+      'فحوصات حالة المعدات';
+
+  @override
+  String get settings_conflict_field_configJson => 'الإعدادات';
+
+  @override
+  String get settings_conflict_field_connectedAccounts_kind => 'الخدمة';
+
+  @override
+  String get settings_conflict_field_connectionType => 'الاتصال';
+
+  @override
+  String get settings_conflict_field_contentHash => 'بصمة المحتوى';
+
+  @override
+  String get settings_conflict_field_contentSizeBytes => 'الحجم بالبايت';
+
+  @override
+  String get settings_conflict_field_contributingFactors => 'العوامل المساهمة';
+
+  @override
+  String get settings_conflict_field_coordinateFormat => 'تنسيق الإحداثيات';
+
+  @override
+  String get settings_conflict_field_cost => 'التكلفة';
+
+  @override
+  String get settings_conflict_field_count => 'العدد';
+
+  @override
+  String get settings_conflict_field_country => 'البلد';
+
+  @override
+  String get settings_conflict_field_courseRequirements_kind => 'نوع المتطلب';
+
+  @override
+  String get settings_conflict_field_credentialsHostId => 'خادم تسجيل الدخول';
+
+  @override
+  String get settings_conflict_field_currency => 'العملة';
+
+  @override
+  String get settings_conflict_field_currentSetsTowardDeg =>
+      'اتجاه التيار بالدرجات';
+
+  @override
+  String get settings_conflict_field_currentSpeedMps => 'سرعة التيار';
+
+  @override
+  String get settings_conflict_field_customReminderDays => 'أيام التذكير';
+
+  @override
+  String get settings_conflict_field_customReminderEnabled => 'تذكيرات مخصصة';
+
+  @override
+  String get settings_conflict_field_cylinderFills_source => 'سُجِّل عبر';
+
+  @override
+  String get settings_conflict_field_date => 'التاريخ';
+
+  @override
+  String get settings_conflict_field_dateFormat => 'تنسيق التاريخ';
+
+  @override
+  String get settings_conflict_field_dayNumber => 'رقم اليوم';
+
+  @override
+  String get settings_conflict_field_dayType => 'نوع اليوم';
+
+  @override
+  String get settings_conflict_field_decoStopIncrement =>
+      'المسافة بين محطات تخفيف الضغط';
+
+  @override
+  String get settings_conflict_field_decoSwitchDepth =>
+      'عمق التبديل إلى غاز تخفيف الضغط';
+
+  @override
+  String get settings_conflict_field_deepDiveThresholdM => 'حد الغوص العميق';
+
+  @override
+  String get settings_conflict_field_defaultCategory => 'الفئة الافتراضية';
+
+  @override
+  String get settings_conflict_field_defaultCeilingSource =>
+      'مصدر بيانات السقف';
+
+  @override
+  String get settings_conflict_field_defaultCnsSource => 'مصدر بيانات CNS';
+
+  @override
+  String get settings_conflict_field_defaultCost => 'التكلفة الافتراضية';
+
+  @override
+  String get settings_conflict_field_defaultCurrency => 'العملة الافتراضية';
+
+  @override
+  String get settings_conflict_field_defaultCurrentSetsTowardDeg =>
+      'اتجاه التيار الافتراضي بالدرجات';
+
+  @override
+  String get settings_conflict_field_defaultCurrentSpeedMps =>
+      'سرعة التيار الافتراضية';
+
+  @override
+  String get settings_conflict_field_defaultDecoStopSource =>
+      'مصدر بيانات محطات تخفيف الضغط';
+
+  @override
+  String get settings_conflict_field_defaultDiveType => 'نوع الغوص الافتراضي';
+
+  @override
+  String get settings_conflict_field_defaultGtrSource => 'مصدر بيانات GTR';
+
+  @override
+  String get settings_conflict_field_defaultIntervalDays =>
+      'الفاصل الافتراضي بالأيام';
+
+  @override
+  String get settings_conflict_field_defaultIntervalDives =>
+      'الفاصل الافتراضي بالغوصات';
+
+  @override
+  String get settings_conflict_field_defaultIntervalHours =>
+      'الفاصل الافتراضي بالساعات';
+
+  @override
+  String get settings_conflict_field_defaultNdlSource => 'مصدر بيانات NDL';
+
+  @override
+  String get settings_conflict_field_defaultPlannerWaterType =>
+      'نوع الماء الافتراضي في المخطط';
+
+  @override
+  String get settings_conflict_field_defaultRightAxisMetric =>
+      'المحور الأيمن للملف';
+
+  @override
+  String get settings_conflict_field_defaultShowAscentRateLine =>
+      'الملف يعرض سرعة الصعود';
+
+  @override
+  String get settings_conflict_field_defaultShowCns => 'الملف يعرض CNS';
+
+  @override
+  String get settings_conflict_field_defaultShowEstimatedTankPressure =>
+      'الملف يعرض ضغط الأسطوانة المقدر';
+
+  @override
+  String get settings_conflict_field_defaultShowEvents => 'الملف يعرض الأحداث';
+
+  @override
+  String get settings_conflict_field_defaultShowGasDensity =>
+      'الملف يعرض كثافة الغاز';
+
+  @override
+  String get settings_conflict_field_defaultShowGasSwitchMarkers =>
+      'الملف يعرض تبديلات الغاز';
+
+  @override
+  String get settings_conflict_field_defaultShowGasTimeline =>
+      'الملف يعرض الخط الزمني للغازات';
+
+  @override
+  String get settings_conflict_field_defaultShowGf => 'الملف يعرض معامل التدرج';
+
+  @override
+  String get settings_conflict_field_defaultShowGtr => 'الملف يعرض GTR';
+
+  @override
+  String get settings_conflict_field_defaultShowHeartRate =>
+      'الملف يعرض معدل ضربات القلب';
+
+  @override
+  String get settings_conflict_field_defaultShowMeanDepth =>
+      'الملف يعرض متوسط العمق';
+
+  @override
+  String get settings_conflict_field_defaultShowO2CellMv =>
+      'الملف يعرض ملي فولت خلايا O2';
+
+  @override
+  String get settings_conflict_field_defaultShowOtu => 'الملف يعرض OTU';
+
+  @override
+  String get settings_conflict_field_defaultShowPhotoMarkers =>
+      'الملف يعرض الصور';
+
+  @override
+  String get settings_conflict_field_defaultShowPpHe => 'الملف يعرض ppHe';
+
+  @override
+  String get settings_conflict_field_defaultShowPpN2 => 'الملف يعرض ppN2';
+
+  @override
+  String get settings_conflict_field_defaultShowPpO2 => 'الملف يعرض ppO2';
+
+  @override
+  String get settings_conflict_field_defaultShowPressure =>
+      'الملف يعرض ضغط الأسطوانة';
+
+  @override
+  String get settings_conflict_field_defaultShowSac =>
+      'الملف يعرض استهلاك الغاز';
+
+  @override
+  String get settings_conflict_field_defaultShowSurfaceGf =>
+      'الملف يعرض معامل التدرج السطحي';
+
+  @override
+  String get settings_conflict_field_defaultShowTemperature =>
+      'الملف يعرض درجة الحرارة';
+
+  @override
+  String get settings_conflict_field_defaultShowTts =>
+      'الملف يعرض الوقت حتى السطح';
+
+  @override
+  String get settings_conflict_field_defaultStartPressure =>
+      'ضغط البداية الافتراضي';
+
+  @override
+  String get settings_conflict_field_defaultStartPressureBar =>
+      'ضغط البداية الافتراضي';
+
+  @override
+  String get settings_conflict_field_defaultTankPreset =>
+      'قالب الأسطوانة الافتراضي';
+
+  @override
+  String get settings_conflict_field_defaultTankVolume =>
+      'حجم الأسطوانة الافتراضي';
+
+  @override
+  String get settings_conflict_field_defaultTtsSource =>
+      'مصدر بيانات الوقت حتى السطح';
+
+  @override
+  String get settings_conflict_field_depth => 'العمق';
+
+  @override
+  String get settings_conflict_field_depthM => 'العمق';
+
+  @override
+  String get settings_conflict_field_depthMeters => 'العمق';
+
+  @override
+  String get settings_conflict_field_depthUnit => 'وحدة العمق';
+
+  @override
+  String get settings_conflict_field_distanceUnit => 'وحدة المسافة';
+
+  @override
+  String get settings_conflict_field_defaultShowLateGasSwitches =>
+      'الملف يعرض تبديلات الغاز المتأخرة';
+
+  @override
+  String get settings_conflict_field_insightsMutedObservationRules =>
+      'أنواع الملاحظات المخفية';
+
+  @override
+  String get settings_conflict_field_fingerprint => 'بصمة الملاحظة';
+
+  @override
+  String get settings_conflict_field_descentRate => 'سرعة النزول';
+
+  @override
+  String get settings_conflict_field_description => 'الوصف';
+
+  @override
+  String get settings_conflict_field_descriptorModel => 'رقم طراز حاسوب الغوص';
+
+  @override
+  String get settings_conflict_field_descriptorProduct => 'منتج حاسوب الغوص';
+
+  @override
+  String get settings_conflict_field_descriptorVendor =>
+      'الشركة المصنعة لحاسوب الغوص';
+
+  @override
+  String get settings_conflict_field_detectorId => 'الفحص';
+
+  @override
+  String get settings_conflict_field_detectorVersion => 'إصدار الفحص';
+
+  @override
+  String get settings_conflict_field_deviationDepthDelta => 'عمق إضافي للطوارئ';
+
+  @override
+  String get settings_conflict_field_deviationTimeMinutes =>
+      'وقت إضافي للطوارئ';
+
+  @override
+  String get settings_conflict_field_deviceName => 'سُجِّل على';
+
+  @override
+  String get settings_conflict_field_diluentHe => 'هيليوم المخفف';
+
+  @override
+  String get settings_conflict_field_diluentO2 => 'أكسجين المخفف';
+
+  @override
+  String get settings_conflict_field_disembarkLatitude =>
+      'خط عرض النزول من القارب';
+
+  @override
+  String get settings_conflict_field_disembarkLongitude =>
+      'خط طول النزول من القارب';
+
+  @override
+  String get settings_conflict_field_disembarkPort => 'ميناء النزول';
+
+  @override
+  String get settings_conflict_field_dismissedAt => 'تم التجاهل';
+
+  @override
+  String get settings_conflict_field_displayHint => 'تلميح العرض';
+
+  @override
+  String get settings_conflict_field_displayName => 'الاسم المعروض';
+
+  @override
+  String get settings_conflict_field_distanceM => 'المسافة';
+
+  @override
+  String get settings_conflict_field_diveCenterListViewMode =>
+      'عرض قائمة مراكز الغوص';
+
+  @override
+  String get settings_conflict_field_diveComputerFirmware =>
+      'البرنامج الثابت لحاسوب الغوص';
+
+  @override
+  String get settings_conflict_field_diveComputerSerial =>
+      'الرقم التسلسلي لحاسوب الغوص';
+
+  @override
+  String get settings_conflict_field_diveCount => 'عدد الغوصات';
+
+  @override
+  String get settings_conflict_field_diveDetailLayout => 'تخطيط تفاصيل الغوصة';
+
+  @override
+  String get settings_conflict_field_diveDetailSections =>
+      'أقسام تفاصيل الغوصة';
+
+  @override
+  String get settings_conflict_field_diveListViewMode => 'عرض قائمة الغوصات';
+
+  @override
+  String get settings_conflict_field_diveModeOverride =>
+      'وضع التنفس لهذا المقطع';
+
+  @override
+  String get settings_conflict_field_diveOperator => 'مشغل الغوص';
+
+  @override
+  String get settings_conflict_field_divePlanSegments_type => 'المقطع';
+
+  @override
+  String get settings_conflict_field_divePlanTanks_role => 'دور الأسطوانة';
+
+  @override
+  String get settings_conflict_field_diveProfileEvents_severity => 'الخطورة';
+
+  @override
+  String get settings_conflict_field_diveProfileEvents_source => 'المصدر';
+
+  @override
+  String get settings_conflict_field_diveSafetyFindings_severity => 'الخطورة';
+
+  @override
+  String get settings_conflict_field_diversSharingCylinders =>
+      'الغواصون المتشاركون في الأسطوانات';
+
+  @override
+  String get settings_conflict_field_divesPerDayTarget => 'هدف الغوصات اليومي';
+
+  @override
+  String get settings_conflict_field_divingSince => 'يغوص منذ';
+
+  @override
+  String get settings_conflict_field_dueDate => 'الاستحقاق';
+
+  @override
+  String get settings_conflict_field_dueOffsetDays =>
+      'الاستحقاق بالأيام قبل الرحلة';
+
+  @override
+  String get settings_conflict_field_duration => 'المدة';
+
+  @override
+  String get settings_conflict_field_durationSeconds => 'المدة';
+
+  @override
+  String get settings_conflict_field_elapsedSeconds => 'الوقت داخل الغوصة';
+
+  @override
+  String get settings_conflict_field_embarkLatitude =>
+      'خط عرض الصعود إلى القارب';
+
+  @override
+  String get settings_conflict_field_embarkLongitude =>
+      'خط طول الصعود إلى القارب';
+
+  @override
+  String get settings_conflict_field_embarkPort => 'ميناء الصعود';
+
+  @override
+  String get settings_conflict_field_emergencyContact2Name =>
+      'جهة اتصال الطوارئ الثانية';
+
+  @override
+  String get settings_conflict_field_emergencyContact2Phone =>
+      'هاتف جهة اتصال الطوارئ الثانية';
+
+  @override
+  String get settings_conflict_field_emergencyContact2Relation =>
+      'صلة جهة اتصال الطوارئ الثانية';
+
+  @override
+  String get settings_conflict_field_emergencyContactName =>
+      'جهة اتصال الطوارئ';
+
+  @override
+  String get settings_conflict_field_emergencyContactPhone =>
+      'هاتف جهة اتصال الطوارئ';
+
+  @override
+  String get settings_conflict_field_emergencyContactRelation =>
+      'صلة جهة اتصال الطوارئ';
+
+  @override
+  String get settings_conflict_field_emergencyRegion => 'منطقة الطوارئ';
+
+  @override
+  String get settings_conflict_field_enabled => 'مفعّل';
+
+  @override
+  String get settings_conflict_field_endDepth => 'عمق النهاية';
+
+  @override
+  String get settings_conflict_field_endLatitude => 'خط عرض النهاية';
+
+  @override
+  String get settings_conflict_field_endLimit => 'حد العمق المخدر';
+
+  @override
+  String get settings_conflict_field_endLongitude => 'خط طول النهاية';
+
+  @override
+  String get settings_conflict_field_endMode => 'نهاية المسار';
+
+  @override
+  String get settings_conflict_field_endTime => 'وقت الانتهاء';
+
+  @override
+  String get settings_conflict_field_endTimestamp =>
+      'ينتهي عند (الوقت داخل الغوصة)';
+
+  @override
+  String get settings_conflict_field_engineVersion => 'إصدار التحليل';
+
+  @override
+  String get settings_conflict_field_entryKey => 'الإدخال';
+
+  @override
+  String get settings_conflict_field_entryLatitude => 'خط عرض الدخول';
+
+  @override
+  String get settings_conflict_field_entryLongitude => 'خط طول الدخول';
+
+  @override
+  String get settings_conflict_field_entryTime => 'وقت الدخول';
+
+  @override
+  String get settings_conflict_field_environment => 'البيئة';
+
+  @override
+  String get settings_conflict_field_equipmentComponents_role => 'الدور';
+
+  @override
+  String get settings_conflict_field_equipmentFindings_severity => 'الخطورة';
+
+  @override
+  String get settings_conflict_field_equipmentListViewMode =>
+      'عرض قائمة المعدات';
+
+  @override
+  String get settings_conflict_field_equipmentObservations_status => 'الحالة';
+
+  @override
+  String get settings_conflict_field_equipmentOwnershipEvents_kind => 'الحدث';
+
+  @override
+  String get settings_conflict_field_equipmentSetName => 'مجموعة المعدات';
+
+  @override
+  String get settings_conflict_field_eventType => 'الحدث';
+
+  @override
+  String get settings_conflict_field_evidence => 'الدليل';
+
+  @override
+  String get settings_conflict_field_evidenceFingerprint => 'بصمة الدليل';
+
+  @override
+  String get settings_conflict_field_excludedFromGasStats =>
+      'مستبعد من إحصاءات الغاز';
+
+  @override
+  String get settings_conflict_field_excludedFromStats => 'مستبعد من الإحصاءات';
+
+  @override
+  String get settings_conflict_field_exitLatitude => 'خط عرض الخروج';
+
+  @override
+  String get settings_conflict_field_exitLongitude => 'خط طول الخروج';
+
+  @override
+  String get settings_conflict_field_exitTime => 'وقت الخروج';
+
+  @override
+  String get settings_conflict_field_expectedDives => 'الغوصات المتوقعة';
+
+  @override
+  String get settings_conflict_field_expectedRuntimeMinutes =>
+      'المدة المتوقعة لكل غوصة';
+
+  @override
+  String get settings_conflict_field_exposureIntervals => 'فترات التعرض';
+
+  @override
+  String get settings_conflict_field_fetchedAt => 'تم الجلب';
+
+  @override
+  String get settings_conflict_field_fieldKey => 'حقل مخصص';
+
+  @override
+  String get settings_conflict_field_fieldValue => 'قيمة الحقل المخصص';
+
+  @override
+  String get settings_conflict_field_fileName => 'اسم الملف';
+
+  @override
+  String get settings_conflict_field_filePath => 'الملف';
+
+  @override
+  String get settings_conflict_field_fileType => 'نوع الملف';
+
+  @override
+  String get settings_conflict_field_fillClosesAt => 'انتهاء التعبئة';
+
+  @override
+  String get settings_conflict_field_fillOpensAt => 'بدء التعبئة';
+
+  @override
+  String get settings_conflict_field_filledAt => 'تمت التعبئة';
+
+  @override
+  String get settings_conflict_field_filterJson => 'المرشح';
+
+  @override
+  String get settings_conflict_field_finalAscentRate => 'سرعة الصعود النهائية';
+
+  @override
+  String get settings_conflict_field_firmwareVersion => 'البرنامج الثابت';
+
+  @override
+  String get settings_conflict_field_firstDepth => 'عمق أول قراءة';
+
+  @override
+  String get settings_conflict_field_format => 'التنسيق';
+
+  @override
+  String get settings_conflict_field_gasConsumptionDisplay =>
+      'عرض استهلاك الغاز بصيغة';
+
+  @override
+  String get settings_conflict_field_gasHe => 'الهيليوم';
+
+  @override
+  String get settings_conflict_field_gasO2 => 'الأكسجين';
+
+  @override
+  String get settings_conflict_field_gasSwitchStopSeconds => 'محطة تبديل الغاز';
+
+  @override
+  String get settings_conflict_field_gearType => 'نوع المعدات';
+
+  @override
+  String get settings_conflict_field_groupTripsInDiveList =>
+      'تجميع الرحلات في قائمة الغوصات';
+
+  @override
+  String get settings_conflict_field_gtrReservePressure => 'ضغط احتياطي GTR';
+
+  @override
+  String get settings_conflict_field_hasDecoStop => 'فيها محطة تخفيف ضغط';
+
+  @override
+  String get settings_conflict_field_hasDecoType => 'فيها بيانات تخفيف ضغط';
+
+  @override
+  String get settings_conflict_field_hasPositiveCeiling => 'فيها سقف';
+
+  @override
+  String get settings_conflict_field_hePercent => 'الهيليوم';
+
+  @override
+  String get settings_conflict_field_headingDeg => 'الاتجاه بالدرجات';
+
+  @override
+  String get settings_conflict_field_headingOffsetDeg =>
+      'تصحيح الاتجاه بالدرجات';
+
+  @override
+  String get settings_conflict_field_height => 'الارتفاع بالبكسل';
+
+  @override
+  String get settings_conflict_field_heightCm => 'الطول';
+
+  @override
+  String get settings_conflict_field_heightMeters => 'ارتفاع المد';
+
+  @override
+  String get settings_conflict_field_hiddenChamberIds => 'غرف الضغط المخفية';
+
+  @override
+  String get settings_conflict_field_hiddenTankPresetIds =>
+      'قوالب الأسطوانات المخفية';
+
+  @override
+  String get settings_conflict_field_highO2ThresholdPercent =>
+      'حد الأكسجين المرتفع';
+
+  @override
+  String get settings_conflict_field_highTideHeight => 'ارتفاع المد العالي';
+
+  @override
+  String get settings_conflict_field_highTideTime => 'المد العالي';
+
+  @override
+  String get settings_conflict_field_imageData => 'الصورة';
+
+  @override
+  String get settings_conflict_field_importId => 'معرّف الاستيراد';
+
+  @override
+  String get settings_conflict_field_importVersion => 'إصدار الاستيراد';
+
+  @override
+  String get settings_conflict_field_importedAt => 'تم الاستيراد';
+
+  @override
+  String get settings_conflict_field_incidents_category => 'الفئة';
+
+  @override
+  String get settings_conflict_field_incidents_severity => 'الخطورة';
+
+  @override
+  String get settings_conflict_field_inputsHash => 'الإعدادات المستخدمة';
+
+  @override
+  String get settings_conflict_field_insuranceEmergencyPhone =>
+      'خط طوارئ التأمين';
+
+  @override
+  String get settings_conflict_field_insuranceExpiryDate => 'انتهاء التأمين';
+
+  @override
+  String get settings_conflict_field_insurancePhone => 'هاتف التأمين';
+
+  @override
+  String get settings_conflict_field_insurancePolicyNumber =>
+      'رقم وثيقة التأمين';
+
+  @override
+  String get settings_conflict_field_insuranceProvider => 'شركة التأمين';
+
+  @override
+  String get settings_conflict_field_intermediateAscentRate =>
+      'سرعة الصعود بين المحطات العميقة';
+
+  @override
+  String get settings_conflict_field_intervalDays => 'الفاصل بالأيام';
+
+  @override
+  String get settings_conflict_field_intervalDives => 'الفاصل بالغوصات';
+
+  @override
+  String get settings_conflict_field_intervalHours => 'الفاصل بالساعات';
+
+  @override
+  String get settings_conflict_field_isArchived => 'مؤرشف';
+
+  @override
+  String get settings_conflict_field_isBuiltIn => 'مدمج';
+
+  @override
+  String get settings_conflict_field_isCustom => 'مخصص';
+
+  @override
+  String get settings_conflict_field_isDefault => 'افتراضي';
+
+  @override
+  String get settings_conflict_field_isDone => 'تم';
+
+  @override
+  String get settings_conflict_field_isOrphaned => 'الملف مفقود';
+
+  @override
+  String get settings_conflict_field_isPackage => 'جزء من باقة';
+
+  @override
+  String get settings_conflict_field_isPlanned => 'غوصة مخططة';
+
+  @override
+  String get settings_conflict_field_isPrimary => 'أساسي';
+
+  @override
+  String get settings_conflict_field_isRequired => 'إلزامي';
+
+  @override
+  String get settings_conflict_field_isShared => 'مشترك';
+
+  @override
+  String get settings_conflict_field_isTravelGas => 'غاز العبور';
+
+  @override
+  String get settings_conflict_field_issueTags => 'المشكلات';
+
+  @override
+  String get settings_conflict_field_itemType => 'نوع العنصر';
+
+  @override
+  String get settings_conflict_field_label => 'التسمية';
+
+  @override
+  String get settings_conflict_field_lastDepth => 'عمق آخر قراءة';
+
+  @override
+  String get settings_conflict_field_lastDiveFingerprint => 'آخر غوصة منزّلة';
+
+  @override
+  String get settings_conflict_field_lastDownloadTimestamp => 'آخر تنزيل';
+
+  @override
+  String get settings_conflict_field_lastParsedAt => 'آخر قراءة';
+
+  @override
+  String get settings_conflict_field_lastStopDepth => 'عمق آخر محطة';
+
+  @override
+  String get settings_conflict_field_lastSweepAt => 'آخر فحص';
+
+  @override
+  String get settings_conflict_field_lastVerifiedAt => 'آخر تحقق';
+
+  @override
+  String get settings_conflict_field_latitude => 'خط العرض';
+
+  @override
+  String get settings_conflict_field_leadAdjustmentKg =>
+      'الرصاص الإضافي المطلوب';
+
+  @override
+  String get settings_conflict_field_lessonsLearned => 'الدروس المستفادة';
+
+  @override
+  String get settings_conflict_field_libdivecomputerVersion =>
+      'إصدار libdivecomputer';
+
+  @override
+  String get settings_conflict_field_linkMode => 'مرتبط';
+
+  @override
+  String get settings_conflict_field_localPath => 'ملف محلي';
+
+  @override
+  String get settings_conflict_field_locale => 'اللغة';
+
+  @override
+  String get settings_conflict_field_longitude => 'خط الطول';
+
+  @override
+  String get settings_conflict_field_loopO2Avg => 'متوسط ppO2 في الدائرة';
+
+  @override
+  String get settings_conflict_field_loopO2Max => 'أعلى ppO2 في الدائرة';
+
+  @override
+  String get settings_conflict_field_loopO2Min => 'أدنى ppO2 في الدائرة';
+
+  @override
+  String get settings_conflict_field_loopVolume => 'حجم الدائرة';
+
+  @override
+  String get settings_conflict_field_lowTideHeight => 'ارتفاع الجزر';
+
+  @override
+  String get settings_conflict_field_lowTideTime => 'الجزر';
+
+  @override
+  String get settings_conflict_field_manifestUrl => 'عنوان الموجز';
+
+  @override
+  String get settings_conflict_field_manualElapsedSeconds =>
+      'الوقت داخل الغوصة، مضبوط يدويًا';
+
+  @override
+  String get settings_conflict_field_manufacturer => 'الشركة المصنعة';
+
+  @override
+  String get settings_conflict_field_matchConfidence => 'المطابقة';
+
+  @override
+  String get settings_conflict_field_material => 'مادة الأسطوانة';
+
+  @override
+  String get settings_conflict_field_maxAscentRate => 'أقصى سرعة صعود';
+
+  @override
+  String get settings_conflict_field_maxDescentRate => 'أقصى سرعة نزول';
+
+  @override
+  String get settings_conflict_field_maxSpeed => 'السرعة القصوى';
+
+  @override
+  String get settings_conflict_field_measuredAt => 'تم القياس';
+
+  @override
+  String get settings_conflict_field_medicalClearanceExpiryDate =>
+      'انتهاء الشهادة الطبية';
+
+  @override
+  String get settings_conflict_field_medicalNotes => 'ملاحظات طبية';
+
+  @override
+  String get settings_conflict_field_medications => 'الأدوية';
+
+  @override
+  String get settings_conflict_field_mergeSourceSlot =>
+      'الموضع بين المصادر المدمجة';
+
+  @override
+  String get settings_conflict_field_mode => 'وضع التنفس';
+
+  @override
+  String get settings_conflict_field_movedAt => 'تاريخ النقل';
+
+  @override
+  String get settings_conflict_field_name => 'الاسم';
+
+  @override
+  String get settings_conflict_field_narrative => 'ما حدث';
+
+  @override
+  String get settings_conflict_field_noFlyPreset => 'قاعدة حظر الطيران';
+
+  @override
+  String get settings_conflict_field_note => 'ملاحظة';
+
+  @override
+  String get settings_conflict_field_notedAt => 'تم التدوين';
+
+  @override
+  String get settings_conflict_field_notificationsEnabled => 'الإشعارات';
+
+  @override
+  String get settings_conflict_field_o2Narcotic => 'الأكسجين محسوب كمخدر';
+
+  @override
+  String get settings_conflict_field_o2Percent => 'الأكسجين';
+
+  @override
+  String get settings_conflict_field_observedAt => 'تمت الملاحظة';
+
+  @override
+  String get settings_conflict_field_occurredAt => 'وقع';
+
+  @override
+  String get settings_conflict_field_operatorName => 'المشغل';
+
+  @override
+  String get settings_conflict_field_originalFilename => 'اسم الملف الأصلي';
+
+  @override
+  String get settings_conflict_field_outingId => 'الرحلة البحرية';
+
+  @override
+  String get settings_conflict_field_overdueServices => 'صيانات متأخرة';
+
+  @override
+  String get settings_conflict_field_params => 'التفاصيل';
+
+  @override
+  String get settings_conflict_field_parkingInfo => 'موقف السيارات';
+
+  @override
+  String get settings_conflict_field_passportId => 'جواز الأسطوانة';
+
+  @override
+  String get settings_conflict_field_phone => 'الهاتف';
+
+  @override
+  String get settings_conflict_field_photo => 'الصورة';
+
+  @override
+  String get settings_conflict_field_photoBack => 'ظهر البطاقة';
+
+  @override
+  String get settings_conflict_field_photoBackPath => 'ظهر البطاقة';
+
+  @override
+  String get settings_conflict_field_photoFront => 'وجه البطاقة';
+
+  @override
+  String get settings_conflict_field_photoFrontPath => 'وجه البطاقة';
+
+  @override
+  String get settings_conflict_field_photoPath => 'الصورة';
+
+  @override
+  String get settings_conflict_field_placeNameLanguage => 'لغة أسماء الأماكن';
+
+  @override
+  String get settings_conflict_field_plannedDives => 'الغوصات المخططة';
+
+  @override
+  String get settings_conflict_field_plannedWeightKg => 'الرصاص المخطط';
+
+  @override
+  String get settings_conflict_field_plannedWeightPlacement =>
+      'توزيع الرصاص المخطط';
+
+  @override
+  String get settings_conflict_field_platformAssetId => 'عنصر مكتبة الصور';
+
+  @override
+  String get settings_conflict_field_pointCount => 'عدد النقاط';
+
+  @override
+  String get settings_conflict_field_points => 'نقاط المسار';
+
+  @override
+  String get settings_conflict_field_pollIntervalSeconds => 'التحقق كل';
+
+  @override
+  String get settings_conflict_field_portName => 'الميناء';
+
+  @override
+  String get settings_conflict_field_ppO2Bottom => 'ppO2 في القاع';
+
+  @override
+  String get settings_conflict_field_ppO2Deco => 'ppO2 لتخفيف الضغط';
+
+  @override
+  String get settings_conflict_field_ppO2MaxDeco => 'أقصى ppO2 لتخفيف الضغط';
+
+  @override
+  String get settings_conflict_field_ppO2MaxWorking => 'أقصى ppO2 للعمل';
+
+  @override
+  String get settings_conflict_field_preDiveChecklistTemplates_category =>
+      'الفئة';
+
+  @override
+  String get settings_conflict_field_preDiveSessions_status => 'الحالة';
+
+  @override
+  String get settings_conflict_field_presetJson => 'الإعداد المسبق';
+
+  @override
+  String get settings_conflict_field_presetName => 'قالب الأسطوانة';
+
+  @override
+  String get settings_conflict_field_pressure => 'الضغط';
+
+  @override
+  String get settings_conflict_field_pressureBar => 'الضغط';
+
+  @override
+  String get settings_conflict_field_pressureUnit => 'وحدة الضغط';
+
+  @override
+  String get settings_conflict_field_priorDiveCount => 'الغوصات قبل هذا السجل';
+
+  @override
+  String get settings_conflict_field_priorDiveTimeSeconds =>
+      'وقت الغوص قبل هذا السجل';
+
+  @override
+  String get settings_conflict_field_problemSolvingMinutes => 'وقت حل المشكلات';
+
+  @override
+  String get settings_conflict_field_provider => 'مقدم الخدمة';
+
+  @override
+  String get settings_conflict_field_providerType => 'مزود التخزين';
+
+  @override
+  String get settings_conflict_field_purchaseCurrency => 'عملة الشراء';
+
+  @override
+  String get settings_conflict_field_qualityFindings_category => 'الفئة';
+
+  @override
+  String get settings_conflict_field_qualityFindings_severity => 'الخطورة';
+
+  @override
+  String get settings_conflict_field_qualityFindings_status => 'الحالة';
+
+  @override
+  String get settings_conflict_field_queryJson => 'الاستعلام';
+
+  @override
+  String get settings_conflict_field_radiusMeters => 'نصف القطر';
+
+  @override
+  String get settings_conflict_field_rate => 'السرعة';
+
+  @override
+  String get settings_conflict_field_rateOfChange => 'معدل التغير';
+
+  @override
+  String get settings_conflict_field_rawData => 'البيانات الخام لحاسوب الغوص';
+
+  @override
+  String get settings_conflict_field_rawFingerprint => 'بصمة حاسوب الغوص';
+
+  @override
+  String get settings_conflict_field_reminderTime => 'وقت التذكير';
+
+  @override
+  String get settings_conflict_field_remoteAssetId => 'عنصر بعيد';
+
+  @override
+  String get settings_conflict_field_remoteCompressedUploadedAt =>
+      'تم رفع النسخة المضغوطة';
+
+  @override
+  String get settings_conflict_field_remoteThumbUploadedAt =>
+      'تم رفع الصورة المصغرة';
+
+  @override
+  String get settings_conflict_field_remoteUploadedAt => 'تم الرفع';
+
+  @override
+  String get settings_conflict_field_reservePressure => 'ضغط الاحتياطي';
+
+  @override
+  String get settings_conflict_field_retainInLibrary => 'محفوظ في المكتبة';
+
+  @override
+  String get settings_conflict_field_returnFlightAt => 'رحلة العودة';
+
+  @override
+  String get settings_conflict_field_reviewedAt => 'تمت المراجعة';
+
+  @override
+  String get settings_conflict_field_roleSource => 'حدّد الدور';
+
+  @override
+  String get settings_conflict_field_ruleId => 'القاعدة';
+
+  @override
+  String get settings_conflict_field_sacBottom => 'استهلاك الغاز في القاع';
+
+  @override
+  String get settings_conflict_field_sacDeco =>
+      'استهلاك الغاز أثناء تخفيف الضغط';
+
+  @override
+  String get settings_conflict_field_sacFactor => 'معامل استهلاك الغاز';
+
+  @override
+  String get settings_conflict_field_sacStressed =>
+      'استهلاك الغاز تحت الضغط النفسي';
+
+  @override
+  String get settings_conflict_field_safetyReviewDisabledRules =>
+      'فحوصات السلامة المعطلة';
+
+  @override
+  String get settings_conflict_field_safetyReviewEnabled => 'مراجعة السلامة';
+
+  @override
+  String get settings_conflict_field_salinityPpt => 'الملوحة بالأجزاء في الألف';
+
+  @override
+  String get settings_conflict_field_sampleCount => 'عدد القراءات';
+
+  @override
+  String get settings_conflict_field_samples => 'قراءات الملف';
+
+  @override
+  String get settings_conflict_field_scientificName => 'الاسم العلمي';
+
+  @override
+  String get settings_conflict_field_scooterBurnSeconds => 'مدة تشغيل السكوتر';
+
+  @override
+  String get settings_conflict_field_scooterName => 'السكوتر';
+
+  @override
+  String get settings_conflict_field_scooterSpeedMps => 'سرعة السكوتر';
+
+  @override
+  String get settings_conflict_field_scrAdditionRatio => 'نسبة إضافة SCR';
+
+  @override
+  String get settings_conflict_field_scrInjectionRate => 'معدل حقن SCR';
+
+  @override
+  String get settings_conflict_field_scrOrificeSize => 'حجم فتحة SCR';
+
+  @override
+  String get settings_conflict_field_scrType => 'نوع SCR';
+
+  @override
+  String get settings_conflict_field_scrubberDurationMinutes =>
+      'مدة الجير الماص';
+
+  @override
+  String get settings_conflict_field_scrubberRemainingMinutes =>
+      'المدة المتبقية للجير الماص';
+
+  @override
+  String get settings_conflict_field_scrubberType => 'نوع الجير الماص';
+
+  @override
+  String get settings_conflict_field_seascapeAppearance =>
+      'مظهر المشهد تحت الماء';
+
+  @override
+  String get settings_conflict_field_seascapeVerticalExaggerationOverrides =>
+      'المقياس الرأسي للمشهد تحت الماء';
+
+  @override
+  String get settings_conflict_field_section => 'القسم';
+
+  @override
+  String get settings_conflict_field_serviceCategory => 'نوع الصيانة';
+
+  @override
+  String get settings_conflict_field_serviceDate => 'تاريخ الصيانة';
+
+  @override
+  String get settings_conflict_field_serviceReminderDays =>
+      'أيام تذكير الصيانة';
+
+  @override
+  String get settings_conflict_field_setpointBar => 'نقطة الضبط';
+
+  @override
+  String get settings_conflict_field_setpointSwitchDepth =>
+      'عمق تبديل نقطة الضبط';
+
+  @override
+  String get settings_conflict_field_settings_key => 'الإعداد';
+
+  @override
+  String get settings_conflict_field_settings_value => 'القيمة';
+
+  @override
+  String get settings_conflict_field_shallowAscentRate =>
+      'سرعة الصعود بين المحطات الضحلة';
+
+  @override
+  String get settings_conflict_field_sharedComputerIds => 'مشترك مع الحواسيب';
+
+  @override
+  String get settings_conflict_field_shoreSwimM => 'السباحة إلى الشاطئ';
+
+  @override
+  String get settings_conflict_field_shoreWalkM => 'المشي إلى الشاطئ';
+
+  @override
+  String get settings_conflict_field_shortName => 'الاسم المختصر';
+
+  @override
+  String get settings_conflict_field_showAscentRateColors =>
+      'ألوان سرعة الصعود';
+
+  @override
+  String get settings_conflict_field_showCeilingOnProfile => 'الملف يعرض السقف';
+
+  @override
+  String get settings_conflict_field_showDataSourceBadges =>
+      'شارات مصدر البيانات';
+
+  @override
+  String get settings_conflict_field_showDecoStopsOnProfile =>
+      'الملف يعرض محطات تخفيف الضغط';
+
+  @override
+  String get settings_conflict_field_showDepthColoredDiveCards =>
+      'بطاقات الغوص ملونة حسب العمق';
+
+  @override
+  String get settings_conflict_field_showDetailsPaneBuddies =>
+      'لوحة التفاصيل للرفاق';
+
+  @override
+  String get settings_conflict_field_showDetailsPaneCertifications =>
+      'لوحة التفاصيل للشهادات';
+
+  @override
+  String get settings_conflict_field_showDetailsPaneCourses =>
+      'لوحة التفاصيل للدورات';
+
+  @override
+  String get settings_conflict_field_showDetailsPaneDiveCenters =>
+      'لوحة التفاصيل لمراكز الغوص';
+
+  @override
+  String get settings_conflict_field_showDetailsPaneDives =>
+      'لوحة التفاصيل للغوصات';
+
+  @override
+  String get settings_conflict_field_showDetailsPaneEquipment =>
+      'لوحة التفاصيل للمعدات';
+
+  @override
+  String get settings_conflict_field_showDetailsPaneSites =>
+      'لوحة التفاصيل للمواقع';
+
+  @override
+  String get settings_conflict_field_showDetailsPaneTrips =>
+      'لوحة التفاصيل للرحلات';
+
+  @override
+  String get settings_conflict_field_showDiveFigure => 'مجسم الغواص';
+
+  @override
+  String get settings_conflict_field_showFigure => 'معروض على مجسم الغواص';
+
+  @override
+  String get settings_conflict_field_showInDetailHeader =>
+      'معروض في رأس الغوصة';
+
+  @override
+  String get settings_conflict_field_showInListView => 'معروض في قائمة الغوصات';
+
+  @override
+  String get settings_conflict_field_showMapBackgroundOnDiveCards =>
+      'خريطة خلف بطاقات الغوص';
+
+  @override
+  String get settings_conflict_field_showMapBackgroundOnSiteCards =>
+      'خريطة خلف بطاقات المواقع';
+
+  @override
+  String get settings_conflict_field_showMaxDepthMarker =>
+      'الملف يعرض أقصى عمق';
+
+  @override
+  String get settings_conflict_field_showNdlOnProfile => 'الملف يعرض NDL';
+
+  @override
+  String get settings_conflict_field_showPressureThresholdMarkers =>
+      'الملف يعرض حدود الضغط';
+
+  @override
+  String get settings_conflict_field_showProfilePanelInTableView =>
+      'لوحة الملف في عرض الجدول';
+
+  @override
+  String get settings_conflict_field_signatureType => 'نوع التوقيع';
+
+  @override
+  String get settings_conflict_field_signedRecord => 'سجل تعبئة موقّع';
+
+  @override
+  String get settings_conflict_field_signerName => 'موقّع من';
+
+  @override
+  String get settings_conflict_field_siteDetailLayout => 'تخطيط تفاصيل الموقع';
+
+  @override
+  String get settings_conflict_field_siteDetailSections =>
+      'أقسام تفاصيل الموقع';
+
+  @override
+  String get settings_conflict_field_siteFeatures_type => 'نوع المعلم';
+
+  @override
+  String get settings_conflict_field_siteListViewMode => 'عرض قائمة المواقع';
+
+  @override
+  String get settings_conflict_field_siteSuggestionDismissedAt =>
+      'تم تجاهل اقتراح الموقع';
+
+  @override
+  String get settings_conflict_field_size => 'المقاس';
+
+  @override
+  String get settings_conflict_field_sortOrder => 'ترتيب الفرز';
+
+  @override
+  String get settings_conflict_field_source => 'المصدر';
+
+  @override
+  String get settings_conflict_field_sourceDiverKey => 'الغواص في السجل المصدر';
+
+  @override
+  String get settings_conflict_field_sourceFileFormat => 'تنسيق الملف المصدر';
+
+  @override
+  String get settings_conflict_field_sourceFileName => 'اسم الملف المصدر';
+
+  @override
+  String get settings_conflict_field_sourceFormat => 'تنسيق المصدر';
+
+  @override
+  String get settings_conflict_field_sourceItemId => 'عنصر مرتبط';
+
+  @override
+  String get settings_conflict_field_sourceRef => 'الملف أو الجهاز المصدر';
+
+  @override
+  String get settings_conflict_field_sourceTankIndex =>
+      'رقم الأسطوانة في السجل المصدر';
+
+  @override
+  String get settings_conflict_field_sourceType => 'المصدر';
+
+  @override
+  String get settings_conflict_field_sourceUuid => 'معرّف المصدر';
+
+  @override
+  String get settings_conflict_field_sourceValueNumber => 'القيمة المرجعية';
+
+  @override
+  String get settings_conflict_field_spec => 'خريطة الاتصالات';
+
+  @override
+  String get settings_conflict_field_species_category => 'الفئة';
+
+  @override
+  String get settings_conflict_field_startDateTime => 'البداية المخططة';
+
+  @override
+  String get settings_conflict_field_startDepth => 'عمق البداية';
+
+  @override
+  String get settings_conflict_field_startTime => 'وقت البدء';
+
+  @override
+  String get settings_conflict_field_startTimestamp =>
+      'يبدأ عند (الوقت داخل الغوصة)';
+
+  @override
+  String get settings_conflict_field_startedAt => 'بدأ';
+
+  @override
+  String get settings_conflict_field_state => 'الحالة';
+
+  @override
+  String get settings_conflict_field_stationKey => 'مفتاح محطة التعبئة';
+
+  @override
+  String get settings_conflict_field_stationName => 'محطة التعبئة';
+
+  @override
+  String get settings_conflict_field_stopMinimumsJson =>
+      'الحد الأدنى لأوقات المحطات';
+
+  @override
+  String get settings_conflict_field_strictOrder => 'عناصر بترتيب ثابت';
+
+  @override
+  String get settings_conflict_field_subject => 'يبحث في';
+
+  @override
+  String get settings_conflict_field_summaryMaxDepth => 'أقصى عمق مخطط';
+
+  @override
+  String get settings_conflict_field_summaryRuntimeSeconds => 'المدة المخططة';
+
+  @override
+  String get settings_conflict_field_summaryTtsSeconds =>
+      'الوقت المخطط حتى السطح';
+
+  @override
+  String get settings_conflict_field_supersedesRuleId =>
+      'يحل محل القاعدة المدمجة';
+
+  @override
+  String get settings_conflict_field_surfaceConditions => 'الأحوال على السطح';
+
+  @override
+  String get settings_conflict_field_surfaceSwimLimitM =>
+      'أطول سباحة على السطح';
+
+  @override
+  String get settings_conflict_field_swimSpeedMps => 'سرعة السباحة';
+
+  @override
+  String get settings_conflict_field_takenAt => 'التُقطت';
+
+  @override
+  String get settings_conflict_field_tankMaterial => 'مادة الأسطوانة';
+
+  @override
+  String get settings_conflict_field_tankName => 'اسم الأسطوانة';
+
+  @override
+  String get settings_conflict_field_tankOrder => 'ترتيب الأسطوانة';
+
+  @override
+  String get settings_conflict_field_tankRole => 'دور الأسطوانة';
+
+  @override
+  String get settings_conflict_field_targetCount => 'الهدف';
+
+  @override
+  String get settings_conflict_field_taxonomyClass => 'الطائفة التصنيفية';
+
+  @override
+  String get settings_conflict_field_temperatureC => 'درجة الحرارة';
+
+  @override
+  String get settings_conflict_field_temperatureCelsius => 'درجة الحرارة';
+
+  @override
+  String get settings_conflict_field_temperatureUnit => 'وحدة درجة الحرارة';
+
+  @override
+  String get settings_conflict_field_templateName => 'قالب قائمة التحقق';
+
+  @override
+  String get settings_conflict_field_themeMode => 'السمة';
+
+  @override
+  String get settings_conflict_field_themePreset => 'سمة الألوان';
+
+  @override
+  String get settings_conflict_field_thickness => 'السماكة';
+
+  @override
+  String get settings_conflict_field_thumbnailGeneratedAt =>
+      'تم إنشاء الصورة المصغرة';
+
+  @override
+  String get settings_conflict_field_tideState => 'المد والجزر';
+
+  @override
+  String get settings_conflict_field_timeFormat => 'تنسيق الوقت';
+
+  @override
+  String get settings_conflict_field_timeOffsetSeconds => 'فارق الوقت';
+
+  @override
+  String get settings_conflict_field_timestamp => 'الوقت داخل الغوصة';
+
+  @override
+  String get settings_conflict_field_timestampOffsetSeconds => 'فارق الوقت';
+
+  @override
+  String get settings_conflict_field_tissueColorScheme => 'ألوان الأنسجة';
+
+  @override
+  String get settings_conflict_field_tissueVizMode => 'مخطط الأنسجة';
+
+  @override
+  String get settings_conflict_field_title => 'العنوان';
+
+  @override
+  String get settings_conflict_field_totalDistance => 'المسافة الإجمالية';
+
+  @override
+  String get settings_conflict_field_towBurnFactor =>
+      'معامل الاستهلاك عند السحب';
+
+  @override
+  String get settings_conflict_field_towSpeedFactor => 'معامل السرعة عند السحب';
+
+  @override
+  String get settings_conflict_field_transmitterSerial =>
+      'الرقم التسلسلي للمرسل';
+
+  @override
+  String get settings_conflict_field_trimEndTime => 'النهاية المقصوصة';
+
+  @override
+  String get settings_conflict_field_trimStartTime => 'البداية المقصوصة';
+
+  @override
+  String get settings_conflict_field_trimTankPressureAtSurfacing =>
+      'ضغط الأسطوانة مقصوص عند الخروج إلى السطح';
+
+  @override
+  String get settings_conflict_field_tripChecklistItems_category => 'الفئة';
+
+  @override
+  String get settings_conflict_field_tripCylinderEvents_kind => 'الحدث';
+
+  @override
+  String get settings_conflict_field_tripListViewMode => 'عرض قائمة الرحلات';
+
+  @override
+  String get settings_conflict_field_tripServiceLeadDays =>
+      'تحذير الصيانة بالأيام قبل الرحلة';
+
+  @override
+  String get settings_conflict_field_trustFraction => 'الجزء الموثوق من المسار';
+
+  @override
+  String get settings_conflict_field_turnPressureFraction => 'نسبة ضغط العودة';
+
+  @override
+  String get settings_conflict_field_turnPressureRule => 'قاعدة ضغط العودة';
+
+  @override
+  String get settings_conflict_field_tzOffsetMinutes =>
+      'فارق المنطقة الزمنية بالدقائق';
+
+  @override
+  String get settings_conflict_field_uploadFactsHlc => 'سجل الرفع';
+
+  @override
+  String get settings_conflict_field_url => 'العنوان';
+
+  @override
+  String get settings_conflict_field_usageDuration => 'وقت التنفس';
+
+  @override
+  String get settings_conflict_field_useDiveComputerCnsData =>
+      'CNS من حاسوب الغوص';
+
+  @override
+  String get settings_conflict_field_value => 'القيمة';
+
+  @override
+  String get settings_conflict_field_valueLabel => 'تسمية القيمة';
+
+  @override
+  String get settings_conflict_field_valueMax => 'أعلى قيمة متوقعة';
+
+  @override
+  String get settings_conflict_field_valueMin => 'أدنى قيمة متوقعة';
+
+  @override
+  String get settings_conflict_field_valueNum => 'القيمة';
+
+  @override
+  String get settings_conflict_field_valueNumber => 'القراءة';
+
+  @override
+  String get settings_conflict_field_valueText => 'القيمة';
+
+  @override
+  String get settings_conflict_field_valueUnit => 'الوحدة';
+
+  @override
+  String get settings_conflict_field_verdict => 'الحكم';
+
+  @override
+  String get settings_conflict_field_verifyFactsHlc => 'سجل التحقق';
+
+  @override
+  String get settings_conflict_field_vesselName => 'السفينة';
+
+  @override
+  String get settings_conflict_field_vesselType => 'نوع السفينة';
+
+  @override
+  String get settings_conflict_field_viewMode => 'العرض';
+
+  @override
+  String get settings_conflict_field_visibilityScaleExcellentM =>
+      'رؤية ممتازة بدءًا من';
+
+  @override
+  String get settings_conflict_field_visibilityScaleGoodM =>
+      'رؤية جيدة بدءًا من';
+
+  @override
+  String get settings_conflict_field_visibilityScaleModerateM =>
+      'رؤية متوسطة بدءًا من';
+
+  @override
+  String get settings_conflict_field_volume => 'الحجم';
+
+  @override
+  String get settings_conflict_field_volumeL => 'الحجم';
+
+  @override
+  String get settings_conflict_field_volumeLiters => 'الحجم';
+
+  @override
+  String get settings_conflict_field_volumeUnit => 'وحدة الحجم';
+
+  @override
+  String get settings_conflict_field_walkSpeedMps => 'سرعة المشي';
+
+  @override
+  String get settings_conflict_field_weatherCode => 'رمز الطقس';
+
+  @override
+  String get settings_conflict_field_weatherFetchedAt => 'تم جلب الطقس';
+
+  @override
+  String get settings_conflict_field_weatherSource => 'مصدر الطقس';
+
+  @override
+  String get settings_conflict_field_weightAmount => 'الرصاص';
+
+  @override
+  String get settings_conflict_field_weightKg => 'الوزن';
+
+  @override
+  String get settings_conflict_field_weightType => 'نوع الرصاص';
+
+  @override
+  String get settings_conflict_field_weightUnit => 'وحدة الوزن';
+
+  @override
+  String get settings_conflict_field_weightingFeedback => 'ضبط الوزن';
+
+  @override
+  String get settings_conflict_field_weightingFeedbackKg => 'فرق الوزن';
+
+  @override
+  String get settings_conflict_field_width => 'العرض بالبكسل';
+
+  @override
+  String get settings_conflict_field_windDirection => 'اتجاه الرياح';
+
+  @override
+  String get settings_conflict_field_workingPressure => 'ضغط التشغيل';
+
+  @override
+  String get settings_conflict_field_workingPressureBar => 'ضغط التشغيل';
+
+  @override
+  String get settings_conflict_finerThanShown =>
+      'الفرق أدق مما يعرضه هذا العرض.';
+
+  @override
   String get settings_conflict_keepBoth => 'الاحتفاظ بكليهما';
 
   @override
-  String get settings_conflict_keepLocal => 'الاحتفاظ بالمحلي';
+  String settings_conflict_keepDevice(String device) {
+    return 'الاحتفاظ بـ $device';
+  }
 
   @override
-  String get settings_conflict_keepRemote => 'الاحتفاظ بالبعيد';
+  String settings_conflict_localDeleted(String device) {
+    return 'حذف $device هذا السجل.';
+  }
 
   @override
-  String get settings_conflict_localVersion => 'النسخة المحلية';
+  String settings_conflict_modifiedBy(String device, String time) {
+    return '$device · عُدِّل $time';
+  }
 
   @override
-  String settings_conflict_modified(Object time) {
-    return 'تم التعديل: $time';
+  String settings_conflict_moreFields(String fields, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count حقل آخر',
+      many: '$count حقلًا آخر',
+      few: '$count حقول أخرى',
+      two: 'حقلان آخران',
+      one: 'حقل آخر',
+      zero: 'لا شيء آخر',
+    );
+    return '$fields و$_temp0';
   }
 
   @override
@@ -19345,10 +22924,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_conflict_noConflicts_title => 'لا توجد تعارضات';
 
   @override
-  String get settings_conflict_noDataAvailable => 'لا توجد بيانات متاحة';
+  String get settings_conflict_notSet => 'غير محدد';
+
+  @override
+  String get settings_conflict_otherDevice => 'جهاز آخر';
 
   @override
   String get settings_conflict_previous_tooltip => 'التعارض السابق';
+
+  @override
+  String get settings_conflict_ref_appliedSet => 'مطبّق من المجموعة';
+
+  @override
+  String get settings_conflict_ref_attachedThrough => 'مركّب عبر';
 
   @override
   String get settings_conflict_ref_buddy => 'رفيق الغوص';
@@ -19358,6 +22946,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_conflict_ref_checklistTemplate => 'قالب قائمة التحقق';
+
+  @override
+  String get settings_conflict_ref_component => 'المكوّن';
 
   @override
   String get settings_conflict_ref_connectedAccount => 'الحساب المتصل';
@@ -19387,6 +22978,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_conflict_ref_divePlan => 'خطة الغوص';
 
   @override
+  String get settings_conflict_ref_diveRole => 'الدور في الغوص';
+
+  @override
   String get settings_conflict_ref_diveSite => 'موقع الغوص';
 
   @override
@@ -19399,6 +22993,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_conflict_ref_equipment => 'المعدات';
 
   @override
+  String get settings_conflict_ref_equipmentLocation => 'موقع المعدات';
+
+  @override
   String get settings_conflict_ref_equipmentSet => 'طقم المعدات';
 
   @override
@@ -19406,6 +23003,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_conflict_ref_importedFile => 'ملف مستورد';
+
+  @override
+  String get settings_conflict_ref_installedIn => 'مركّب في';
 
   @override
   String get settings_conflict_ref_instructor => 'المدرب';
@@ -19438,7 +23038,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_conflict_ref_preDiveSession => 'قائمة التحقق قبل الغوص';
 
   @override
+  String get settings_conflict_ref_regulator => 'المنظم';
+
+  @override
   String get settings_conflict_ref_relatedDive => 'الغوصة ذات الصلة';
+
+  @override
+  String get settings_conflict_ref_samePerson => 'الشخص نفسه مثل';
 
   @override
   String get settings_conflict_ref_serviceKind => 'نوع الصيانة';
@@ -19465,27 +23071,253 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_conflict_ref_tank => 'الأسطوانة';
 
   @override
+  String get settings_conflict_ref_transmitter => 'المرسل';
+
+  @override
   String get settings_conflict_ref_trip => 'الرحلة';
 
   @override
   String get settings_conflict_ref_tripCylinder => 'أسطوانة الرحلة';
 
   @override
-  String get settings_conflict_remoteVersion => 'النسخة البعيدة';
+  String get settings_conflict_ref_weightPreset => 'قالب الرصاص';
+
+  @override
+  String get settings_conflict_ref_yourRole => 'دورك';
+
+  @override
+  String settings_conflict_remoteDeleted(String device) {
+    return 'حذف $device هذا السجل.';
+  }
 
   @override
   String settings_conflict_resolved(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count تعارضات',
+      other: '$count تعارض',
+      many: '$count تعارضًا',
+      few: '$count تعارضات',
+      two: 'تعارضين',
       one: 'تعارض واحد',
     );
     return 'تم حل $_temp0';
   }
 
   @override
+  String get settings_conflict_same => 'متطابق';
+
+  @override
+  String get settings_conflict_sameContent =>
+      'للنسختين المحتوى نفسه؛ يختلف وقت الحفظ فقط. أي خيار يحتفظ بكل شيء.';
+
+  @override
+  String settings_conflict_sameFields(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count حقل متطابق',
+      many: '$count حقلًا متطابقًا',
+      few: '$count حقول متطابقة',
+      two: 'حقلان متطابقان',
+      one: 'حقل واحد متطابق',
+      zero: 'لا توجد حقول متطابقة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_conflict_textDiffHint =>
+      'الكلمات المميزة موجودة في تلك النسخة فقط.';
+
+  @override
+  String get settings_conflict_thisDevice => 'هذا الجهاز';
+
+  @override
   String get settings_conflict_title => 'حل التعارضات';
+
+  @override
+  String get enum_tissueVizMode_heatMap => 'خريطة حرارية';
+
+  @override
+  String get enum_tissueVizMode_stackedArea => 'مساحات متراكمة';
+
+  @override
+  String get enum_tissueColorScheme_classic => 'كلاسيكي';
+
+  @override
+  String get enum_tissueColorScheme_thermal => 'حراري';
+
+  @override
+  String get enum_manifestFormat_atom => 'Atom';
+
+  @override
+  String get enum_manifestFormat_csv => 'CSV';
+
+  @override
+  String get enum_manifestFormat_json => 'JSON';
+
+  @override
+  String get enum_requirementKind_checklist => 'قائمة تحقق';
+
+  @override
+  String get enum_requirementKind_dive => 'غوصات';
+
+  @override
+  String get enum_preDiveSessionStatus_aborted => 'أُلغيت';
+
+  @override
+  String get enum_preDiveSessionStatus_completed => 'اكتملت';
+
+  @override
+  String get enum_preDiveSessionStatus_inProgress => 'قيد التنفيذ';
+
+  @override
+  String get enum_preDiveItemType_cellLinearity => 'خطية الخلايا';
+
+  @override
+  String get enum_preDiveItemType_check => 'فحص';
+
+  @override
+  String get enum_preDiveItemType_equipment => 'المعدات';
+
+  @override
+  String get enum_preDiveItemType_equipmentSet => 'مجموعة المعدات';
+
+  @override
+  String get enum_preDiveItemType_value => 'قيمة';
+
+  @override
+  String get enum_preDiveItemState_done => 'تم';
+
+  @override
+  String get enum_preDiveItemState_flagged => 'مُعلَّم';
+
+  @override
+  String get enum_preDiveItemState_pending => 'معلّق';
+
+  @override
+  String get enum_preDiveItemState_skipped => 'تم التخطي';
+
+  @override
+  String get enum_planMode_pscr => 'جهاز إعادة تنفس شبه مغلق سلبي';
+
+  @override
+  String get enum_missionEnvironment_openWater => 'مياه مفتوحة';
+
+  @override
+  String get enum_missionEnvironment_overhead => 'بيئة ذات سقف';
+
+  @override
+  String get enum_ownershipEventKind_shared => 'تمت المشاركة';
+
+  @override
+  String get enum_ownershipEventKind_transferred => 'تم النقل';
+
+  @override
+  String get enum_ownershipEventKind_unshared => 'توقفت المشاركة';
+
+  @override
+  String get enum_fillSource_file => 'ملف';
+
+  @override
+  String get enum_fillSource_issued => 'صادر عن محطة التعبئة';
+
+  @override
+  String get enum_fillSource_link => 'رابط';
+
+  @override
+  String get enum_fillSource_manual => 'مُدخل يدويًا';
+
+  @override
+  String get enum_fillSource_nfc => 'وسم NFC';
+
+  @override
+  String get enum_fillSource_qr => 'رمز QR';
+
+  @override
+  String get enum_tripCylinderEventKind_adjustment => 'تعديل';
+
+  @override
+  String get enum_tripCylinderEventKind_fill => 'تعبئة';
+
+  @override
+  String get enum_weatherSource_manual => 'يدوي';
+
+  @override
+  String get enum_weatherSource_openMeteo => 'Open-Meteo';
+
+  @override
+  String get enum_tankRoleSource_transmitterName => 'اسم المرسل';
+
+  @override
+  String get enum_safetySeverity_caution => 'تنبيه';
+
+  @override
+  String get enum_safetySeverity_info => 'معلومة';
+
+  @override
+  String get enum_safetySeverity_significant => 'مهم';
+
+  @override
+  String get enum_qualityStatus_dismissed => 'تم التجاهل';
+
+  @override
+  String get enum_qualityStatus_open => 'مفتوح';
+
+  @override
+  String get enum_qualityStatus_resolved => 'تم الحل';
+
+  @override
+  String get enum_qualitySeverity_critical => 'حرج';
+
+  @override
+  String get enum_qualitySeverity_info => 'معلومة';
+
+  @override
+  String get enum_qualitySeverity_warning => 'تحذير';
+
+  @override
+  String get enum_qualityCategory_duplicate => 'مكرر';
+
+  @override
+  String get enum_qualityCategory_gas => 'الغاز';
+
+  @override
+  String get enum_qualityCategory_pressure => 'الضغط';
+
+  @override
+  String get enum_qualityCategory_profile => 'الملف';
+
+  @override
+  String get enum_qualityCategory_source => 'المصدر';
+
+  @override
+  String get enum_qualityCategory_tank => 'الأسطوانة';
+
+  @override
+  String get enum_qualityCategory_temperature => 'درجة الحرارة';
+
+  @override
+  String get enum_qualityCategory_time => 'الوقت';
+
+  @override
+  String get enum_eventSource_computed => 'محسوب';
+
+  @override
+  String get enum_eventSource_imported => 'مستورد';
+
+  @override
+  String get enum_eventSource_user => 'أضفته أنت';
+
+  @override
+  String settings_conflict_whatDiffers(int count) {
+    return 'ما يختلف ($count)';
+  }
+
+  @override
+  String get settings_conflict_whitespaceOnly =>
+      'تختلف المسافات أو فواصل الأسطر فقط.';
 
   @override
   String get settings_data_appDefaultLocation => 'موقع التطبيق الافتراضي';
@@ -20096,6 +23928,120 @@ class AppLocalizationsAr extends AppLocalizations {
       'الصيانة التي تحتاجها معداتك، وعدد مراتها';
 
   @override
+  String get settings_manage_locations => 'المواقع';
+
+  @override
+  String get settings_manage_locations_subtitle =>
+      'أين تُخزَّن معداتك أو تُصان أو تُعار';
+
+  @override
+  String get settings_manage_currencyRules => 'صلاحية الشهادات';
+
+  @override
+  String get settings_manage_currencyRules_subtitle => 'قواعد التنشيط والتجديد';
+
+  @override
+  String get currencyRules_title => 'صلاحية الشهادات';
+
+  @override
+  String get currencyRules_addTooltip => 'إضافة قاعدة';
+
+  @override
+  String get currencyRules_editTooltip => 'تعديل القاعدة';
+
+  @override
+  String get currencyRules_deleteTooltip => 'حذف القاعدة';
+
+  @override
+  String get currencyRules_builtIn => 'مدمجة';
+
+  @override
+  String get currencyRules_custom => 'قواعدك';
+
+  @override
+  String currencyRules_replaces(String name) {
+    return 'تحل محل $name';
+  }
+
+  @override
+  String currencyRules_replacedBy(String name) {
+    return 'استُبدلت بـ $name';
+  }
+
+  @override
+  String currencyRules_summary_activity(int lapse) {
+    String _temp0 = intl.Intl.pluralLogic(
+      lapse,
+      locale: localeName,
+      other: 'تنتهي بعد $lapse يوم من آخر غطسة مؤهلة',
+      many: 'تنتهي بعد $lapse يومًا من آخر غطسة مؤهلة',
+      few: 'تنتهي بعد $lapse أيام من آخر غطسة مؤهلة',
+      two: 'تنتهي بعد يومين من آخر غطسة مؤهلة',
+      one: 'تنتهي بعد يوم واحد من آخر غطسة مؤهلة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String currencyRules_summary_date(int lapse) {
+    String _temp0 = intl.Intl.pluralLogic(
+      lapse,
+      locale: localeName,
+      other: 'تنتهي بعد $lapse يوم من التاريخ على البطاقة',
+      many: 'تنتهي بعد $lapse يومًا من التاريخ على البطاقة',
+      few: 'تنتهي بعد $lapse أيام من التاريخ على البطاقة',
+      two: 'تنتهي بعد يومين من التاريخ على البطاقة',
+      one: 'تنتهي بعد يوم واحد من التاريخ على البطاقة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get currencyRules_deleteDialog_title => 'حذف القاعدة؟';
+
+  @override
+  String currencyRules_deleteDialog_content(String name) {
+    return 'ستتم إزالة $name. تبقى الدورات التنشيطية المسجلة في سجل كل بطاقة.';
+  }
+
+  @override
+  String get currencyRules_dialog_addTitle => 'قاعدة جديدة';
+
+  @override
+  String get currencyRules_dialog_editTitle => 'تعديل القاعدة';
+
+  @override
+  String get currencyRules_dialog_copyNote =>
+      'يؤدي الحفظ إلى إنشاء نسختك الخاصة التي تحل محل هذه القاعدة المدمجة.';
+
+  @override
+  String get currencyRules_dialog_name => 'الاسم';
+
+  @override
+  String get currencyRules_dialog_nameRequired => 'أدخل اسمًا';
+
+  @override
+  String get currencyRules_dialog_clock => 'يُحتسب من';
+
+  @override
+  String get currencyRules_dialog_clock_activity => 'آخر غطسة مؤهلة';
+
+  @override
+  String get currencyRules_dialog_clock_date => 'تاريخ على البطاقة';
+
+  @override
+  String get currencyRules_dialog_agencies => 'الوكالات';
+
+  @override
+  String get currencyRules_dialog_levels => 'المستويات';
+
+  @override
+  String get currencyRules_dialog_anyHint => 'عدم تحديد أي شيء يعني الكل';
+
+  @override
+  String get currencyRules_dialog_note => 'ملاحظة';
+
+  @override
   String get settings_migrationProgress_doNotClose => 'يرجى عدم إغلاق التطبيق';
 
   @override
@@ -20219,7 +24165,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count جهات اتصال',
+      other: '$count جهة اتصال',
+      many: '$count جهة اتصال',
+      few: '$count جهات اتصال',
+      two: 'جهتا اتصال',
       one: 'جهة اتصال واحدة',
       zero: 'غير محدد',
     );
@@ -20584,6 +24533,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_summary_weight => 'الوزن';
 
   @override
+  String get settings_summary_altitude => 'الارتفاع';
+
+  @override
+  String get settings_summary_distance => 'المسافة';
+
+  @override
   String get settings_units_custom => 'مخصص';
 
   @override
@@ -20734,6 +24689,30 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_units_weight_pounds => 'أرطال (lbs)';
+
+  @override
+  String get settings_units_altitude => 'الارتفاع';
+
+  @override
+  String get settings_units_altitude_feet => 'أقدام (ft)';
+
+  @override
+  String get settings_units_altitude_meters => 'أمتار (m)';
+
+  @override
+  String get settings_units_dialog_altitudeUnit => 'وحدة الارتفاع';
+
+  @override
+  String get settings_units_distance => 'المسافة';
+
+  @override
+  String get settings_units_distance_kilometers => 'كيلومترات (km)';
+
+  @override
+  String get settings_units_distance_miles => 'أميال (mi)';
+
+  @override
+  String get settings_units_dialog_distanceUnit => 'وحدة المسافة';
 
   @override
   String get settings_updates_automaticUpdates => 'التحديثات التلقائية';
@@ -20992,6 +24971,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get insights_category_progression_subtitle => 'اتجاهات العمق والوقت';
+
+  @override
+  String get insights_category_focus_subtitle =>
+      'مجموعات الأفضل والأسوأ وحسب الحد';
 
   @override
   String get insights_category_progression_title => 'التقدم';
@@ -21263,7 +25246,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غوصات',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
       one: 'غوصة واحدة',
     );
     return '$_temp0';
@@ -21320,6 +25306,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get insights_gas_sacRecords_title => 'سجلات استهلاك الغاز';
 
   @override
+  String get insights_gas_sacRecords_seeTop => 'عرض أفضل 10';
+
+  @override
   String get insights_gas_sacTrend_error => 'فشل تحميل اتجاه الاستهلاك';
 
   @override
@@ -21327,6 +25316,229 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get insights_gas_sacTrend_title => 'اتجاه استهلاك الغاز';
+
+  @override
+  String get insights_focus_title => 'تركيز الغطسات';
+
+  @override
+  String get insights_focus_error => 'تعذر تحميل تركيز الغطسات';
+
+  @override
+  String get insights_focus_empty => 'لا توجد غطسات بهذه القيمة بعد';
+
+  @override
+  String insights_focus_summary(
+    int count,
+    int total,
+    String group,
+    String overall,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$total غطسة',
+      many: '$total غطسةً',
+      few: '$total غطسات',
+      two: 'غطستين',
+      one: 'غطسة واحدة',
+    );
+    return '$count من $_temp0، متوسط المجموعة $group مقابل $overall إجمالاً';
+  }
+
+  @override
+  String insights_focus_summary_allShown(int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$total غطسة فقط لها هذه القيمة، لذا تُعرض جميعها',
+      many: '$total غطسةً فقط لها هذه القيمة، لذا تُعرض جميعها',
+      few: '$total غطسات فقط لها هذه القيمة، لذا تُعرض جميعها',
+      two: 'غطستان فقط لهما هذه القيمة، لذا تُعرض كلتاهما',
+      one: 'غطسة واحدة فقط لها هذه القيمة، لذا تُعرض',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String insights_focus_noMatch_above(String value, String min, String max) {
+    return 'لا توجد غطسات فوق $value. تتراوح غطساتك من $min إلى $max.';
+  }
+
+  @override
+  String insights_focus_noMatch_below(String value, String min, String max) {
+    return 'لا توجد غطسات تحت $value. تتراوح غطساتك من $min إلى $max.';
+  }
+
+  @override
+  String get insights_focus_enterValue =>
+      'أدخل قيمة لرؤية الغطسات فوقها أو تحتها';
+
+  @override
+  String get insights_focus_chart_title => 'المجموعة عبر الزمن';
+
+  @override
+  String get insights_focus_chart_group => 'في المجموعة';
+
+  @override
+  String get insights_focus_list_title => 'غطسات المجموعة';
+
+  @override
+  String get insights_focus_list_unknownSite => 'لا يوجد موقع';
+
+  @override
+  String get insights_focus_unit_minutes => 'د';
+
+  @override
+  String get insights_focus_metric_rmv => 'RMV';
+
+  @override
+  String get insights_focus_metric_sac => 'SAC';
+
+  @override
+  String get insights_focus_metric_maxDepth => 'العمق الأقصى';
+
+  @override
+  String get insights_focus_metric_bottomTime => 'وقت القاع';
+
+  @override
+  String get insights_focus_metric_weight => 'الأثقال';
+
+  @override
+  String get insights_focus_metric_waterTemp => 'حرارة الماء';
+
+  @override
+  String get insights_focus_mode_best => 'الأفضل';
+
+  @override
+  String get insights_focus_mode_worst => 'الأسوأ';
+
+  @override
+  String get insights_focus_mode_lowest => 'الأدنى';
+
+  @override
+  String get insights_focus_mode_highest => 'الأعلى';
+
+  @override
+  String get insights_focus_mode_above => 'فوق';
+
+  @override
+  String get insights_focus_mode_below => 'تحت';
+
+  @override
+  String get insights_focus_count_label => 'الغطسات';
+
+  @override
+  String get insights_focus_count_error => 'أدخل عدداً صحيحاً من 1 إلى 999';
+
+  @override
+  String get insights_focus_threshold_label => 'القيمة';
+
+  @override
+  String get insights_focus_threshold_error => 'أدخل رقماً';
+
+  @override
+  String get insights_focus_threshold_negativeError => 'أدخل صفراً أو أكثر';
+
+  @override
+  String get insights_focus_factors_title => 'العوامل المشتركة';
+
+  @override
+  String get insights_focus_factors_subtitle =>
+      'هذه المجموعة مقارنة بكل الغطسات التي لها هذه القيمة';
+
+  @override
+  String get insights_focus_factors_tooFew =>
+      'اختر 3 غطسات على الأقل لمقارنة العوامل المشتركة';
+
+  @override
+  String get insights_focus_factors_standsOut => 'بارز';
+
+  @override
+  String insights_focus_factors_standoutsSummary(String factors) {
+    return 'بارز: $factors';
+  }
+
+  @override
+  String insights_focus_factors_versus(String group, String baseline) {
+    return '$group مقابل $baseline';
+  }
+
+  @override
+  String insights_focus_factors_coverage(int covered, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$total غطسة',
+      many: '$total غطسةً',
+      few: '$total غطسات',
+      two: 'غطستين',
+      one: 'غطسة واحدة',
+    );
+    return '$covered من $_temp0';
+  }
+
+  @override
+  String get insights_focus_factorGroup_diveShape => 'شكل الغطسة';
+
+  @override
+  String get insights_focus_factorGroup_conditions => 'الظروف';
+
+  @override
+  String get insights_focus_factorGroup_whenWhere => 'متى وأين';
+
+  @override
+  String get insights_focus_factorGroup_kitGas => 'المعدات والغاز';
+
+  @override
+  String get insights_focus_factor_avgDepth => 'متوسط العمق';
+
+  @override
+  String get insights_focus_factor_duration => 'المدة';
+
+  @override
+  String get insights_focus_factor_visibility => 'الرؤية';
+
+  @override
+  String get insights_focus_factor_current => 'التيار';
+
+  @override
+  String get insights_focus_factor_waterType => 'نوع الماء';
+
+  @override
+  String get insights_focus_factor_entryMethod => 'طريقة الدخول';
+
+  @override
+  String get insights_focus_factor_month => 'الشهر';
+
+  @override
+  String get insights_focus_factor_timeOfDay => 'وقت اليوم';
+
+  @override
+  String get insights_focus_factor_site => 'الموقع';
+
+  @override
+  String get insights_focus_factor_diveType => 'نوع الغطسة';
+
+  @override
+  String get insights_focus_factor_gas => 'الغاز';
+
+  @override
+  String get insights_focus_factor_tankVolume => 'حجم الأسطوانة';
+
+  @override
+  String get insights_focus_factor_suit => 'البدلة';
+
+  @override
+  String get insights_focus_factor_buddy => 'منفرد أو مع رفيق';
+
+  @override
+  String get insights_focus_gas_air => 'هواء';
+
+  @override
+  String get insights_focus_gas_nitrox => 'نيتروكس';
+
+  @override
+  String get insights_focus_gas_trimix => 'ترايمكس';
 
   @override
   String get insights_gas_tankRole_backGas => 'غاز رئيسي';
@@ -21695,6 +25907,320 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get insights_observations_title => 'ملاحظات';
+
+  @override
+  String get insights_observations_seeAll => 'عرض الكل';
+
+  @override
+  String get insights_observations_filterNote =>
+      'تعتمد الملاحظات على سجلك بالكامل، لذلك لا يُطبَّق عليها عامل التصفية';
+
+  @override
+  String get insights_observations_empty => 'تظهر الملاحظات كلما كبر سجلك';
+
+  @override
+  String get insights_observations_error => 'تعذّر تحميل الملاحظات';
+
+  @override
+  String get insights_observations_actions => 'إجراءات الملاحظة';
+
+  @override
+  String get insights_observations_dismiss => 'تجاهل';
+
+  @override
+  String get insights_observations_dismissed => 'تم تجاهل الملاحظة';
+
+  @override
+  String get insights_observations_dismissFailed => 'تعذّر تجاهل الملاحظة';
+
+  @override
+  String get insights_observations_mute => 'عدم عرض هذا النوع';
+
+  @override
+  String get insights_observations_muted => 'الملاحظات من هذا النوع مخفية';
+
+  @override
+  String get insights_observations_undo => 'تراجع';
+
+  @override
+  String get insights_observations_mutedKinds => 'الأنواع المخفية';
+
+  @override
+  String get insights_observations_mutedKinds_empty => 'لا توجد أنواع مخفية';
+
+  @override
+  String get insights_observations_unmute => 'إظهار مجددًا';
+
+  @override
+  String get insights_observations_rule_rmvTrend => 'اتجاه RMV';
+
+  @override
+  String get insights_observations_rule_maxDepthTrend => 'اتجاه العمق الأقصى';
+
+  @override
+  String get insights_observations_rule_diveTimeTrend => 'اتجاه زمن الغوص';
+
+  @override
+  String get insights_observations_rule_weightTrend => 'اتجاه الأثقال';
+
+  @override
+  String get insights_observations_rule_frequencyTrend => 'تكرار الغوص';
+
+  @override
+  String get insights_observations_rule_diveCountMilestone =>
+      'محطات عدد الغطسات';
+
+  @override
+  String get insights_observations_rule_diveHoursMilestone =>
+      'محطات ساعات الغوص';
+
+  @override
+  String get insights_observations_rule_deepestDive => 'أعمق غوصة جديدة';
+
+  @override
+  String get insights_observations_rule_longestDive => 'أطول غوصة جديدة';
+
+  @override
+  String get insights_observations_rule_newCountry => 'دول جديدة';
+
+  @override
+  String get insights_observations_rule_newSpecies => 'أنواع جديدة';
+
+  @override
+  String get insights_observations_rule_diveGap => 'الوقت منذ آخر غوصة';
+
+  @override
+  String get insights_observations_rule_favouriteSite => 'الموقع المفضل';
+
+  @override
+  String get insights_observations_rule_regularBuddy => 'الرفيق الدائم';
+
+  @override
+  String get insights_observations_rule_busiestMonth => 'أكثر الشهور نشاطًا';
+
+  @override
+  String get insights_observations_rule_ascentRate => 'سرعة الصعود';
+
+  @override
+  String insights_observations_rmvTrend_improved(
+    String recent,
+    String previous,
+    String percent,
+  ) {
+    return 'تحسّن RMV لديك: $recent خلال آخر 12 شهرًا، أقل بنسبة $percent% من العام السابق ($previous)';
+  }
+
+  @override
+  String insights_observations_rmvTrend_rose(
+    String recent,
+    String previous,
+    String percent,
+  ) {
+    return 'ارتفع RMV لديك: $recent خلال آخر 12 شهرًا، أعلى بنسبة $percent% من العام السابق ($previous)';
+  }
+
+  @override
+  String insights_observations_maxDepthTrend_deeper(
+    String recent,
+    String previous,
+    String percent,
+  ) {
+    return 'خلال آخر 12 شهرًا كان متوسط عمقك الأقصى $recent، أعمق بنسبة $percent% من العام السابق ($previous)';
+  }
+
+  @override
+  String insights_observations_maxDepthTrend_shallower(
+    String recent,
+    String previous,
+    String percent,
+  ) {
+    return 'خلال آخر 12 شهرًا كان متوسط عمقك الأقصى $recent، أقل عمقًا بنسبة $percent% من العام السابق ($previous)';
+  }
+
+  @override
+  String insights_observations_diveTimeTrend_longer(
+    String recent,
+    String previous,
+    String percent,
+  ) {
+    return 'خلال آخر 12 شهرًا كان متوسط زمن غوصك $recent، أطول بنسبة $percent% من العام السابق ($previous)';
+  }
+
+  @override
+  String insights_observations_diveTimeTrend_shorter(
+    String recent,
+    String previous,
+    String percent,
+  ) {
+    return 'خلال آخر 12 شهرًا كان متوسط زمن غوصك $recent، أقصر بنسبة $percent% من العام السابق ($previous)';
+  }
+
+  @override
+  String insights_observations_weightTrend_more(String amount) {
+    return 'خلال آخر 12 شهرًا حملت في المتوسط $amount أثقالًا أكثر من العام السابق';
+  }
+
+  @override
+  String insights_observations_weightTrend_less(String amount) {
+    return 'خلال آخر 12 شهرًا حملت في المتوسط $amount أثقالًا أقل من العام السابق';
+  }
+
+  @override
+  String insights_observations_frequencyTrend_more(int count, String percent) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'سجّلت $count غوصة خلال آخر 12 شهرًا، أكثر بنسبة $percent% من العام السابق',
+      many:
+          'سجّلت $count غوصة خلال آخر 12 شهرًا، أكثر بنسبة $percent% من العام السابق',
+      few:
+          'سجّلت $count غوصات خلال آخر 12 شهرًا، أكثر بنسبة $percent% من العام السابق',
+      two:
+          'سجّلت غوصتين خلال آخر 12 شهرًا، أكثر بنسبة $percent% من العام السابق',
+      one:
+          'سجّلت غوصة واحدة خلال آخر 12 شهرًا، أكثر بنسبة $percent% من العام السابق',
+      zero:
+          'سجّلت $count غوصة خلال آخر 12 شهرًا، أكثر بنسبة $percent% من العام السابق',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String insights_observations_frequencyTrend_fewer(int count, String percent) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'سجّلت $count غوصة خلال آخر 12 شهرًا، أقل بنسبة $percent% من العام السابق',
+      many:
+          'سجّلت $count غوصة خلال آخر 12 شهرًا، أقل بنسبة $percent% من العام السابق',
+      few:
+          'سجّلت $count غوصات خلال آخر 12 شهرًا، أقل بنسبة $percent% من العام السابق',
+      two:
+          'سجّلت غوصتين خلال آخر 12 شهرًا، أقل بنسبة $percent% من العام السابق',
+      one:
+          'سجّلت غوصة واحدة خلال آخر 12 شهرًا، أقل بنسبة $percent% من العام السابق',
+      zero:
+          'سجّلت $count غوصة خلال آخر 12 شهرًا، أقل بنسبة $percent% من العام السابق',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String insights_observations_diveCountMilestone(String count, String date) {
+    return 'بلغت $count غوصة في $date';
+  }
+
+  @override
+  String insights_observations_diveCountMilestone_logged(
+    String count,
+    String date,
+  ) {
+    return 'بلغت $count غوصة مسجّلة في $date';
+  }
+
+  @override
+  String insights_observations_diveHoursMilestone(String hours, String date) {
+    return 'تجاوزت $hours ساعة تحت الماء في $date';
+  }
+
+  @override
+  String insights_observations_diveHoursMilestone_logged(
+    String hours,
+    String date,
+  ) {
+    return 'تجاوزت $hours ساعة مسجّلة تحت الماء في $date';
+  }
+
+  @override
+  String insights_observations_deepestDive(
+    String value,
+    String date,
+    String previous,
+  ) {
+    return 'أعمق غوصة جديدة: $value في $date، متجاوزةً رقمك السابق $previous';
+  }
+
+  @override
+  String insights_observations_longestDive(
+    String value,
+    String date,
+    String previous,
+  ) {
+    return 'أطول غوصة جديدة: $value في $date، متجاوزةً رقمك السابق $previous';
+  }
+
+  @override
+  String insights_observations_newCountry(String country, String date) {
+    return 'أول غوصة لك في $country، في $date';
+  }
+
+  @override
+  String insights_observations_newSpecies(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count نوع جديد خلال آخر 90 يومًا، آخرها $name',
+      many: '$count نوعًا جديدًا خلال آخر 90 يومًا، آخرها $name',
+      few: '$count أنواع جديدة خلال آخر 90 يومًا، آخرها $name',
+      two: 'نوعان جديدان خلال آخر 90 يومًا، آخرهما $name',
+      one: 'نوع جديد واحد خلال آخر 90 يومًا: $name',
+      zero: '$count نوع جديد خلال آخر 90 يومًا، آخرها $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String insights_observations_diveGap(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'كانت آخر غوصة لك قبل $count يوم',
+      many: 'كانت آخر غوصة لك قبل $count يومًا',
+      few: 'كانت آخر غوصة لك قبل $count أيام',
+      two: 'كانت آخر غوصة لك قبل يومين',
+      one: 'كانت آخر غوصة لك قبل يوم واحد',
+      zero: 'كانت آخر غوصة لك اليوم',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String insights_observations_favouriteSite(
+    String site,
+    String dives,
+    String total,
+  ) {
+    return 'استضاف $site $dives من أصل $total غوصة لك خلال آخر 12 شهرًا';
+  }
+
+  @override
+  String insights_observations_regularBuddy(
+    String buddyName,
+    String dives,
+    String total,
+  ) {
+    return 'غصت مع $buddyName في $dives من أصل $total غوصة لك خلال آخر 12 شهرًا';
+  }
+
+  @override
+  String insights_observations_busiestMonth(String month, String years) {
+    return 'كان $month أكثر شهورك نشاطًا في $years سنوات مختلفة';
+  }
+
+  @override
+  String insights_observations_ascentRate(
+    String rate,
+    String dives,
+    String low,
+    String high,
+  ) {
+    return 'كان متوسط سرعة صعودك خلال آخر 12 شهرًا $rate، عبر $dives غوصة. التوصية الشائعة هي من $low إلى $high أو أبطأ';
+  }
+
+  @override
   String get insights_records_milestones => 'الإنجازات';
 
   @override
@@ -21794,7 +26320,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غوصات',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
       one: 'غوصة واحدة',
     );
     return '$_temp0';
@@ -22203,6 +26732,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'إضافة $count وسم',
+      many: 'إضافة $count وسمًا',
+      few: 'إضافة $count وسوم',
+      two: 'إضافة وسمين',
       one: 'إضافة وسم واحد',
       zero: 'إضافة وسوم',
     );
@@ -22221,11 +26753,38 @@ class AppLocalizationsAr extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_source_fileCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ملف',
+      many: '$count ملفًا',
+      few: '$count ملفات',
+      two: 'ملفان',
+      one: 'ملف واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String importWizard_source_firmware(String version) {
+    return 'البرنامج الثابت $version';
+  }
+
+  @override
+  String importWizard_source_fromApp(String app) {
+    return 'من $app';
+  }
+
+  @override
   String importWizard_photos_foundCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count صور مشار إليها في هذا السجل',
+      other: '$count صورة مشار إليها في هذا السجل',
+      many: '$count صورة مشار إليها في هذا السجل',
+      few: '$count صور مشار إليها في هذا السجل',
+      two: 'صورتان مشار إليهما في هذا السجل',
       one: 'صورة واحدة مشار إليها في هذا السجل',
     );
     return '$_temp0';
@@ -22258,7 +26817,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count صور مضمّنة في الأرشيف',
+      other: '$count صورة مضمّنة في الأرشيف',
+      many: '$count صورة مضمّنة في الأرشيف',
+      few: '$count صور مضمّنة في الأرشيف',
+      two: 'صورتان مضمّنتان في الأرشيف',
       one: 'صورة واحدة مضمّنة في الأرشيف',
     );
     return '$_temp0';
@@ -22283,7 +26845,7 @@ class AppLocalizationsAr extends AppLocalizations {
       other: '$count صورة للتنزيل',
       many: '$count صورة للتنزيل',
       few: '$count صور للتنزيل',
-      two: '$count صورتان للتنزيل',
+      two: 'صورتان للتنزيل',
       one: '$count صورة للتنزيل',
     );
     return '$_temp0';
@@ -22294,8 +26856,11 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم تخطي $count غطسات أقدم — موجودة بالفعل في سجلك',
-      one: 'تم تخطي غطسة واحدة أقدم — موجودة بالفعل في سجلك',
+      other: 'تم تخطي $count غطسة أقدم: موجودة بالفعل في سجلك',
+      many: 'تم تخطي $count غطسة أقدم: موجودة بالفعل في سجلك',
+      few: 'تم تخطي $count غطسات أقدم: موجودة بالفعل في سجلك',
+      two: 'تم تخطي غطستين أقدم: موجودتان بالفعل في سجلك',
+      one: 'تم تخطي غطسة واحدة أقدم: موجودة بالفعل في سجلك',
     );
     return '$_temp0';
   }
@@ -22325,6 +26890,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
       one: 'غوصة واحدة',
       zero: '0 غوصات',
     );
@@ -22355,7 +26923,13 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other:
+          'هذا الوسم على $count غوصة. إيقاف \"استخدام للغوصات\" يزيله من تلك الغوصات.',
+      many:
+          'هذا الوسم على $count غوصة. إيقاف \"استخدام للغوصات\" يزيله من تلك الغوصات.',
+      few:
           'هذا الوسم على $count غوصات. إيقاف \"استخدام للغوصات\" يزيله من تلك الغوصات.',
+      two:
+          'هذا الوسم على غوصتين. إيقاف \"استخدام للغوصات\" يزيله من هاتين الغوصتين.',
       one:
           'هذا الوسم على غوصة واحدة. إيقاف \"استخدام للغوصات\" يزيله من تلك الغوصة.',
     );
@@ -22387,7 +26961,13 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other:
+          'هذا الوسم على $count موقع. إيقاف \"استخدام للمواقع\" يزيله من تلك المواقع.',
+      many:
+          'هذا الوسم على $count موقعًا. إيقاف \"استخدام للمواقع\" يزيله من تلك المواقع.',
+      few:
           'هذا الوسم على $count مواقع. إيقاف \"استخدام للمواقع\" يزيله من تلك المواقع.',
+      two:
+          'هذا الوسم على موقعين. إيقاف \"استخدام للمواقع\" يزيله من هذين الموقعين.',
       one:
           'هذا الوسم على موقع واحد. إيقاف \"استخدام للمواقع\" يزيله من ذلك الموقع.',
     );
@@ -22416,7 +26996,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count مواقع',
+      other: '$count موقع',
+      many: '$count موقعًا',
+      few: '$count مواقع',
+      two: 'موقعان',
       one: 'موقع واحد',
       zero: '0 مواقع',
     );
@@ -22456,6 +27039,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتين',
       one: 'غوصة واحدة',
       zero: '0 غوصات',
     );
@@ -22467,7 +27053,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count مواقع',
+      other: '$count موقع',
+      many: '$count موقعًا',
+      few: '$count مواقع',
+      two: 'موقعين',
       one: 'موقع واحد',
     );
     return 'سيتم إزالة \"$tagName\" من $_temp0. لا يمكن التراجع عن هذا الإجراء.';
@@ -22483,12 +27072,18 @@ class AppLocalizationsAr extends AppLocalizations {
       diveCount,
       locale: localeName,
       other: '$diveCount غوصة',
+      many: '$diveCount غوصة',
+      few: '$diveCount غوصات',
+      two: 'غوصتين',
       one: 'غوصة واحدة',
     );
     String _temp1 = intl.Intl.pluralLogic(
       siteCount,
       locale: localeName,
-      other: '$siteCount مواقع',
+      other: '$siteCount موقع',
+      many: '$siteCount موقعًا',
+      few: '$siteCount مواقع',
+      two: 'موقعين',
       one: 'موقع واحد',
     );
     return 'سيتم إزالة \"$tagName\" من $_temp0 و$_temp1. لا يمكن التراجع عن هذا الإجراء.';
@@ -22615,6 +27210,9 @@ class AppLocalizationsAr extends AppLocalizations {
       diveCount,
       locale: localeName,
       other: '$diveCount غوصة',
+      many: '$diveCount غوصة',
+      few: '$diveCount غوصات',
+      two: 'غوصتين',
       one: 'غوصة واحدة',
       zero: '0 غوصات',
     );
@@ -22626,7 +27224,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       siteCount,
       locale: localeName,
-      other: '$siteCount مواقع',
+      other: '$siteCount موقع',
+      many: '$siteCount موقعًا',
+      few: '$siteCount مواقع',
+      two: 'موقعين',
       one: 'موقع واحد',
     );
     return 'سيتم إزالة هذه الوسوم من $_temp0 إجمالاً. لا يمكن التراجع عن هذا الإجراء.';
@@ -22641,12 +27242,18 @@ class AppLocalizationsAr extends AppLocalizations {
       diveCount,
       locale: localeName,
       other: '$diveCount غوصة',
+      many: '$diveCount غوصة',
+      few: '$diveCount غوصات',
+      two: 'غوصتين',
       one: 'غوصة واحدة',
     );
     String _temp1 = intl.Intl.pluralLogic(
       siteCount,
       locale: localeName,
-      other: '$siteCount مواقع',
+      other: '$siteCount موقع',
+      many: '$siteCount موقعًا',
+      few: '$siteCount مواقع',
+      two: 'موقعين',
       one: 'موقع واحد',
     );
     return 'سيتم إزالة هذه الوسوم من $_temp0 و$_temp1 إجمالاً. لا يمكن التراجع عن هذا الإجراء.';
@@ -22775,6 +27382,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتين',
       one: 'غوصة واحدة',
       zero: '0 غوصات',
     );
@@ -22786,7 +27396,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count مواقع',
+      other: '$count موقع',
+      many: '$count موقعًا',
+      few: '$count مواقع',
+      two: 'موقعين',
       one: 'موقع واحد',
     );
     return 'سيؤثر هذا على $_temp0 إجمالاً.';
@@ -22798,12 +27411,18 @@ class AppLocalizationsAr extends AppLocalizations {
       diveCount,
       locale: localeName,
       other: '$diveCount غوصة',
+      many: '$diveCount غوصة',
+      few: '$diveCount غوصات',
+      two: 'غوصتين',
       one: 'غوصة واحدة',
     );
     String _temp1 = intl.Intl.pluralLogic(
       siteCount,
       locale: localeName,
-      other: '$siteCount مواقع',
+      other: '$siteCount موقع',
+      many: '$siteCount موقعًا',
+      few: '$siteCount مواقع',
+      two: 'موقعين',
       one: 'موقع واحد',
     );
     return 'سيؤثر هذا على $_temp0 و$_temp1 إجمالاً.';
@@ -23219,7 +27838,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غوصات',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
       one: 'غوصة واحدة',
     );
     return '$_temp0';
@@ -23242,7 +27864,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       hours,
       locale: localeName,
-      other: 'قبل $hours ساعات',
+      other: 'قبل $hours ساعة',
+      many: 'قبل $hours ساعة',
+      few: 'قبل $hours ساعات',
+      two: 'قبل ساعتين',
       one: 'قبل ساعة',
     );
     return '$_temp0';
@@ -23569,7 +28194,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count رحلات',
+      other: '$count رحلة',
+      many: '$count رحلة',
+      few: '$count رحلات',
+      two: 'رحلتان',
       one: 'رحلة واحدة',
     );
     return '$_temp0';
@@ -23580,7 +28208,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       total,
       locale: localeName,
-      other: '$total رحلات',
+      other: '$total رحلة',
+      many: '$total رحلة',
+      few: '$total رحلات',
+      two: 'رحلتين',
       one: 'رحلة واحدة',
     );
     return '$shown من $_temp0';
@@ -23622,8 +28253,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trips_detail_dives_unknownSite => 'موقع غوص غير معروف';
 
   @override
-  String trips_detail_durationDays(Object days) {
-    return '$days أيام';
+  String trips_detail_durationDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days يوم',
+      many: '$days يومًا',
+      few: '$days أيام',
+      two: 'يومان',
+      one: 'يوم واحد',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -23660,8 +28300,17 @@ class AppLocalizationsAr extends AppLocalizations {
       'تعذّر البحث عن الصور. حاول مرة أخرى.';
 
   @override
-  String trips_detail_scan_linkedPhotos(Object count) {
-    return 'تم ربط $count صور';
+  String trips_detail_scan_linkedPhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم ربط $count صورة',
+      many: 'تم ربط $count صورة',
+      few: 'تم ربط $count صور',
+      two: 'تم ربط صورتين',
+      one: 'تم ربط صورة واحدة',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -23699,12 +28348,30 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String trips_diveScan_addButton(int count) {
-    return 'إضافة $count غوصات';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'إضافة $count غوصة',
+      many: 'إضافة $count غوصة',
+      few: 'إضافة $count غوصات',
+      two: 'إضافة غوصتين',
+      one: 'إضافة غوصة واحدة',
+    );
+    return '$_temp0';
   }
 
   @override
   String trips_diveScan_added(int count) {
-    return 'تمت إضافة $count غوصات إلى الرحلة';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تمت إضافة $count غوصة إلى الرحلة',
+      many: 'تمت إضافة $count غوصة إلى الرحلة',
+      few: 'تمت إضافة $count غوصات إلى الرحلة',
+      two: 'تمت إضافة غوصتين إلى الرحلة',
+      one: 'تمت إضافة غوصة واحدة إلى الرحلة',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -23739,7 +28406,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String trips_diveScan_subtitle(int count) {
-    return 'تم العثور على $count غوصات في نطاق التاريخ';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم العثور على $count غوصة في نطاق التاريخ',
+      many: 'تم العثور على $count غوصة في نطاق التاريخ',
+      few: 'تم العثور على $count غوصات في نطاق التاريخ',
+      two: 'تم العثور على غوصتين في نطاق التاريخ',
+      one: 'تم العثور على غوصة واحدة في نطاق التاريخ',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -23784,7 +28460,9 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: '$days أيام',
+      other: '$days يوم',
+      many: '$days يومًا',
+      few: '$days أيام',
       two: 'يومان',
       one: 'يوم واحد',
     );
@@ -23879,7 +28557,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'صور',
+      other: 'صورة',
+      many: 'صورة',
+      few: 'صور',
+      two: 'صورتان',
       one: 'صورة',
     );
     return '$_temp0';
@@ -23908,8 +28589,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trips_gallery_error_loading => 'تعذّر تحميل الصور.';
 
   @override
-  String trips_gallery_linkedPhotos(Object count) {
-    return 'تم ربط $count صور';
+  String trips_gallery_linkedPhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم ربط $count صورة',
+      many: 'تم ربط $count صورة',
+      few: 'تم ربط $count صور',
+      two: 'تم ربط صورتين',
+      one: 'تم ربط صورة واحدة',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -23929,7 +28619,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'خلال $days أيام',
+      other: 'خلال $days يوم',
+      many: 'خلال $days يومًا',
+      few: 'خلال $days أيام',
+      two: 'خلال يومين',
       one: 'خلال يوم واحد',
       zero: 'يبدأ اليوم',
     );
@@ -23972,8 +28665,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trips_list_sort_title => 'ترتيب الرحلات';
 
   @override
-  String trips_list_tile_diveCount(Object count) {
-    return '$count غوصات';
+  String trips_list_tile_diveCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
+      one: 'غوصة واحدة',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -23998,8 +28700,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trips_photos_error_loading => 'خطأ في تحميل الصور';
 
   @override
-  String trips_photos_moreIndicator_semanticLabel(Object count) {
-    return '$count صور إضافية';
+  String trips_photos_moreIndicator_semanticLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صورة إضافية',
+      many: '$count صورة إضافية',
+      few: '$count صور إضافية',
+      two: 'صورتان إضافيتان',
+      one: 'صورة إضافية واحدة',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -24171,7 +28882,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get trips_edit_hint_divesPerDay =>
-      'لتوقع التعبئة. الفراغ يعني التقدير.';
+      'لتوقع التعبئة. اتركه فارغًا لاستخدام الغطسات المتوقعة أو خطة كل يوم.';
 
   @override
   String get trips_edit_label_expectedDives => 'الغطسات المتوقعة';
@@ -24343,6 +29054,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trips_gear_openBoard => 'فتح اللوحة';
 
   @override
+  String get trips_gear_tank_notOnBoard => 'ليست على اللوحة';
+
+  @override
+  String get trips_gear_tank_putOnBoard => 'ضعها على اللوحة';
+
+  @override
   String trips_cylinders_forecast_todayShort(int needed, int full) {
     return 'اليوم يحتاج إلى $needed، ولديك $full ممتلئة.';
   }
@@ -24369,7 +29086,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غطسات',
+      other: '$count غطسة',
+      many: '$count غطسة',
+      few: '$count غطسات',
+      two: 'غطستان',
       one: '$count غطسة',
     );
     return '$_temp0';
@@ -24381,7 +29101,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get trips_cylinders_forecast_useEstimate => 'استخدام التقدير';
+  String get trips_cylinders_forecast_clearPlan => 'مسح الخطة';
 
   @override
   String get trips_cylinders_forecast_fewer => 'غطسات أقل';
@@ -24408,7 +29128,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count تعبئات مسجلة',
+      other: '$count تعبئة مسجلة',
+      many: '$count تعبئة مسجلة',
+      few: '$count تعبئات مسجلة',
+      two: 'تعبئتان مسجلتان',
       one: '$count تعبئة مسجلة',
     );
     return '$_temp0';
@@ -24419,7 +29142,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غطسات غير محسوبة',
+      other: '$count غطسة غير محسوبة',
+      many: '$count غطسة غير محسوبة',
+      few: '$count غطسات غير محسوبة',
+      two: 'غطستان غير محسوبتين',
       one: '$count غطسة غير محسوبة',
     );
     return '$_temp0';
@@ -24430,7 +29156,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count تعبئات ضمن باقة',
+      other: '$count تعبئة ضمن باقة',
+      many: '$count تعبئة ضمن باقة',
+      few: '$count تعبئات ضمن باقة',
+      two: 'تعبئتان ضمن باقة',
       one: '$count تعبئة ضمن باقة',
     );
     return '$_temp0';
@@ -24441,7 +29170,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count أسطوانات غطس غير مرتبطة بأسطوانة رحلة',
+      other: '$count أسطوانة غطس غير مرتبطة بأسطوانة رحلة',
+      many: '$count أسطوانة غطس غير مرتبطة بأسطوانة رحلة',
+      few: '$count أسطوانات غطس غير مرتبطة بأسطوانة رحلة',
+      two: 'أسطوانتا غطس غير مرتبطتين بأسطوانة رحلة',
       one: '$count أسطوانة غطس غير مرتبطة بأسطوانة رحلة',
     );
     return '$_temp0';
@@ -24531,7 +29263,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غطسات',
+      other: '$count غطسة',
+      many: '$count غطسة',
+      few: '$count غطسات',
+      two: 'غطستان',
       one: '$count غطسة',
     );
     return '$_temp0';
@@ -24584,7 +29319,13 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other:
+          'حذف هذه الأسطوانة وتعبئاتها؟ استخدمتها $count غطسة. تحتفظ الغطسات بأسطواناتها ويُزال الربط فقط.',
+      many:
+          'حذف هذه الأسطوانة وتعبئاتها؟ استخدمتها $count غطسة. تحتفظ الغطسات بأسطواناتها ويُزال الربط فقط.',
+      few:
           'حذف هذه الأسطوانة وتعبئاتها؟ استخدمتها $count غطسات. تحتفظ الغطسات بأسطواناتها ويُزال الربط فقط.',
+      two:
+          'حذف هذه الأسطوانة وتعبئاتها؟ استخدمتها غطستان. تحتفظ الغطستان بأسطوانتيهما ويُزال الربط فقط.',
       one:
           'حذف هذه الأسطوانة وتعبئاتها؟ استخدمتها $count غطسة. تحتفظ الغطسة بأسطوانتها ويُزال الربط فقط.',
     );
@@ -24758,7 +29499,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count مستحقة هذا الأسبوع',
+      other: '$count مهمة مستحقة هذا الأسبوع',
+      many: '$count مهمة مستحقة هذا الأسبوع',
+      few: '$count مهام مستحقة هذا الأسبوع',
+      two: 'مهمتان مستحقتان هذا الأسبوع',
       one: 'مهمة واحدة مستحقة هذا الأسبوع',
     );
     return '$_temp0';
@@ -24769,7 +29513,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count متأخرة',
+      other: '$count مهمة متأخرة',
+      many: '$count مهمة متأخرة',
+      few: '$count مهام متأخرة',
+      two: 'مهمتان متأخرتان',
       one: 'مهمة واحدة متأخرة',
     );
     return '$_temp0';
@@ -24780,7 +29527,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count عناصر مُجهزة',
+      other: '$count عنصر مُجهز',
+      many: '$count عنصرًا مُجهزًا',
+      few: '$count عناصر مُجهزة',
+      two: 'عنصران مُجهزان',
       one: 'عنصر واحد مُجهز',
       zero: 'لم يُجهز شيء',
     );
@@ -24792,7 +29542,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count أسطوانات',
+      other: '$count أسطوانة',
+      many: '$count أسطوانة',
+      few: '$count أسطوانات',
+      two: 'أسطوانتان',
       one: 'أسطوانة واحدة',
     );
     return '$_temp0';
@@ -24803,7 +29556,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count تنبيهات صيانة',
+      other: '$count تنبيه صيانة',
+      many: '$count تنبيه صيانة',
+      few: '$count تنبيهات صيانة',
+      two: 'تنبيها صيانة',
       one: 'تنبيه صيانة واحد',
     );
     return '$_temp0';
@@ -24814,7 +29570,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count أيام',
+      other: '$count يوم',
+      many: '$count يومًا',
+      few: '$count أيام',
+      two: 'يومان',
       one: 'يوم واحد',
     );
     return '$_temp0';
@@ -24825,7 +29584,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غوصات مخططة',
+      other: '$count غوصة مخططة',
+      many: '$count غوصة مخططة',
+      few: '$count غوصات مخططة',
+      two: 'غوصتان مخططتان',
       one: 'غوصة واحدة مخططة',
     );
     return '$_temp0';
@@ -24839,7 +29601,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String trips_overview_plan_divesPerDay(int count) {
-    return '$count غوصات/يوم';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غوصة/يوم',
+      many: '$count غوصة/يوم',
+      few: '$count غوصات/يوم',
+      two: 'غوصتان/يوم',
+      one: 'غوصة واحدة/يوم',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -24847,7 +29618,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غواصين يتشاركون الأسطوانات',
+      other: '$count غواص يتشاركون الأسطوانات',
+      many: '$count غواصًا يتشاركون الأسطوانات',
+      few: '$count غواصين يتشاركون الأسطوانات',
+      two: 'غواصان يتشاركان الأسطوانات',
       one: 'غواص واحد يتشارك الأسطوانات',
     );
     return '$_temp0';
@@ -24896,8 +29670,11 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count dives',
-      one: '1 dive',
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
+      one: 'غوصة واحدة',
     );
     return '$_temp0';
   }
@@ -24932,7 +29709,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غوصات مخططة',
+      other: '$count غوصة مخططة',
+      many: '$count غوصة مخططة',
+      few: '$count غوصات مخططة',
+      two: 'غوصتان مخططتان',
       one: 'غوصة واحدة مخططة',
     );
     return '$_temp0';
@@ -24944,6 +29724,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get trips_itinerary_plannedDives_invalid =>
       'أدخل عددًا صحيحًا من الغوصات، أو اتركه فارغًا.';
+
+  @override
+  String trips_itinerary_plannedDives_tooMany(int max) {
+    return 'يمكنك التخطيط لـ $max غوصة كحد أقصى في اليوم.';
+  }
 
   @override
   String get trips_itinerary_location_label => 'الموقع';
@@ -25001,7 +29786,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count ملفات جاهزة للاستيراد',
+      other: '$count ملف جاهز للاستيراد',
+      many: '$count ملفًا جاهزًا للاستيراد',
+      few: '$count ملفات جاهزة للاستيراد',
+      two: 'ملفان جاهزان للاستيراد',
       one: 'ملف واحد جاهز للاستيراد',
     );
     return '$_temp0';
@@ -25012,7 +29800,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم تحديد $count ملفات',
+      other: 'تم تحديد $count ملف',
+      many: 'تم تحديد $count ملفًا',
+      few: 'تم تحديد $count ملفات',
+      two: 'تم تحديد ملفين',
       one: 'تم تحديد ملف واحد',
     );
     return '$_temp0';
@@ -25020,6 +29811,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get universalImport_triage_excludedCsv => 'استيراد فردي (CSV)';
+
+  @override
+  String universalImport_triage_excludedHandoff(String format) {
+    return 'استيراد فردي ($format)';
+  }
 
   @override
   String get universalImport_triage_unsupported => 'تنسيق غير مدعوم';
@@ -25056,7 +29852,13 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other:
+          'يحتوي هذا السجل على غطسات لـ $count غواص. اختر وجهة غطسات وشهادات كل غواص.',
+      many:
+          'يحتوي هذا السجل على غطسات لـ $count غواصًا. اختر وجهة غطسات وشهادات كل غواص.',
+      few:
           'يحتوي هذا السجل على غطسات لـ $count غواصين. اختر وجهة غطسات وشهادات كل غواص.',
+      two:
+          'يحتوي هذا السجل على غطسات لغواصَين اثنين. اختر وجهة غطسات وشهادات كل غواص.',
     );
     return '$_temp0';
   }
@@ -25066,7 +29868,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غطسات',
+      other: '$count غطسة',
+      many: '$count غطسة',
+      few: '$count غطسات',
+      two: 'غطستان',
       one: 'غطسة واحدة',
     );
     return '$_temp0';
@@ -25077,7 +29882,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count شهادات',
+      other: '$count شهادة',
+      many: '$count شهادة',
+      few: '$count شهادات',
+      two: 'شهادتان',
       one: 'شهادة واحدة',
     );
     return '$_temp0';
@@ -25129,7 +29937,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'يؤثر على $count غطسات',
+      other: 'يؤثر على $count غطسة',
+      many: 'يؤثر على $count غطسة',
+      few: 'يؤثر على $count غطسات',
+      two: 'يؤثر على غطستين',
       one: 'يؤثر على غطسة واحدة',
     );
     return '$_temp0';
@@ -25148,7 +29959,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم تخطي $count غطسات',
+      other: 'تم تخطي $count غطسة',
+      many: 'تم تخطي $count غطسة',
+      few: 'تم تخطي $count غطسات',
+      two: 'تم تخطي غطستين',
       one: 'تم تخطي غطسة واحدة',
     );
     return '$_temp0';
@@ -25197,7 +30011,13 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other:
+          'تعذّر تحويل $count قيمة فتُركت فارغة. إذا بدا أحد الحقول خاطئًا، فتحقق من ربط الأعمدة ثم استورد مجددًا.',
+      many:
+          'تعذّر تحويل $count قيمة فتُركت فارغة. إذا بدا أحد الحقول خاطئًا، فتحقق من ربط الأعمدة ثم استورد مجددًا.',
+      few:
           'تعذّر تحويل $count قيم فتُركت فارغة. إذا بدا أحد الحقول خاطئًا، فتحقق من ربط الأعمدة ثم استورد مجددًا.',
+      two:
+          'تعذّر تحويل قيمتين فتُركتا فارغتين. إذا بدا أحد الحقول خاطئًا، فتحقق من ربط الأعمدة ثم استورد مجددًا.',
       one:
           'تعذّر تحويل قيمة واحدة فتُركت فارغة. إذا بدا أحد الحقول خاطئًا، فتحقق من ربط الأعمدة ثم استورد مجددًا.',
     );
@@ -25213,7 +30033,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'لم يكن لـ $count صور اسم ملف فتعذّر ربطها.',
+      other: 'لم يكن لـ $count صورة اسم ملف فتعذّر ربطها.',
+      many: 'لم يكن لـ $count صورة اسم ملف فتعذّر ربطها.',
+      few: 'لم يكن لـ $count صور اسم ملف فتعذّر ربطها.',
+      two: 'لم يكن لصورتين اسم ملف فتعذّر ربطهما.',
       one: 'لم يكن لصورة واحدة اسم ملف فتعذّر ربطها.',
     );
     return '$_temp0';
@@ -25255,7 +30078,7 @@ class AppLocalizationsAr extends AppLocalizations {
       other: 'تعذّر سرد صور $count غطسة، لذا لم يتم استيرادها.',
       many: 'تعذّر سرد صور $count غطسة، لذا لم يتم استيرادها.',
       few: 'تعذّر سرد صور $count غطسات، لذا لم يتم استيرادها.',
-      two: 'تعذّر سرد صور $count غطستين، لذا لم يتم استيرادها.',
+      two: 'تعذّر سرد صور غطستين، لذا لم يتم استيرادها.',
       one: 'تعذّر سرد صور $count غطسة، لذا لم يتم استيرادها.',
     );
     return '$_temp0';
@@ -25277,7 +30100,7 @@ class AppLocalizationsAr extends AppLocalizations {
       few:
           'تعذّر تنزيل $count صور. استورد مجددًا لإعادة المحاولة؛ لن تتكرر الصور المحفوظة بالفعل.',
       two:
-          'تعذّر تنزيل $count صورتين. استورد مجددًا لإعادة المحاولة؛ لن تتكرر الصور المحفوظة بالفعل.',
+          'تعذّر تنزيل صورتين. استورد مجددًا لإعادة المحاولة؛ لن تتكرر الصور المحفوظة بالفعل.',
       one:
           'تعذّر تنزيل $count صورة. استورد مجددًا لإعادة المحاولة؛ لن تتكرر الصور المحفوظة بالفعل.',
     );
@@ -25322,7 +30145,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'لم يتم استيراد $count صفوف',
+      other: 'لم يتم استيراد $count صف',
+      many: 'لم يتم استيراد $count صفًا',
+      few: 'لم يتم استيراد $count صفوف',
+      two: 'لم يتم استيراد صفين',
       one: 'لم يتم استيراد صف واحد',
     );
     return '$_temp0';
@@ -25334,6 +30160,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'الصفوف $rows',
+      many: 'الصفوف $rows',
+      few: 'الصفوف $rows',
+      two: 'الصفوف $rows',
       one: 'الصف $rows',
     );
     return '$_temp0';
@@ -25347,7 +30176,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'الصفوف $rows و$count أخرى',
+      other: 'الصفوف $rows و$count صف آخر',
+      many: 'الصفوف $rows و$count صفًا آخر',
+      few: 'الصفوف $rows و$count صفوف أخرى',
+      two: 'الصفوف $rows وصفان آخران',
       one: 'الصفوف $rows وصف آخر',
     );
     return '$_temp0';
@@ -25358,7 +30190,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم استيراد $count غطسات',
+      other: 'تم استيراد $count غطسة',
+      many: 'تم استيراد $count غطسة',
+      few: 'تم استيراد $count غطسات',
+      two: 'تم استيراد غطستين',
       one: 'تم استيراد غطسة واحدة',
     );
     return '$_temp0';
@@ -25429,7 +30264,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'لم يتم استيراد أي شيء: تعذّرت قراءة التواريخ في $count صفوف.',
+      other: 'لم يتم استيراد أي شيء: تعذّرت قراءة التواريخ في $count صف.',
+      many: 'لم يتم استيراد أي شيء: تعذّرت قراءة التواريخ في $count صفًا.',
+      few: 'لم يتم استيراد أي شيء: تعذّرت قراءة التواريخ في $count صفوف.',
+      two: 'لم يتم استيراد أي شيء: تعذّرت قراءة التاريخ في صفين.',
       one: 'لم يتم استيراد أي شيء: تعذّرت قراءة التاريخ في صف واحد.',
     );
     return '$_temp0';
@@ -26055,7 +30893,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'استيراد $count غطسات تم تنزيلها',
+      other: 'استيراد $count غطسة تم تنزيلها',
+      many: 'استيراد $count غطسة تم تنزيلها',
+      few: 'استيراد $count غطسات تم تنزيلها',
+      two: 'استيراد غطستين تم تنزيلهما',
       one: 'استيراد غطسة واحدة تم تنزيلها',
     );
     return '$_temp0';
@@ -26614,6 +31455,7 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count نقطة',
+      many: '$count نقطة',
       few: '$count نقاط',
       two: 'نقطتان',
       one: 'نقطة واحدة',
@@ -26636,6 +31478,7 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count نقطة',
+      many: '$count نقطة',
       few: '$count نقاط',
       two: 'نقطتان',
       one: 'نقطة واحدة',
@@ -26658,6 +31501,7 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count نقطة',
+      many: '$count نقطة',
       few: '$count نقاط',
       two: 'نقطتان',
       one: 'نقطة واحدة',
@@ -26724,6 +31568,7 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count نقطة',
+      many: '$count نقطة',
       few: '$count نقاط',
       two: 'نقطتان',
       one: 'نقطة واحدة',
@@ -27623,7 +32468,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم تحديث $count بلاطات',
+      other: 'تم تحديث $count بلاطة',
+      many: 'تم تحديث $count بلاطة',
+      few: 'تم تحديث $count بلاطات',
+      two: 'تم تحديث بلاطتين',
       one: 'تم تحديث بلاطة واحدة',
     );
     return '$_temp0';
@@ -27704,6 +32552,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'سيُعاد تحميل $count موقع غوص.',
+      many: 'سيُعاد تحميل $count موقع غوص.',
+      few: 'سيُعاد تحميل $count مواقع غوص.',
+      two: 'سيُعاد تحميل موقعي غوص.',
       one: 'سيُعاد تحميل موقع غوص واحد.',
       zero: 'لا يوجد موقع غوص له إحداثيات.',
     );
@@ -27754,6 +32605,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'يتبقّى حوالي $count ثانية',
+      many: 'يتبقّى حوالي $count ثانية',
+      few: 'يتبقّى حوالي $count ثوانٍ',
+      two: 'يتبقّى حوالي ثانيتين',
       one: 'يتبقّى حوالي ثانية واحدة',
     );
     return '$_temp0';
@@ -27765,6 +32619,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'يتبقّى حوالي $count دقيقة',
+      many: 'يتبقّى حوالي $count دقيقة',
+      few: 'يتبقّى حوالي $count دقائق',
+      two: 'يتبقّى حوالي دقيقتين',
       one: 'يتبقّى حوالي دقيقة واحدة',
     );
     return '$_temp0';
@@ -27781,6 +32638,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'قيد التشغيل منذ $count ثانية',
+      many: 'قيد التشغيل منذ $count ثانية',
+      few: 'قيد التشغيل منذ $count ثوانٍ',
+      two: 'قيد التشغيل منذ ثانيتين',
       one: 'قيد التشغيل منذ ثانية واحدة',
     );
     return '$_temp0';
@@ -27792,6 +32652,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'قيد التشغيل منذ $count دقيقة',
+      many: 'قيد التشغيل منذ $count دقيقة',
+      few: 'قيد التشغيل منذ $count دقائق',
+      two: 'قيد التشغيل منذ دقيقتين',
       one: 'قيد التشغيل منذ دقيقة واحدة',
     );
     return '$_temp0';
@@ -28085,7 +32948,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'سيتم حذف $count مواقع.',
+      other: 'سيتم حذف $count موقع.',
+      many: 'سيتم حذف $count موقعًا.',
+      few: 'سيتم حذف $count مواقع.',
+      two: 'سيتم حذف موقعين.',
       one: 'سيتم حذف $count موقع.',
     );
     return '$_temp0';
@@ -28096,7 +32962,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'سيتم حذف $count رحلات.',
+      other: 'سيتم حذف $count رحلة.',
+      many: 'سيتم حذف $count رحلة.',
+      few: 'سيتم حذف $count رحلات.',
+      two: 'سيتم حذف رحلتين.',
       one: 'سيتم حذف $count رحلة.',
     );
     return '$_temp0';
@@ -28107,7 +32976,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تمت إزالة $count عناصر من ملفك',
+      other: 'تمت إزالة $count عنصر من ملفك',
+      many: 'تمت إزالة $count عنصرًا من ملفك',
+      few: 'تمت إزالة $count عناصر من ملفك',
+      two: 'تمت إزالة عنصرين من ملفك',
       one: 'تمت إزالة $count عنصر من ملفك',
     );
     return '$_temp0';
@@ -28118,7 +32990,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'ستتم إزالة $count مواقع مشتركة من ملفك فقط.',
+      other: 'ستتم إزالة $count موقع مشترك من ملفك فقط.',
+      many: 'ستتم إزالة $count موقعًا مشتركًا من ملفك فقط.',
+      few: 'ستتم إزالة $count مواقع مشتركة من ملفك فقط.',
+      two: 'ستتم إزالة موقعين مشتركين من ملفك فقط.',
       one: 'ستتم إزالة $count موقع مشترك من ملفك فقط.',
     );
     return '$_temp0';
@@ -28129,7 +33004,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'ستتم إزالة $count رحلات مشتركة من ملفك فقط.',
+      other: 'ستتم إزالة $count رحلة مشتركة من ملفك فقط.',
+      many: 'ستتم إزالة $count رحلة مشتركة من ملفك فقط.',
+      few: 'ستتم إزالة $count رحلات مشتركة من ملفك فقط.',
+      two: 'ستتم إزالة رحلتين مشتركتين من ملفك فقط.',
       one: 'ستتم إزالة $count رحلة مشتركة من ملفك فقط.',
     );
     return '$_temp0';
@@ -28140,7 +33018,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'إزالة $count عناصر من ملفك؟',
+      other: 'إزالة $count عنصر من ملفك؟',
+      many: 'إزالة $count عنصرًا من ملفك؟',
+      few: 'إزالة $count عناصر من ملفك؟',
+      two: 'إزالة عنصرين من ملفك؟',
       one: 'إزالة $count عنصر من ملفك؟',
     );
     return '$_temp0';
@@ -28152,6 +33033,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count منها مشتركة مع ملفات غوص أخرى وستُحذف للجميع.',
+      many: '$count منها مشتركة مع ملفات غوص أخرى وستُحذف للجميع.',
+      few: '$count منها مشتركة مع ملفات غوص أخرى وستُحذف للجميع.',
+      two: 'اثنان منها مشتركان مع ملفات غوص أخرى وسيُحذفان للجميع.',
       one: '$count منها مشترك مع ملفات غوص أخرى وسيُحذف للجميع.',
     );
     return '$_temp0';
@@ -28163,6 +33047,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count منها مشتركة مع ملفات غوص أخرى وستُحذف للجميع.',
+      many: '$count منها مشتركة مع ملفات غوص أخرى وستُحذف للجميع.',
+      few: '$count منها مشتركة مع ملفات غوص أخرى وستُحذف للجميع.',
+      two: 'اثنتان منها مشتركتان مع ملفات غوص أخرى وستُحذفان للجميع.',
       one: '$count منها مشتركة مع ملفات غوص أخرى وستُحذف للجميع.',
     );
     return '$_temp0';
@@ -28186,7 +33073,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'ستفقد $count غطسات في ملفات غوص أخرى هذا الموقع.',
+      other: 'ستفقد $count غطسة في ملفات غوص أخرى هذا الموقع.',
+      many: 'ستفقد $count غطسة في ملفات غوص أخرى هذا الموقع.',
+      few: 'ستفقد $count غطسات في ملفات غوص أخرى هذا الموقع.',
+      two: 'ستفقد غطستان في ملفات غوص أخرى هذا الموقع.',
       one: 'ستفقد $count غطسة في ملف غوص آخر هذا الموقع.',
     );
     return '$_temp0';
@@ -28197,7 +33087,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'ستفقد $count غطسات في ملفات غوص أخرى هذه الرحلة.',
+      other: 'ستفقد $count غطسة في ملفات غوص أخرى هذه الرحلة.',
+      many: 'ستفقد $count غطسة في ملفات غوص أخرى هذه الرحلة.',
+      few: 'ستفقد $count غطسات في ملفات غوص أخرى هذه الرحلة.',
+      two: 'ستفقد غطستان في ملفات غوص أخرى هذه الرحلة.',
       one: 'ستفقد $count غطسة في ملف غوص آخر هذه الرحلة.',
     );
     return '$_temp0';
@@ -28220,6 +33113,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'ستبقى $count من غطساتك مرتبطة به.',
+      many: 'ستبقى $count من غطساتك مرتبطة به.',
+      few: 'ستبقى $count من غطساتك مرتبطة به.',
+      two: 'ستبقى اثنتان من غطساتك مرتبطتين به.',
       one: 'ستبقى $count من غطساتك مرتبطة به.',
     );
     return '$_temp0';
@@ -28266,16 +33162,22 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       trips,
       locale: localeName,
-      other: 'رحلات مشتركة',
-      one: 'رحلة مشتركة',
+      other: '$trips رحلة مشتركة',
+      many: '$trips رحلة مشتركة',
+      few: '$trips رحلات مشتركة',
+      two: 'رحلتان مشتركتان',
+      one: 'رحلة مشتركة واحدة',
     );
     String _temp1 = intl.Intl.pluralLogic(
       sites,
       locale: localeName,
-      other: 'مواقع مشتركة',
-      one: 'موقع مشترك',
+      other: '$sites موقع مشترك',
+      many: '$sites موقعًا مشتركًا',
+      few: '$sites مواقع مشتركة',
+      two: 'موقعان مشتركان',
+      one: 'موقع مشترك واحد',
     );
-    return 'تم حذف الغواص. $trips $_temp0 و$sites $_temp1 أُعيد تعيينها إلى $name.';
+    return 'تم حذف الغواص. $_temp0 و$_temp1 أُعيد تعيينها إلى $name.';
   }
 
   @override
@@ -28284,7 +33186,13 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other:
+          'سيتم الاحتفاظ بـ $count قطعة معدات تستخدمها ملفات غوص أخرى وتسليمها إليها.',
+      many:
+          'سيتم الاحتفاظ بـ $count قطعة معدات تستخدمها ملفات غوص أخرى وتسليمها إليها.',
+      few:
           'سيتم الاحتفاظ بـ $count قطع معدات تستخدمها ملفات غوص أخرى وتسليمها إليها.',
+      two:
+          'سيتم الاحتفاظ بقطعتي معدات تستخدمهما ملفات غوص أخرى وتسليمهما إليها.',
       one:
           'سيتم الاحتفاظ بـ $count قطعة معدات تستخدمها ملفات غوص أخرى وتسليمها إليها.',
     );
@@ -28296,7 +33204,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم تسليم $count قطع معدات إلى $name.',
+      other: 'تم تسليم $count قطعة معدات إلى $name.',
+      many: 'تم تسليم $count قطعة معدات إلى $name.',
+      few: 'تم تسليم $count قطع معدات إلى $name.',
+      two: 'تم تسليم قطعتي معدات إلى $name.',
       one: 'تم تسليم $count قطعة معدات إلى $name.',
     );
     return '$_temp0';
@@ -28307,7 +33218,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم تسليم $count قطع معدات إلى ملفات الغوص التي تستخدمها.',
+      other: 'تم تسليم $count قطعة معدات إلى ملفات الغوص التي تستخدمها.',
+      many: 'تم تسليم $count قطعة معدات إلى ملفات الغوص التي تستخدمها.',
+      few: 'تم تسليم $count قطع معدات إلى ملفات الغوص التي تستخدمها.',
+      two: 'تم تسليم قطعتي معدات إلى ملفات الغوص التي تستخدمهما.',
       one: 'تم تسليم $count قطعة معدات إلى ملفات الغوص التي تستخدمها.',
     );
     return '$_temp0';
@@ -28340,10 +33254,13 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count ملفات مكررة',
+      other: '$count ملف مكرر',
+      many: '$count ملفًا مكررًا',
+      few: '$count ملفات مكررة',
+      two: 'ملفين مكررين',
       one: 'ملف مكرر',
     );
-    return 'سيتم نقل جميع الغطسات والشهادات والمعدات والبيانات الأخرى من $_temp0 إلى \"$name\". لا يمكن التراجع عن هذا تلقائيًا.';
+    return 'سيتم نقل جميع الغطسات والشهادات والمعدات والبيانات الأخرى من $_temp0 إلى \"$name\". يمكن التراجع عن هذا مباشرةً بعد الدمج.';
   }
 
   @override
@@ -28578,19 +33495,28 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       originals,
       locale: localeName,
-      other: '$originals أصلية',
+      other: '$originals نسخة أصلية',
+      many: '$originals نسخة أصلية',
+      few: '$originals نسخ أصلية',
+      two: 'نسختان أصليتان',
       one: 'أصل واحد',
     );
     String _temp1 = intl.Intl.pluralLogic(
       thumbs,
       locale: localeName,
-      other: '$thumbs صور مصغرة',
+      other: '$thumbs صورة مصغرة',
+      many: '$thumbs صورة مصغرة',
+      few: '$thumbs صور مصغرة',
+      two: 'صورتان مصغرتان',
       one: 'صورة مصغرة واحدة',
     );
     String _temp2 = intl.Intl.pluralLogic(
       renditions,
       locale: localeName,
-      other: '$renditions نسخ مضغوطة',
+      other: '$renditions نسخة مضغوطة',
+      many: '$renditions نسخة مضغوطة',
+      few: '$renditions نسخ مضغوطة',
+      two: 'نسختان مضغوطتان',
       one: 'نسخة مضغوطة واحدة',
     );
     return 'تم فحص $checked عنصرًا سحابيًا ($_temp0، $_temp1، $_temp2): أزيل $removed يتيمًا، وأُدرج $repaired إصلاحًا في قائمة الانتظار، وأُلغي $aborted رفعًا قديمًا';
@@ -29572,6 +34498,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get attrLabel_pocket_mount => 'التثبيت';
 
   @override
+  String get attrLabel_lens_type => 'نوع العدسة';
+
+  @override
+  String get attrLabel_focal_length_mm => 'البعد البؤري (مم)';
+
+  @override
+  String get attrLabel_port_type => 'نوع المنفذ';
+
+  @override
+  String get attrLabel_tray_style => 'النمط';
+
+  @override
+  String get attrLabel_arm_length_m => 'طول الذراع';
+
+  @override
+  String get attrLabel_guide_number_m => 'الرقم الدليلي';
+
+  @override
+  String get attrLabel_bag_style => 'النمط';
+
+  @override
+  String get attrLabel_capacity_l => 'السعة';
+
+  @override
   String get attrChoice_plate_material_aluminum => 'ألومنيوم';
 
   @override
@@ -29723,6 +34673,54 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get attrChoice_pocket_mount_thigh => 'الفخذ';
+
+  @override
+  String get attrChoice_lens_type_camera_lens => 'عدسة الكاميرا';
+
+  @override
+  String get attrChoice_lens_type_wet_lens => 'عدسة رطبة';
+
+  @override
+  String get attrChoice_lens_type_diopter => 'عدسة مقرّبة (ديوبتر)';
+
+  @override
+  String get attrChoice_port_type_dome => 'قبة';
+
+  @override
+  String get attrChoice_port_type_flat => 'مسطح';
+
+  @override
+  String get attrChoice_port_type_macro => 'ماكرو';
+
+  @override
+  String get attrChoice_tray_style_single_handle => 'مقبض واحد';
+
+  @override
+  String get attrChoice_tray_style_double_handle => 'مقبضان';
+
+  @override
+  String get attrChoice_tray_style_pistol_grip => 'مقبض مسدس';
+
+  @override
+  String get attrChoice_bag_style_duffel => 'حقيبة سفر';
+
+  @override
+  String get attrChoice_bag_style_roller => 'حقيبة بعجلات';
+
+  @override
+  String get attrChoice_bag_style_backpack => 'حقيبة ظهر';
+
+  @override
+  String get attrChoice_bag_style_mesh => 'حقيبة شبكية';
+
+  @override
+  String get attrChoice_bag_style_dry_bag => 'حقيبة جافة';
+
+  @override
+  String get attrChoice_bag_style_regulator_bag => 'حقيبة منظم التنفس';
+
+  @override
+  String get attrChoice_bag_style_catch_bag => 'كيس جمع';
 
   @override
   String get attrChoice_bcd_style_jacket => 'جاكيت';
@@ -30013,6 +35011,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get safetySettings_noFlyHeader => 'الطيران بعد الغوص';
 
   @override
+  String get safetySettings_cnsOtuHeader => 'الحمل الحالي لـ CNS/OTU';
+
+  @override
   String get safetySettings_noFlyPreset_standard => 'قياسي (12/18/24 س)';
 
   @override
@@ -30059,6 +35060,30 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get safetyHub_noFly_clear_subtitle => 'لا يوجد قيد نشط على الطيران';
+
+  @override
+  String get safetyHub_cnsOtu_clear_title => 'لا يوجد حمل نشط';
+
+  @override
+  String get safetyHub_cnsOtu_clear_subtitle =>
+      'تلاشى كل من CNS وOTU منذ غطستك الأخيرة';
+
+  @override
+  String safetyHub_cnsOtu_sinceLastDive(String duration) {
+    return 'انتهت الغطسة الأخيرة منذ $duration';
+  }
+
+  @override
+  String safetyHub_cnsOtu_elapsedDaysHours(int days, int hours) {
+    return '${days}d ${hours}h';
+  }
+
+  @override
+  String get safetyHub_cnsOtu_noProfile_title => 'آخر غطسة بلا بيانات مخطط';
+
+  @override
+  String get safetyHub_cnsOtu_noProfile_body =>
+      'لا يمكن حساب CNS% و OTU لها بدون بيانات العمق. المجاميع أدناه لا تشملها.';
 
   @override
   String safetyHub_noFly_category_single(int hours) {
@@ -30225,7 +35250,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count غرف ضغط',
+      other: '$count غرفة ضغط',
+      many: '$count غرفة ضغط',
+      few: '$count غرف ضغط',
+      two: 'غرفتا ضغط',
       one: 'غرفة ضغط واحدة',
     );
     return '$_temp0';
@@ -30480,7 +35508,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count حوادث وشيكة مرتبطة بهذه الغطسة',
+      other: '$count حادث وشيك مرتبط بهذه الغطسة',
+      many: '$count حادثًا وشيكًا مرتبطًا بهذه الغطسة',
+      few: '$count حوادث وشيكة مرتبطة بهذه الغطسة',
+      two: 'حادثان وشيكان مرتبطان بهذه الغطسة',
       one: 'حادث وشيك واحد مرتبط بهذه الغطسة',
     );
     return '$_temp0';
@@ -30488,6 +35519,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get planning_card_noFly_subtitle => 'عدّاد إرشادي منذ آخر غطساتك';
+
+  @override
+  String get planning_card_cnsOtu_subtitle => 'تناقص مباشر منذ غطستك الأخيرة';
 
   @override
   String get settings_section_safety_title => 'السلامة';
@@ -30524,7 +35558,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'قبل $days أيام',
+      other: 'قبل $days يوم',
+      many: 'قبل $days يومًا',
+      few: 'قبل $days أيام',
+      two: 'قبل يومين',
       one: 'قبل يوم واحد',
       zero: 'اليوم',
     );
@@ -30536,7 +35573,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       months,
       locale: localeName,
-      other: 'قبل $months أشهر',
+      other: 'قبل $months شهر',
+      many: 'قبل $months شهرًا',
+      few: 'قبل $months أشهر',
+      two: 'قبل شهرين',
       one: 'قبل شهر واحد',
     );
     return '$_temp0';
@@ -30584,7 +35624,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count نتائج',
+      other: '$count نتيجة',
+      many: '$count نتيجة',
+      few: '$count نتائج',
+      two: 'نتيجتان',
       one: 'نتيجة واحدة',
     );
     return '$_temp0';
@@ -30604,7 +35647,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'إظهار $count نتائج متجاهلة',
+      other: 'إظهار $count نتيجة متجاهلة',
+      many: 'إظهار $count نتيجة متجاهلة',
+      few: 'إظهار $count نتائج متجاهلة',
+      two: 'إظهار نتيجتين متجاهلتين',
       one: 'إظهار نتيجة متجاهلة واحدة',
     );
     return '$_temp0';
@@ -30673,7 +35719,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       n,
       locale: localeName,
-      other: '$n غطسات',
+      other: '$n غطسة',
+      many: '$n غطسة',
+      few: '$n غطسات',
+      two: 'غطستان',
       one: 'غطسة واحدة',
     );
     return '$_temp0، $range';
@@ -30684,7 +35733,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       n,
       locale: localeName,
-      other: '$n غطسات',
+      other: '$n غطسة',
+      many: '$n غطسة',
+      few: '$n غطسات',
+      two: 'غطستان',
       one: 'غطسة واحدة',
     );
     return '$_temp0';
@@ -30705,7 +35757,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       n,
       locale: localeName,
-      other: '$n غطسات باردة',
+      other: '$n غطسة باردة',
+      many: '$n غطسة باردة',
+      few: '$n غطسات باردة',
+      two: 'غطستان باردتان',
       one: 'غطسة باردة واحدة',
     );
     return '$_temp0';
@@ -30721,7 +35776,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       n,
       locale: localeName,
-      other: '$n غطسات عميقة',
+      other: '$n غطسة عميقة',
+      many: '$n غطسة عميقة',
+      few: '$n غطسات عميقة',
+      two: 'غطستان عميقتان',
       one: 'غطسة عميقة واحدة',
     );
     return '$_temp0';
@@ -30732,7 +35790,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       n,
       locale: localeName,
-      other: '$n دورات بطارية',
+      other: '$n دورة بطارية',
+      many: '$n دورة بطارية',
+      few: '$n دورات بطارية',
+      two: 'دورتا بطارية',
       one: 'دورة بطارية واحدة',
     );
     return '$_temp0';
@@ -30829,7 +35890,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count حوادث تذكر هذه القطعة',
+      other: '$count حادث يذكر هذه القطعة',
+      many: '$count حادثًا يذكر هذه القطعة',
+      few: '$count حوادث تذكر هذه القطعة',
+      two: 'حادثان يذكران هذه القطعة',
       one: 'حادث واحد يذكر هذه القطعة',
     );
     return '$_temp0';
@@ -30840,7 +35904,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       n,
       locale: localeName,
-      other: '$n غطسات',
+      other: '$n غطسة',
+      many: '$n غطسة',
+      few: '$n غطسات',
+      two: 'غطستان',
       one: 'غطسة واحدة',
     );
     return '$_temp0، $range';
@@ -30899,13 +35966,19 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       dives,
       locale: localeName,
-      other: 'تعذّر تلخيص $dives غطسات',
+      other: 'تعذّر تلخيص $dives غطسة',
+      many: 'تعذّر تلخيص $dives غطسة',
+      few: 'تعذّر تلخيص $dives غطسات',
+      two: 'تعذّر تلخيص غطستين',
       one: 'تعذّر تلخيص غطسة واحدة',
     );
     String _temp1 = intl.Intl.pluralLogic(
       items,
       locale: localeName,
-      other: 'تعذّر تحديث نتائج الحالة لـ $items قطع معدات',
+      other: 'تعذّر تحديث نتائج الحالة لـ $items قطعة معدات',
+      many: 'تعذّر تحديث نتائج الحالة لـ $items قطعة معدات',
+      few: 'تعذّر تحديث نتائج الحالة لـ $items قطع معدات',
+      two: 'تعذّر تحديث نتائج الحالة لقطعتي معدات',
       one: 'تعذّر تحديث نتائج الحالة لقطعة معدات واحدة',
     );
     return '$_temp0؛ $_temp1';
@@ -30916,7 +35989,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تعذّر تلخيص $count غطسات',
+      other: 'تعذّر تلخيص $count غطسة',
+      many: 'تعذّر تلخيص $count غطسة',
+      few: 'تعذّر تلخيص $count غطسات',
+      two: 'تعذّر تلخيص غطستين',
       one: 'تعذّر تلخيص غطسة واحدة',
     );
     return 'أُعيد بناء ملخصات المستشعرات؛ $_temp0';
@@ -30927,7 +36003,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تعذّر تحديث نتائج الحالة لـ $count قطع معدات',
+      other: 'تعذّر تحديث نتائج الحالة لـ $count قطعة معدات',
+      many: 'تعذّر تحديث نتائج الحالة لـ $count قطعة معدات',
+      few: 'تعذّر تحديث نتائج الحالة لـ $count قطع معدات',
+      two: 'تعذّر تحديث نتائج الحالة لقطعتي معدات',
       one: 'تعذّر تحديث نتائج الحالة لقطعة معدات واحدة',
     );
     return 'أُعيد بناء ملخصات المستشعرات؛ $_temp0';
@@ -31209,7 +36288,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       minutes,
       locale: localeName,
-      other: 'بعد $minutes دقائق',
+      other: 'بعد $minutes دقيقة',
+      many: 'بعد $minutes دقيقة',
+      few: 'بعد $minutes دقائق',
+      two: 'بعد دقيقتين',
       one: 'بعد دقيقة واحدة',
     );
     return '$_temp0';
@@ -31363,9 +36445,12 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'اكتمل الفحص - $count عناصر للمراجعة',
-      one: 'اكتمل الفحص - عنصر واحد للمراجعة',
-      zero: 'اكتمل الفحص - لا توجد نتائج جديدة',
+      other: 'اكتمل الفحص: $count عنصر للمراجعة',
+      many: 'اكتمل الفحص: $count عنصرًا للمراجعة',
+      few: 'اكتمل الفحص: $count عناصر للمراجعة',
+      two: 'اكتمل الفحص: عنصران للمراجعة',
+      one: 'اكتمل الفحص: عنصر واحد للمراجعة',
+      zero: 'اكتمل الفحص: لا توجد نتائج جديدة',
     );
     return '$_temp0';
   }
@@ -31518,7 +36603,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تشمل $count قطع مركّبة.',
+      other: 'تشمل $count قطعة مركّبة.',
+      many: 'تشمل $count قطعة مركّبة.',
+      few: 'تشمل $count قطع مركّبة.',
+      two: 'تشمل قطعتين مركّبتين.',
       one: 'تشمل $count قطعة مركّبة.',
     );
     return '$_temp0';
@@ -31539,7 +36627,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count فجوات في العينات',
+      other: '$count فجوة في العينات',
+      many: '$count فجوة في العينات',
+      few: '$count فجوات في العينات',
+      two: 'فجوتان في العينات',
       one: 'فجوة واحدة في العينات',
     );
     return '$_temp0، أطولها $longest';
@@ -31604,7 +36695,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'سجّل مستشعر الضغط قراءات خاطئة $count مرات (انقطاعات أو قفزات)',
+      other: 'سجّل مستشعر الضغط قراءات خاطئة $count مرة (انقطاعات أو قفزات)',
+      many: 'سجّل مستشعر الضغط قراءات خاطئة $count مرة (انقطاعات أو قفزات)',
+      few: 'سجّل مستشعر الضغط قراءات خاطئة $count مرات (انقطاعات أو قفزات)',
+      two: 'سجّل مستشعر الضغط قراءات خاطئة مرتين (انقطاعات أو قفزات)',
       one: 'سجّل مستشعر الضغط قراءة خاطئة مرة واحدة (انقطاع أو قفزة)',
     );
     return '$_temp0';
@@ -31699,7 +36793,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count قطع معدات',
+      other: '$count قطعة معدات',
+      many: '$count قطعة معدات',
+      few: '$count قطع معدات',
+      two: 'قطعتا معدات',
       one: 'قطعة معدات واحدة',
     );
     return '$_temp0';
@@ -31710,7 +36807,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count أوزان',
+      other: '$count وزن',
+      many: '$count وزنًا',
+      few: '$count أوزان',
+      two: 'وزنان',
       one: 'وزن واحد',
     );
     return '$_temp0';
@@ -31721,7 +36821,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count رفقاء',
+      other: '$count رفيق',
+      many: '$count رفيقًا',
+      few: '$count رفقاء',
+      two: 'رفيقان',
       one: 'رفيق واحد',
     );
     return '$_temp0';
@@ -31732,7 +36835,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count وسوم',
+      other: '$count وسم',
+      many: '$count وسمًا',
+      few: '$count وسوم',
+      two: 'وسمان',
       one: 'وسم واحد',
     );
     return '$_temp0';
@@ -31743,7 +36849,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count صور أو مقاطع فيديو',
+      other: '$count صورة أو مقطع فيديو',
+      many: '$count صورة أو مقطع فيديو',
+      few: '$count صور أو مقاطع فيديو',
+      two: 'صورتان أو مقطعا فيديو',
       one: 'صورة أو فيديو واحد',
     );
     return '$_temp0';
@@ -31754,7 +36863,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count مرفقات',
+      other: '$count مرفق',
+      many: '$count مرفقًا',
+      few: '$count مرفقات',
+      two: 'مرفقان',
       one: 'مرفق واحد',
     );
     return '$_temp0';
@@ -31765,7 +36877,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count حقول مخصصة',
+      other: '$count حقل مخصص',
+      many: '$count حقلًا مخصصًا',
+      few: '$count حقول مخصصة',
+      two: 'حقلان مخصصان',
       one: 'حقل مخصص واحد',
     );
     return '$_temp0';
@@ -31848,7 +36963,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count عناصر مُعلَّمة للمراجعة',
+      other: '$count عنصر مُعلَّم للمراجعة',
+      many: '$count عنصرًا مُعلَّمًا للمراجعة',
+      few: '$count عناصر مُعلَّمة للمراجعة',
+      two: 'عنصران مُعلَّمان للمراجعة',
       one: 'عنصر واحد مُعلَّم للمراجعة',
     );
     return '$_temp0';
@@ -38824,7 +43942,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count أيام من الأسبوع',
+      other: '$count يوم من الأسبوع',
+      many: '$count يومًا من الأسبوع',
+      few: '$count أيام من الأسبوع',
+      two: 'يومان من الأسبوع',
       one: 'يوم واحد من الأسبوع',
     );
     return '$_temp0';
@@ -40436,6 +45557,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count قيد الدمج',
+      many: '$count قيد الدمج',
+      few: '$count قيد الدمج',
+      two: '$count قيد الدمج',
     );
     return '$_temp0';
   }
@@ -40446,6 +45570,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count قيد الاستبدال',
+      many: '$count قيد الاستبدال',
+      few: '$count قيد الاستبدال',
+      two: '$count قيد الاستبدال',
     );
     return '$_temp0';
   }
@@ -40456,6 +45583,10 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count لإكمال غوصات مخططة',
+      many: '$count لإكمال غوصات مخططة',
+      few: '$count لإكمال غوصات مخططة',
+      two: '$count لإكمال غوصات مخططة',
+      one: '$count لإكمال غوصة مخططة',
     );
     return '$_temp0';
   }
@@ -42260,6 +47391,37 @@ class AppLocalizationsAr extends AppLocalizations {
   String get insights_trend_tooltip_highest => 'الأعلى';
 
   @override
+  String get insights_trend_overview_semanticLabel =>
+      'نظرة عامة على المخطط. اسحب النافذة المميزة للتنقل عبر الزمن.';
+
+  @override
+  String get insights_trend_range_tooltip => 'النطاق المرئي';
+
+  @override
+  String get insights_trend_range_all => 'الكل';
+
+  @override
+  String get insights_trend_range_years5 => 'آخر 5 سنوات';
+
+  @override
+  String get insights_trend_range_years2 => 'آخر سنتين';
+
+  @override
+  String get insights_trend_range_year1 => 'آخر سنة';
+
+  @override
+  String get insights_trend_range_months6 => 'آخر 6 أشهر';
+
+  @override
+  String get insights_trend_range_months3 => 'آخر 3 أشهر';
+
+  @override
+  String get insights_trend_range_custom => 'مخصص';
+
+  @override
+  String get insights_trend_range_customPick => 'نطاق مخصص...';
+
+  @override
   String get diveLog_edit_excludeFromStats => 'استبعاد من الإحصائيات';
 
   @override
@@ -42372,6 +47534,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'تم العثور على $count غوصة',
+      many: 'تم العثور على $count غوصة',
+      few: 'تم العثور على $count غوصات',
+      two: 'تم العثور على غوصتين',
       one: 'تم العثور على غوصة واحدة',
       zero: 'لم يتم العثور على غوصات',
     );
@@ -42384,6 +47549,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'تعذّر تحويل $count غوصة وتم تخطيها.',
+      many: 'تعذّر تحويل $count غوصة وتم تخطيها.',
+      few: 'تعذّر تحويل $count غوصات وتم تخطيها.',
+      two: 'تعذّر تحويل غوصتين وتم تخطيهما.',
       one: 'تعذّر تحويل غوصة واحدة وتم تخطيها.',
     );
     return '$_temp0';
@@ -42462,6 +47630,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'تم العثور على $count غوصة',
+      many: 'تم العثور على $count غوصة',
+      few: 'تم العثور على $count غوصات',
+      two: 'تم العثور على غوصتين',
       one: 'تم العثور على غوصة واحدة',
       zero: 'لم يتم العثور على غوصات',
     );
@@ -42474,6 +47645,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'تعذّر تحويل $count غوصة وتم تخطيها.',
+      many: 'تعذّر تحويل $count غوصة وتم تخطيها.',
+      few: 'تعذّر تحويل $count غوصات وتم تخطيها.',
+      two: 'تعذّر تحويل غوصتين وتم تخطيهما.',
       one: 'تعذّر تحويل غوصة واحدة وتم تخطيها.',
     );
     return '$_temp0';
@@ -42693,7 +47867,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'ستنتقل $count غطسات إلى السجل المحتفظ به.',
+      other: 'ستنتقل $count غطسة إلى السجل المحتفظ به.',
+      many: 'ستنتقل $count غطسة إلى السجل المحتفظ به.',
+      few: 'ستنتقل $count غطسات إلى السجل المحتفظ به.',
+      two: 'ستنتقل غطستان إلى السجل المحتفظ به.',
       one: 'ستنتقل غطسة واحدة إلى السجل المحتفظ به.',
       zero: 'لا توجد غطسات مرتبطة بالسجلات الأخرى.',
     );
@@ -42712,7 +47889,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تم دمج $count سجلات في $name',
+      other: 'تم دمج $count سجل في $name',
+      many: 'تم دمج $count سجلًا في $name',
+      few: 'تم دمج $count سجلات في $name',
+      two: 'تم دمج سجلين في $name',
       one: 'تم دمج سجل واحد في $name',
     );
     return '$_temp0';
@@ -42851,13 +48031,19 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       diveCount,
       locale: localeName,
-      other: '$diveCount غوصات',
+      other: '$diveCount غوصة',
+      many: '$diveCount غوصة',
+      few: '$diveCount غوصات',
+      two: 'غوصتان',
       one: 'غوصة واحدة',
     );
     String _temp1 = intl.Intl.pluralLogic(
       siteCount,
       locale: localeName,
-      other: '$siteCount مواقع غوص',
+      other: '$siteCount موقع غوص',
+      many: '$siteCount موقع غوص',
+      few: '$siteCount مواقع غوص',
+      two: 'موقعا غوص',
       one: 'موقع غوص واحد',
     );
     return '$_temp0, $_temp1 - $size';
@@ -42872,13 +48058,19 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       diveCount,
       locale: localeName,
-      other: '$diveCount غوصات',
+      other: '$diveCount غوصة',
+      many: '$diveCount غوصة',
+      few: '$diveCount غوصات',
+      two: 'غوصتان',
       one: 'غوصة واحدة',
     );
     String _temp1 = intl.Intl.pluralLogic(
       siteCount,
       locale: localeName,
-      other: '$siteCount مواقع غوص',
+      other: '$siteCount موقع غوص',
+      many: '$siteCount موقع غوص',
+      few: '$siteCount مواقع غوص',
+      two: 'موقعا غوص',
       one: 'موقع غوص واحد',
     );
     return '$_temp0, $_temp1 - $size (تلقائي)';
@@ -42960,6 +48152,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count غطسة',
+      many: '$count غطسة',
+      few: '$count غطسات',
+      two: 'غطستان',
       one: 'غطسة واحدة',
     );
     return '$_temp0';
@@ -43048,6 +48243,9 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count قراءة',
+      many: '$count قراءة',
+      few: '$count قراءات',
+      two: 'قراءتان',
       one: 'قراءة واحدة',
     );
     return '$_temp0';
@@ -43138,7 +48336,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'حذف $count ملفات ($size)',
+      other: 'حذف $count ملف ($size)',
+      many: 'حذف $count ملفًا ($size)',
+      few: 'حذف $count ملفات ($size)',
+      two: 'حذف ملفين ($size)',
       one: 'حذف ملف واحد ($size)',
     );
     return '$_temp0';
@@ -43155,6 +48356,11 @@ class AppLocalizationsAr extends AppLocalizations {
       locale: localeName,
       other:
           'ستُحذف $count من ملفات النسخ الاحتياطي نهائيًا. لا يمكن التراجع عن ذلك.',
+      many:
+          'ستُحذف $count من ملفات النسخ الاحتياطي نهائيًا. لا يمكن التراجع عن ذلك.',
+      few:
+          'ستُحذف $count من ملفات النسخ الاحتياطي نهائيًا. لا يمكن التراجع عن ذلك.',
+      two: 'سيُحذف ملفا نسخ احتياطي نهائيًا. لا يمكن التراجع عن ذلك.',
       one: 'سيُحذف ملف نسخ احتياطي واحد نهائيًا. لا يمكن التراجع عن ذلك.',
     );
     return '$_temp0';
@@ -43232,7 +48438,10 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count ملفات غير موجودة في سجل النسخ الاحتياطي',
+      other: '$count ملف غير موجود في سجل النسخ الاحتياطي',
+      many: '$count ملفًا غير موجود في سجل النسخ الاحتياطي',
+      few: '$count ملفات غير موجودة في سجل النسخ الاحتياطي',
+      two: 'ملفان غير موجودين في سجل النسخ الاحتياطي',
       one: 'ملف واحد غير موجود في سجل النسخ الاحتياطي',
     );
     return '$_temp0';
@@ -43615,6 +48824,7 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count مسار تحت الماء ينتظر اختيارك',
+      many: '$count مسارًا تحت الماء ينتظر اختيارك',
       few: '$count مسارات تحت الماء تنتظر اختيارك',
       two: 'مساران تحت الماء ينتظران اختيارك',
       one: 'مسار تحت الماء واحد ينتظر اختيارك',
@@ -43641,6 +48851,62 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navTrack_handoff_reviewTrackButton => 'مراجعة المسار تحت الماء';
 
   @override
+  String get suuntoJson_handoff_recognized =>
+      'تم التعرف على تصدير غطسة من Suunto';
+
+  @override
+  String get suuntoJson_handoff_description =>
+      'تم تصدير هذا الملف من تطبيق Suunto. يقرأه مستورد Suunto بالطريقة نفسها التي يعمل بها الاستيراد من Suunto Cloud، بما في ذلك المسار المسجّل للغطسة.';
+
+  @override
+  String get suuntoJson_handoff_importButton => 'استيراد غطسة Suunto';
+
+  @override
+  String get suuntoFile_step_title => 'تصديرات تطبيق Suunto';
+
+  @override
+  String get suuntoFile_step_description =>
+      'اختر غطسة واحدة أو أكثر مُصدَّرة من تطبيق Suunto بصيغة JSON. الغطسات المسجّلة مع مسار تجلبه معها.';
+
+  @override
+  String get suuntoFile_step_chooseFiles => 'اختيار الملفات';
+
+  @override
+  String suuntoFile_step_readyCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غطسة جاهزة للاستيراد',
+      many: '$count غطسة جاهزة للاستيراد',
+      few: '$count غطسات جاهزة للاستيراد',
+      two: 'غطستان جاهزتان للاستيراد',
+      one: 'غطسة واحدة جاهزة للاستيراد',
+      zero: 'لا توجد غطسات جاهزة للاستيراد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get suuntoFile_step_routeIncluded => 'يتضمن مسارًا مسجّلًا';
+
+  @override
+  String get suuntoFile_step_noRoute => 'لا يوجد مسار مسجّل';
+
+  @override
+  String get suuntoFile_rejection_notJson => 'ليس ملف JSON';
+
+  @override
+  String get suuntoFile_rejection_notSuuntoExport =>
+      'ليس تصديرًا من تطبيق Suunto';
+
+  @override
+  String get suuntoFile_rejection_notADive => 'ليست غطسة (نوع نشاط آخر)';
+
+  @override
+  String get universalImport_summary_importWithSuunto =>
+      'استيراد باستخدام مستورد Suunto';
+
+  @override
   String get navTrack_section_trackTitle => 'مسار تحت الماء';
 
   @override
@@ -43649,6 +48915,7 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count مسار',
+      many: '$count مسارًا',
       few: '$count مسارات',
       two: 'مساران',
       one: 'مسار واحد',
@@ -44368,6 +49635,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_equipment_lastDived => 'آخر استخدام';
 
   @override
+  String get query_equipment_location => 'الموقع';
+
+  @override
   String get query_equipment_model => 'الطراز';
 
   @override
@@ -44573,6 +49843,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get query_weights_amount => 'الكمية';
+
+  @override
+  String get query_weights_label => 'الاسم';
 
   @override
   String get query_weights_notes => 'ملاحظات';
@@ -45006,4 +50279,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get query_saveNeedsDiver => 'أنشئ ملف غواص لحفظ الاستعلامات';
+
+  @override
+  String get builtIns_showColumnLabel => 'إظهار';
+
+  @override
+  String get builtIns_showInPickers => 'إظهار في قوائم الاختيار';
+
+  @override
+  String preDive_start_allTemplatesHidden(String path) {
+    return 'جميع قوائم التحقق مخفية. أظهر واحدة مجددًا من $path.';
+  }
+
+  @override
+  String get settings_conflict_field_hiddenBuiltInIds =>
+      'العناصر المضمنة المخفية';
 }

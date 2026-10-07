@@ -22,12 +22,16 @@ import 'package:submersion/features/planner/presentation/pages/plan_canvas_page.
 import 'package:submersion/features/marine_life/presentation/pages/species_page.dart';
 import 'package:submersion/features/safety/presentation/pages/incident_edit_page.dart';
 import 'package:submersion/features/safety/presentation/pages/incidents_list_page.dart';
+import 'package:submersion/features/safety/presentation/pages/cns_otu_page.dart';
 import 'package:submersion/features/safety/presentation/pages/no_fly_page.dart';
+import 'package:submersion/features/settings/presentation/pages/manage_currency_rules_page.dart';
 import 'package:submersion/features/settings/presentation/pages/section_appearance_page.dart';
 import 'package:submersion/features/settings/presentation/pages/settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/site_detail_sections_page.dart';
 import 'package:submersion/features/settings/presentation/widgets/unrecognized_backups_notice.dart';
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
+import 'package:submersion/features/trips/presentation/helpers/trip_edit_navigation.dart';
+import 'package:submersion/features/trips/presentation/pages/trip_edit_page.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 /// Finds a [GoRoute] by name in a route tree recursively.
@@ -142,6 +146,50 @@ void main() {
 
   tearDown(() {
     container.dispose();
+  });
+
+  group('trip edit (#2880)', () {
+    test('openTripEdit pushes the editTrip route', () {
+      // openTripEdit writes the path by hand; it must stay this route's.
+      expect(
+        _locationOfRoute(router.configuration.routes, 'editTrip'),
+        '/trips/:tripId/edit',
+      );
+    });
+
+    testWidgets('editTrip opens the form at the section in the URL', (
+      tester,
+    ) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      TripEditPage build(String location) =>
+          _findRouteByName(router.configuration.routes, 'editTrip')!.builder!(
+                capturedContext,
+                GoRouterState(
+                  router.configuration,
+                  uri: Uri.parse(location),
+                  matchedLocation: Uri.parse(location).path,
+                  fullPath: '/trips/:tripId/edit',
+                  pathParameters: const {'tripId': 't1'},
+                  pageKey: ValueKey(location),
+                ),
+              )
+              as TripEditPage;
+
+      final planning = build('/trips/t1/edit?section=planning');
+      expect(planning.tripId, 't1');
+      expect(planning.initialSection, TripEditSection.planning);
+      expect(build('/trips/t1/edit').initialSection, isNull);
+    });
   });
 
   group('tracks area', () {
@@ -372,6 +420,15 @@ void main() {
         Uri.parse('/insights/connections?mode=around&focus=buddy:abc'),
       );
       expect(match.fullPath, '/insights/connections');
+    });
+
+    test('observations live under Insights (#2381)', () {
+      final routes = router.configuration.routes;
+      expect(_findRouteByName(routes, 'insightsObservations'), isNotNull);
+      final match = router.configuration.findMatch(
+        Uri.parse('/insights/observations'),
+      );
+      expect(match.fullPath, '/insights/observations');
     });
 
     test('the cylinder passport nests under equipment detail', () {
@@ -936,6 +993,23 @@ void main() {
       expect(noFly!.builder!(context, state), isA<NoFlyPage>());
     });
 
+    testWidgets('cnsOtu route builds the CnsOtuPage', (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: SizedBox()));
+      final context = tester.element(find.byType(SizedBox));
+
+      final cnsOtu = _findRouteByName(router.configuration.routes, 'cnsOtu');
+      expect(cnsOtu, isNotNull);
+      final state = GoRouterState(
+        router.configuration,
+        uri: Uri.parse('/planning/cns-otu'),
+        matchedLocation: '/planning/cns-otu',
+        fullPath: '/planning/cns-otu',
+        pathParameters: const {},
+        pageKey: const ValueKey('/planning/cns-otu'),
+      );
+      expect(cnsOtu!.builder!(context, state), isA<CnsOtuPage>());
+    });
+
     testWidgets(
       'editPlan builder threads planId; divePlanner builds a new plan',
       (tester) async {
@@ -1494,6 +1568,34 @@ void main() {
         _locationOfRoute(router.configuration.routes, 'unrecognizedBackups'),
         UnrecognizedBackupsNotice.routeLocation,
       );
+    });
+  });
+
+  group('certification currency rules route', () {
+    test('resolves to the path the Manage tile pushes', () {
+      expect(
+        _locationOfRoute(router.configuration.routes, 'currencyRules'),
+        '/currency-rules',
+      );
+    });
+
+    testWidgets('builds the certification currency rules page', (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: SizedBox()));
+      final context = tester.element(find.byType(SizedBox));
+      final config = router.configuration;
+      final route = _findRouteByName(config.routes, 'currencyRules');
+      expect(route, isNotNull);
+
+      const location = '/currency-rules';
+      final state = GoRouterState(
+        config,
+        uri: Uri.parse(location),
+        matchedLocation: location,
+        fullPath: location,
+        pathParameters: const {},
+        pageKey: const ValueKey(location),
+      );
+      expect(route!.builder!(context, state), isA<ManageCurrencyRulesPage>());
     });
   });
 

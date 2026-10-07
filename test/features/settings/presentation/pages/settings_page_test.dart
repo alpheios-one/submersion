@@ -2,12 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/built_ins/built_in_catalog.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/gas_consumption_display.dart';
 import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/theme/feature_accent_colors.dart';
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_finding.dart';
+import 'package:submersion/features/insights/domain/observations/observation_rule_id.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -142,6 +144,22 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   }
 
   @override
+  Future<void> setBuiltInHidden(
+    BuiltInCatalog catalog,
+    String id,
+    bool hidden,
+  ) async {
+    state = state.copyWith(
+      hiddenBuiltInIds: withBuiltInHidden(
+        state.hiddenBuiltInIds,
+        catalog,
+        id,
+        hidden,
+      ),
+    );
+  }
+
+  @override
   Future<void> setEmergencyRegion(String? countryCode) async =>
       state = countryCode == null
       ? state.copyWith(clearEmergencyRegion: true)
@@ -223,6 +241,9 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setAltitudeUnit(AltitudeUnit unit) async =>
       state = state.copyWith(altitudeUnit: unit);
+  @override
+  Future<void> setDistanceUnit(DistanceUnit unit) async =>
+      state = state.copyWith(distanceUnit: unit);
   @override
   Future<void> setCoordinateFormat(CoordinateFormat format) async =>
       state = state.copyWith(coordinateFormat: format);
@@ -382,6 +403,20 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   }
 
   @override
+  Future<void> setObservationRuleMuted(
+    ObservationRuleId rule,
+    bool muted,
+  ) async {
+    final rules = {...state.insightsMutedObservationRules};
+    if (muted) {
+      rules.add(rule.dbValue);
+    } else {
+      rules.remove(rule.dbValue);
+    }
+    state = state.copyWith(insightsMutedObservationRules: rules);
+  }
+
+  @override
   Future<void> setShowAscentRateColors(bool value) async =>
       state = state.copyWith(showAscentRateColors: value);
   @override
@@ -408,9 +443,6 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultNdlSource(MetricDataSource value) async =>
       state = state.copyWith(defaultNdlSource: value);
-  @override
-  Future<void> setDefaultCeilingSource(MetricDataSource value) async =>
-      state = state.copyWith(defaultCeilingSource: value);
   @override
   Future<void> setDefaultDecoStopSource(MetricDataSource value) async =>
       state = state.copyWith(defaultDecoStopSource: value);
@@ -444,6 +476,12 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDiveCenterListViewMode(ListViewMode mode) async =>
       state = state.copyWith(diveCenterListViewMode: mode);
+  @override
+  Future<void> setCertificationListViewMode(ListViewMode mode) async =>
+      state = state.copyWith(certificationListViewMode: mode);
+  @override
+  Future<void> setCourseListViewMode(ListViewMode mode) async =>
+      state = state.copyWith(courseListViewMode: mode);
   @override
   Future<void> setMapStyle(MapStyle style) async =>
       state = state.copyWith(mapStyle: style);
@@ -555,6 +593,9 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultShowGasSwitchMarkers(bool value) async =>
       state = state.copyWith(defaultShowGasSwitchMarkers: value);
+  @override
+  Future<void> setDefaultShowLateGasSwitches(bool value) async =>
+      state = state.copyWith(defaultShowLateGasSwitches: value);
   @override
   Future<void> setDefaultShowPpO2(bool value) async =>
       state = state.copyWith(defaultShowPpO2: value);
@@ -1702,8 +1743,16 @@ void main() {
             builder: (context, state) => const Text('Service Types Stub'),
           ),
           GoRoute(
+            path: '/equipment/locations',
+            builder: (context, state) => const Text('Locations Stub'),
+          ),
+          GoRoute(
             path: '/site-types',
             builder: (context, state) => const Text('Site Types Stub'),
+          ),
+          GoRoute(
+            path: '/currency-rules',
+            builder: (context, state) => const Text('Currency Rules Stub'),
           ),
           GoRoute(
             path: '/settings/trimix-mixer',
@@ -1765,6 +1814,45 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('renders the locations tile and navigates on tap', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildManageWidget(getOverrides()));
+      await tester.pumpAndSettle();
+
+      final tile = find.byKey(const ValueKey('settings_manage_locations'));
+      expect(tile, findsOneWidget);
+      expect(
+        find.text('Where your gear is kept, serviced or lent'),
+        findsOneWidget,
+      );
+
+      await tester.ensureVisible(tile);
+      await tester.tap(tile);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Locations Stub'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets(
+      'renders the certification currency tile and navigates on tap',
+      (tester) async {
+        await tester.pumpWidget(buildManageWidget(getOverrides()));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Certification currency'), findsOneWidget);
+        expect(find.text('Refresher and renewal rules'), findsOneWidget);
+
+        await tester.ensureVisible(find.text('Certification currency'));
+        await tester.tap(find.text('Certification currency'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Currency Rules Stub'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
     testWidgets('renders the site types tile and navigates on tap', (
       tester,
     ) async {
@@ -1793,6 +1881,9 @@ void main() {
 
       expect(find.text('Trimix Mixer'), findsOneWidget);
 
+      // The Certification Agencies tile (issue #690) pushed this one down.
+      await tester.ensureVisible(find.text('Trimix Mixer'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Trimix Mixer'));
       await tester.pumpAndSettle();
 

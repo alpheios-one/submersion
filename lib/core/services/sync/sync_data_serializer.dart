@@ -15,6 +15,7 @@ import 'package:submersion/core/database/profile_series_pack.dart';
 import 'package:submersion/core/database/site_type_seed.dart';
 import 'package:submersion/core/database/tag_scope_tables.dart';
 import 'package:submersion/core/services/sync/child_column_clears.dart';
+import 'package:submersion/core/services/sync/device_local_fields.dart';
 import 'package:submersion/core/services/sync/sync_fact_groups.dart';
 import 'package:submersion/core/services/sync/sync_record_overlay.dart';
 import 'package:submersion/core/services/sync/changeset_log/sync_temp_dir.dart';
@@ -106,9 +107,9 @@ class SyncDeletion {
   final int deletedAt;
 
   /// The clock of the delete itself, as the deleting device stamped it
-  /// (DeletionLog.originHlc). The merge compares it with a child row's own
-  /// HLC. Null from a peer that predates it; omitted from the JSON then, so
-  /// such a tombstone reads exactly as before.
+  /// (DeletionLog.originHlc). The merge compares it with the local row's own
+  /// HLC, for every entity (#2943). Null from a peer that predates it;
+  /// omitted from the JSON then, so such a tombstone reads exactly as before.
   final String? hlc;
 
   const SyncDeletion({required this.id, required this.deletedAt, this.hlc});
@@ -285,6 +286,9 @@ class SyncData {
   final List<Map<String, dynamic>> serviceRecords;
   final List<Map<String, dynamic>> serviceKinds;
   final List<Map<String, dynamic>> serviceSchedules;
+  final List<Map<String, dynamic>> certificationCurrencyRules;
+  final List<Map<String, dynamic>> certificationCurrencyPrefs;
+  final List<Map<String, dynamic>> certificationCurrencyEvents;
   final List<Map<String, dynamic>> diveCenters;
   final List<Map<String, dynamic>> diveCenterGearNotes;
   final List<Map<String, dynamic>> trips;
@@ -315,6 +319,8 @@ class SyncData {
   final List<Map<String, dynamic>> diveDiveTypes;
   final List<Map<String, dynamic>> diveTypes;
   final List<Map<String, dynamic>> diveRoles;
+  final List<Map<String, dynamic>> customCertificationAgencies;
+  final List<Map<String, dynamic>> customCertificationLevels;
   final List<Map<String, dynamic>> tankPresets;
   final List<Map<String, dynamic>> weightPresets;
   final List<Map<String, dynamic>> weightPresetEntries;
@@ -323,6 +329,7 @@ class SyncData {
   final List<Map<String, dynamic>> cylinderFills;
   final List<Map<String, dynamic>> connectionMaps;
   final List<Map<String, dynamic>> savedQueries;
+  final List<Map<String, dynamic>> insightObservationDismissals;
 
   /// Inbound only since v182: older peers still send row-per-sample arrays;
   /// they apply into the legacy tables and are packed into series by
@@ -347,6 +354,8 @@ class SyncData {
   final List<Map<String, dynamic>> siteSpecies;
   final List<Map<String, dynamic>> siteTypes;
   final List<Map<String, dynamic>> siteSiteTypes;
+  final List<Map<String, dynamic>> diveDiverRoles;
+  final List<Map<String, dynamic>> diveBuddyRoles;
   final List<Map<String, dynamic>> siteTags;
   final List<Map<String, dynamic>> equipmentTags;
   final List<Map<String, dynamic>> equipmentShares;
@@ -354,6 +363,8 @@ class SyncData {
   final List<Map<String, dynamic>> tripHides;
   final List<Map<String, dynamic>> siteHides;
   final List<Map<String, dynamic>> equipmentOwnershipEvents;
+  final List<Map<String, dynamic>> equipmentLocations;
+  final List<Map<String, dynamic>> equipmentLocationMoves;
   final List<Map<String, dynamic>> mediaSpecies;
   final List<Map<String, dynamic>> siteFeatures;
   final List<Map<String, dynamic>> csvPresets;
@@ -395,6 +406,9 @@ class SyncData {
     this.serviceRecords = const [],
     this.serviceKinds = const [],
     this.serviceSchedules = const [],
+    this.certificationCurrencyRules = const [],
+    this.certificationCurrencyPrefs = const [],
+    this.certificationCurrencyEvents = const [],
     this.diveCenters = const [],
     this.diveCenterGearNotes = const [],
     this.trips = const [],
@@ -425,6 +439,8 @@ class SyncData {
     this.diveDiveTypes = const [],
     this.diveTypes = const [],
     this.diveRoles = const [],
+    this.customCertificationAgencies = const [],
+    this.customCertificationLevels = const [],
     this.tankPresets = const [],
     this.weightPresets = const [],
     this.weightPresetEntries = const [],
@@ -433,6 +449,7 @@ class SyncData {
     this.cylinderFills = const [],
     this.connectionMaps = const [],
     this.savedQueries = const [],
+    this.insightObservationDismissals = const [],
     this.tankPressureProfiles = const [],
     this.tideRecords = const [],
     this.settings = const [],
@@ -452,6 +469,8 @@ class SyncData {
     this.siteSpecies = const [],
     this.siteTypes = const [],
     this.siteSiteTypes = const [],
+    this.diveDiverRoles = const [],
+    this.diveBuddyRoles = const [],
     this.siteTags = const [],
     this.equipmentTags = const [],
     this.equipmentShares = const [],
@@ -459,6 +478,8 @@ class SyncData {
     this.tripHides = const [],
     this.siteHides = const [],
     this.equipmentOwnershipEvents = const [],
+    this.equipmentLocations = const [],
+    this.equipmentLocationMoves = const [],
     this.mediaSpecies = const [],
     this.siteFeatures = const [],
     this.csvPresets = const [],
@@ -500,6 +521,9 @@ class SyncData {
     'serviceRecords': serviceRecords,
     'serviceKinds': serviceKinds,
     'serviceSchedules': serviceSchedules,
+    'certificationCurrencyRules': certificationCurrencyRules,
+    'certificationCurrencyPrefs': certificationCurrencyPrefs,
+    'certificationCurrencyEvents': certificationCurrencyEvents,
     'diveCenters': diveCenters,
     'diveCenterGearNotes': diveCenterGearNotes,
     'trips': trips,
@@ -530,6 +554,8 @@ class SyncData {
     'diveDiveTypes': diveDiveTypes,
     'diveTypes': diveTypes,
     'diveRoles': diveRoles,
+    'customCertificationAgencies': customCertificationAgencies,
+    'customCertificationLevels': customCertificationLevels,
     'tankPresets': tankPresets,
     'weightPresets': weightPresets,
     'weightPresetEntries': weightPresetEntries,
@@ -538,6 +564,7 @@ class SyncData {
     'cylinderFills': cylinderFills,
     'connectionMaps': connectionMaps,
     'savedQueries': savedQueries,
+    'insightObservationDismissals': insightObservationDismissals,
     'tideRecords': tideRecords,
     'settings': settings,
     'species': species,
@@ -556,6 +583,8 @@ class SyncData {
     'siteSpecies': siteSpecies,
     'siteTypes': siteTypes,
     'siteSiteTypes': siteSiteTypes,
+    'diveDiverRoles': diveDiverRoles,
+    'diveBuddyRoles': diveBuddyRoles,
     'siteTags': siteTags,
     'equipmentTags': equipmentTags,
     'equipmentShares': equipmentShares,
@@ -563,6 +592,8 @@ class SyncData {
     'tripHides': tripHides,
     'siteHides': siteHides,
     'equipmentOwnershipEvents': equipmentOwnershipEvents,
+    'equipmentLocations': equipmentLocations,
+    'equipmentLocationMoves': equipmentLocationMoves,
     'mediaSpecies': mediaSpecies,
     'siteFeatures': siteFeatures,
     'csvPresets': csvPresets,
@@ -606,6 +637,15 @@ class SyncData {
       serviceRecords: _parseList(json['serviceRecords']),
       serviceKinds: _parseList(json['serviceKinds']),
       serviceSchedules: _parseList(json['serviceSchedules']),
+      certificationCurrencyRules: _parseList(
+        json['certificationCurrencyRules'],
+      ),
+      certificationCurrencyPrefs: _parseList(
+        json['certificationCurrencyPrefs'],
+      ),
+      certificationCurrencyEvents: _parseList(
+        json['certificationCurrencyEvents'],
+      ),
       diveCenters: _parseList(json['diveCenters']),
       diveCenterGearNotes: _parseList(json['diveCenterGearNotes']),
       trips: _parseList(json['trips']),
@@ -638,6 +678,10 @@ class SyncData {
       diveDiveTypes: _parseList(json['diveDiveTypes']),
       diveTypes: _parseList(json['diveTypes']),
       diveRoles: _parseList(json['diveRoles']),
+      customCertificationAgencies: _parseList(
+        json['customCertificationAgencies'],
+      ),
+      customCertificationLevels: _parseList(json['customCertificationLevels']),
       tankPresets: _parseList(json['tankPresets']),
       weightPresets: _parseList(json['weightPresets']),
       weightPresetEntries: _parseList(json['weightPresetEntries']),
@@ -646,6 +690,9 @@ class SyncData {
       cylinderFills: _parseList(json['cylinderFills']),
       connectionMaps: _parseList(json['connectionMaps']),
       savedQueries: _parseList(json['savedQueries']),
+      insightObservationDismissals: _parseList(
+        json['insightObservationDismissals'],
+      ),
       tankPressureProfiles: _parseList(json['tankPressureProfiles']),
       tideRecords: _parseList(json['tideRecords']),
       settings: _parseList(json['settings']),
@@ -665,6 +712,8 @@ class SyncData {
       siteSpecies: _parseList(json['siteSpecies']),
       siteTypes: _parseList(json['siteTypes']),
       siteSiteTypes: _parseList(json['siteSiteTypes']),
+      diveDiverRoles: _parseList(json['diveDiverRoles']),
+      diveBuddyRoles: _parseList(json['diveBuddyRoles']),
       siteTags: _parseList(json['siteTags']),
       equipmentTags: _parseList(json['equipmentTags']),
       equipmentShares: _parseList(json['equipmentShares']),
@@ -672,6 +721,8 @@ class SyncData {
       tripHides: _parseList(json['tripHides']),
       siteHides: _parseList(json['siteHides']),
       equipmentOwnershipEvents: _parseList(json['equipmentOwnershipEvents']),
+      equipmentLocations: _parseList(json['equipmentLocations']),
+      equipmentLocationMoves: _parseList(json['equipmentLocationMoves']),
       mediaSpecies: _parseList(json['mediaSpecies']),
       siteFeatures: _parseList(json['siteFeatures']),
       csvPresets: _parseList(json['csvPresets']),
@@ -964,6 +1015,25 @@ class SyncDataSerializer {
       blob: false,
       full: null,
     ),
+    // Built-in currency rules are reference data (mirrors serviceKinds).
+    (
+      key: 'certificationCurrencyRules',
+      table: null,
+      blob: false,
+      full: () => _exportCertificationCurrencyRules(null),
+    ),
+    (
+      key: 'certificationCurrencyPrefs',
+      table: _db.certificationCurrencyPrefs,
+      blob: false,
+      full: null,
+    ),
+    (
+      key: 'certificationCurrencyEvents',
+      table: _db.certificationCurrencyEvents,
+      blob: false,
+      full: null,
+    ),
     (key: 'diveCenters', table: _db.diveCenters, blob: false, full: null),
     (
       key: 'diveCenterGearNotes',
@@ -1096,6 +1166,18 @@ class SyncDataSerializer {
       blob: false,
       full: () => _exportDiveRoles(null),
     ),
+    (
+      key: 'customCertificationAgencies',
+      table: _db.customCertificationAgencies,
+      blob: false,
+      full: null,
+    ),
+    (
+      key: 'customCertificationLevels',
+      table: _db.customCertificationLevels,
+      blob: false,
+      full: null,
+    ),
     (key: 'tankPresets', table: _db.tankPresets, blob: false, full: null),
     (key: 'weightPresets', table: _db.weightPresets, blob: false, full: null),
     (
@@ -1109,6 +1191,12 @@ class SyncDataSerializer {
     (key: 'cylinderFills', table: _db.cylinderFills, blob: false, full: null),
     (key: 'connectionMaps', table: _db.connectionMaps, blob: false, full: null),
     (key: 'savedQueries', table: _db.savedQueries, blob: false, full: null),
+    (
+      key: 'insightObservationDismissals',
+      table: _db.insightObservationDismissals,
+      blob: false,
+      full: null,
+    ),
     (key: 'tideRecords', table: _db.tideRecords, blob: false, full: null),
     (
       key: 'settings',
@@ -1188,6 +1276,8 @@ class SyncDataSerializer {
       full: () => _exportSiteTypes(null),
     ),
     (key: 'siteSiteTypes', table: _db.siteSiteTypes, blob: false, full: null),
+    (key: 'diveDiverRoles', table: _db.diveDiverRoles, blob: false, full: null),
+    (key: 'diveBuddyRoles', table: _db.diveBuddyRoles, blob: false, full: null),
     (key: 'siteTags', table: _db.siteTags, blob: false, full: null),
     (key: 'equipmentTags', table: _db.equipmentTags, blob: false, full: null),
     (
@@ -1202,6 +1292,18 @@ class SyncDataSerializer {
     (
       key: 'equipmentOwnershipEvents',
       table: _db.equipmentOwnershipEvents,
+      blob: false,
+      full: null,
+    ),
+    (
+      key: 'equipmentLocations',
+      table: _db.equipmentLocations,
+      blob: false,
+      full: null,
+    ),
+    (
+      key: 'equipmentLocationMoves',
+      table: _db.equipmentLocationMoves,
       blob: false,
       full: null,
     ),
@@ -1440,7 +1542,9 @@ class SyncDataSerializer {
               maxRowHlc = clock;
             }
           }
-          await writeData(jsonEncode(row));
+          // Device-local columns never leave this device, in a base as in a
+          // changeset (issue #2947).
+          await writeData(jsonEncode(withoutDeviceLocalColumns(spec.key, row)));
         }
 
         if (spec.table != null) {
@@ -1601,6 +1705,8 @@ class SyncDataSerializer {
     'courseRequirementDives',
     'diveTags',
     'diveDiveTypes',
+    'diveDiverRoles',
+    'diveBuddyRoles',
     'siteSiteTypes',
     'siteTags',
     'equipmentTags',
@@ -1610,6 +1716,7 @@ class SyncDataSerializer {
     'siteHides',
     'equipmentOwnershipEvents',
     'weightPresetEntries',
+    'equipmentLocationMoves',
     'diveCenterGearNotes',
     'tideRecords',
     'sightings',
@@ -1829,6 +1936,8 @@ class SyncDataSerializer {
     'courseRequirementDives': 'course_requirement_dives',
     'diveTags': 'dive_tags',
     'siteSiteTypes': 'site_site_types',
+    'diveDiverRoles': 'dive_diver_roles',
+    'diveBuddyRoles': 'dive_buddy_roles',
     'siteTags': 'site_tags',
     'equipmentTags': 'equipment_tags',
     'equipmentShares': 'equipment_shares',
@@ -1836,6 +1945,7 @@ class SyncDataSerializer {
     'tripHides': 'trip_hides',
     'siteHides': 'site_hides',
     'equipmentOwnershipEvents': 'equipment_ownership_events',
+    'equipmentLocationMoves': 'equipment_location_moves',
     'diveDiveTypes': 'dive_dive_types',
     'weightPresetEntries': 'weight_preset_entries',
     'diveCenterGearNotes': 'dive_center_gear_notes',
@@ -2097,6 +2207,18 @@ class SyncDataSerializer {
         'serviceSchedules',
         () => _exportServiceSchedules(hlcSince),
       ),
+      certificationCurrencyRules: await _safeExport(
+        'certificationCurrencyRules',
+        () => _exportCertificationCurrencyRules(hlcSince),
+      ),
+      certificationCurrencyPrefs: await _safeExport(
+        'certificationCurrencyPrefs',
+        () => _exportCertificationCurrencyPrefs(hlcSince),
+      ),
+      certificationCurrencyEvents: await _safeExport(
+        'certificationCurrencyEvents',
+        () => _exportCertificationCurrencyEvents(hlcSince),
+      ),
       diveCenters: await _safeExport(
         'diveCenters',
         () => _exportDiveCenters(hlcSince),
@@ -2219,6 +2341,30 @@ class SyncDataSerializer {
           pendingChildren,
         ),
       ),
+      diveDiverRoles: await _safeExport(
+        'diveDiverRoles',
+        () async => _withPendingChildren(
+          'diveDiverRoles',
+          await _exportDiveRoleRows(hlcSince, (diveIds) {
+            final query = _db.select(_db.diveDiverRoles);
+            if (diveIds != null) query.where((t) => t.diveId.isIn(diveIds));
+            return query.get();
+          }),
+          pendingChildren,
+        ),
+      ),
+      diveBuddyRoles: await _safeExport(
+        'diveBuddyRoles',
+        () async => _withPendingChildren(
+          'diveBuddyRoles',
+          await _exportDiveRoleRows(hlcSince, (diveIds) {
+            final query = _db.select(_db.diveBuddyRoles);
+            if (diveIds != null) query.where((t) => t.diveId.isIn(diveIds));
+            return query.get();
+          }),
+          pendingChildren,
+        ),
+      ),
       diveTypes: await _safeExport(
         'diveTypes',
         () => _exportDiveTypes(hlcSince),
@@ -2226,6 +2372,14 @@ class SyncDataSerializer {
       diveRoles: await _safeExport(
         'diveRoles',
         () => _exportDiveRoles(hlcSince),
+      ),
+      customCertificationAgencies: await _safeExport(
+        'customCertificationAgencies',
+        () => _exportCustomCertificationAgencies(hlcSince),
+      ),
+      customCertificationLevels: await _safeExport(
+        'customCertificationLevels',
+        () => _exportCustomCertificationLevels(hlcSince),
       ),
       tankPresets: await _safeExport(
         'tankPresets',
@@ -2262,6 +2416,10 @@ class SyncDataSerializer {
       savedQueries: await _safeExport(
         'savedQueries',
         () => _exportSavedQueries(hlcSince),
+      ),
+      insightObservationDismissals: await _safeExport(
+        'insightObservationDismissals',
+        () => _exportInsightObservationDismissals(hlcSince),
       ),
       tideRecords: await _safeExport(
         'tideRecords',
@@ -2421,6 +2579,18 @@ class SyncDataSerializer {
           pendingChildren,
         ),
       ),
+      equipmentLocations: await _safeExport(
+        'equipmentLocations',
+        () => _exportEquipmentLocations(hlcSince),
+      ),
+      equipmentLocationMoves: await _safeExport(
+        'equipmentLocationMoves',
+        () async => _withPendingChildren(
+          'equipmentLocationMoves',
+          await _exportEquipmentLocationMoves(hlcSince),
+          pendingChildren,
+        ),
+      ),
       siteTypes: await _safeExport(
         'siteTypes',
         () => _exportSiteTypes(hlcSince),
@@ -2519,7 +2689,9 @@ class SyncDataSerializer {
   /// it via a non-cascading FK, which would otherwise fail the deferred-FK
   /// COMMIT and abort the whole sync. Must run inside
   /// [applyInDeferredFkTransaction] so COMMIT sees a consistent graph. Loops
-  /// because deleting an orphan can in turn dangle its own children.
+  /// because deleting an orphan can in turn dangle its own children. Each
+  /// raw write announces its table, since a parent deleted without an FK
+  /// action of its own leaves Drift no rule that would reach the child.
   ///
   /// Every batch apply path ends here, so it then re-derives the one value a
   /// peer's row may not carry: a linked route's owner (see
@@ -2538,8 +2710,13 @@ class SyncDataSerializer {
   /// by the conflict resolution's single-record writes, which skip that
   /// repair. Not marked pending: every device derives the same owner from
   /// the same synced dive.
+  ///
+  /// Raw SQL that Drift cannot see, and usually the dive alone changed in
+  /// this apply, so it announces a re-owned route itself; otherwise the
+  /// routes list keeps showing the route to its old owner (#2851). Only when
+  /// a row actually changed, so an ordinary sync wakes no route watcher.
   Future<void> alignLinkedRouteOwners() async {
-    await _db.customStatement('''
+    final reowned = await _db.customUpdate('''
       UPDATE nav_tracks
       SET diver_id = (
         SELECT d.diver_id FROM dives d WHERE d.id = nav_tracks.dive_id
@@ -2549,6 +2726,11 @@ class SyncDataSerializer {
           SELECT d.diver_id FROM dives d WHERE d.id = nav_tracks.dive_id
         )
     ''');
+    if (reowned > 0) {
+      _db.notifyUpdates({
+        TableUpdate.onTable(_db.navTracks, kind: UpdateKind.update),
+      });
+    }
   }
 
   Future<void> _repairDanglingReferences() async {
@@ -2586,12 +2768,14 @@ class SyncDataSerializer {
           await _db.customStatement('DELETE FROM "$table" WHERE rowid = ?', [
             rowid,
           ]);
+          _db.notifyUpdates({TableUpdate(table, kind: UpdateKind.delete)});
         } else {
           _log.warning('Sync repair: clearing dangling $table."$column"');
           await _db.customStatement(
             'UPDATE "$table" SET "$column" = NULL WHERE rowid = ?',
             [rowid],
           );
+          _db.notifyUpdates({TableUpdate(table, kind: UpdateKind.update)});
         }
       }
     }
@@ -2622,7 +2806,9 @@ class SyncDataSerializer {
         final row = await (_db.select(
           _db.diverSettings,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
-        return row?.toJson();
+        return row == null
+            ? null
+            : withoutDeviceLocalColumns('diverSettings', row.toJson());
       case 'dives':
         final row = await (_db.select(
           _db.dives,
@@ -2773,6 +2959,21 @@ class SyncDataSerializer {
       case 'serviceSchedules':
         final row = await (_db.select(
           _db.serviceSchedules,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'certificationCurrencyRules':
+        final row = await (_db.select(
+          _db.certificationCurrencyRules,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'certificationCurrencyPrefs':
+        final row = await (_db.select(
+          _db.certificationCurrencyPrefs,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'certificationCurrencyEvents':
+        final row = await (_db.select(
+          _db.certificationCurrencyEvents,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
       case 'diveCenters':
@@ -2936,6 +3137,16 @@ class SyncDataSerializer {
           _db.siteSiteTypes,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
+      case 'diveDiverRoles':
+        final row = await (_db.select(
+          _db.diveDiverRoles,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'diveBuddyRoles':
+        final row = await (_db.select(
+          _db.diveBuddyRoles,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
       case 'siteTags':
         final row = await (_db.select(
           _db.siteTags,
@@ -2971,9 +3182,29 @@ class SyncDataSerializer {
           _db.equipmentOwnershipEvents,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
+      case 'equipmentLocations':
+        final row = await (_db.select(
+          _db.equipmentLocations,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'equipmentLocationMoves':
+        final row = await (_db.select(
+          _db.equipmentLocationMoves,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
       case 'diveRoles':
         final row = await (_db.select(
           _db.diveRoles,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'customCertificationAgencies':
+        final row = await (_db.select(
+          _db.customCertificationAgencies,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'customCertificationLevels':
+        final row = await (_db.select(
+          _db.customCertificationLevels,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
       case 'tankPresets':
@@ -2995,7 +3226,9 @@ class SyncDataSerializer {
         final row = await (_db.select(
           _db.diveComputers,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
-        return row == null ? null : _withoutDeviceLocalFields(row.toJson());
+        return row == null
+            ? null
+            : withoutDeviceLocalColumns('diveComputers', row.toJson());
       case 'transmitters':
         final row = await (_db.select(
           _db.transmitters,
@@ -3014,6 +3247,11 @@ class SyncDataSerializer {
       case 'savedQueries':
         final row = await (_db.select(
           _db.savedQueries,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'insightObservationDismissals':
+        final row = await (_db.select(
+          _db.insightObservationDismissals,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
       case 'mediaSmartAlbums':
@@ -3180,7 +3418,10 @@ class SyncDataSerializer {
         final rows = await (_db.select(
           _db.diverSettings,
         )..where((t) => t.id.isIn(idList))).get();
-        return {for (final r in rows) r.id: r.toJson()};
+        return {
+          for (final r in rows)
+            r.id: withoutDeviceLocalColumns('diverSettings', r.toJson()),
+        };
       case 'dives':
         final rows = await (_db.select(
           _db.dives,
@@ -3410,6 +3651,16 @@ class SyncDataSerializer {
           _db.diveRoles,
         )..where((t) => t.id.isIn(idList))).get();
         return {for (final r in rows) r.id: r.toJson()};
+      case 'customCertificationAgencies':
+        final rows = await (_db.select(
+          _db.customCertificationAgencies,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
+      case 'customCertificationLevels':
+        final rows = await (_db.select(
+          _db.customCertificationLevels,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
       case 'tankPresets':
         final rows = await (_db.select(
           _db.tankPresets,
@@ -3430,7 +3681,8 @@ class SyncDataSerializer {
           _db.diveComputers,
         )..where((t) => t.id.isIn(idList))).get();
         return {
-          for (final r in rows) r.id: _withoutDeviceLocalFields(r.toJson()),
+          for (final r in rows)
+            r.id: withoutDeviceLocalColumns('diveComputers', r.toJson()),
         };
       case 'transmitters':
         final rows = await (_db.select(
@@ -3450,6 +3702,11 @@ class SyncDataSerializer {
       case 'savedQueries':
         final rows = await (_db.select(
           _db.savedQueries,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
+      case 'insightObservationDismissals':
+        final rows = await (_db.select(
+          _db.insightObservationDismissals,
         )..where((t) => t.id.isIn(idList))).get();
         return {for (final r in rows) r.id: r.toJson()};
       case 'mediaSmartAlbums':
@@ -3487,9 +3744,29 @@ class SyncDataSerializer {
           _db.serviceSchedules,
         )..where((t) => t.id.isIn(idList))).get();
         return {for (final r in rows) r.id: r.toJson()};
+      case 'certificationCurrencyRules':
+        final rows = await (_db.select(
+          _db.certificationCurrencyRules,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
+      case 'certificationCurrencyPrefs':
+        final rows = await (_db.select(
+          _db.certificationCurrencyPrefs,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
+      case 'certificationCurrencyEvents':
+        final rows = await (_db.select(
+          _db.certificationCurrencyEvents,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
       case 'csvPresets':
         final rows = await (_db.select(
           _db.csvPresets,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
+      case 'equipmentLocations':
+        final rows = await (_db.select(
+          _db.equipmentLocations,
         )..where((t) => t.id.isIn(idList))).get();
         return {for (final r in rows) r.id: r.toJson()};
       case 'viewConfigs':
@@ -3986,6 +4263,57 @@ class SyncDataSerializer {
         );
   }
 
+  /// Applies one incoming `dive_diver_roles` row (v272, issue #1221): the
+  /// (dive, role) key is unique, so a peer's copy under another id is
+  /// reconciled to the lower id and then skipped with DO NOTHING, for the
+  /// reasons [_applyDiveDiveTypeRecord] gives.
+  Future<void> _applyDiveDiverRoleRecord(DiveDiverRole record) async {
+    await _reconcileJunctionIds(
+      'dive_diver_roles',
+      parentColumn: 'dive_id',
+      childColumn: 'role_id',
+      pairs: [(parent: record.diveId, child: record.roleId, id: record.id)],
+    );
+    await _db
+        .into(_db.diveDiverRoles)
+        .insert(
+          record,
+          onConflict: DoNothing<$DiveDiverRolesTable, DiveDiverRole>(
+            target: const [],
+          ),
+        );
+  }
+
+  /// Applies one incoming `dive_buddy_roles` row (v272). Its key is a
+  /// triple, so it reconciles through [_reconcileBuddyRoleIds].
+  Future<void> _applyDiveBuddyRoleRecord(DiveBuddyRole record) async {
+    await _reconcileBuddyRoleIds([record]);
+    await _db
+        .into(_db.diveBuddyRoles)
+        .insert(
+          record,
+          onConflict: DoNothing<$DiveBuddyRolesTable, DiveBuddyRole>(
+            target: const [],
+          ),
+        );
+  }
+
+  /// [_reconcileJunctionIds] for the (dive, buddy, role) key of
+  /// `dive_buddy_roles`: this device's row goes whenever the incoming id
+  /// sorts below it.
+  Future<void> _reconcileBuddyRoleIds(List<DiveBuddyRole> rows) async {
+    if (rows.isEmpty) return;
+    await _db.batch((batch) {
+      for (final row in rows) {
+        batch.customStatement(
+          'DELETE FROM dive_buddy_roles WHERE dive_id = ? AND buddy_id = ? '
+          'AND role_id = ? AND id > ?',
+          [row.diveId, row.buddyId, row.roleId, row.id],
+        );
+      }
+    });
+  }
+
   /// Applies one incoming `site_tags` row (v217, issue #1765), the site twin
   /// of [_applyDiveTagRecord].
   Future<void> _applySiteTagRecord(SiteTag record) async {
@@ -4130,13 +4458,17 @@ class SyncDataSerializer {
     String entityType,
     Map<String, dynamic> data,
   ) async {
-    data = _withRenamedKeys(
+    data = _withoutUnsetNulls(
       entityType,
-      _withoutDeviceLocalFields(data, entityType: entityType),
+      _withRenamedKeys(entityType, withoutDeviceLocalColumns(entityType, data)),
     );
+    data = (await _withDeviceLocalFromHere(entityType, [data])).single;
     data = _withSchemaDefaults(
       entityType,
-      (await _withLocalForOmitted(entityType, [data])).single,
+      _withDerivedDistanceUnit(
+        entityType,
+        (await _withLocalForOmitted(entityType, [data])).single,
+      ),
     );
     switch (entityType) {
       case 'divers':
@@ -4347,6 +4679,27 @@ class SyncDataSerializer {
               ServiceScheduleRow.fromJson(data).toCompanion(false),
             );
         return;
+      case 'certificationCurrencyRules':
+        await _db
+            .into(_db.certificationCurrencyRules)
+            .insertOnConflictUpdate(
+              CurrencyRuleRow.fromJson(data).toCompanion(false),
+            );
+        return;
+      case 'certificationCurrencyPrefs':
+        await _db
+            .into(_db.certificationCurrencyPrefs)
+            .insertOnConflictUpdate(
+              CurrencyPrefRow.fromJson(data).toCompanion(false),
+            );
+        return;
+      case 'certificationCurrencyEvents':
+        await _db
+            .into(_db.certificationCurrencyEvents)
+            .insertOnConflictUpdate(
+              CurrencyEventRow.fromJson(data).toCompanion(false),
+            );
+        return;
       case 'diveCenters':
         await _db
             .into(_db.diveCenters)
@@ -4538,6 +4891,12 @@ class SyncDataSerializer {
       case 'siteSiteTypes':
         await _applySiteSiteTypeRecord(SiteSiteType.fromJson(data));
         return;
+      case 'diveDiverRoles':
+        await _applyDiveDiverRoleRecord(DiveDiverRole.fromJson(data));
+        return;
+      case 'diveBuddyRoles':
+        await _applyDiveBuddyRoleRecord(DiveBuddyRole.fromJson(data));
+        return;
       case 'siteTags':
         await _applySiteTagRecord(SiteTag.fromJson(_withTagAlias(data)));
         return;
@@ -4563,11 +4922,39 @@ class SyncDataSerializer {
             .into(_db.equipmentOwnershipEvents)
             .insertOnConflictUpdate(EquipmentOwnershipEventRow.fromJson(data));
         return;
+      case 'equipmentLocations':
+        await _db
+            .into(_db.equipmentLocations)
+            .insertOnConflictUpdate(
+              EquipmentLocationRow.fromJson(
+                _withTimestampDefaults(data),
+              ).toCompanion(false),
+            );
+        return;
+      case 'equipmentLocationMoves':
+        await _db
+            .into(_db.equipmentLocationMoves)
+            .insertOnConflictUpdate(EquipmentLocationMoveRow.fromJson(data));
+        return;
       case 'diveRoles':
         await _db
             .into(_db.diveRoles)
             .insertOnConflictUpdate(
               DiveRoleRow.fromJson(data).toCompanion(false),
+            );
+        return;
+      case 'customCertificationAgencies':
+        await _db
+            .into(_db.customCertificationAgencies)
+            .insertOnConflictUpdate(
+              CustomCertificationAgencyRow.fromJson(data).toCompanion(false),
+            );
+        return;
+      case 'customCertificationLevels':
+        await _db
+            .into(_db.customCertificationLevels)
+            .insertOnConflictUpdate(
+              CustomCertificationLevelRow.fromJson(data).toCompanion(false),
             );
         return;
       case 'tankPresets':
@@ -4624,6 +5011,13 @@ class SyncDataSerializer {
               SavedQueryRow.fromJson(data).toCompanion(false),
             );
         return;
+      case 'insightObservationDismissals':
+        await _db
+            .into(_db.insightObservationDismissals)
+            .insertOnConflictUpdate(
+              InsightObservationDismissalRow.fromJson(data).toCompanion(false),
+            );
+        return;
       case 'mediaSmartAlbums':
         await _db
             .into(_db.mediaSmartAlbums)
@@ -4647,7 +5041,7 @@ class SyncDataSerializer {
         // (e.g. active_diver_id). Export filters these, but a peer on an older
         // build may still ship them; applying would switch this device's
         // active diver. Symmetric with _exportSettings.
-        if (_deviceLocalSettingsKeys.contains(data['key'])) {
+        if (deviceLocalSettingsKeys.contains(data['key'])) {
           return;
         }
         await _db
@@ -4976,15 +5370,25 @@ class SyncDataSerializer {
     List<Map<String, dynamic>> records,
   ) async {
     if (records.isEmpty) return;
-    records = await _withLocalForOmitted(entityType, [
-      for (final record in records)
-        _withRenamedKeys(
-          entityType,
-          _withoutDeviceLocalFields(record, entityType: entityType),
-        ),
-    ]);
+    records = await _withLocalForOmitted(
+      entityType,
+      await _withDeviceLocalFromHere(entityType, [
+        for (final record in records)
+          _withoutUnsetNulls(
+            entityType,
+            _withRenamedKeys(
+              entityType,
+              withoutDeviceLocalColumns(entityType, record),
+            ),
+          ),
+      ]),
+    );
     records = [
-      for (final record in records) _withSchemaDefaults(entityType, record),
+      for (final record in records)
+        _withSchemaDefaults(
+          entityType,
+          _withDerivedDistanceUnit(entityType, record),
+        ),
     ];
     switch (entityType) {
       case 'divers':
@@ -5288,6 +5692,36 @@ class SyncDataSerializer {
             _db.serviceSchedules,
             records
                 .map((r) => ServiceScheduleRow.fromJson(r).toCompanion(false))
+                .toList(),
+          ),
+        );
+        return;
+      case 'certificationCurrencyRules':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.certificationCurrencyRules,
+            records
+                .map((r) => CurrencyRuleRow.fromJson(r).toCompanion(false))
+                .toList(),
+          ),
+        );
+        return;
+      case 'certificationCurrencyPrefs':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.certificationCurrencyPrefs,
+            records
+                .map((r) => CurrencyPrefRow.fromJson(r).toCompanion(false))
+                .toList(),
+          ),
+        );
+        return;
+      case 'certificationCurrencyEvents':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.certificationCurrencyEvents,
+            records
+                .map((r) => CurrencyEventRow.fromJson(r).toCompanion(false))
                 .toList(),
           ),
         );
@@ -5656,6 +6090,53 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'diveDiverRoles':
+        // DoNothing: see [_applyDiveDiverRoleRecord].
+        final diverRoleRows = _lowestIdPerPair(
+          records.map((r) => DiveDiverRole.fromJson(r)).toList(),
+          (row) => (parent: row.diveId, child: row.roleId, id: row.id),
+        );
+        await _reconcileJunctionIds(
+          'dive_diver_roles',
+          parentColumn: 'dive_id',
+          childColumn: 'role_id',
+          pairs: [
+            for (final row in diverRoleRows)
+              (parent: row.diveId, child: row.roleId, id: row.id),
+          ],
+        );
+        await _db.batch(
+          (b) => b.insertAll(
+            _db.diveDiverRoles,
+            diverRoleRows,
+            onConflict: DoNothing<$DiveDiverRolesTable, DiveDiverRole>(
+              target: const [],
+            ),
+          ),
+        );
+        return;
+      case 'diveBuddyRoles':
+        // The pair key folds (dive, buddy) into one string; it only keys
+        // the in-memory dedupe, never SQL.
+        final buddyRoleRows = _lowestIdPerPair(
+          records.map((r) => DiveBuddyRole.fromJson(r)).toList(),
+          (row) => (
+            parent: '${row.diveId}|${row.buddyId}',
+            child: row.roleId,
+            id: row.id,
+          ),
+        );
+        await _reconcileBuddyRoleIds(buddyRoleRows);
+        await _db.batch(
+          (b) => b.insertAll(
+            _db.diveBuddyRoles,
+            buddyRoleRows,
+            onConflict: DoNothing<$DiveBuddyRolesTable, DiveBuddyRole>(
+              target: const [],
+            ),
+          ),
+        );
+        return;
       case 'siteTags':
         final siteTagsOffScope = await _tagsOutsideScope(siteTagScopeTable);
         final siteTagRows = _lowestIdPerPair(
@@ -5803,12 +6284,62 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'equipmentLocations':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.equipmentLocations,
+            records
+                .map(
+                  (r) => EquipmentLocationRow.fromJson(
+                    _withTimestampDefaults(r),
+                  ).toCompanion(false),
+                )
+                .toList(),
+          ),
+        );
+        return;
+      case 'equipmentLocationMoves':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.equipmentLocationMoves,
+            records.map((r) => EquipmentLocationMoveRow.fromJson(r)).toList(),
+          ),
+        );
+        return;
       case 'diveRoles':
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
             _db.diveRoles,
             records
                 .map((r) => DiveRoleRow.fromJson(r).toCompanion(false))
+                .toList(),
+          ),
+        );
+        return;
+      case 'customCertificationAgencies':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.customCertificationAgencies,
+            records
+                .map(
+                  (r) => CustomCertificationAgencyRow.fromJson(
+                    r,
+                  ).toCompanion(false),
+                )
+                .toList(),
+          ),
+        );
+        return;
+      case 'customCertificationLevels':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.customCertificationLevels,
+            records
+                .map(
+                  (r) => CustomCertificationLevelRow.fromJson(
+                    r,
+                  ).toCompanion(false),
+                )
                 .toList(),
           ),
         );
@@ -5891,6 +6422,20 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'insightObservationDismissals':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.insightObservationDismissals,
+            records
+                .map(
+                  (r) => InsightObservationDismissalRow.fromJson(
+                    r,
+                  ).toCompanion(false),
+                )
+                .toList(),
+          ),
+        );
+        return;
       case 'mediaSmartAlbums':
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
@@ -5918,7 +6463,7 @@ class SyncDataSerializer {
       case 'settings':
         // Mirror upsertRecord: never overwrite a device-local settings key.
         final settingsRows = records
-            .where((r) => !_deviceLocalSettingsKeys.contains(r['key']))
+            .where((r) => !deviceLocalSettingsKeys.contains(r['key']))
             .map((r) => Setting.fromJson(r).toCompanion(false))
             .toList();
         if (settingsRows.isEmpty) return;
@@ -6322,6 +6867,10 @@ class SyncDataSerializer {
         return plain(_db.siteTypes, _db.siteTypes.id);
       case 'siteSiteTypes':
         return plain(_db.siteSiteTypes, _db.siteSiteTypes.id);
+      case 'diveDiverRoles':
+        return plain(_db.diveDiverRoles, _db.diveDiverRoles.id);
+      case 'diveBuddyRoles':
+        return plain(_db.diveBuddyRoles, _db.diveBuddyRoles.id);
       case 'siteTags':
         return plain(_db.siteTags, _db.siteTags.id);
       case 'equipmentTags':
@@ -6339,8 +6888,22 @@ class SyncDataSerializer {
           _db.equipmentOwnershipEvents,
           _db.equipmentOwnershipEvents.id,
         );
+      case 'equipmentLocations':
+        return plain(_db.equipmentLocations, _db.equipmentLocations.id);
+      case 'equipmentLocationMoves':
+        return plain(_db.equipmentLocationMoves, _db.equipmentLocationMoves.id);
       case 'diveRoles':
         return plain(_db.diveRoles, _db.diveRoles.id);
+      case 'customCertificationAgencies':
+        return plain(
+          _db.customCertificationAgencies,
+          _db.customCertificationAgencies.id,
+        );
+      case 'customCertificationLevels':
+        return plain(
+          _db.customCertificationLevels,
+          _db.customCertificationLevels.id,
+        );
       case 'tankPresets':
         return plain(_db.tankPresets, _db.tankPresets.id);
       case 'weightPresets':
@@ -6357,6 +6920,11 @@ class SyncDataSerializer {
         return plain(_db.connectionMaps, _db.connectionMaps.id);
       case 'savedQueries':
         return plain(_db.savedQueries, _db.savedQueries.id);
+      case 'insightObservationDismissals':
+        return plain(
+          _db.insightObservationDismissals,
+          _db.insightObservationDismissals.id,
+        );
       case 'species':
         return plain(_db.species, _db.species.id);
       case 'tags':
@@ -6427,6 +6995,21 @@ class SyncDataSerializer {
         return plain(_db.serviceKinds, _db.serviceKinds.id);
       case 'serviceSchedules':
         return plain(_db.serviceSchedules, _db.serviceSchedules.id);
+      case 'certificationCurrencyRules':
+        return plain(
+          _db.certificationCurrencyRules,
+          _db.certificationCurrencyRules.id,
+        );
+      case 'certificationCurrencyPrefs':
+        return plain(
+          _db.certificationCurrencyPrefs,
+          _db.certificationCurrencyPrefs.id,
+        );
+      case 'certificationCurrencyEvents':
+        return plain(
+          _db.certificationCurrencyEvents,
+          _db.certificationCurrencyEvents.id,
+        );
       case 'media':
         return plain(_db.media, _db.media.id);
       case 'mediaSmartAlbums':
@@ -6453,7 +7036,7 @@ class SyncDataSerializer {
   /// union is equivalent to upsert-then-delete-not-in-cloud but needs no in-RAM
   /// id set to diff against, so adopt memory stays bounded regardless of size.
   ///
-  /// Device-local settings keys ([_deviceLocalSettingsKeys], e.g.
+  /// Device-local settings keys ([deviceLocalSettingsKeys], e.g.
   /// `active_diver_id`) are preserved: they are never part of a synced or
   /// replaced library, so an adopt must not wipe them (they are also excluded
   /// from the base by [_exportSettings], so re-insert would not restore them).
@@ -6462,12 +7045,20 @@ class SyncDataSerializer {
   /// [_exportDiveTypes], [_exportSpecies] and [_exportFieldPresets] all omit
   /// `isBuiltIn` rows, so the refill that follows this clear cannot put them
   /// back. Deleting them would leave the catalog permanently empty.
+  ///
+  /// Device-local columns ([deviceLocalSyncColumns]) of the cleared rows are
+  /// remembered first, so the refill keeps this device's values.
   Future<void> deleteAllRecords(String entityType) async {
+    if (deviceLocalSyncColumns.containsKey(entityType)) {
+      _adoptKeptDeviceLocal[entityType] = Map.of(
+        await _deviceLocalValuesHere(entityType),
+      );
+    }
     switch (entityType) {
       case 'settings':
         await (_db.delete(
           _db.settings,
-        )..where((t) => t.key.isNotIn(_deviceLocalSettingsKeys.toList()))).go();
+        )..where((t) => t.key.isNotIn(deviceLocalSettingsKeys.toList()))).go();
         return;
       case 'diveTypes':
         await (_db.delete(
@@ -6512,6 +7103,13 @@ class SyncDataSerializer {
       case 'serviceKinds':
         await (_db.delete(
           _db.serviceKinds,
+        )..where((t) => t.isBuiltIn.equals(false))).go();
+        return;
+      // Built-in currency rules are seeded, never exported: an unguarded
+      // clear here would delete ten rules that no refill restores.
+      case 'certificationCurrencyRules':
+        await (_db.delete(
+          _db.certificationCurrencyRules,
         )..where((t) => t.isBuiltIn.equals(false))).go();
         return;
     }
@@ -6730,6 +7328,10 @@ class SyncDataSerializer {
         return _db.siteTypes;
       case 'siteSiteTypes':
         return _db.siteSiteTypes;
+      case 'diveDiverRoles':
+        return _db.diveDiverRoles;
+      case 'diveBuddyRoles':
+        return _db.diveBuddyRoles;
       case 'siteTags':
         return _db.siteTags;
       case 'equipmentTags':
@@ -6744,8 +7346,16 @@ class SyncDataSerializer {
         return _db.siteHides;
       case 'equipmentOwnershipEvents':
         return _db.equipmentOwnershipEvents;
+      case 'equipmentLocations':
+        return _db.equipmentLocations;
+      case 'equipmentLocationMoves':
+        return _db.equipmentLocationMoves;
       case 'diveRoles':
         return _db.diveRoles;
+      case 'customCertificationAgencies':
+        return _db.customCertificationAgencies;
+      case 'customCertificationLevels':
+        return _db.customCertificationLevels;
       case 'tankPresets':
         return _db.tankPresets;
       case 'weightPresets':
@@ -6762,6 +7372,8 @@ class SyncDataSerializer {
         return _db.connectionMaps;
       case 'savedQueries':
         return _db.savedQueries;
+      case 'insightObservationDismissals':
+        return _db.insightObservationDismissals;
       case 'species':
         return _db.species;
       case 'tags':
@@ -6832,6 +7444,12 @@ class SyncDataSerializer {
         return _db.serviceKinds;
       case 'serviceSchedules':
         return _db.serviceSchedules;
+      case 'certificationCurrencyRules':
+        return _db.certificationCurrencyRules;
+      case 'certificationCurrencyPrefs':
+        return _db.certificationCurrencyPrefs;
+      case 'certificationCurrencyEvents':
+        return _db.certificationCurrencyEvents;
       case 'media':
         return _db.media;
       case 'mediaSmartAlbums':
@@ -7037,6 +7655,21 @@ class SyncDataSerializer {
           _db.serviceSchedules,
         )..where((t) => t.id.equals(recordId))).go();
         return;
+      case 'certificationCurrencyRules':
+        await (_db.delete(
+          _db.certificationCurrencyRules,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'certificationCurrencyPrefs':
+        await (_db.delete(
+          _db.certificationCurrencyPrefs,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'certificationCurrencyEvents':
+        await (_db.delete(
+          _db.certificationCurrencyEvents,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
       case 'diveCenters':
         await (_db.delete(
           _db.diveCenters,
@@ -7203,6 +7836,16 @@ class SyncDataSerializer {
           _db.siteSiteTypes,
         )..where((t) => t.id.equals(recordId))).go();
         return;
+      case 'diveDiverRoles':
+        await (_db.delete(
+          _db.diveDiverRoles,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'diveBuddyRoles':
+        await (_db.delete(
+          _db.diveBuddyRoles,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
       case 'siteTags':
         await (_db.delete(
           _db.siteTags,
@@ -7238,9 +7881,29 @@ class SyncDataSerializer {
           _db.equipmentOwnershipEvents,
         )..where((t) => t.id.equals(recordId))).go();
         return;
+      case 'equipmentLocations':
+        await (_db.delete(
+          _db.equipmentLocations,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'equipmentLocationMoves':
+        await (_db.delete(
+          _db.equipmentLocationMoves,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
       case 'diveRoles':
         await (_db.delete(
           _db.diveRoles,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'customCertificationAgencies':
+        await (_db.delete(
+          _db.customCertificationAgencies,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'customCertificationLevels':
+        await (_db.delete(
+          _db.customCertificationLevels,
         )..where((t) => t.id.equals(recordId))).go();
         return;
       case 'tankPresets':
@@ -7281,6 +7944,11 @@ class SyncDataSerializer {
       case 'savedQueries':
         await (_db.delete(
           _db.savedQueries,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'insightObservationDismissals':
+        await (_db.delete(
+          _db.insightObservationDismissals,
         )..where((t) => t.id.equals(recordId))).go();
         return;
       case 'mediaSmartAlbums':
@@ -7440,7 +8108,9 @@ class SyncDataSerializer {
       query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
     }
     final rows = await query.get();
-    return rows.map((r) => r.toJson()).toList();
+    return rows
+        .map((r) => withoutDeviceLocalColumns('diverSettings', r.toJson()))
+        .toList();
   }
 
   Future<List<Map<String, dynamic>>> _exportDives(String? hlcSince) async {
@@ -7867,6 +8537,43 @@ class SyncDataSerializer {
     return rows.map((r) => r.toJson()).toList();
   }
 
+  /// Built-in currency rules are re-seeded identically on every device, so
+  /// exporting one publishes nothing. Custom rules, including the
+  /// copy-on-write rules that supersede a built-in, are ordinary synced rows.
+  Future<List<Map<String, dynamic>>> _exportCertificationCurrencyRules(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.certificationCurrencyRules)
+      ..where((t) => t.isBuiltIn.equals(false));
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> _exportCertificationCurrencyPrefs(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.certificationCurrencyPrefs);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> _exportCertificationCurrencyEvents(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.certificationCurrencyEvents);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
   Future<List<Map<String, dynamic>>> _exportDiveCenters(
     String? hlcSince,
   ) async {
@@ -8255,6 +8962,30 @@ class SyncDataSerializer {
     return rows.map((r) => r.toJson()).toList();
   }
 
+  /// A role junction's rows (v272, issue #1221), gated on the parent dive's
+  /// clock like [_exportDiveDiveTypes]. [select] reads the junction rows of
+  /// the given dives, or every row when passed null (a full export).
+  Future<List<Map<String, dynamic>>> _exportDiveRoleRows<R extends DataClass>(
+    String? hlcSince,
+    Future<List<R>> Function(List<String>? diveIds) select,
+  ) async {
+    if (hlcSince == null) {
+      return [for (final row in await select(null)) row.toJson()];
+    }
+    final diveIds = await _diveIdsModifiedSince(hlcSince);
+    if (diveIds.isEmpty) return [];
+    return _childRowsOf(diveIds, select);
+  }
+
+  Future<Set<String>> _diveIdsModifiedSince(String hlcSince) async {
+    final rows =
+        await (_db.selectOnly(_db.dives)
+              ..addColumns([_db.dives.id])
+              ..where(_db.dives.hlc.isBiggerThanValue(hlcSince)))
+            .get();
+    return {for (final r in rows) r.read(_db.dives.id)!};
+  }
+
   Future<List<Map<String, dynamic>>> _exportDiveTypes(String? hlcSince) async {
     // Built-in dive types are re-seeded identically on every device at first
     // launch and cannot be edited, so syncing them only risks cross-device
@@ -8273,6 +9004,31 @@ class SyncDataSerializer {
     // syncing them only risks collisions and payload bloat. Custom only.
     final query = _db.select(_db.diveRoles)
       ..where((t) => t.isBuiltIn.equals(false));
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
+  /// Custom certification agencies (issue #690). Every row is user data;
+  /// these tables hold no built-ins.
+  Future<List<Map<String, dynamic>>> _exportCustomCertificationAgencies(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.customCertificationAgencies);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
+  /// Custom certification levels (issue #690).
+  Future<List<Map<String, dynamic>>> _exportCustomCertificationLevels(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.customCertificationLevels);
     if (hlcSince != null) {
       query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
     }
@@ -8331,7 +9087,9 @@ class SyncDataSerializer {
       query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
     }
     final rows = await query.get();
-    return rows.map((r) => _withoutDeviceLocalFields(r.toJson())).toList();
+    return rows
+        .map((r) => withoutDeviceLocalColumns('diveComputers', r.toJson()))
+        .toList();
   }
 
   Future<List<Map<String, dynamic>>> _exportTransmitters(
@@ -8378,18 +9136,39 @@ class SyncDataSerializer {
     return rows.map((r) => r.toJson()).toList();
   }
 
-  /// Removes fields that describe this host's connection to a device rather
-  /// than the device's synced identity. A remote BLE identifier must never
-  /// overwrite the identifier stored locally on another host.
-  static Map<String, dynamic> _withoutDeviceLocalFields(
-    Map<String, dynamic> data, {
-    String? entityType,
-  }) {
-    if (entityType != null && entityType != 'diveComputers') return data;
-    if (!data.containsKey('bluetoothAddress')) return data;
-    final copy = Map<String, dynamic>.from(data);
-    copy.remove('bluetoothAddress');
-    return copy;
+  /// Nullable columns where null means "never held a value" rather than a
+  /// choice (v262, issue #2948): a device adopts its own old pref into such a
+  /// column. A peer that has none carries no choice, so its null must not
+  /// clear the value this device holds.
+  static const Map<String, Set<String>> _nullMeansUnsetKeys = {
+    'diverSettings': {'pscrRatio', 'profileMetricsFollowViewport'},
+  };
+
+  /// [data] without the [_nullMeansUnsetKeys] it carries as null, so
+  /// [_withLocalForOmitted] keeps this device's value for them.
+  static Map<String, dynamic> _withoutUnsetNulls(
+    String entityType,
+    Map<String, dynamic> data,
+  ) {
+    final keys = _nullMeansUnsetKeys[entityType];
+    if (keys == null) return data;
+    bool unsetNull(String key) => keys.contains(key) && data[key] == null;
+    if (!data.keys.any(unsetNull)) return data;
+    return {
+      for (final entry in data.entries)
+        if (!unsetNull(entry.key)) entry.key: entry.value,
+    };
+  }
+
+  Future<List<Map<String, dynamic>>> _exportInsightObservationDismissals(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.insightObservationDismissals);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    return rows.map((r) => r.toJson()).toList();
   }
 
   Future<List<Map<String, dynamic>>> _exportTideRecords(
@@ -8411,22 +9190,6 @@ class SyncDataSerializer {
     return rows.map((r) => r.toJson()).toList();
   }
 
-  /// Settings keys that hold per-device state and must never sync.
-  ///
-  /// Including these in the payload causes the receiving device to flag a
-  /// conflict on every cross-device pull (same `key` row, different value
-  /// per device).
-  ///
-  /// Audit (last reviewed when [SyncData] grew to ~39 entities): only three
-  /// keys are ever written to the `settings` table in app code:
-  ///   - `active_diver_id` (per-device — each device auto-creates its own
-  ///     owner diver at first launch). FILTERED.
-  ///   - `share_new_records_by_default` (global user preference). Syncs.
-  ///   - `nav_primary_ids` (user's preferred top-level nav). Syncs.
-  /// New keys should be assessed against the rule: "is this answer the same
-  /// across all of one user's devices?" If no, add it here.
-  static const Set<String> _deviceLocalSettingsKeys = {'active_diver_id'};
-
   Future<List<Map<String, dynamic>>> _exportSettings(String? hlcSince) async {
     final query = _db.select(_db.settings);
     if (hlcSince != null) {
@@ -8434,7 +9197,7 @@ class SyncDataSerializer {
     }
     final rows = await query.get();
     return rows
-        .where((r) => !_deviceLocalSettingsKeys.contains(r.key))
+        .where((r) => !deviceLocalSettingsKeys.contains(r.key))
         .map((r) => r.toJson())
         .toList();
   }
@@ -8708,6 +9471,37 @@ class SyncDataSerializer {
     return rows.map((r) => r.toJson()).toList();
   }
 
+  Future<List<Map<String, dynamic>>> _exportEquipmentLocations(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.equipmentLocations);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
+  /// Equipment location moves (v268), gated on the parent item's clock like
+  /// [_exportEquipmentOwnershipEvents]; a move edited on its own rides in
+  /// through the pending children.
+  Future<List<Map<String, dynamic>>> _exportEquipmentLocationMoves(
+    String? hlcSince,
+  ) async {
+    if (hlcSince != null) {
+      final itemIds = await _equipmentModifiedSince(hlcSince);
+      if (itemIds.isEmpty) return [];
+      return _childRowsOf(
+        itemIds,
+        (chunk) => (_db.select(
+          _db.equipmentLocationMoves,
+        )..where((t) => t.equipmentId.isIn(chunk))).get(),
+      );
+    }
+    final rows = await _db.select(_db.equipmentLocationMoves).get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
   /// Ids of equipment rows whose clock is past [hlcSince].
   Future<Set<String>> _equipmentModifiedSince(String hlcSince) async {
     final modifiedItems = await (_db.select(
@@ -8961,6 +9755,67 @@ class SyncDataSerializer {
   /// one without a read. Empty for a type with no table here.
   final Map<String, Set<String>> _rowKeys = {};
 
+  /// Device-local columns [deleteAllRecords] read before a replace-adopt
+  /// cleared their table, by entity type and record id. The refill consumes
+  /// an entry when its row comes back, so this device keeps its own values.
+  final Map<String, Map<String, Map<String, dynamic>>> _adoptKeptDeviceLocal =
+      {};
+
+  /// The device-local columns ([deviceLocalSyncColumns]) of [entityType]'s
+  /// rows on this device, by record id; every row when [ids] is null.
+  Future<Map<String, Map<String, dynamic>>> _deviceLocalValuesHere(
+    String entityType, [
+    Iterable<String>? ids,
+  ]) async {
+    final keys = deviceLocalSyncColumns[entityType];
+    if (keys == null) return const {};
+    // Read through the entity's own table, so a new entry in
+    // deviceLocalSyncColumns needs no code here. Every listed table is keyed
+    // by a text id; the test that reads every entry fails on one that is not.
+    final table = _syncTableFor(entityType);
+    final idColumn = table.columnsByName['id']! as GeneratedColumn<String>;
+    final query = _db.select(table);
+    if (ids != null) query.where((_) => idColumn.isIn(ids));
+    final rows = [
+      for (final row in await query.get()) (row as DataClass).toJson(),
+    ];
+    return {
+      for (final row in rows)
+        row['id'] as String: {for (final key in keys) key: row[key]},
+    };
+  }
+
+  /// Forgets what [deleteAllRecords] remembered for a replace-adopt's refill.
+  /// The adopt calls this once the refill is done, so a row that comes back
+  /// in a later sync is new to this device and takes the column defaults.
+  void endAdoptRefill() => _adoptKeptDeviceLocal.clear();
+
+  /// Fills each device-local column of [records] with this device's value:
+  /// the row it holds, else what a replace-adopt cleared, else nothing (a row
+  /// new here takes the column default). Stripping the wire values is not
+  /// enough on its own: [_buildRowKeys] leaves these columns out, so
+  /// [_withLocalForOmitted] would not refill them and the full-row upsert
+  /// would write their defaults over this device's values.
+  Future<List<Map<String, dynamic>>> _withDeviceLocalFromHere(
+    String entityType,
+    List<Map<String, dynamic>> records,
+  ) async {
+    if (!deviceLocalSyncColumns.containsKey(entityType)) return records;
+    final ids = {
+      for (final record in records) ?syncRecordId(entityType, record),
+    };
+    if (ids.isEmpty) return records;
+    final here = await _deviceLocalValuesHere(entityType, ids);
+    final kept = _adoptKeptDeviceLocal[entityType];
+    final filled = <Map<String, dynamic>>[];
+    for (final record in records) {
+      final id = syncRecordId(entityType, record);
+      final values = id == null ? null : (here[id] ?? kept?.remove(id));
+      filled.add(values == null ? record : {...record, ...values});
+    }
+    return filled;
+  }
+
   /// Fills each key [records] omit from the row this device already holds
   /// for the same record (#2553), before [_withSchemaDefaults] would fill
   /// it with the column default. A peer on an older build omits every
@@ -9009,15 +9864,8 @@ class SyncDataSerializer {
       return const {};
     }
     return {for (final column in table.$columns) columnJsonKey(column.name)}
-      ..removeAll(_deviceLocalKeys[entityType] ?? const <String>{});
+      ..removeAll(deviceLocalSyncColumns[entityType] ?? const <String>{});
   }
-
-  /// Columns a synced row never carries because they belong to one device
-  /// ([_withoutDeviceLocalFields]). Their absence does not make a row
-  /// partial.
-  static const Map<String, Set<String>> _deviceLocalKeys = {
-    'diveComputers': {'bluetoothAddress'},
-  };
 
   static const Set<String> _gearJunctions = {
     'diveEquipment',
@@ -9072,6 +9920,24 @@ class SyncDataSerializer {
       map.putIfAbsent(entry.value, () => legacy);
     }
     return patched ?? data;
+  }
+
+  /// Issue #2030. A diver_settings row from a peer older than v263 carries
+  /// no `distanceUnit`. [_withLocalForOmitted] already kept this device's
+  /// value for a row it holds; for a row new here, derive the unit from the
+  /// payload's own depth unit before [_withSchemaDefaults] fills the column
+  /// default, so a feet diver's settings do not arrive in kilometres.
+  static Map<String, dynamic> _withDerivedDistanceUnit(
+    String entityType,
+    Map<String, dynamic> data,
+  ) {
+    if (entityType != 'diverSettings' || data['distanceUnit'] != null) {
+      return data;
+    }
+    return {
+      ...data,
+      'distanceUnit': data['depthUnit'] == 'feet' ? 'miles' : 'kilometers',
+    };
   }
 
   Map<String, dynamic> _withSchemaDefaults(
@@ -9188,7 +10054,6 @@ class SyncDataSerializer {
       'endLimit': 30.0,
       'useDiveComputerCnsData': false,
       'defaultNdlSource': 1,
-      'defaultCeilingSource': 1,
       'defaultTtsSource': 1,
       'defaultCnsSource': 1,
       // Appearance settings
@@ -9214,6 +10079,9 @@ class SyncDataSerializer {
       'equipmentListViewMode': 'detailed',
       'buddyListViewMode': 'detailed',
       'diveCenterListViewMode': 'detailed',
+      // v262: seed them so payloads predating the columns hydrate.
+      'certificationListViewMode': 'detailed',
+      'courseListViewMode': 'detailed',
       // Map style
       'mapStyle': 'openStreetMap',
       // Auto site matching sensitivity
@@ -9245,6 +10113,9 @@ class SyncDataSerializer {
       'defaultShowGtr': false,
       'defaultGtrSource': 1,
       'gtrReservePressure': 50.0,
+      // v264: seed it so payloads predating the column hydrate instead of
+      // throwing in DiverSetting.fromJson (issue #2939).
+      'defaultShowLateGasSwitches': true,
       // v166: seed it so payloads predating the column hydrate instead of
       // throwing in DiverSetting.fromJson (issue #1187).
       'placeNameLanguage': 'en',

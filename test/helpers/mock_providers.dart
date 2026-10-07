@@ -4,6 +4,7 @@ import 'package:http/testing.dart';
 // ignore: implementation_imports
 import 'package:riverpod/src/framework.dart' as riverpod show Override;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:submersion/core/built_ins/built_in_catalog.dart';
 import 'package:submersion/features/cylinder_passports/presentation/providers/cylinder_passport_providers.dart';
 import 'package:submersion/features/cylinder_passports/data/services/nfc_tag_service.dart';
 import 'package:submersion/features/cylinder_passports/presentation/services/passport_link_dispatcher.dart';
@@ -20,6 +21,7 @@ import 'package:submersion/features/dive_sites/domain/matching/site_match_sensit
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_finding.dart';
+import 'package:submersion/features/insights/domain/observations/observation_rule_id.dart';
 import 'package:submersion/features/equipment/domain/entities/gear_link.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:submersion/core/constants/units.dart';
@@ -107,6 +109,9 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setAltitudeUnit(AltitudeUnit unit) async =>
       state = state.copyWith(altitudeUnit: unit);
   @override
+  Future<void> setDistanceUnit(DistanceUnit unit) async =>
+      state = state.copyWith(distanceUnit: unit);
+  @override
   Future<void> setSeascapeAppearance(SeascapeAppearance appearance) async =>
       state = state.copyWith(seascapeAppearance: appearance);
   @override
@@ -182,6 +187,22 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
       ids.remove(presetName);
     }
     state = state.copyWith(hiddenTankPresetIds: ids);
+  }
+
+  @override
+  Future<void> setBuiltInHidden(
+    BuiltInCatalog catalog,
+    String id,
+    bool hidden,
+  ) async {
+    state = state.copyWith(
+      hiddenBuiltInIds: withBuiltInHidden(
+        state.hiddenBuiltInIds,
+        catalog,
+        id,
+        hidden,
+      ),
+    );
   }
 
   @override
@@ -323,6 +344,20 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   }
 
   @override
+  Future<void> setObservationRuleMuted(
+    ObservationRuleId rule,
+    bool muted,
+  ) async {
+    final rules = {...state.insightsMutedObservationRules};
+    if (muted) {
+      rules.add(rule.dbValue);
+    } else {
+      rules.remove(rule.dbValue);
+    }
+    state = state.copyWith(insightsMutedObservationRules: rules);
+  }
+
+  @override
   Future<void> setShowAscentRateColors(bool value) async =>
       state = state.copyWith(showAscentRateColors: value);
   @override
@@ -349,9 +384,6 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultNdlSource(MetricDataSource value) async =>
       state = state.copyWith(defaultNdlSource: value);
-  @override
-  Future<void> setDefaultCeilingSource(MetricDataSource value) async =>
-      state = state.copyWith(defaultCeilingSource: value);
   @override
   Future<void> setDefaultDecoStopSource(MetricDataSource value) async =>
       state = state.copyWith(defaultDecoStopSource: value);
@@ -385,6 +417,12 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDiveCenterListViewMode(ListViewMode mode) async =>
       state = state.copyWith(diveCenterListViewMode: mode);
+  @override
+  Future<void> setCertificationListViewMode(ListViewMode mode) async =>
+      state = state.copyWith(certificationListViewMode: mode);
+  @override
+  Future<void> setCourseListViewMode(ListViewMode mode) async =>
+      state = state.copyWith(courseListViewMode: mode);
   @override
   Future<void> setMapStyle(MapStyle style) async =>
       state = state.copyWith(mapStyle: style);
@@ -430,6 +468,8 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
     pressureUnit: PressureUnit.bar,
     volumeUnit: VolumeUnit.liters,
     weightUnit: WeightUnit.kilograms,
+    altitudeUnit: AltitudeUnit.meters,
+    distanceUnit: DistanceUnit.kilometers,
   );
   @override
   Future<void> setImperial() async => state = state.copyWith(
@@ -438,6 +478,8 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
     pressureUnit: PressureUnit.psi,
     volumeUnit: VolumeUnit.cubicFeet,
     weightUnit: WeightUnit.pounds,
+    altitudeUnit: AltitudeUnit.feet,
+    distanceUnit: DistanceUnit.miles,
   );
   @override
   Future<void> setNotificationsEnabled(bool value) async =>
@@ -483,6 +525,9 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultShowGasSwitchMarkers(bool value) async =>
       state = state.copyWith(defaultShowGasSwitchMarkers: value);
+  @override
+  Future<void> setDefaultShowLateGasSwitches(bool value) async =>
+      state = state.copyWith(defaultShowLateGasSwitches: value);
   @override
   Future<void> setDefaultShowPhotoMarkers(bool value) async =>
       state = state.copyWith(defaultShowPhotoMarkers: value);

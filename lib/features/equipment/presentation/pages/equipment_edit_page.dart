@@ -15,8 +15,12 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
 import 'package:submersion/features/equipment/domain/constants/equipment_colors.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/equipment/data/services/initial_location.dart';
+import 'package:submersion/features/equipment/domain/entities/equipment_location.dart';
+import 'package:submersion/features/equipment/presentation/providers/equipment_location_providers.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_tag_providers.dart';
+import 'package:submersion/features/equipment/presentation/widgets/equipment_location_field.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_tags_field.dart';
 import 'package:submersion/features/tags/domain/entities/tag.dart';
 import 'package:submersion/core/services/logger_service.dart';
@@ -25,6 +29,7 @@ import 'package:submersion/features/equipment/presentation/widgets/equipment_cus
 import 'package:submersion/shared/widgets/app_bar_text_action.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
 import 'package:submersion/features/equipment/presentation/utils/equipment_enum_display.dart';
+import 'package:submersion/features/equipment/presentation/widgets/children_card.dart';
 import 'package:submersion/shared/widgets/forms/number_input_validation.dart';
 
 class EquipmentEditPage extends ConsumerStatefulWidget {
@@ -66,6 +71,10 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
 
   EquipmentType _selectedType = EquipmentType.regulator;
   EquipmentStatus _selectedStatus = EquipmentStatus.active;
+
+  /// Wishlist gear (#2025): fields that only make sense for gear in hand
+  /// are hidden, but their values are kept and saved unchanged.
+  bool get _isWanted => _selectedStatus == EquipmentStatus.wanted;
   DateTime? _purchaseDate;
   String? _parentEquipmentId;
   bool _isLoading = false;
@@ -78,6 +87,9 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
   /// compares against. Tags live beside the entity, not on it, so they load
   /// on their own.
   List<Tag> _selectedTags = [];
+
+  /// A new item's first place (v268); null leaves it with no location.
+  EquipmentLocation? _initialLocation;
   Set<String> _originalTagIds = {};
 
   /// Set once an edit's stored tags are read. Until then (and for good, if
@@ -177,9 +189,12 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
     // A legacy row can carry isActive=false with a non-terminal status.
     // Show it as Retired so the form states the item's real condition --
     // otherwise saving would silently reactivate it (#636). "Sold" is the
-    // other status that means gone, so keep it rather than overwrite it.
+    // other status that means gone, so keep it rather than overwrite it, and
+    // "Wanted" (#2025) is inactive by design.
     _selectedStatus =
-        !equipment.isActive && equipment.status != EquipmentStatus.sold
+        !equipment.isActive &&
+            equipment.status != EquipmentStatus.sold &&
+            equipment.status != EquipmentStatus.wanted
         ? EquipmentStatus.retired
         : equipment.status;
     _purchaseDate = equipment.purchaseDate;
@@ -263,13 +278,9 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
   static Set<EquipmentType> _parentTypesFor(EquipmentType type) =>
       switch (type) {
         EquipmentType.o2Cell => const {EquipmentType.rebreather},
-        EquipmentType.battery => const {
-          EquipmentType.computer,
-          EquipmentType.transmitter,
-          EquipmentType.light,
-          EquipmentType.dpv,
-          EquipmentType.rebreather,
-        },
+        // The detail page's host set, so a battery is only ever installed
+        // where its host's Children card will show it.
+        EquipmentType.battery => childHostTypes,
         _ => const {},
       };
 
@@ -347,12 +358,15 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
               labelText: context.l10n.equipment_edit_typeLabel,
               prefixIcon: const Icon(Icons.category),
             ),
-            items: EquipmentType.values.map((type) {
-              return DropdownMenuItem(
-                value: type,
-                child: Text(type.localizedName(context.l10n)),
-              );
-            }).toList(),
+            items: [
+              for (final type in EquipmentType.values.sortedByLocalizedName(
+                context.l10n,
+              ))
+                DropdownMenuItem(
+                  value: type,
+                  child: Text(type.localizedName(context.l10n)),
+                ),
+            ],
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -395,8 +409,9 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
           ),
           const SizedBox(height: 16),
 
-          // Parent item, for the child types only (v202).
-          if (_parentTypesFor(_selectedType).isNotEmpty) ...[
+          // Parent item, for the child types only (v202). Wishlist gear
+          // (#2025) cannot be fitted into anything yet.
+          if (!_isWanted && _parentTypesFor(_selectedType).isNotEmpty) ...[
             Builder(
               builder: (context) {
                 final candidates =
@@ -526,14 +541,15 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
               _hasChanges = true;
             }),
           ),
-          // Serial #
-          TextFormField(
-            controller: _serialController,
-            decoration: InputDecoration(
-              labelText: context.l10n.equipment_edit_serialNumberLabel,
-              prefixIcon: const Icon(Icons.numbers),
+          // Serial #, once the gear is in hand (#2025).
+          if (!_isWanted)
+            TextFormField(
+              controller: _serialController,
+              decoration: InputDecoration(
+                labelText: context.l10n.equipment_edit_serialNumberLabel,
+                prefixIcon: const Icon(Icons.numbers),
+              ),
             ),
-          ),
           const SizedBox(height: 24),
           // Purchase Date
           _buildDateSection(context),
@@ -561,12 +577,25 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
             }),
           ),
           const SizedBox(height: 24),
+          // Location (new items only): an existing item changes place
+          // through Move, so every change lands in its history.
+          if (!widget.isEditing) ...[
+            EquipmentLocationField(
+              value: _initialLocation,
+              onChanged: (loc) => setState(() {
+                _initialLocation = loc;
+                _hasChanges = true;
+              }),
+            ),
+            const SizedBox(height: 24),
+          ],
           // Advanced (buoyancy metadata for weight prediction)
           _buildAdvancedSection(context),
           const SizedBox(height: 24),
 
-          // Notification Overrides
-          _buildNotificationSection(context),
+          // Notification Overrides: service reminders are for owned gear
+          // (#2025).
+          if (!_isWanted) _buildNotificationSection(context),
 
           if (!widget.embedded) ...[
             const SizedBox(height: 32),
@@ -761,38 +790,42 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 16),
-            Text(
-              context.l10n.equipment_edit_purchaseDateLabel,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+            // A purchase date waits for the purchase (#2025); a date already
+            // entered is kept and comes back when the status changes.
+            if (!_isWanted) ...[
+              Text(
+                context.l10n.equipment_edit_purchaseDateLabel,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            OutlinedButton.icon(
-              onPressed: _selectPurchaseDate,
-              icon: const Icon(Icons.calendar_today),
-              label: Text(
-                // #1512: hand-rolled M/D/YYYY ignored the diver's preference,
-                // which the detail page for the same field already honours.
-                _purchaseDate != null
-                    ? UnitFormatter(
-                        ref.watch(settingsProvider),
-                      ).formatDate(_purchaseDate)
-                    : context.l10n.equipment_edit_selectDate,
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: _selectPurchaseDate,
+                icon: const Icon(Icons.calendar_today),
+                label: Text(
+                  // #1512: hand-rolled M/D/YYYY ignored the diver's preference,
+                  // which the detail page for the same field already honours.
+                  _purchaseDate != null
+                      ? UnitFormatter(
+                          ref.watch(settingsProvider),
+                        ).formatDate(_purchaseDate)
+                      : context.l10n.equipment_edit_selectDate,
+                ),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                ),
               ),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 48),
-              ),
-            ),
-            if (_purchaseDate != null)
-              TextButton(
-                onPressed: () => setState(() {
-                  _purchaseDate = null;
-                  _hasChanges = true;
-                }),
-                child: Text(context.l10n.equipment_edit_clearDate),
-              ),
-            const SizedBox(height: 16),
+              if (_purchaseDate != null)
+                TextButton(
+                  onPressed: () => setState(() {
+                    _purchaseDate = null;
+                    _hasChanges = true;
+                  }),
+                  child: Text(context.l10n.equipment_edit_clearDate),
+                ),
+              const SizedBox(height: 16),
+            ],
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -808,8 +841,9 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
                         key: const ValueKey('equipment-purchase-price'),
                         controller: _purchasePriceController,
                         decoration: InputDecoration(
-                          labelText:
-                              context.l10n.equipment_edit_purchasePriceLabel,
+                          labelText: _isWanted
+                              ? context.l10n.equipment_edit_expectedPriceLabel
+                              : context.l10n.equipment_edit_purchasePriceLabel,
                           prefixText: symbol.isEmpty ? null : '$symbol ',
                         ),
                         keyboardType: const TextInputType.numberWithOptions(
@@ -1080,9 +1114,11 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
         notes: _notesController.text.trim(),
         // Retiring or selling via the status dropdown must deactivate the
         // item, or it keeps appearing in active-gear pickers (#636).
+        // Retired, Sold and Wanted (#2025) are all out of the kit.
         isActive:
             _selectedStatus != EquipmentStatus.retired &&
-            _selectedStatus != EquipmentStatus.sold,
+            _selectedStatus != EquipmentStatus.sold &&
+            _selectedStatus != EquipmentStatus.wanted,
         // Only attributes in the SELECTED type's catalog are kept: switching
         // type drops out-of-catalog values at save time (form = source of
         // truth), plus non-empty custom fields with re-packed sort order.
@@ -1101,6 +1137,8 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
 
       final notifier = ref.read(equipmentListNotifierProvider.notifier);
       String savedId;
+      // False only when a chosen first location failed to save.
+      var locationSaved = true;
 
       // Tags (issue #1942) are written with the row, in one transaction,
       // only when they differ from what the form loaded; a new item writes
@@ -1123,14 +1161,24 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
           tagIds: tagsChanged ? tagIds : null,
         );
         savedId = newEquipment.id;
+        final place = _initialLocation;
+        if (place != null) {
+          locationSaved = await recordInitialLocation(
+            moves: ref.read(equipmentLocationMoveRepositoryProvider),
+            equipmentId: savedId,
+            locationId: place.id,
+          );
+        }
       }
 
       if (mounted) {
+        final messenger = ScaffoldMessenger.of(context);
+        final locationFailed = context.l10n.equipment_edit_locationFailed;
         if (widget.embedded) {
           widget.onSaved?.call(savedId);
         } else {
           context.pop();
-          ScaffoldMessenger.of(context).showSnackBar(
+          messenger.showSnackBar(
             SnackBar(
               content: Text(
                 widget.isEditing
@@ -1139,6 +1187,11 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
               ),
             ),
           );
+        }
+        // The item is saved; only its location is missing. Say so, so the
+        // diver knows to set it with Move rather than retry the save.
+        if (!locationSaved) {
+          messenger.showSnackBar(SnackBar(content: Text(locationFailed)));
         }
       }
     } catch (e) {

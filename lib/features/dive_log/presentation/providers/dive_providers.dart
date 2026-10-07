@@ -27,6 +27,7 @@ import 'package:submersion/features/dive_log/domain/entities/profile_series_revi
 import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
 import 'package:submersion/features/dive_log/query/dive_filter_query.dart';
+import 'package:submersion/features/dive_log/query/dive_query_entity.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_service_status_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/filter_aware_tick.dart';
 import 'package:submersion/features/dive_log/presentation/providers/narrow_dives.dart';
@@ -344,7 +345,11 @@ final batchProfileCacheProvider =
 final diveStatisticsProvider = FutureProvider<DiveStatistics>((ref) async {
   final repository = ref.watch(diveRepositoryProvider);
   final currentDiverId = ref.watch(currentDiverIdProvider);
-  ref.invalidateSelfWhen(repository.watchDivesChanges());
+  // Every table the query reads, so a site rename refreshes Most Visited
+  // Sites without waiting for a dive write.
+  ref.invalidateSelfWhen(
+    repository.watchTables(DiveRepository.statisticsTickTables),
+  );
   // divesThisYear reads the clock once per build (#2600).
   ref.invalidateSelfWhen(localDayChanges());
   return repository.getStatistics(diverId: currentDiverId);
@@ -413,7 +418,11 @@ final tripDiveCountsProvider = FutureProvider<Map<String, int>>((ref) async {
 final diveRecordsProvider = FutureProvider<DiveRecords>((ref) async {
   final repository = ref.watch(diveRepositoryProvider);
   final currentDiverId = ref.watch(currentDiverIdProvider);
-  ref.invalidateSelfWhen(repository.watchDivesChanges());
+  // Every table the query reads, so a site rename refreshes each record's
+  // site name without waiting for a dive write.
+  ref.invalidateSelfWhen(
+    repository.watchTables(DiveRepository.statisticsTickTables),
+  );
   return repository.getRecords(diverId: currentDiverId);
 });
 
@@ -446,7 +455,15 @@ final diveSearchProvider = FutureProvider.family<List<DiveSummary>, String>((
     validatedCurrentDiverIdProvider.future,
   );
   final repository = ref.watch(diveRepositoryProvider);
-  ref.invalidateSelfWhen(repository.watchDivesChanges());
+  // The summary row's tables plus every table the text search reads, so a
+  // rename of a dive type, tag, buddy, site or center re-runs an open search
+  // rather than waiting for an unrelated dive write (#2884).
+  ref.invalidateSelfWhen(
+    repository.watchTables({
+      ...DiveRepository.diveListTickTables,
+      ...diveQueryEntity.textSearchTables,
+    }),
+  );
   return repository.searchDiveSummaries(
     query,
     diverId: validatedDiverId,

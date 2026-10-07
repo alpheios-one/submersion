@@ -84,6 +84,11 @@ class DiverSettings extends Table {
       text().withDefault(const Constant('kilograms'))();
   TextColumn get altitudeUnit => text().withDefault(const Constant('meters'))();
 
+  /// v263: geographic distance unit, a DistanceUnit name (issue #2030).
+  /// Backfilled from depth_unit as the column is added.
+  TextColumn get distanceUnit =>
+      text().withDefault(const Constant('kilometers'))();
+
   /// v170: renamed from sacUnit. Holds a GasConsumptionDisplay name (sac,
   /// rmv, both). The Drift getter name is also the sync wire key, so this
   /// rename raises minimumCompatibleSchemaVersion; see
@@ -208,10 +213,9 @@ class DiverSettings extends Table {
   // every settings row is written from. Sync fills a key missing from an
   // older peer's payload with this column default and writes it over the
   // local row, so a 0 here would move existing libraries to computer.
-  // Applies to the GTR and deco stop sources below too.
+  // Applies to the GTR and deco stop sources below too. The ceiling line has
+  // no source (#755); its column was dropped in v261 (#767).
   IntColumn get defaultNdlSource => integer().withDefault(const Constant(1))();
-  IntColumn get defaultCeilingSource =>
-      integer().withDefault(const Constant(1))();
   IntColumn get defaultTtsSource => integer().withDefault(const Constant(1))();
   IntColumn get defaultCnsSource => integer().withDefault(const Constant(1))();
   // Gas time remaining on the profile chart (v177). Source is a
@@ -256,6 +260,15 @@ class DiverSettings extends Table {
   /// v227: built-in tank presets the diver hid from the pickers (issue
   /// #2305), JSON list of preset slugs. Null or absent = none hidden.
   TextColumn get hiddenTankPresetIds => text().nullable()();
+
+  /// v265: muted Insights observation rules (#2381), JSON list of
+  /// ObservationRuleId.dbValue. Null or absent = none muted.
+  TextColumn get insightsMutedObservationRules => text().nullable()();
+
+  /// v269: built-in catalog entries the diver hid from the pickers (issue
+  /// #401), a JSON object of catalog key to id list. Null or absent = none
+  /// hidden.
+  TextColumn get hiddenBuiltInIds => text().nullable()();
   // Appearance settings
   BoolColumn get showDepthColoredDiveCards =>
       boolean().withDefault(const Constant(false))();
@@ -309,6 +322,21 @@ class DiverSettings extends Table {
       text().withDefault(const Constant('detailed'))();
   TextColumn get diveCenterListViewMode =>
       text().withDefault(const Constant('detailed'))();
+
+  /// v262 (issue #2948): the certification and course list view modes,
+  /// which were in-memory only and reset on every restart.
+  TextColumn get certificationListViewMode =>
+      text().withDefault(const Constant('detailed'))();
+  TextColumn get courseListViewMode =>
+      text().withDefault(const Constant('detailed'))();
+
+  /// v262 (issue #2948): profile metric overlays follow the zoomed depth
+  /// window, and the passive-SCR ratio. Both were device-local prefs.
+  /// Nullable ON PURPOSE: null marks a row that has never held a value,
+  /// which is what lets each device adopt its old pref into it (see
+  /// SettingsNotifier). Null reads as off and 100.
+  BoolColumn get profileMetricsFollowViewport => boolean().nullable()();
+  RealColumn get pscrRatio => real().nullable()();
   // Map style (v67)
   TextColumn get mapStyle =>
       text().withDefault(const Constant('openStreetMap'))();
@@ -355,6 +383,10 @@ class DiverSettings extends Table {
   BoolColumn get defaultShowOtu =>
       boolean().withDefault(const Constant(false))();
   BoolColumn get defaultShowGasSwitchMarkers =>
+      boolean().withDefault(const Constant(true))();
+
+  /// v264: shade late and missed deco gas switches on the profile (#2939).
+  BoolColumn get defaultShowLateGasSwitches =>
       boolean().withDefault(const Constant(true))();
   BoolColumn get defaultShowGasTimeline =>
       boolean().withDefault(const Constant(false))();

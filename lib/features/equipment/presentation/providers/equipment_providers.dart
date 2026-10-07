@@ -152,14 +152,33 @@ final effectiveEquipmentFilterProvider = Provider<EquipmentFilterState>((ref) {
 
 /// The gear categories the diver actually owns, in [EquipmentType] order.
 ///
+/// That order is not the display order: the surfaces that show these sort
+/// them by localized label (#2937).
+///
 /// Drives the filter panel's category chips so it never offers a type with no
 /// gear behind it. Derived from every item -- including retired -- because the
 /// status axis can put retired gear back on screen.
-final ownedEquipmentTypesProvider = Provider<List<EquipmentType>>((ref) {
-  final all = ref.watch(allEquipmentProvider).value ?? const <EquipmentItem>[];
-  final present = all.map((e) => e.type).toSet();
+final ownedEquipmentTypesProvider = Provider<List<EquipmentType>>(
+  (ref) => _typesPresentIn(
+    ref.watch(allEquipmentProvider).value ?? const <EquipmentItem>[],
+  ),
+);
+
+/// The types [items] hold, in [EquipmentType] order.
+List<EquipmentType> _typesPresentIn(Iterable<EquipmentItem> items) {
+  final present = items.map((e) => e.type).toSet();
   return EquipmentType.values.where(present.contains).toList();
-});
+}
+
+/// The gear categories a diver can filter dives by: [ownedEquipmentTypesProvider]
+/// less any type held only by wishlist gear (#2025), which is never on a dive.
+final diveGearTypesProvider = Provider<List<EquipmentType>>(
+  (ref) => _typesPresentIn(
+    (ref.watch(allEquipmentProvider).value ?? const <EquipmentItem>[]).where(
+      (e) => !e.isWanted,
+    ),
+  ),
+);
 
 /// The Add Equipment picker's own filter (#1576).
 ///
@@ -553,6 +572,22 @@ class EquipmentListNotifier
 
   Future<void> reactivateEquipment(String id) async {
     await _repository.reactivateEquipment(id);
+    await refresh();
+  }
+
+  /// The status offer after a location move (v268).
+  Future<void> setStatusForMany(
+    List<String> ids,
+    EquipmentStatus status,
+  ) async {
+    await _repository.setStatusForMany(ids, status);
+    await refresh();
+  }
+
+  /// Wishlist gear bought (#2025). The detail page's item provider watches
+  /// the equipment table, so it reloads on its own.
+  Future<void> markPurchased(String id) async {
+    await _repository.markEquipmentPurchased(id);
     await refresh();
   }
 }

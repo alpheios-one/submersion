@@ -16,6 +16,7 @@ import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/features/gas_calculators/presentation/gas_calculator_tools.dart';
+import 'package:submersion/features/settings/presentation/widgets/altitude_distance_unit_pickers.dart';
 import 'package:submersion/features/settings/presentation/widgets/notification_permission_card.dart';
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
 import 'package:submersion/features/settings/presentation/pages/safety_settings_page.dart';
@@ -26,6 +27,7 @@ import 'package:submersion/features/settings/presentation/widgets/coordinate_for
 import 'package:submersion/features/dive_sites/domain/services/site_location_backfill_service.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/site_location_backfill_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/place_name_language_picker.dart';
+import 'package:submersion/features/settings/presentation/widgets/settings_value_tile.dart';
 import 'package:submersion/features/settings/presentation/widgets/visibility_scale_picker.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/settings/presentation/pages/home_appearance_page.dart';
@@ -523,6 +525,28 @@ class _UnitsSectionContent extends ConsumerWidget {
                 const Divider(height: 1),
                 _buildUnitTile(
                   context,
+                  title: context.l10n.settings_units_altitude,
+                  value: settings.altitudeUnit.symbol,
+                  onTap: () => showAltitudeUnitPicker(
+                    context,
+                    ref,
+                    settings.altitudeUnit,
+                  ),
+                ),
+                const Divider(height: 1),
+                _buildUnitTile(
+                  context,
+                  title: context.l10n.settings_units_distance,
+                  value: settings.distanceUnit.symbol,
+                  onTap: () => showDistanceUnitPicker(
+                    context,
+                    ref,
+                    settings.distanceUnit,
+                  ),
+                ),
+                const Divider(height: 1),
+                _buildUnitTile(
+                  context,
                   title: context.l10n.settings_units_gasConsumption,
                   value: switch (settings.gasConsumptionDisplay) {
                     GasConsumptionDisplay.sac =>
@@ -596,23 +620,11 @@ class _UnitsSectionContent extends ConsumerWidget {
                       showCoordinateFormatPicker(context, ref, settings),
                 ),
                 const Divider(height: 1),
-                ListTile(
-                  title: Text(context.l10n.settings_placeNameLanguage_title),
-                  subtitle: Text(
-                    context.l10n.settings_placeNameLanguage_subtitle,
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        placeNameLanguageLabel(settings.placeNameLanguage),
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      const Icon(Icons.chevron_right),
-                    ],
-                  ),
+                _buildUnitTile(
+                  context,
+                  title: context.l10n.settings_placeNameLanguage_title,
+                  subtitle: context.l10n.settings_placeNameLanguage_subtitle,
+                  value: placeNameLanguageLabel(settings.placeNameLanguage),
                   onTap: () =>
                       unawaited(_pickPlaceNameLanguage(context, ref, settings)),
                 ),
@@ -710,21 +722,10 @@ class _UnitsSectionContent extends ConsumerWidget {
     required String value,
     required VoidCallback onTap,
   }) {
-    return ListTile(
-      title: Text(title),
-      subtitle: subtitle == null ? null : Text(subtitle),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            value,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-          const Icon(Icons.chevron_right),
-        ],
-      ),
+    return SettingsValueTile(
+      title: title,
+      subtitle: subtitle,
+      value: value,
       onTap: onTap,
     );
   }
@@ -1601,6 +1602,14 @@ class _DecompressionSectionContent extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final isSelected = settings.cnsCalculationMethod == method;
+    // Foregrounds must pair with the fill: on primaryContainer only
+    // onPrimaryContainer is guaranteed to read (#2959).
+    final labelColor = isSelected
+        ? colorScheme.onPrimaryContainer
+        : colorScheme.onSurface;
+    final descriptionColor = isSelected
+        ? colorScheme.onPrimaryContainer
+        : colorScheme.onSurfaceVariant;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -1634,19 +1643,24 @@ class _DecompressionSectionContent extends ConsumerWidget {
                         _cnsMethodLabel(context, method),
                         style: textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
+                          color: labelColor,
                         ),
                       ),
                       Text(
                         _cnsMethodDescription(context, method),
                         style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
+                          color: descriptionColor,
                         ),
                       ),
                     ],
                   ),
                 ),
                 if (isSelected)
-                  Icon(Icons.check, color: colorScheme.primary, size: 20),
+                  Icon(
+                    Icons.check,
+                    color: colorScheme.onPrimaryContainer,
+                    size: 20,
+                  ),
               ],
             ),
           ),
@@ -2463,6 +2477,18 @@ class _ManageSectionContent extends StatelessWidget {
                 ),
                 const Divider(height: 1),
                 ListTile(
+                  leading: const Icon(Icons.workspace_premium_outlined),
+                  title: Text(
+                    context.l10n.settings_manage_certificationAgencies,
+                  ),
+                  subtitle: Text(
+                    context.l10n.settings_manage_certificationAgencies_subtitle,
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/certification-agencies'),
+                ),
+                const Divider(height: 1),
+                ListTile(
                   leading: const Icon(MdiIcons.divingScubaTank),
                   title: Text(context.l10n.settings_manage_tankPresets),
                   subtitle: Text(
@@ -2510,6 +2536,28 @@ class _ManageSectionContent extends StatelessWidget {
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => context.push('/equipment/service-types'),
+                ),
+                const Divider(height: 1),
+                // Refresher and renewal rules (issue #2267)
+                ListTile(
+                  leading: const Icon(Icons.event_repeat_outlined),
+                  title: Text(context.l10n.settings_manage_currencyRules),
+                  subtitle: Text(
+                    context.l10n.settings_manage_currencyRules_subtitle,
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/currency-rules'),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  key: const ValueKey('settings_manage_locations'),
+                  leading: const Icon(Icons.place_outlined),
+                  title: Text(context.l10n.settings_manage_locations),
+                  subtitle: Text(
+                    context.l10n.settings_manage_locations_subtitle,
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/equipment/locations'),
                 ),
                 const Divider(height: 1),
                 ListTile(

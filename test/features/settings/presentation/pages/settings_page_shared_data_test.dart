@@ -2,12 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/built_ins/built_in_catalog.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_share_repository.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_share_providers.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_finding.dart';
+import 'package:submersion/features/insights/domain/observations/observation_rule_id.dart';
 import 'package:submersion/features/equipment/domain/models/equipment_arrangement.dart';
 import 'package:submersion/core/constants/gas_consumption_display.dart';
 import 'package:submersion/core/constants/gas_model.dart';
@@ -171,6 +173,11 @@ class _FakeAppSettingsRepository implements AppSettingsRepository {
   Future<bool> getNavAlwaysHideLabels() async => false;
   @override
   Future<void> setNavAlwaysHideLabels(bool value) async {}
+
+  @override
+  Future<bool> getEquipmentGroupByLocation() async => false;
+  @override
+  Future<void> setEquipmentGroupByLocation(bool value) async {}
 }
 
 /// Mock SettingsNotifier that doesn't access the database.
@@ -236,6 +243,22 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
       ids.remove(presetName);
     }
     state = state.copyWith(hiddenTankPresetIds: ids);
+  }
+
+  @override
+  Future<void> setBuiltInHidden(
+    BuiltInCatalog catalog,
+    String id,
+    bool hidden,
+  ) async {
+    state = state.copyWith(
+      hiddenBuiltInIds: withBuiltInHidden(
+        state.hiddenBuiltInIds,
+        catalog,
+        id,
+        hidden,
+      ),
+    );
   }
 
   @override
@@ -321,6 +344,20 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   }
 
   @override
+  Future<void> setObservationRuleMuted(
+    ObservationRuleId rule,
+    bool muted,
+  ) async {
+    final rules = {...state.insightsMutedObservationRules};
+    if (muted) {
+      rules.add(rule.dbValue);
+    } else {
+      rules.remove(rule.dbValue);
+    }
+    state = state.copyWith(insightsMutedObservationRules: rules);
+  }
+
+  @override
   Future<void> setDefaultShowGasTimeline(bool value) async =>
       state = state.copyWith(defaultShowGasTimeline: value);
   @override
@@ -377,6 +414,9 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setAltitudeUnit(AltitudeUnit unit) async =>
       state = state.copyWith(altitudeUnit: unit);
+  @override
+  Future<void> setDistanceUnit(DistanceUnit unit) async =>
+      state = state.copyWith(distanceUnit: unit);
   @override
   Future<void> setTimeFormat(TimeFormat format) async =>
       state = state.copyWith(timeFormat: format);
@@ -484,9 +524,6 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setDefaultNdlSource(MetricDataSource value) async =>
       state = state.copyWith(defaultNdlSource: value);
   @override
-  Future<void> setDefaultCeilingSource(MetricDataSource value) async =>
-      state = state.copyWith(defaultCeilingSource: value);
-  @override
   Future<void> setDefaultDecoStopSource(MetricDataSource value) async =>
       state = state.copyWith(defaultDecoStopSource: value);
   @override
@@ -519,6 +556,12 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDiveCenterListViewMode(ListViewMode mode) async =>
       state = state.copyWith(diveCenterListViewMode: mode);
+  @override
+  Future<void> setCertificationListViewMode(ListViewMode mode) async =>
+      state = state.copyWith(certificationListViewMode: mode);
+  @override
+  Future<void> setCourseListViewMode(ListViewMode mode) async =>
+      state = state.copyWith(courseListViewMode: mode);
   @override
   Future<void> setMapStyle(MapStyle style) async =>
       state = state.copyWith(mapStyle: style);
@@ -629,6 +672,9 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultShowGasSwitchMarkers(bool value) async =>
       state = state.copyWith(defaultShowGasSwitchMarkers: value);
+  @override
+  Future<void> setDefaultShowLateGasSwitches(bool value) async =>
+      state = state.copyWith(defaultShowLateGasSwitches: value);
   @override
   Future<void> setDefaultShowPpO2(bool value) async =>
       state = state.copyWith(defaultShowPpO2: value);

@@ -56,7 +56,6 @@ import 'package:submersion/features/dive_log/presentation/pages/profile_editor_p
 import 'package:submersion/features/dive_log/presentation/providers/profile_editor_provider.dart';
 import 'package:submersion/features/maps/presentation/pages/dive_activity_map_page.dart';
 import 'package:submersion/features/maps/presentation/pages/offline_maps_page.dart';
-import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/pages/site_list_page.dart';
 import 'package:submersion/features/dive_sites/presentation/pages/site_detail_page.dart';
 import 'package:submersion/features/dive_sites/presentation/pages/site_edit_page.dart';
@@ -70,10 +69,13 @@ import 'package:submersion/features/equipment/presentation/pages/equipment_edit_
 import 'package:submersion/features/cylinder_configs/presentation/pages/cylinder_config_edit_page.dart';
 import 'package:submersion/features/cylinder_configs/presentation/pages/cylinder_config_list_page.dart';
 import 'package:submersion/features/equipment/presentation/pages/equipment_set_list_page.dart';
+import 'package:submersion/features/equipment/presentation/pages/equipment_location_detail_page.dart';
+import 'package:submersion/features/equipment/presentation/pages/equipment_location_list_page.dart';
 import 'package:submersion/features/equipment/presentation/pages/service_kind_list_page.dart';
 import 'package:submersion/features/equipment/presentation/pages/equipment_set_detail_page.dart';
 import 'package:submersion/features/equipment/presentation/pages/equipment_set_edit_page.dart';
 import 'package:submersion/features/media/presentation/pages/media_section_page.dart';
+import 'package:submersion/features/trips/presentation/helpers/trip_edit_navigation.dart';
 import 'package:submersion/features/trips/presentation/pages/trip_list_page.dart';
 import 'package:submersion/features/trips/presentation/pages/trip_detail_page.dart';
 import 'package:submersion/features/trips/presentation/pages/trip_edit_page.dart';
@@ -92,8 +94,11 @@ import 'package:submersion/features/insights/presentation/pages/insights_geograp
 import 'package:submersion/features/insights/presentation/pages/insights_marine_life_page.dart';
 import 'package:submersion/features/insights/presentation/pages/insights_time_patterns_page.dart';
 import 'package:submersion/features/insights/presentation/pages/insights_equipment_page.dart';
+import 'package:submersion/features/insights/presentation/pages/insights_observations_page.dart';
+import 'package:submersion/features/insights/presentation/pages/insights_focus_page.dart';
 import 'package:submersion/features/insights/presentation/pages/insights_profile_page.dart';
 import 'package:submersion/features/backup/presentation/pages/backup_settings_page.dart';
+import 'package:submersion/features/settings/presentation/pages/manage_currency_rules_page.dart';
 import 'package:submersion/features/settings/presentation/pages/hidden_items_page.dart';
 import 'package:submersion/features/settings/presentation/pages/cloud_sync_page.dart';
 import 'package:submersion/features/media_store/presentation/pages/media_storage_page.dart';
@@ -116,6 +121,7 @@ import 'package:submersion/features/settings/presentation/pages/site_detail_sect
 import 'package:submersion/features/safety/presentation/pages/add_chamber_page.dart';
 import 'package:submersion/features/safety/presentation/pages/chambers_directory_page.dart';
 import 'package:submersion/features/safety/presentation/pages/incident_edit_page.dart';
+import 'package:submersion/features/safety/presentation/pages/cns_otu_page.dart';
 import 'package:submersion/features/safety/presentation/pages/no_fly_page.dart';
 import 'package:submersion/features/safety/presentation/pages/incidents_list_page.dart';
 import 'package:submersion/features/safety/presentation/pages/emergency_card_page.dart';
@@ -182,6 +188,10 @@ import 'package:submersion/features/import_wizard/data/adapters/dive_computer_ad
 import 'package:submersion/features/import_wizard/data/adapters/divelogs_import_adapter.dart';
 import 'package:submersion/features/import_wizard/data/adapters/garmin_cloud_adapter.dart';
 import 'package:submersion/features/import_wizard/data/adapters/suunto_cloud_adapter.dart';
+import 'package:submersion/features/import_wizard/data/adapters/suunto_file_adapter.dart';
+import 'package:submersion/core/services/suunto_cloud/suunto_json_file_reader.dart';
+import 'package:submersion/features/import_wizard/data/adapters/suunto_route_writer.dart';
+import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
 import 'package:submersion/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:submersion/features/planner/presentation/pages/plan_canvas_page.dart';
 import 'package:submersion/features/planner/presentation/pages/plan_compare_page.dart';
@@ -189,6 +199,8 @@ import 'package:submersion/features/surface_interval_tool/presentation/pages/sur
 import 'package:submersion/features/import_wizard/data/adapters/universal_adapter.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/main_scaffold.dart';
+import 'package:submersion/features/certification_agencies/presentation/pages/certification_agencies_page.dart';
+import 'package:submersion/features/certification_agencies/presentation/pages/certification_agency_edit_page.dart';
 
 /// Root navigator key, so app-wide modals (e.g. the replaced-library adopt
 /// dialog surfaced from the app root) can be shown above the shell.
@@ -359,6 +371,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 name: 'noFly',
                 builder: (context, state) => const NoFlyPage(),
               ),
+              GoRoute(
+                path: 'cns-otu',
+                name: 'cnsOtu',
+                builder: (context, state) => const CnsOtuPage(),
+              ),
               // The GPS logger moved into the Tracks area; keep old deep
               // links working.
               GoRoute(
@@ -515,11 +532,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'new',
                 name: 'newSite',
-                builder: (context, state) => SiteEditPage(
-                  initialLocation: state.extra is GeoPoint
-                      ? state.extra as GeoPoint
-                      : null,
-                ),
+                builder: (context, state) =>
+                    SiteEditPage.fromNewSiteExtra(state.extra),
               ),
               GoRoute(
                 path: 'merge',
@@ -600,6 +614,24 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 // nested navigator this page would open behind that dialog.
                 parentNavigatorKey: rootNavigatorKey,
                 builder: (context, state) => const ServiceKindListPage(),
+              ),
+              // Settings > Manage > Locations (v268). Before the
+              // ':equipmentId' catch-all, like service-types.
+              GoRoute(
+                path: 'locations',
+                name: 'manageEquipmentLocations',
+                parentNavigatorKey: rootNavigatorKey,
+                builder: (context, state) => const EquipmentLocationListPage(),
+                routes: [
+                  GoRoute(
+                    path: ':locationId',
+                    name: 'equipmentLocationDetail',
+                    parentNavigatorKey: rootNavigatorKey,
+                    builder: (context, state) => EquipmentLocationDetailPage(
+                      locationId: state.pathParameters['locationId']!,
+                    ),
+                  ),
+                ],
               ),
               // Must precede the ':equipmentId' catch-all below, which would
               // otherwise swallow 'cylinder-configs' as an equipment id.
@@ -853,8 +885,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'edit',
                     name: 'editTrip',
-                    builder: (context, state) =>
-                        TripEditPage(tripId: state.pathParameters['tripId']),
+                    builder: (context, state) => TripEditPage(
+                      tripId: state.pathParameters['tripId'],
+                      initialSection: TripEditSection.fromQuery(
+                        state.uri.queryParameters['section'],
+                      ),
+                    ),
                   ),
                   GoRoute(
                     path: 'gallery',
@@ -945,6 +981,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 name: 'insightsProfile',
                 builder: (context, state) => const InsightsProfilePage(),
               ),
+              GoRoute(
+                path: 'observations',
+                name: 'insightsObservations',
+                builder: (context, state) => const InsightsObservationsPage(),
+              ),
+              GoRoute(
+                path: 'focus',
+                name: 'insightsFocus',
+                builder: (context, state) => const InsightsFocusPage(),
+              ),
               // Connections opens from Insights as its own full page.
               GoRoute(
                 path: kConnectionsSegment,
@@ -995,6 +1041,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 name: 'importFromCloudSuunto',
                 builder: (context, state) =>
                     const _SuuntoCloudImportWizardRoute(),
+              ),
+              GoRoute(
+                path: 'import-file/suunto',
+                name: 'importFromFileSuunto',
+                builder: (context, state) => _SuuntoFileImportWizardRoute(
+                  initialFiles: state.extra is List<SuuntoJsonFile>
+                      ? state.extra! as List<SuuntoJsonFile>
+                      : const [],
+                ),
               ),
               GoRoute(
                 path: 'import-cloud/garmin',
@@ -1479,6 +1534,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'diveTypes',
             builder: (context, state) => const DiveTypesPage(),
           ),
+          // Certification currency rules (issue #2267)
+          GoRoute(
+            path: '/currency-rules',
+            name: 'currencyRules',
+            builder: (context, state) => const ManageCurrencyRulesPage(),
+          ),
           // Site Types Management (issue #1765)
           GoRoute(
             path: '/site-types',
@@ -1491,6 +1552,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/dive-roles',
             name: 'diveRoles',
             builder: (context, state) => const DiveRolesPage(),
+          ),
+
+          // Certification agencies and their certifications (issue #690).
+          // :id is a built-in enum name or a custom agency id.
+          GoRoute(
+            path: '/certification-agencies',
+            name: 'certificationAgencies',
+            builder: (context, state) => const CertificationAgenciesPage(),
+            routes: [
+              GoRoute(
+                path: ':id',
+                name: 'certificationAgencyEdit',
+                builder: (context, state) => CertificationAgencyEditPage(
+                  agencyId: state.pathParameters['id']!,
+                ),
+              ),
+            ],
           ),
 
           // Saved queries management (#2365)
@@ -1937,7 +2015,43 @@ class _SuuntoCloudImportWizardRoute extends ConsumerWidget {
         diveRepository: diveRepo,
         consolidationService: consolidationService,
         diverId: diverId,
+        routeWriter: SuuntoRouteWriter(
+          repository: ref.watch(navTrackRepositoryProvider),
+        ),
         ref: ref,
+      ),
+    );
+  }
+}
+
+/// Wrapper that creates a [SuuntoFileAdapter] with dependencies from
+/// Riverpod, for importing Suunto app JSON exports (issue #1445), opened
+/// with the files a hand-off, share or drop already chose.
+class _SuuntoFileImportWizardRoute extends ConsumerWidget {
+  const _SuuntoFileImportWizardRoute({required this.initialFiles});
+
+  final List<SuuntoJsonFile> initialFiles;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final diverId = ref.watch(currentDiverIdProvider) ?? '';
+    final importService = ref.watch(diveImportServiceProvider);
+    final computerRepo = ref.watch(diveComputerRepositoryProvider);
+    final diveRepo = ref.watch(diveRepositoryProvider);
+    final consolidationService = ref.watch(diveConsolidationServiceProvider);
+
+    return UnifiedImportWizard(
+      adapter: SuuntoFileAdapter(
+        importService: importService,
+        computerRepository: computerRepo,
+        diveRepository: diveRepo,
+        consolidationService: consolidationService,
+        diverId: diverId,
+        routeWriter: SuuntoRouteWriter(
+          repository: ref.watch(navTrackRepositoryProvider),
+        ),
+        ref: ref,
+        initialFiles: initialFiles,
       ),
     );
   }

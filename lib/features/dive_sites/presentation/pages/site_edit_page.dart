@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart' show kIsWeb, setEquals;
 import 'package:flutter/material.dart';
+import 'package:submersion/core/built_ins/built_in_catalog.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/data/visibility/shared_item_policy.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -15,9 +16,11 @@ import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/environment_enum_display.dart';
+import 'package:submersion/features/settings/presentation/providers/hidden_built_ins_provider.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/dive_sites/data/repositories/site_repository_impl.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/dive_sites/domain/models/new_site_seed.dart';
 import 'package:submersion/features/dive_sites/domain/entities/site_classification.dart';
 import 'package:submersion/features/dive_sites/presentation/site_difficulty_display.dart';
 import 'package:submersion/features/dive_sites/domain/services/site_location_merge.dart';
@@ -63,6 +66,10 @@ class SiteEditPage extends ConsumerStatefulWidget {
   final VoidCallback? onDeleted;
   final GeoPoint? initialLocation;
 
+  /// Starts a new site's name field with this text, such as what the diver
+  /// searched the site picker for (#1501).
+  final String? initialName;
+
   const SiteEditPage({
     super.key,
     this.siteId,
@@ -72,6 +79,7 @@ class SiteEditPage extends ConsumerStatefulWidget {
     this.onCancel,
     this.onDeleted,
     this.initialLocation,
+    this.initialName,
   }) : assert(
          siteId == null || mergeSiteIds == null,
          'siteId and mergeSiteIds are mutually exclusive',
@@ -79,7 +87,18 @@ class SiteEditPage extends ConsumerStatefulWidget {
        assert(
          initialLocation == null || (siteId == null && mergeSiteIds == null),
          'initialLocation is only valid when creating a new site',
+       ),
+       assert(
+         initialName == null || (siteId == null && mergeSiteIds == null),
+         'initialName is only valid when creating a new site',
        );
+
+  /// The new-site form for the `/sites/new` route, seeded from its `extra`
+  /// as [NewSiteSeed.fromRouteExtra] reads it.
+  factory SiteEditPage.fromNewSiteExtra(Object? extra) {
+    final seed = NewSiteSeed.fromRouteExtra(extra);
+    return SiteEditPage(initialLocation: seed.location, initialName: seed.name);
+  }
 
   bool get isEditing => siteId != null;
   bool get isMerging => mergeSiteIds != null && mergeSiteIds!.length > 1;
@@ -217,6 +236,18 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
       );
       _isApplyingInitialValues = wasApplying;
     });
+  }
+
+  /// Seed a brand-new site form's name from [SiteEditPage.initialName], as a
+  /// non-dirtying initial value: cancelling an untouched form needs no
+  /// discard prompt.
+  void _seedInitialName() {
+    final name = widget.initialName;
+    if (name == null || name.isEmpty) return;
+
+    _isApplyingInitialValues = true;
+    _nameController.text = name;
+    _isApplyingInitialValues = false;
   }
 
   /// Seed a brand-new site form from [SiteEditPage.initialLocation]: fill the
@@ -721,6 +752,7 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     // For new sites, mark as initialized immediately
     if (!_isInitialized) {
       _isInitialized = true;
+      _seedInitialName();
       _seedInitialLocation();
     }
 
@@ -1022,6 +1054,10 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
           if (!widget.isMerging)
             TypeTagsSection(
               allTypes: ref.watch(siteTypesProvider).value ?? const [],
+              hiddenTypeIds: ref.watch(
+                hiddenBuiltInIdsProvider(BuiltInCatalog.siteTypes),
+              ),
+              keepTypeIds: _originalTypeIds,
               selectedTypeIds: _selectedTypeIds,
               onTypesChanged: (ids) => setState(() {
                 _selectedTypeIds = ids;

@@ -31,6 +31,7 @@ import 'package:submersion/features/dive_log/domain/entities/computer_tissue_sna
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/tank_shared_computers.dart';
+import 'package:submersion/features/dive_log/domain/entities/weight_label.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_source_export.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
@@ -53,7 +54,9 @@ import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
 import 'package:submersion/core/query/compiler/query_compiler.dart';
+import 'package:submersion/core/query/domain/query_node.dart';
 import 'package:submersion/features/dive_log/query/dive_filter_query.dart';
+import 'package:submersion/features/dive_log/query/dive_query_entity.dart';
 import 'package:submersion/features/insights/data/dive_filter_sql.dart';
 import 'package:submersion/features/dive_centers/domain/entities/dive_center.dart'
     as domain;
@@ -76,6 +79,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive_custom_field.d
     as domain;
 import 'package:submersion/features/dive_log/data/repositories/dive_custom_field_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/safety_findings_repository.dart';
+import 'package:submersion/features/query/app_query_registry.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:submersion/features/tags/domain/entities/tag.dart' as domain;
 import 'package:submersion/features/tags/data/repositories/tag_repository.dart';
@@ -83,6 +87,8 @@ import 'package:submersion/features/trips/domain/entities/trip.dart' as domain;
 import 'package:submersion/features/buddies/domain/entities/buddy.dart'
     as domain;
 import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
+import 'package:submersion/features/dive_roles/data/repositories/dive_role_link_repository.dart';
+import 'package:submersion/features/dive_roles/domain/services/dive_role_set.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_observation_repository.dart';
 import 'package:submersion/features/data_quality/data/services/quality_scan_service.dart';
 
@@ -148,6 +154,7 @@ class DiveRepository {
   final _log = LoggerService.forClass(DiveRepository);
   final TagRepository _tagRepository = TagRepository();
   final BuddyRepository _buddyRepository = BuddyRepository();
+  final DiveRoleLinkRepository _roleLinks = DiveRoleLinkRepository();
   final EquipmentObservationRepository _observationRepository =
       EquipmentObservationRepository();
   late final DiveCustomFieldRepository _customFieldRepository =
@@ -216,6 +223,13 @@ class DiveRepository {
       .tableUpdates(TableUpdateQuery.allOf(_diveListTables))
       .debounce(changeTickDebounce);
 
+  /// The tables [getStatistics] and [getRecords] read, by SQL name, before
+  /// any filter joins: the dives themselves and the `dive_sites` JOIN that
+  /// names Most Visited Sites and each record's site. A provider built on
+  /// either query ticks on all of these plus the filter's own tables, so a
+  /// site rename (a `dive_sites`-only write) refreshes the names it shows.
+  static const Set<String> statisticsTickTables = {'dives', 'dive_sites'};
+
   /// The tables the dive list renders from, by SQL name: the summary row,
   /// its site and trip joins, the safety badge, and the row chips (tag
   /// membership and names, the dive-type junction; type NAMES resolve
@@ -271,6 +285,10 @@ class DiveRepository {
   List<TableUpdateQuery> get _buddyLinkTables => [
     TableUpdateQuery.onTable(_db.diveBuddies),
     TableUpdateQuery.onTable(_db.buddies),
+    // The role junctions (#1221): a non-primary role change, or a synced
+    // role row, writes only these.
+    TableUpdateQuery.onTable(_db.diveDiverRoles),
+    TableUpdateQuery.onTable(_db.diveBuddyRoles),
   ];
 
   /// Aggregate change-tick for the dive DETAIL page: fires when ANY table that
@@ -328,6 +346,9 @@ class DiveRepository {
           TableUpdateQuery.onTable(_db.courses),
           TableUpdateQuery.onTable(_db.diveBuddies),
           TableUpdateQuery.onTable(_db.buddies),
+          // Role sets (#1221): a non-primary role writes only these.
+          TableUpdateQuery.onTable(_db.diveDiverRoles),
+          TableUpdateQuery.onTable(_db.diveBuddyRoles),
           TableUpdateQuery.onTable(_db.sightings),
           TableUpdateQuery.onTable(_db.species),
           TableUpdateQuery.onTable(_db.media),
@@ -545,6 +566,9 @@ class DiveRepository {
         // Load all tags for these dives in one query
         final tagsByDive = await _tagRepository.getTagsForDives(diveIds);
         final diveTypesByDive = await _diveTypesForDives(diveIds);
+        final diverRolesByDive = await _roleLinks.resolveDiverRoleIds({
+          for (final row in rows) row.id: row.diverRole,
+        });
 
         // Load all custom fields for these dives in one query
         final customFieldsByDive = await _customFieldRepository
@@ -573,6 +597,7 @@ class DiveRepository {
                 trip: row.tripId != null ? tripsById[row.tripId] : null,
                 tags: tagsByDive[row.id] ?? [],
                 diveTypeIds: diveTypesByDive[row.id],
+                diverRoleIds: diverRolesByDive[row.id],
                 customFields: customFieldsByDive[row.id] ?? [],
                 buddies: buddiesByDive[row.id] ?? const [],
               ),
@@ -1580,7 +1605,7 @@ class DiveRepository {
                 diveType: Value(dive.diveTypeId),
                 buddy: Value(dive.buddy),
                 diveMaster: Value(dive.diveMaster),
-                diverRole: Value(dive.diverRoleId),
+                diverRole: Value(DiveRoleSet.primary(dive.diverRoleIds)),
                 notes: Value(dive.notes),
                 name: Value(dive.name),
                 siteId: Value(dive.site?.id),
@@ -1675,6 +1700,7 @@ class DiveRepository {
           localUpdatedAt: now,
         );
         await _replaceDiveTypeRows(id, dive.diveTypeIds, now);
+        await _roleLinks.writeDiverRoles(id, dive.diverRoleIds, now: now);
 
         // Child ids are resolved before the batch rather than inside it:
         // _db.batch takes a synchronous closure, so an id minted in there is
@@ -1746,6 +1772,7 @@ class DiveRepository {
                 weightType: Value(weight.weightType.name),
                 amountKg: Value(weight.amountKg),
                 notes: Value(weight.notes),
+                label: Value(normalizeWeightLabel(weight.label)),
                 createdAt: Value(now),
               ),
             );
@@ -1904,7 +1931,7 @@ class DiveRepository {
             diveType: Value(dive.diveTypeId),
             buddy: Value(dive.buddy),
             diveMaster: Value(dive.diveMaster),
-            diverRole: Value(dive.diverRoleId),
+            diverRole: Value(DiveRoleSet.primary(dive.diverRoleIds)),
             notes: Value(dive.notes),
             name: Value(dive.name),
             siteId: Value(dive.site?.id),
@@ -1989,6 +2016,7 @@ class DiveRepository {
           localUpdatedAt: now,
         );
         await _replaceDiveTypeRows(dive.id, dive.diveTypeIds, now);
+        await _roleLinks.writeDiverRoles(dive.id, dive.diverRoleIds, now: now);
 
         // Update tanks:
         // Try to match existing tanks by ID to do updates instead of delete+insert when possible,
@@ -2938,8 +2966,12 @@ class DiveRepository {
   }
 
   /// Search dives by name, notes, buddy, dive master, site name/country/
-  /// region, dive center name, linked buddy names, tag names, or custom
-  /// fields, returning lightweight [DiveSummary] rows.
+  /// region, dive center name, linked buddy names, tag names, custom fields,
+  /// or dive types, returning lightweight [DiveSummary] rows.
+  ///
+  /// Matches through the Dives search row's own text search
+  /// (`diveQueryEntity.textSearchSql`), so the two can never disagree on what
+  /// a term finds (issue #2884).
   ///
   /// Exactly four SQL statements regardless of match count (match ids,
   /// summary rows, batched tags, batched dive types), bounded to the [limit]
@@ -2947,7 +2979,7 @@ class DiveRepository {
   /// need to detect truncation pass `limit + 1` and treat a full-length
   /// result as "more matches exist". Replaces the unbounded full-Dive-
   /// hydrating search whose roughly-ten-queries-per-match N+1 dominated
-  /// search cost on large databases (docs/superpowers/specs/2026-07-10-
+  /// search cost on large databases (docs/design/specs/2026-07-10-
   /// large-db-performance-findings.md).
   // stats-scope-exempt: search results are a displayed list, like the logbook
   Future<List<DiveSummary>> searchDiveSummaries(
@@ -2966,7 +2998,13 @@ class DiveRepository {
         if (trimmed.isEmpty || limit <= 0) return <DiveSummary>[];
         // Match on the trimmed term so incidental leading/trailing whitespace
         // (e.g. "manta ") does not silently exclude otherwise-matching dives.
-        final likeTerm = '%$trimmed%';
+        // One text node is one phrase, as the old LIKE was.
+        final text = compileQuery(
+          TextNode([trimmed]),
+          diveQueryEntity,
+          appQueryRegistry,
+          rootAlias: 'd',
+        );
         final diverClause = diverId != null ? 'AND d.diver_id = ?' : '';
         final diverArgs = diverId != null
             ? [Variable<String>(diverId)]
@@ -2975,38 +3013,18 @@ class DiveRepository {
         final matchingIds = await _db
             .customSelect(
               '''
-              SELECT DISTINCT d.id,
+              SELECT d.id,
                 COALESCE(d.entry_time, d.dive_date_time) AS sort_ts,
                 d.dive_number AS dive_number
               FROM dives d
-              LEFT JOIN dive_sites ds ON d.site_id = ds.id
-              LEFT JOIN dive_centers dc ON d.dive_center_id = dc.id
-              LEFT JOIN dive_buddies db ON db.dive_id = d.id
-              LEFT JOIN buddies b ON db.buddy_id = b.id
-              LEFT JOIN dive_tags dt ON dt.dive_id = d.id
-              LEFT JOIN tags t ON dt.tag_id = t.id
-              LEFT JOIN dive_custom_fields cf ON cf.dive_id = d.id
-              WHERE (
-                d.notes LIKE ?
-                OR d.name LIKE ?
-                OR d.buddy LIKE ?
-                OR d.dive_master LIKE ?
-                OR ds.name LIKE ?
-                OR ds.country LIKE ?
-                OR ds.region LIKE ?
-                OR dc.name LIKE ?
-                OR b.name LIKE ?
-                OR t.name LIKE ?
-                OR cf.field_key LIKE ?
-                OR cf.field_value LIKE ?
-              )
+              WHERE ${text.where}
               $diverClause
               ORDER BY sort_ts DESC,
                 COALESCE(d.dive_number, 0) DESC, d.id DESC
               LIMIT ?
               ''',
               variables: [
-                for (var i = 0; i < 12; i++) Variable<String>(likeTerm),
+                for (final p in text.params) Variable(p),
                 ...diverArgs,
                 Variable<int>(limit),
               ],
@@ -3769,6 +3787,7 @@ class DiveRepository {
     Trip? trip,
     List<domain.Tag> tags = const [],
     List<String>? diveTypeIds,
+    List<String>? diverRoleIds,
     List<domain.DiveCustomField> customFields = const [],
     List<domain.BuddyWithRole> buddies = const [],
   }) {
@@ -3863,7 +3882,7 @@ class DiveRepository {
       buddy: row.buddy,
       diveMaster: row.diveMaster,
       buddies: buddies,
-      diverRoleId: row.diverRole,
+      diverRoleIds: diverRoleIds ?? [?row.diverRole],
       notes: row.notes,
       name: row.name,
       site: domainSite,
@@ -4259,6 +4278,11 @@ class DiveRepository {
     final tags = await _tagRepository.getTagsForDive(row.id);
     final diveTypesByDive = await _diveTypesForDives([row.id]);
     final diveTypeIds = diveTypesByDive[row.id] ?? [row.diveType];
+    final diverRoleIds =
+        (await _roleLinks.resolveDiverRoleIds({
+          row.id: row.diverRole,
+        }))[row.id] ??
+        const <String>[];
 
     // Derive waterTemp from the profile if not set on the dive row. Some
     // imports populate per-sample temperature but miss the dive-level field.
@@ -4302,7 +4326,7 @@ class DiveRepository {
       diveTypeIds: diveTypeIds,
       buddy: row.buddy,
       diveMaster: row.diveMaster,
-      diverRoleId: row.diverRole,
+      diverRoleIds: diverRoleIds,
       notes: row.notes,
       name: row.name,
       site: site,
@@ -4733,6 +4757,7 @@ class DiveRepository {
               ),
               amountKg: row.amountKg,
               notes: row.notes,
+              label: row.label,
             ),
           )
           .toList();
@@ -5425,12 +5450,89 @@ class DiveRepository {
     return _mapDiveTimesRow(rows.first);
   }
 
+  /// The most recent EXECUTED dive of [diverId] (excludes planner rows with
+  /// `isPlanned = true`, mirroring [getNextDive]) whose effective start
+  /// (entryTime, falling back to the legacy diveDateTime) is at or before
+  /// [notAfter]. Reverse of [getNextDive]'s predicate and ordering.
+  ///
+  /// Used for "current state" readouts (e.g. live CNS/OTU decay since the
+  /// last dive): without the isPlanned filter, a dive planned for a future
+  /// date would otherwise sort ahead of the diver's actual last dive.
+  ///
+  /// Unlike most lookups in this file, a query failure is rethrown rather
+  /// than mapped to null: callers use null to mean "no executed dive", and
+  /// masking a real error the same way would render as "no load" on a
+  /// safety readout instead of surfacing the failure.
+  Future<domain.DiveTimes?> getMostRecentDiveTimes({
+    required String? diverId,
+    required DateTime notAfter,
+  }) async {
+    try {
+      final cutoffMs = notAfter.millisecondsSinceEpoch;
+      final clauses = <String>[
+        'd.is_planned = 0',
+        '(d.entry_time <= ? OR (d.entry_time IS NULL AND d.dive_date_time <= ?))',
+      ];
+      final args = <Variable<Object>>[
+        Variable<int>(cutoffMs),
+        Variable<int>(cutoffMs),
+      ];
+      if (diverId != null) {
+        clauses.add('d.diver_id = ?');
+        args.add(Variable<String>(diverId));
+      } else {
+        clauses.add('d.diver_id IS NULL');
+      }
+
+      final rows = await _db
+          .customSelect(
+            '$_diveTimesSelect WHERE ${clauses.join(' AND ')} '
+            'ORDER BY COALESCE(d.entry_time, d.dive_date_time) DESC, '
+            'd.dive_number DESC LIMIT 1',
+            variables: args,
+            readsFrom: {_db.dives, _db.diveProfileSeries},
+          )
+          .get();
+      if (rows.isEmpty) return null;
+      return _mapDiveTimesRow(rows.first);
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get most recent dive for diver: $diverId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      // Rethrows rather than returning null like most lookups here: this
+      // feeds a safety readout (cnsOtuSnapshotProvider) where null is
+      // overloaded to also mean "no executed dive on record". Swallowing a
+      // real DB failure into that same null would render as "all clear"
+      // instead of the page's explicit error state.
+      rethrow;
+    }
+  }
+
   /// Times-only equivalent of [getDivesInRange] (identical WHERE and
   /// ordering), for same-day and weekly exposure aggregation.
   Future<List<domain.DiveTimes>> getDiveTimesInRange(
     DateTime start,
     DateTime end, {
     String? diverId,
+  }) => _diveTimesInRange(start, end, diverId: diverId);
+
+  /// [getDiveTimesInRange] for [diverId], excluding planner rows
+  /// (`isPlanned = true`), for "current state" totals such as the live
+  /// weekly OTU readout: a saved plan has not been dived, so its exposure
+  /// must not count.
+  Future<List<domain.DiveTimes>> getExecutedDiveTimesInRange(
+    DateTime start,
+    DateTime end, {
+    required String diverId,
+  }) => _diveTimesInRange(start, end, diverId: diverId, executedOnly: true);
+
+  Future<List<domain.DiveTimes>> _diveTimesInRange(
+    DateTime start,
+    DateTime end, {
+    String? diverId,
+    bool executedOnly = false,
   }) async {
     final clauses = <String>['d.dive_date_time >= ?', 'd.dive_date_time <= ?'];
     final args = <Variable<Object>>[
@@ -5441,6 +5543,7 @@ class DiveRepository {
       clauses.add('d.diver_id = ?');
       args.add(Variable<String>(diverId));
     }
+    if (executedOnly) clauses.add('d.is_planned = 0');
     final rows = await _db
         .customSelect(
           '$_diveTimesSelect WHERE ${clauses.join(' AND ')} '
@@ -6394,10 +6497,12 @@ class DiveRepository {
     }
     for (final weight in desired) {
       final current = weight.id.isNotEmpty ? existingById[weight.id] : null;
+      final label = normalizeWeightLabel(weight.label);
       if (current != null &&
           current.weightType == weight.weightType.name &&
           current.amountKg == weight.amountKg &&
-          current.notes == weight.notes) {
+          current.notes == weight.notes &&
+          current.label == label) {
         continue;
       }
       final rowId = weight.id.isNotEmpty ? weight.id : _uuid.v4();
@@ -6409,6 +6514,7 @@ class DiveRepository {
             weightType: Value(weight.weightType.name),
             amountKg: Value(weight.amountKg),
             notes: Value(weight.notes),
+            label: Value(label),
           ),
         );
       } else {
@@ -6421,6 +6527,7 @@ class DiveRepository {
                 weightType: Value(weight.weightType.name),
                 amountKg: Value(weight.amountKg),
                 notes: Value(weight.notes),
+                label: Value(label),
                 createdAt: Value(now),
               ),
             );
@@ -6593,8 +6700,8 @@ class DiveRepository {
     ]);
   }
 
-  /// Which of [ids] are active gear (not retired or lost, still flagged
-  /// active): the expander skips the rest.
+  /// Which of [ids] are active gear (not retired, lost or wanted, still
+  /// flagged active): the expander skips the rest.
   Future<Set<String>> _activeIdsAmong(Set<String> ids) async {
     if (ids.isEmpty) return const {};
     final rows =
@@ -6605,6 +6712,7 @@ class DiveRepository {
                   t.status.isNotIn([
                     EquipmentStatus.retired.name,
                     EquipmentStatus.lost.name,
+                    EquipmentStatus.wanted.name,
                   ]),
             ))
             .get();
@@ -7039,6 +7147,7 @@ class DiveRepository {
     weightType: Value(w.weightType.name),
     amountKg: Value(w.amountKg),
     notes: Value(w.notes),
+    label: Value(normalizeWeightLabel(w.label)),
     createdAt: Value(now),
   );
 
@@ -8040,6 +8149,14 @@ class DiveRepository {
             now: now,
           );
         }
+
+        // The safety review grades the primary's own samples, so the stored
+        // one graded the computer that was primary until now.
+        await SafetyFindingsRepository.clearReviewForDive(
+          _db,
+          _syncRepository,
+          diveId,
+        );
       });
       SyncEventBus.notifyLocalChange();
     } catch (e, stackTrace) {

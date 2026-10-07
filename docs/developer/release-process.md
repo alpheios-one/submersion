@@ -3,7 +3,7 @@
 Submersion uses a two-channel release model: every green merge to `main`
 becomes a **beta** automatically, and a **stable** release is a promotion of
 a beta that soaked well - the identical artifacts, never a rebuild. The
-design history lives in `docs/superpowers/specs/2026-07-28-release-channels-design.md`;
+design history lives in `docs/design/specs/2026-07-28-release-channels-design.md`;
 this page is the operational guide.
 
 User-facing channel documentation is on the wiki:
@@ -263,6 +263,8 @@ a build number above the current commit count. Expected to be rare.
 
 - Secrets (App Store, Play, Sparkle, `BETA_BUILDS_TOKEN`,
   `RELEASE_BOT_TOKEN`): `docs/developer/release-secrets-setup.md`
+- Google Play production access and the Data safety declaration to
+  reaffirm on each update: `docs/developer/play-production-access.md`
 - Workflows: `.github/workflows/{build-all,beta,promote,release}.yml`
 - Scripts: `scripts/release/` (`promote.sh`, `bump_version.sh`,
   `contributors.sh`; the old `release.sh` orchestrator belongs to the legacy

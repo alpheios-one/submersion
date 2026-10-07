@@ -12,6 +12,7 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/text/text_sort.dart';
+import 'package:submersion/features/equipment/data/repositories/equipment_location_move_repository.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_share_repository.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_tag_repository.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_visibility_queries.dart';
@@ -81,12 +82,14 @@ class EquipmentRepository {
         // status is the user-visible retirement flag; legacy rows can carry
         // status=retired with isActive still true, so filter on both (#636).
         // "Sold" is the same kind of terminal status -- gear that has left
-        // the kit -- so it drops out of the active list the same way.
+        // the kit -- so it drops out of the active list the same way, and
+        // "Wanted" gear has not joined the kit yet (#2025).
         ..where(
           (t) =>
               t.isActive.equals(true) &
               t.status.isNotValue(EquipmentStatus.retired.name) &
-              t.status.isNotValue(EquipmentStatus.sold.name),
+              t.status.isNotValue(EquipmentStatus.sold.name) &
+              t.status.isNotValue(EquipmentStatus.wanted.name),
         )
         ..orderBy([
           (t) => OrderingTerm.asc(t.type),
@@ -115,13 +118,15 @@ class EquipmentRepository {
       // Either retirement marker counts, so items retired before the two
       // fields were kept in sync are still listed (#636). Sold gear is also
       // isActive=false but is not retired -- keep it out of this list so the
-      // Sold status stays distinct.
+      // Sold status stays distinct. Wanted gear (#2025) is inactive too and
+      // is not retired either.
       final query = _db.select(_db.equipment)
         ..where(
           (t) =>
               (t.isActive.equals(false) |
                   t.status.equals(EquipmentStatus.retired.name)) &
-              t.status.isNotValue(EquipmentStatus.sold.name),
+              t.status.isNotValue(EquipmentStatus.sold.name) &
+              t.status.isNotValue(EquipmentStatus.wanted.name),
         )
         ..orderBy([(t) => OrderingTerm.asc(t.name.collate(Collate.noCase))]);
 
@@ -188,12 +193,14 @@ class EquipmentRepository {
     try {
       // The Retired filter also matches legacy rows that only ever had
       // isActive flipped, so nothing becomes unreachable in the UI (#636) --
-      // but not sold gear, which is isActive=false yet has its own status.
+      // but not sold or wanted gear (#2025), which are isActive=false yet
+      // have their own status.
       final query = _db.select(_db.equipment)
         ..where(
           (t) => status == EquipmentStatus.retired
               ? (t.status.equals(status.name) | t.isActive.equals(false)) &
-                    t.status.isNotValue(EquipmentStatus.sold.name)
+                    t.status.isNotValue(EquipmentStatus.sold.name) &
+                    t.status.isNotValue(EquipmentStatus.wanted.name)
               : t.status.equals(status.name),
         )
         ..orderBy([
@@ -619,6 +626,8 @@ class EquipmentRepository {
         await EquipmentShareRepository().deleteForEquipment(id);
         // Trip packing links (issue #2338), tombstoned like the shares.
         await TripEquipmentRepository().deleteForEquipment(id);
+        // Location history (v268), tombstoned like the shares.
+        await EquipmentLocationMoveRepository().deleteForEquipment(id);
         await (_db.delete(_db.equipment)..where((t) => t.id.equals(id))).go();
         for (final s in schedules) {
           await _syncRepository.logDeletion(
@@ -735,6 +744,48 @@ class EquipmentRepository {
     }
   }
 
+  /// Sets [status] on every item in [ids], for the status offer after a
+  /// location move. Only ever In Service, Loaned Out or Active, so the items
+  /// stay active: is_active pairs with retired and sold only (#636).
+  Future<void> setStatusForMany(
+    Iterable<String> ids,
+    EquipmentStatus status,
+  ) async {
+    final list = ids.toSet().toList();
+    if (list.isEmpty) return;
+    assert(
+      status != EquipmentStatus.retired && status != EquipmentStatus.sold,
+      'Retire through retireEquipment, which also clears is_active',
+    );
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await _db.transaction(() async {
+        await (_db.update(_db.equipment)..where((t) => t.id.isIn(list))).write(
+          EquipmentCompanion(
+            status: Value(status.name),
+            isActive: const Value(true),
+            updatedAt: Value(now),
+          ),
+        );
+        for (final id in list) {
+          await _syncRepository.markRecordPending(
+            entityType: 'equipment',
+            recordId: id,
+            localUpdatedAt: now,
+          );
+        }
+      });
+      SyncEventBus.notifyLocalChange();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to set status ${status.name} on ${list.length} items',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   /// Retires [old] and creates its successor in the same parent and slot
   /// (condition phase 4a): same diver, type, name, brand and model, the
   /// `cell_slot` attribute when present, `installed_date` set to [now];
@@ -819,9 +870,15 @@ class EquipmentRepository {
       final current = await (_db.select(
         _db.equipment,
       )..where((t) => t.id.equals(id))).getSingleOrNull();
+      // Wanted gear is not owned yet (#2025): reactivating would leave a
+      // wishlist row flagged active. Buying it goes through
+      // markEquipmentPurchased instead.
+      if (current == null || current.status == EquipmentStatus.wanted.name) {
+        return;
+      }
       final clearsTerminalStatus =
-          current?.status == EquipmentStatus.retired.name ||
-          current?.status == EquipmentStatus.sold.name;
+          current.status == EquipmentStatus.retired.name ||
+          current.status == EquipmentStatus.sold.name;
       await (_db.update(_db.equipment)..where((t) => t.id.equals(id))).write(
         EquipmentCompanion(
           isActive: const Value(true),
@@ -840,6 +897,49 @@ class EquipmentRepository {
     } catch (e, stackTrace) {
       _log.error(
         'Failed to reactivate equipment: $id',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Turns a Wanted item into owned, active gear (#2025): status active,
+  /// isActive true, and the purchase date set to [today] (date only) unless
+  /// one was already entered on the wishlist. Everything else is kept. A
+  /// row that is not Wanted is left alone.
+  Future<void> markEquipmentPurchased(String id, {DateTime? today}) async {
+    try {
+      final current = await (_db.select(
+        _db.equipment,
+      )..where((t) => t.id.equals(id))).getSingleOrNull();
+      if (current == null || current.status != EquipmentStatus.wanted.name) {
+        return;
+      }
+      final now = DateTime.now();
+      final day = today ?? now;
+      final ts = now.millisecondsSinceEpoch;
+      await (_db.update(_db.equipment)..where((t) => t.id.equals(id))).write(
+        EquipmentCompanion(
+          isActive: const Value(true),
+          status: Value(EquipmentStatus.active.name),
+          purchaseDate: current.purchaseDate == null
+              ? Value(
+                  DateTime(day.year, day.month, day.day).millisecondsSinceEpoch,
+                )
+              : const Value.absent(),
+          updatedAt: Value(ts),
+        ),
+      );
+      await _syncRepository.markRecordPending(
+        entityType: 'equipment',
+        recordId: id,
+        localUpdatedAt: ts,
+      );
+      SyncEventBus.notifyLocalChange();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to mark equipment as purchased: $id',
         error: e,
         stackTrace: stackTrace,
       );

@@ -4,7 +4,6 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/domain/models/incoming_dive_data.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/logger_service.dart';
-import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_computer/domain/services/reported_model_relabel.dart';
 import 'package:submersion/features/dive_log/data/services/derived_metrics_scheduler.dart';
 import 'package:submersion/features/equipment/data/services/sensor_summary_scheduler.dart';
@@ -27,6 +26,7 @@ import 'package:submersion/features/dive_log/data/repositories/dive_repository_i
 import 'package:submersion/features/dive_log/data/services/dive_consolidation_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
 import 'package:submersion/features/dive_log/domain/services/unreadable_series_exception.dart';
+import 'package:submersion/features/import_wizard/data/adapters/dive_computer_source_details.dart';
 import 'package:submersion/features/import_wizard/data/adapters/dive_number_conflict_notice.dart';
 import 'package:submersion/features/import_wizard/domain/adapters/import_source_adapter.dart';
 import 'package:submersion/features/import_wizard/domain/models/duplicate_action.dart';
@@ -38,6 +38,7 @@ import 'package:submersion/features/import_wizard/domain/models/unified_import_r
 import 'package:submersion/features/dive_log/domain/services/transmitter_serial.dart';
 import 'package:submersion/shared/widgets/wizard/wizard_step_def.dart';
 import 'package:submersion/features/import_wizard/presentation/widgets/dc_adapter_steps.dart';
+import 'package:submersion/features/import_wizard/presentation/widgets/downloaded_dive_summary.dart';
 
 // ---------------------------------------------------------------------------
 // Bridge providers
@@ -154,6 +155,8 @@ class DiveComputerAdapter implements ImportSourceAdapter {
   bool get forceFullDownload => _forceFullDownload;
 
   List<DownloadedDive> _downloadedDives = [];
+  bool _downloadInterrupted = false;
+  bool _deliversOldestFirst = false;
   DiveComputer? _computer;
   String? _customDeviceName;
   DateTime? _sinceCutoff;
@@ -199,10 +202,20 @@ class DiveComputerAdapter implements ImportSourceAdapter {
 
   /// Load the list of downloaded dives into this adapter.
   ///
-  /// Called by the download step widget when the download completes.
+  /// Called by the download step widget when the download completes, or
+  /// with [interrupted] set when the user keeps the dives a failed or
+  /// cancelled download delivered. [deliversOldestFirst] says whether the
+  /// backend sent them oldest-first; together they decide whether the import
+  /// may move the saved fingerprint (see [selectResumeFingerprint]).
   /// Must be called before [buildBundle].
-  void setDownloadedDives(List<DownloadedDive> dives) {
+  void setDownloadedDives(
+    List<DownloadedDive> dives, {
+    bool interrupted = false,
+    bool deliversOldestFirst = false,
+  }) {
     _downloadedDives = List.unmodifiable(dives);
+    _downloadInterrupted = interrupted;
+    _deliversOldestFirst = deliversOldestFirst;
   }
 
   /// Set the first-sync cutoff captured from the download state.
@@ -389,6 +402,8 @@ class DiveComputerAdapter implements ImportSourceAdapter {
   @override
   void resetState() {
     _sinceCutoff = null;
+    _downloadInterrupted = false;
+    _deliversOldestFirst = false;
     _pendingComputerSave = null;
     _computerSaveError = null;
     _pendingClockSyncStatus = null;
@@ -555,6 +570,14 @@ class DiveComputerAdapter implements ImportSourceAdapter {
         type: ImportSourceType.diveComputer,
         displayName: _displayName,
         currentComputerId: computer?.id,
+        details: diveComputerSourceDetails(
+          customName: _customDeviceName,
+          stored: computer,
+          device: _pendingComputerSave?.device,
+          serialNumber: _pendingComputerSave?.serialNumber,
+          firmwareVersion: _pendingComputerSave?.firmwareVersion,
+          reportedProduct: _pendingComputerSave?.reportedProduct,
+        ),
       ),
       groups: {
         ImportEntityType.dives: EntityGroup(
@@ -972,22 +995,16 @@ class DiveComputerAdapter implements ImportSourceAdapter {
 
   EntityItem _diveToEntityItem(DownloadedDive dive) {
     final settings = _ref?.read(settingsProvider) ?? const AppSettings();
-    final units = UnitFormatter(settings);
-
-    final dateStr = units.formatDate(dive.startTime);
-    final timeStr = units.formatTime(dive.startTime);
-    final title = '$dateStr \u2014 $timeStr';
-    final durationMin = dive.duration.inMinutes;
-    final tempStr = dive.minTemperature != null
-        ? ' \u00b7 ${units.formatTemperature(dive.minTemperature!, decimals: 1)}'
-        : '';
-    final subtitle =
-        '${units.formatDepth(dive.maxDepth)} max \u00b7 $durationMin min$tempStr';
+    final summary = formatDownloadedDiveSummary(dive, settings);
 
     final comp = computer;
     final diveData = IncomingDiveData.fromDownloadedDive(dive, computer: comp);
 
-    return EntityItem(title: title, subtitle: subtitle, diveData: diveData);
+    return EntityItem(
+      title: summary.title,
+      subtitle: summary.subtitle,
+      diveData: diveData,
+    );
   }
 
   /// Consolidate a downloaded dive as a secondary computer reading on an
@@ -1103,11 +1120,15 @@ class DiveComputerAdapter implements ImportSourceAdapter {
 
     await _computerRepository.updateLastDownload(comp.id);
 
-    final newestFingerprint = selectNewestFingerprint(importedDives);
-    if (newestFingerprint != null) {
+    final resumeFingerprint = selectResumeFingerprint(
+      importedDives,
+      downloadComplete: !_downloadInterrupted,
+      deliversOldestFirst: _deliversOldestFirst,
+    );
+    if (resumeFingerprint != null) {
       await _computerRepository.updateLastFingerprint(
         comp.id,
-        newestFingerprint,
+        resumeFingerprint,
       );
     }
   }
