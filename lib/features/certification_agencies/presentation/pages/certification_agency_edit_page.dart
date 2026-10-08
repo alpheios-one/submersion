@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/certification_agencies/domain/certification_catalog.dart';
 import 'package:submersion/features/certification_agencies/domain/entities/custom_certification_level.dart';
 import 'package:submersion/features/certification_agencies/presentation/certification_entry_display.dart';
 import 'package:submersion/features/certification_agencies/presentation/providers/certification_catalog_providers.dart';
+import 'package:submersion/features/certification_agencies/presentation/tdi_course_category.dart';
 import 'package:submersion/features/certification_agencies/presentation/widgets/agency_swatch.dart';
 import 'package:submersion/features/certification_agencies/presentation/widgets/certification_delete_dialogs.dart';
 import 'package:submersion/features/certification_agencies/presentation/widgets/certification_level_dialog.dart';
 import 'package:submersion/features/certification_agencies/presentation/widgets/custom_agency_dialog.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/fab_clearance.dart';
 
@@ -65,20 +68,28 @@ class CertificationAgencyEditPage extends ConsumerWidget {
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
-          _LevelSection(
-            title: l10n.certifications_edit_group_progression,
-            agencyId: agencyId,
-            catalog: catalog,
-            levels: catalog.ladderFor(agencyId),
-            reorderable: true,
-          ),
-          _LevelSection(
-            title: l10n.certifications_edit_group_specialties,
-            agencyId: agencyId,
-            catalog: catalog,
-            levels: catalog.specialtiesFor(agencyId),
-            reorderable: false,
-          ),
+          // TDI groups its own course names into five categories on its own
+          // website, not into a progression/specialties split (issue #3072).
+          // Display-only: the stored value and the ladder/specialty split
+          // behind ladderFor/specialtiesFor are unaffected.
+          if (agencyId == CertificationAgency.tdi.name)
+            ..._tdiLevelSections(l10n, catalog)
+          else ...[
+            _LevelSection(
+              title: l10n.certifications_edit_group_progression,
+              agencyId: agencyId,
+              catalog: catalog,
+              levels: catalog.ladderFor(agencyId),
+              reorderable: true,
+            ),
+            _LevelSection(
+              title: l10n.certifications_edit_group_specialties,
+              agencyId: agencyId,
+              catalog: catalog,
+              levels: catalog.specialtiesFor(agencyId),
+              reorderable: false,
+            ),
+          ],
           if (canAdd)
             Padding(
               padding: const EdgeInsets.all(16),
@@ -98,6 +109,68 @@ class CertificationAgencyEditPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// TDI's ladder and specialties, as five section widgets grouped by course
+/// category instead of the generic progression/specialties split (issue
+/// #3072). A diver's own custom level under TDI has no category; unlike the
+/// certification dropdown's single Specialties catch-all, it renders under
+/// a Progression or Specialties catch-all depending on its own progression
+/// flag, so a draggable custom rung keeps working -- see the comment below.
+List<Widget> _tdiLevelSections(
+  AppLocalizations l10n,
+  CertificationCatalog catalog,
+) {
+  final agencyId = CertificationAgency.tdi.name;
+  final grouped = groupTdiCatalog(catalog);
+  // Every category section holds only built-in TDI courses (the category
+  // map keys off entry.builtIn, which custom levels never have), so none of
+  // them ever has a diver's own rung to drag -- not reorderable, same as
+  // every other agency's non-ladder sections.
+  //
+  // The catch-all is the one place a custom TDI level can land, and it
+  // mixes progression- and specialty-type custom entries. Reordering only
+  // persists for progression ones (CertificationCatalog.ladderFor sorts
+  // custom rungs by sortOrder; specialtiesFor always sorts alphabetically),
+  // so the two are split the same way every other agency splits them into
+  // Progression/Specialties, rather than offering a drag handle that
+  // silently does nothing for a specialty-type entry.
+  final uncategorizedProgression = [
+    for (final l in grouped.uncategorized)
+      if (l.isProgression) l,
+  ];
+  final uncategorizedSpecialties = [
+    for (final l in grouped.uncategorized)
+      if (!l.isProgression) l,
+  ];
+  return [
+    for (final category in TdiCourseCategory.values)
+      if (grouped.byCategory[category] case final entries?
+          when entries.isNotEmpty)
+        _LevelSection(
+          title: category.label(l10n),
+          agencyId: agencyId,
+          catalog: catalog,
+          levels: entries,
+          reorderable: false,
+        ),
+    if (uncategorizedProgression.isNotEmpty)
+      _LevelSection(
+        title: l10n.certifications_edit_group_progression,
+        agencyId: agencyId,
+        catalog: catalog,
+        levels: uncategorizedProgression,
+        reorderable: true,
+      ),
+    if (uncategorizedSpecialties.isNotEmpty)
+      _LevelSection(
+        title: l10n.certifications_edit_group_specialties,
+        agencyId: agencyId,
+        catalog: catalog,
+        levels: uncategorizedSpecialties,
+        reorderable: false,
+      ),
+  ];
 }
 
 /// The agency's card gradient with its name: the live preview of a custom

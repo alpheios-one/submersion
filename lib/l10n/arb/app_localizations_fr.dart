@@ -3147,6 +3147,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get currencyRule_generic_refresher_name => 'Remise à niveau';
 
   @override
+  String get currencyRule_tdi_refresher_name => 'Remise à niveau TDI';
+
+  @override
   String get currencyRule_first_aid_24mo_name =>
       'Renouvellement premiers secours et RCP';
 
@@ -3184,6 +3187,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get currencyRule_generic_refresher_advisory =>
       'La plupart des organismes suggèrent une remise à niveau après six à douze mois sans plonger.';
+
+  @override
+  String get currencyRule_tdi_refresher_advisory =>
+      'TDI suggère une remise à niveau après six à douze mois sans plongée technique.';
 
   @override
   String get currencyRule_first_aid_advisory =>
@@ -3610,6 +3617,21 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get certifications_edit_group_specialties => 'Spécialités';
+
+  @override
+  String get certifications_edit_group_tdiOpenCircuit => 'Circuit ouvert';
+
+  @override
+  String get certifications_edit_group_tdiRebreather => 'Recycleur';
+
+  @override
+  String get certifications_edit_group_tdiService => 'Service';
+
+  @override
+  String get certifications_edit_group_tdiOverhead => 'Sous plafond';
+
+  @override
+  String get certifications_edit_group_tdiProfessional => 'Professionnel';
 
   @override
   String get certifications_edit_help_expiryDate =>

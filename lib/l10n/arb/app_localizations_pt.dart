@@ -3138,6 +3138,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get currencyRule_generic_refresher_name => 'Reciclagem';
 
   @override
+  String get currencyRule_tdi_refresher_name => 'Reciclagem TDI';
+
+  @override
   String get currencyRule_first_aid_24mo_name =>
       'Renovação de primeiros socorros e RCP';
 
@@ -3175,6 +3178,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get currencyRule_generic_refresher_advisory =>
       'A maioria das agências sugere uma reciclagem após seis a doze meses sem mergulhar.';
+
+  @override
+  String get currencyRule_tdi_refresher_advisory =>
+      'A TDI sugere uma reciclagem após seis a doze meses sem mergulho técnico.';
 
   @override
   String get currencyRule_first_aid_advisory =>
@@ -3596,6 +3603,21 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get certifications_edit_group_specialties => 'Especialidades';
+
+  @override
+  String get certifications_edit_group_tdiOpenCircuit => 'Circuito aberto';
+
+  @override
+  String get certifications_edit_group_tdiRebreather => 'Rebreather';
+
+  @override
+  String get certifications_edit_group_tdiService => 'Serviço';
+
+  @override
+  String get certifications_edit_group_tdiOverhead => 'Ambientes confinados';
+
+  @override
+  String get certifications_edit_group_tdiProfessional => 'Profissional';
 
   @override
   String get certifications_edit_help_expiryDate =>

@@ -2985,6 +2985,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get currencyRule_generic_refresher_name => '复习课程';
 
   @override
+  String get currencyRule_tdi_refresher_name => 'TDI 复习课程';
+
+  @override
   String get currencyRule_first_aid_24mo_name => '急救与心肺复苏续证';
 
   @override
@@ -3019,6 +3022,10 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get currencyRule_generic_refresher_advisory =>
       '大多数潜水机构建议在六到十二个月未潜水后参加复习课程。';
+
+  @override
+  String get currencyRule_tdi_refresher_advisory =>
+      'TDI 建议在六到十二个月未进行技术潜水后参加复习课程。';
 
   @override
   String get currencyRule_first_aid_advisory => '急救、心肺复苏和供氧员资质通常每两年更新一次。';
@@ -3413,6 +3420,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get certifications_edit_group_specialties => '专长课程';
+
+  @override
+  String get certifications_edit_group_tdiOpenCircuit => '开放式';
+
+  @override
+  String get certifications_edit_group_tdiRebreather => '循环呼吸器';
+
+  @override
+  String get certifications_edit_group_tdiService => '服务';
+
+  @override
+  String get certifications_edit_group_tdiOverhead => '顶板环境';
+
+  @override
+  String get certifications_edit_group_tdiProfessional => '专业';
 
   @override
   String get certifications_edit_help_expiryDate => '不会过期的证书请留空';

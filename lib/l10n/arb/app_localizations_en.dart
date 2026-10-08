@@ -3095,6 +3095,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currencyRule_generic_refresher_name => 'Refresher';
 
   @override
+  String get currencyRule_tdi_refresher_name => 'TDI refresher';
+
+  @override
   String get currencyRule_first_aid_24mo_name => 'First aid and CPR renewal';
 
   @override
@@ -3131,6 +3134,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get currencyRule_generic_refresher_advisory =>
       'Most agencies suggest a refresher after six to twelve months without diving.';
+
+  @override
+  String get currencyRule_tdi_refresher_advisory =>
+      'TDI suggests a refresher after six to twelve months without technical diving.';
 
   @override
   String get currencyRule_first_aid_advisory =>
@@ -3545,6 +3552,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get certifications_edit_group_specialties => 'Specialties';
+
+  @override
+  String get certifications_edit_group_tdiOpenCircuit => 'Open Circuit';
+
+  @override
+  String get certifications_edit_group_tdiRebreather => 'Rebreather';
+
+  @override
+  String get certifications_edit_group_tdiService => 'Service';
+
+  @override
+  String get certifications_edit_group_tdiOverhead => 'Overhead';
+
+  @override
+  String get certifications_edit_group_tdiProfessional => 'Professional';
 
   @override
   String get certifications_edit_help_expiryDate =>

@@ -52,11 +52,29 @@ void main() {
     });
   }
 
+  test('tdi_refresher covers its own ladder plus the three old generic '
+      'rungs it deliberately leaves unrewritten (issue #3072)', () async {
+    final scope = await scopeOf('tdi_refresher');
+    expect(scope.agencies, {CertificationAgency.tdi});
+    expect(
+      scope.levels,
+      laddersOf(scope.agencies).union({
+        // Deliberately unmigrated: generic_refresher dropped TDI, so an old
+        // 'cave'/'rebreather'/'instructor' certification needs its activity
+        // clock here instead, not a guess at which new TDI course it meant.
+        CertificationLevel.cave,
+        CertificationLevel.rebreather,
+        CertificationLevel.instructor,
+      }),
+    );
+  });
+
   test('no refresher matches a dated safety credential', () async {
     for (final id in const [
       'padi_reactivate',
       'ssi_skills_update',
       'generic_refresher',
+      'tdi_refresher',
     ]) {
       final scope = await scopeOf(id);
       expect(
@@ -78,6 +96,7 @@ void main() {
         'padi_reactivate',
         'ssi_skills_update',
         'generic_refresher',
+        'tdi_refresher',
       ])
         ...(await scopeOf(id)).agencies,
     };

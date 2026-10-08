@@ -3087,6 +3087,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get currencyRule_generic_refresher_name => 'ריענון';
 
   @override
+  String get currencyRule_tdi_refresher_name => 'ריענון TDI';
+
+  @override
   String get currencyRule_first_aid_24mo_name => 'חידוש עזרה ראשונה והחייאה';
 
   @override
@@ -3123,6 +3126,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get currencyRule_generic_refresher_advisory =>
       'רוב הארגונים ממליצים על ריענון לאחר שישה עד שנים עשר חודשים ללא צלילה.';
+
+  @override
+  String get currencyRule_tdi_refresher_advisory =>
+      'TDI ממליצה על ריענון לאחר שישה עד שנים עשר חודשים ללא צלילה טכנית.';
 
   @override
   String get currencyRule_first_aid_advisory =>
@@ -3534,6 +3541,21 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get certifications_edit_group_specialties => 'התמחויות';
+
+  @override
+  String get certifications_edit_group_tdiOpenCircuit => 'מעגל פתוח';
+
+  @override
+  String get certifications_edit_group_tdiRebreather => 'ריברידר';
+
+  @override
+  String get certifications_edit_group_tdiService => 'שירות';
+
+  @override
+  String get certifications_edit_group_tdiOverhead => 'סביבת תקרה';
+
+  @override
+  String get certifications_edit_group_tdiProfessional => 'מקצועי';
 
   @override
   String get certifications_edit_help_expiryDate =>

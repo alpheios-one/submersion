@@ -126,13 +126,23 @@ class CertificationCurrencyEvents extends Table {
 /// lead_days is the amber window before lapse_days, so "amber at 6 months,
 /// red at 12" is lapse_days 365 with lead_days 185.
 ///
-/// The three refresher rules cover every rung of their agencies' ladders in
+/// The four refresher rules cover every rung of their agencies' ladders in
 /// CertificationLevelCatalog, professional rungs included, resolved to level
 /// names here so a later change to the catalog never moves a diver's rules.
 /// currency_seed_catalog_test pins the two together, and fails when a new
 /// agency is covered by no refresher (ACUC joined with issue #690). DAN's
 /// provider credentials renew with first aid, its instructors with
 /// membership.
+///
+/// tdi_refresher's levels (issue #3072) also name 'cave', 'rebreather' and
+/// 'instructor': the three old generic TDI ladder rungs the migration
+/// deliberately leaves unrewritten, because they could mean one of several
+/// new TDI courses. They moved here, not from a guess at which new course a
+/// diver meant, but because generic_refresher dropped TDI (TDI has its own
+/// rule now) and an untouched old value must keep the activity-based
+/// refresher clock it already had, same as before this issue. 'techDiver'
+/// and 'wreck' are not added here: neither was ever on the tech ladder
+/// generic_refresher covered, so there is nothing to preserve for them.
 const String kSeedBuiltInCurrencyRulesSql = '''
   INSERT OR IGNORE INTO certification_currency_rules
     (id, diver_id, name, clock_kind, applicable_agencies, applicable_levels,
@@ -156,9 +166,13 @@ const String kSeedBuiltInCurrencyRulesSql = '''
       365, 185, '[]', '[]', 'currencyRule_ssi_skills_update_advisory'
     UNION ALL SELECT 'generic_refresher', 'Refresher',
       'activity',
-      '["naui","sdi","tdi","raid","bsac","cmas","iantd","psai","ffessm","acuc","other"]',
+      '["naui","sdi","raid","bsac","cmas","iantd","psai","ffessm","acuc","other"]',
       '["openWater","advancedOpenWater","rescue","masterDiver","diveGuide","diveMaster","assistantInstructor","instructor","courseDirector","masterInstructor","nitrox","advancedNitrox","decompression","extendedRange","trimix","advancedTrimix","cavern","cave","rebreather","bsacOceanDiver","bsacSportsDiver","bsacDiveLeader","bsacAdvancedDiver","bsacFirstClassDiver","bsacOpenWaterInstructor","bsacAdvancedInstructor","bsacNationalInstructor","cmas1StarDiver","cmas2StarDiver","cmas3StarDiver","cmas4StarDiver","cmas3StarDiverAssistantInstructor","cmas4StarDiverAssistantInstructor","cmas1StarInstructor","cmas2StarInstructor","cmas3StarInstructor","ffessmPlongeurBronze","ffessmPlongeurArgent","ffessmPlongeurOr","ffessmN1","ffessmN2","ffessmN3","ffessmN4","ffessmN5","ffessmInitiateur","ffessmE2","ffessmMf1","ffessmMf2","acucScubaDiver","acucAdvancedDiver","acucRescueLeader","acucUnderwaterGuide","acucTeachingAssistant","acucOpenWaterInstructor","acucAdvancedInstructor","acucInstructorTrainer","acucInstructorTrainerEvaluator"]',
       365, 185, '[]', '[]', 'currencyRule_generic_refresher_advisory'
+    UNION ALL SELECT 'tdi_refresher', 'TDI refresher',
+      'activity', '["tdi"]',
+      '["tdiNitroxDiver","tdiAdvancedNitroxDiver","tdiDecompressionProceduresDiver","tdiHelitroxDiver","tdiExtendedRangeDiver","tdiTrimixDiver","tdiAdvancedTrimixDiver","tdiTechnicalDivemaster","tdiInstructor","tdiInstructorTrainer","cave","rebreather","instructor"]',
+      365, 185, '[]', '[]', 'currencyRule_tdi_refresher_advisory'
     UNION ALL SELECT 'first_aid_24mo', 'First aid and CPR renewal',
       'date', '[]',
       '["firstAid","oxygenProvider","danBls","danEmergencyOxygen","danDfaPro","danDemp","danAdvancedOxygen","danNeurologicalAssessment","danMarineLifeInjuries"]',
@@ -166,7 +180,7 @@ const String kSeedBuiltInCurrencyRulesSql = '''
     UNION ALL SELECT 'pro_membership_annual',
       'Professional membership renewal', 'date',
       '["padi","ssi","naui","sdi","tdi","raid","bsac","cmas","iantd","psai","acuc","dan","other"]',
-      '["diveGuide","diveMaster","assistantInstructor","instructor","masterInstructor","courseDirector","cmas1StarInstructor","cmas2StarInstructor","cmas3StarInstructor","bsacOpenWaterInstructor","bsacAdvancedInstructor","bsacNationalInstructor","acucUnderwaterGuide","acucTeachingAssistant","acucOpenWaterInstructor","acucAdvancedInstructor","acucInstructorTrainer","acucInstructorTrainerEvaluator","danInstructor","danInstructorTrainer"]',
+      '["diveGuide","diveMaster","assistantInstructor","instructor","masterInstructor","courseDirector","tdiTechnicalDivemaster","tdiInstructor","tdiInstructorTrainer","tdiNonDivingSpecialtyInstructor","cmas1StarInstructor","cmas2StarInstructor","cmas3StarInstructor","bsacOpenWaterInstructor","bsacAdvancedInstructor","bsacNationalInstructor","acucUnderwaterGuide","acucTeachingAssistant","acucOpenWaterInstructor","acucAdvancedInstructor","acucInstructorTrainer","acucInstructorTrainerEvaluator","danInstructor","danInstructorTrainer"]',
       365, 45, '[]', '[]', 'currencyRule_pro_membership_advisory'
     UNION ALL SELECT 'gue_revalidation', 'GUE revalidation',
       'date', '["gue"]', '[]',
@@ -175,16 +189,18 @@ const String kSeedBuiltInCurrencyRulesSql = '''
       'FFESSM licence and medical certificate', 'date', '["ffessm"]', '[]',
       365, 45, '[]', '[]', 'currencyRule_ffessm_licence_advisory'
     UNION ALL SELECT 'cave_currency', 'Cave currency',
-      'activity', '[]', '["cave","cavern","gueCave1","gueCave2"]',
+      'activity', '[]',
+      '["cave","cavern","gueCave1","gueCave2","tdiCavernDiver","tdiIntroToCaveDiver","tdiFullCaveDiver","tdiRebreatherCavernDiver","tdiRebreatherIntroCaveDiver","tdiRebreatherFullCaveDiver","tdiCaveSurveyingDiver","tdiStageCaveDiver","tdiDpvCaveDiver"]',
       365, 90, '["cave","cavern"]', '[]',
       'currencyRule_cave_currency_advisory'
     UNION ALL SELECT 'rebreather_currency', 'Rebreather currency',
-      'activity', '[]', '["rebreather"]',
+      'activity', '[]',
+      '["rebreather","tdiAirDiluentCcrDiver","tdiSemiClosedRebreatherDiver","tdiAirDiluentDecoCcrDiver","tdiHelitroxCcrDiver","tdiMixedGasCcrDiver","tdiAdvancedMixedGasCcrDiver","tdiRebreatherCavernDiver","tdiRebreatherIntroCaveDiver","tdiRebreatherFullCaveDiver"]',
       180, 90, '[]', '["ccr","scr"]',
       'currencyRule_rebreather_currency_advisory'
     UNION ALL SELECT 'deco_currency', 'Decompression currency',
       'activity', '[]',
-      '["decompression","trimix","advancedTrimix","advancedNitrox","techDiver","extendedRange","gueTech1","gueTech2"]',
+      '["decompression","trimix","advancedTrimix","advancedNitrox","techDiver","extendedRange","gueTech1","gueTech2","tdiDecompressionProceduresDiver","tdiTrimixDiver","tdiAdvancedTrimixDiver","tdiAdvancedNitroxDiver","tdiExtendedRangeDiver","tdiHelitroxDiver"]',
       365, 90, '["technical"]', '[]',
       'currencyRule_deco_currency_advisory'
   ) r

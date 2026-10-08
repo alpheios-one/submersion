@@ -25,6 +25,7 @@ import 'package:submersion/features/certification_agencies/presentation/provider
 import 'package:submersion/features/certification_agencies/presentation/providers/certification_catalog_providers.dart';
 import 'package:submersion/features/certification_agencies/presentation/widgets/certification_agency_dropdown.dart';
 import 'package:submersion/features/certification_agencies/presentation/widgets/certification_level_dialog.dart';
+import 'package:submersion/features/certifications/presentation/widgets/certification_level_dropdown_items.dart';
 
 class CertificationEditPage extends ConsumerStatefulWidget {
   final String? certificationId;
@@ -586,6 +587,16 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
           child: Text(value.localizedName(context.l10n)),
         );
 
+    final grouped = buildGroupedCertificationItems(
+      agency: agency,
+      ladder: ladder,
+      specialties: specialties,
+      extra: extra,
+      l10n: context.l10n,
+      header: header,
+      item: item,
+    );
+
     return [
       DropdownMenuItem<CertificationOption>(
         value: const CertificationOption.value(null),
@@ -593,11 +604,8 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
           context.l10n.certifications_edit_certification_notSpecified,
         ),
       ),
-      header('progression', context.l10n.certifications_edit_group_progression),
-      ...ladder.map(item),
-      header('specialties', context.l10n.certifications_edit_group_specialties),
-      ...specialties.map(item),
-      if (extra != null) item(extra),
+      ...grouped.items,
+      if (extra != null && !grouped.extraRenderedInGroup) item(extra),
       // Another diver's custom agency takes certifications from its owner
       // only (issue #690).
       if (_catalog.customAgency(agency) == null ||

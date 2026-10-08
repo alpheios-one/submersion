@@ -3143,6 +3143,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get currencyRule_generic_refresher_name => 'Auffrischung';
 
   @override
+  String get currencyRule_tdi_refresher_name => 'TDI-Auffrischung';
+
+  @override
   String get currencyRule_first_aid_24mo_name =>
       'Erneuerung Erste Hilfe und HLW';
 
@@ -3180,6 +3183,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get currencyRule_generic_refresher_advisory =>
       'Die meisten Verbände empfehlen nach sechs bis zwölf Monaten ohne Tauchgang eine Auffrischung.';
+
+  @override
+  String get currencyRule_tdi_refresher_advisory =>
+      'TDI empfiehlt nach sechs bis zwölf Monaten ohne technischen Tauchgang eine Auffrischung.';
 
   @override
   String get currencyRule_first_aid_advisory =>
@@ -3602,6 +3609,21 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get certifications_edit_group_specialties => 'Spezialkurse';
+
+  @override
+  String get certifications_edit_group_tdiOpenCircuit => 'Offener Kreislauf';
+
+  @override
+  String get certifications_edit_group_tdiRebreather => 'Kreislaufgerät';
+
+  @override
+  String get certifications_edit_group_tdiService => 'Service';
+
+  @override
+  String get certifications_edit_group_tdiOverhead => 'Überkopf-Umgebung';
+
+  @override
+  String get certifications_edit_group_tdiProfessional => 'Berufsstufen';
 
   @override
   String get certifications_edit_help_expiryDate =>
@@ -12032,7 +12054,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get enum_certificationAgency_dan => 'DAN';
 
   @override
-  String get enum_certificationAgency_gue => 'GÜ';
+  String get enum_certificationAgency_gue => 'GUE';
 
   @override
   String get enum_certificationAgency_iantd => 'IANTD';
