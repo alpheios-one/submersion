@@ -818,7 +818,11 @@ class _BailoutScheduleTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final lines = scheduleLines(rows);
+    final headerStyle = theme.textTheme.labelSmall?.copyWith(
+      color: theme.colorScheme.outline,
+    );
     final switchStyle = theme.textTheme.bodySmall?.copyWith(
       color: theme.colorScheme.primary,
       fontWeight: FontWeight.w600,
@@ -832,6 +836,17 @@ class _BailoutScheduleTable extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Row(
+          children: [
+            const SizedBox(width: 16),
+            cell(l10n.plannerCanvas_table_depth, style: headerStyle),
+            cell(l10n.plannerCanvas_table_duration, style: headerStyle),
+            cell(l10n.plannerCanvas_table_runtime, style: headerStyle),
+            cell(l10n.plannerCanvas_table_gas, style: headerStyle, flex: 2),
+            cell(l10n.plannerCanvas_table_ppO2, style: headerStyle),
+            cell(l10n.plannerCanvas_table_end, style: headerStyle),
+          ],
+        ),
         for (final line in lines)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 2),
@@ -855,6 +870,8 @@ class _BailoutScheduleTable extends StatelessWidget {
                   style: line.row.gasSwitch ? switchStyle : null,
                   flex: 2,
                 ),
+                cell(line.row.ppO2.toStringAsFixed(2)),
+                cell(units.formatDepth(line.row.endMeters, decimals: 0)),
               ],
             ),
           ),

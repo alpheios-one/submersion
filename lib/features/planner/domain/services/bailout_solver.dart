@@ -11,6 +11,7 @@ import 'package:submersion/features/dive_planner/domain/entities/plan_segment.da
 import 'package:submersion/features/planner/domain/entities/dive_plan.dart'
     as domain;
 import 'package:submersion/features/planner/domain/entities/plan_outcome.dart';
+import 'package:submersion/features/planner/domain/entities/segment_phase.dart';
 import 'package:submersion/features/planner/domain/services/plan_engine.dart';
 import 'package:submersion/features/planner/domain/services/segment_chain.dart';
 import 'package:submersion/features/planner/domain/services/tank_role_resolver.dart';
@@ -223,14 +224,98 @@ class BailoutSolver {
       points: points,
       worstCase: worst,
       availableLiters: availableLiters,
-      worstCaseRows: _scheduleRowsFor(
-        worst,
-        bailoutTanks: bailoutTanks,
-        bailoutPlan: bailoutPlan,
-        policy: policy,
-        environment: environment,
-      ),
+      worstCaseRows: [
+        ..._legRowsUpTo(worst, legs, plan, environment),
+        ..._scheduleRowsFor(
+          worst,
+          bailoutTanks: bailoutTanks,
+          bailoutPlan: bailoutPlan,
+          policy: policy,
+          environment: environment,
+        ),
+      ],
     );
+  }
+
+  /// The authored descent/bottom-phase lines up to (and including, cut off
+  /// mid-leg if needed) [point] -- so the bailout schedule reads as the
+  /// whole dive, not just the OC tail, matching how the main CCR table
+  /// always shows the authored legs first.
+  List<PlanScheduleRow> _legRowsUpTo(
+    BailoutPoint point,
+    List<ResolvedLeg> legs,
+    domain.DivePlan plan,
+    DiveEnvironment environment,
+  ) {
+    final rows = <PlanScheduleRow>[];
+    double? previousFO2;
+    double? previousFHe;
+
+    void add(ResolvedLeg leg, {required int duration, required double depth}) {
+      final fO2 = leg.segment.gasMix.o2 / 100.0;
+      final fHe = leg.segment.gasMix.he / 100.0;
+      final switched =
+          previousFO2 == null ||
+          previousFHe == null ||
+          (fO2 - previousFO2!).abs() > 0.0005 ||
+          (fHe - previousFHe!).abs() > 0.0005;
+      // The loop's real inspired ppO2 is the setpoint, not ambient x the
+      // diluent's own fraction -- same reasoning as PlanEngine's PO2 column
+      // (plan_engine.dart, _buildSchedule's ppO2Override).
+      final setpoint = depth > plan.effectiveSetpointSwitchDepth
+          ? plan.effectiveSetpointHigh
+          : plan.effectiveSetpointLow;
+      final ppO2 = ClosedCircuit(
+        setpoint: setpoint,
+        diluentFO2: fO2,
+        diluentFHe: fHe,
+      ).inspiredAt(environment.pressureAtDepth(depth)).pO2;
+      rows.add(
+        PlanScheduleRow(
+          kind: switch (leg.phase) {
+            SegmentPhase.descent => PlanScheduleRowKind.descent,
+            SegmentPhase.level => PlanScheduleRowKind.level,
+            SegmentPhase.ascent => PlanScheduleRowKind.ascent,
+            SegmentPhase.stop => PlanScheduleRowKind.stop,
+          },
+          depthMeters: depth,
+          durationSeconds: duration,
+          runtimeSeconds: leg.runtimeSeconds < point.runtimeSeconds
+              ? leg.runtimeSeconds
+              : point.runtimeSeconds,
+          gasFO2: fO2,
+          gasFHe: fHe,
+          tankId: leg.tankId,
+          gasSwitch: switched,
+          ppO2: ppO2,
+          endMeters: GasMix(
+            o2: fO2 * 100,
+            he: fHe * 100,
+          ).end(depth, o2Narcotic: config.o2Narcotic),
+        ),
+      );
+      previousFO2 = fO2;
+      previousFHe = fHe;
+    }
+
+    for (final leg in legs) {
+      final legStart = leg.runtimeSeconds - leg.durationSeconds;
+      if (legStart >= point.runtimeSeconds) break;
+      if (leg.runtimeSeconds <= point.runtimeSeconds) {
+        add(leg, duration: leg.durationSeconds, depth: leg.endDepth);
+      } else {
+        // This leg straddles the bailout instant: cut it off exactly there,
+        // at the point's own depth (constant through a hold, the only
+        // realistic case for the worst case -- see BailoutSolver's own
+        // doc comment on why it walks the bottom phase).
+        add(
+          leg,
+          duration: point.runtimeSeconds - legStart,
+          depth: point.depthMeters,
+        );
+      }
+    }
+    return rows;
   }
 
   /// The worst-case point's schedule as printable table lines: every stop
@@ -291,7 +376,7 @@ class BailoutSolver {
           endMeters: GasMix(
             o2: fO2 * 100,
             he: fHe * 100,
-          ).end(depth, o2Narcotic: true),
+          ).end(depth, o2Narcotic: config.o2Narcotic),
         ),
       );
       previousFO2 = fO2;
@@ -299,7 +384,10 @@ class BailoutSolver {
     }
 
     var depth = point.depthMeters;
-    var end = 0;
+    // Absolute dive time, continuing from the authored legs printed before
+    // this (_legRowsUpTo) rather than restarting at 0, so RT reads
+    // continuously across the whole table.
+    var end = point.runtimeSeconds;
     var phase = AscentPhase.toFirstStop;
     final stops = point.schedule.stops;
     for (var i = 0; i < stops.length; i++) {

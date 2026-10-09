@@ -130,23 +130,50 @@ void main() {
   });
 
   group('worstCaseRows (#3137)', () {
-    test('reads from the worst-case depth down to the surface', () {
-      final outcome = solver.solve(_plan())!;
-      expect(outcome.worstCaseRows, isNotEmpty);
-      expect(
-        outcome.worstCaseRows.first.depthMeters,
-        lessThanOrEqualTo(outcome.worstCase.depthMeters),
-      );
-      expect(outcome.worstCaseRows.last.depthMeters, 0);
-    });
+    test(
+      'reads the whole dive: the authored descent/bottom phase (on the '
+      'diluent) up to the bailout instant, then the OC ascent down to the '
+      'surface',
+      () {
+        final outcome = solver.solve(_plan())!;
+        expect(outcome.worstCaseRows, isNotEmpty);
+        expect(outcome.worstCaseRows.first.kind, PlanScheduleRowKind.descent);
+        expect(outcome.worstCaseRows.first.tankId, 'dil');
+        expect(outcome.worstCaseRows.last.depthMeters, 0);
+        // RT is continuous across the whole table, not restarted at the
+        // bailout instant.
+        for (var i = 1; i < outcome.worstCaseRows.length; i++) {
+          expect(
+            outcome.worstCaseRows[i].runtimeSeconds,
+            greaterThanOrEqualTo(outcome.worstCaseRows[i - 1].runtimeSeconds),
+            reason: 'row $i',
+          );
+        }
+        expect(
+          outcome.worstCaseRows.last.runtimeSeconds,
+          greaterThanOrEqualTo(outcome.worstCase.ttsSeconds),
+        );
+      },
+    );
 
-    test('every row resolves to the single carried bailout tank', () {
-      final outcome = solver.solve(_plan())!;
-      for (final row in outcome.worstCaseRows) {
-        expect(row.tankId, 'bo', reason: 'row at ${row.depthMeters} m');
-        expect(row.gasFO2, closeTo(0.50, 1e-9));
-      }
-    });
+    test(
+      'the OC tail resolves to the single carried bailout tank; the '
+      'authored phase before it stays on the diluent',
+      () {
+        final outcome = solver.solve(_plan())!;
+        final bailoutStart = outcome.worstCaseRows.indexWhere(
+          (r) => r.tankId == 'bo',
+        );
+        expect(bailoutStart, greaterThan(0));
+        for (final row in outcome.worstCaseRows.sublist(0, bailoutStart)) {
+          expect(row.tankId, 'dil', reason: 'row at ${row.depthMeters} m');
+        }
+        for (final row in outcome.worstCaseRows.sublist(bailoutStart)) {
+          expect(row.tankId, 'bo', reason: 'row at ${row.depthMeters} m');
+          expect(row.gasFO2, closeTo(0.50, 1e-9));
+        }
+      },
+    );
 
     test('a second, richer bailout gas switches in near its own MOD', () {
       final outcome = solver.solve(
