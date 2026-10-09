@@ -150,6 +150,52 @@ void main() {
     expect(find.textContaining('(+'), findsNothing);
   });
 
+  testWidgets(
+    'the gas column repeats the active gas on every line, not just the '
+    'switch',
+    (tester) async {
+      const outcome = PlanOutcome(
+        runtimeSeconds: 420,
+        maxDepth: 18,
+        ndlAtBottom: 600,
+        ttsAtBottom: 120,
+        stops: [],
+        schedule: [
+          PlanScheduleRow(
+            kind: PlanScheduleRowKind.descent,
+            depthMeters: 18,
+            durationSeconds: 240,
+            runtimeSeconds: 240,
+            gasFO2: 0.32,
+            gasFHe: 0,
+            gasSwitch: true,
+          ),
+          PlanScheduleRow(
+            kind: PlanScheduleRowKind.level,
+            depthMeters: 18,
+            durationSeconds: 180,
+            runtimeSeconds: 420,
+            gasFO2: 0.32,
+            gasFHe: 0,
+            gasSwitch: false,
+          ),
+        ],
+        segmentOutcomes: [],
+        tankUsages: [],
+        cnsEnd: 5,
+        otuTotal: 10,
+        issues: [],
+        endTissue: BuhlmannState(compartments: []),
+        tissueTimeline: [],
+        ceilingTrace: [],
+      );
+      await tester.pumpWidget(_outcomeHarness(outcome));
+      await tester.pumpAndSettle();
+
+      expect(find.text('EAN32'), findsNWidgets(2));
+    },
+  );
+
   testWidgets('a line with an air break shows the break minutes after its '
       'duration', (tester) async {
     await tester.pumpWidget(

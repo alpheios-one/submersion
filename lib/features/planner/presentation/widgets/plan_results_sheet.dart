@@ -372,8 +372,9 @@ class _RuntimeTable extends ConsumerWidget {
     final glyphStyle = theme.textTheme.bodyMedium?.copyWith(
       color: theme.colorScheme.outline,
     );
-    // A diver scans the gas column for the switches, so only those print,
-    // and print so they stand out.
+    // The gas column repeats on every line (not just the switch) so a diver
+    // reading a single row never has to scroll up to see what they are
+    // breathing; a switch still stands out via switchStyle below.
     final switchStyle = theme.textTheme.bodyMedium?.copyWith(
       color: theme.colorScheme.primary,
       fontWeight: FontWeight.w600,
@@ -455,13 +456,8 @@ class _RuntimeTable extends ConsumerWidget {
               child: Icon(Icons.push_pin, size: 14),
             ),
           cell(
-            line.row.gasSwitch
-                ? GasMix(
-                    o2: line.row.gasFO2 * 100,
-                    he: line.row.gasFHe * 100,
-                  ).name
-                : '',
-            style: switchStyle,
+            GasMix(o2: line.row.gasFO2 * 100, he: line.row.gasFHe * 100).name,
+            style: line.row.gasSwitch ? switchStyle : null,
             flex: 2,
           ),
         ],
