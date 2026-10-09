@@ -159,4 +159,41 @@ void main() {
     await tester.pumpAndSettle();
     expect(container.read(divePlanNotifierProvider).setpointLow, 0.8);
   });
+
+  testWidgets('CCR settings fields stay in a row when there is room, and stack '
+      'vertically when there is not (#3130)', (tester) async {
+    await tester.pumpWidget(
+      testApp(
+        overrides: overrides(),
+        child: const SizedBox(width: 500, child: CcrSettingsSection()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final wideFields = find.byType(TextFormField);
+    expect(wideFields, findsNWidgets(3));
+    // Side by side: all three share the same top edge.
+    final wideTops = [
+      for (var i = 0; i < 3; i++) tester.getTopLeft(wideFields.at(i)).dy,
+    ];
+    expect(wideTops[1], wideTops[0]);
+    expect(wideTops[2], wideTops[0]);
+
+    await tester.pumpWidget(
+      testApp(
+        overrides: overrides(),
+        child: const SizedBox(width: 300, child: CcrSettingsSection()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final narrowFields = find.byType(TextFormField);
+    expect(narrowFields, findsNWidgets(3));
+    // Stacked: each field starts strictly below the one before it, so
+    // every label keeps the field's full width instead of being
+    // ellipsis-truncated.
+    final narrowTops = [
+      for (var i = 0; i < 3; i++) tester.getTopLeft(narrowFields.at(i)).dy,
+    ];
+    expect(narrowTops[1], greaterThan(narrowTops[0]));
+    expect(narrowTops[2], greaterThan(narrowTops[1]));
+  });
 }
