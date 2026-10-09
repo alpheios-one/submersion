@@ -4,6 +4,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_planner/domain/entities/plan_segment.dart';
 import 'package:submersion/features/planner/domain/entities/dive_plan.dart'
     as domain;
+import 'package:submersion/features/planner/domain/entities/plan_outcome.dart';
 import 'package:submersion/features/planner/domain/services/bailout_solver.dart';
 
 const _diluent = GasMix(o2: 18, he: 45);
@@ -126,5 +127,63 @@ void main() {
     final outcome = solver.solve(_plan())!;
     final target = outcome.points[2].runtimeSeconds.toDouble();
     expect(outcome.nearest(target).runtimeSeconds, target.toInt());
+  });
+
+  group('worstCaseRows (#3137)', () {
+    test('reads from the worst-case depth down to the surface', () {
+      final outcome = solver.solve(_plan())!;
+      expect(outcome.worstCaseRows, isNotEmpty);
+      expect(
+        outcome.worstCaseRows.first.depthMeters,
+        lessThanOrEqualTo(outcome.worstCase.depthMeters),
+      );
+      expect(outcome.worstCaseRows.last.depthMeters, 0);
+    });
+
+    test('every row resolves to the single carried bailout tank', () {
+      final outcome = solver.solve(_plan())!;
+      for (final row in outcome.worstCaseRows) {
+        expect(row.tankId, 'bo', reason: 'row at ${row.depthMeters} m');
+        expect(row.gasFO2, closeTo(0.50, 1e-9));
+      }
+    });
+
+    test('a second, richer bailout gas switches in near its own MOD', () {
+      final outcome = solver.solve(
+        _plan(
+          tanks: [
+            _diluentTank,
+            _bailout(),
+            const DiveTank(
+              id: 'deco',
+              volume: 11.1,
+              startPressure: 207,
+              gasMix: GasMix(o2: 100),
+              role: TankRole.bailout,
+            ),
+          ],
+        ),
+      )!;
+      final tankIds = outcome.worstCaseRows.map((r) => r.tankId).toSet();
+      expect(
+        tankIds,
+        containsAll(['bo', 'deco']),
+        reason: 'the shallower, richer gas should get used near the surface',
+      );
+    });
+
+    test('only the first travel leg prints before a stop; later stops '
+        'fold the travel time in, same as the main table (#3138)', () {
+      final outcome = solver.solve(_plan())!;
+      final rows = outcome.worstCaseRows;
+      final stopIndexes = [
+        for (var i = 0; i < rows.length; i++)
+          if (rows[i].kind == PlanScheduleRowKind.stop) i,
+      ];
+      expect(stopIndexes.length, greaterThan(1));
+      for (final i in stopIndexes.skip(1)) {
+        expect(rows[i - 1].kind, PlanScheduleRowKind.stop);
+      }
+    });
   });
 }

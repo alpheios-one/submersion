@@ -18762,6 +18762,9 @@ class AppLocalizationsHu extends AppLocalizations {
       'A bailout gáz nem elegendő a legrosszabb esethez';
 
   @override
+  String get plannerCanvas_bailout_schedule => 'Schedule from the worst case';
+
+  @override
   String plannerCanvas_bailout_required(String liters) {
     return 'Szükséges $liters';
   }

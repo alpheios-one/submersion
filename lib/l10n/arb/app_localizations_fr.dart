@@ -18879,6 +18879,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Gaz de bailout insuffisant pour le pire cas';
 
   @override
+  String get plannerCanvas_bailout_schedule => 'Schedule from the worst case';
+
+  @override
   String plannerCanvas_bailout_required(String liters) {
     return 'Nécessaire $liters';
   }

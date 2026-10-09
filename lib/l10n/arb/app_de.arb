@@ -5484,6 +5484,7 @@
   "nav_trips": "Reisen",
   "plannerCanvas_bailout_available": "Verfügbar {liters}",
   "plannerCanvas_bailout_insufficient": "Bailout-Gas reicht für den schlimmsten Fall nicht aus",
+  "plannerCanvas_bailout_schedule": "Plan ab dem schlimmsten Fall",
   "plannerCanvas_bailout_required": "Benötigt {liters}",
   "plannerCanvas_bailout_title": "Bailout (offener Kreislauf)",
   "plannerCanvas_bailout_tts": "Bailout-TTS {minutes}′",

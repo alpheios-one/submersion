@@ -18402,6 +18402,9 @@ class AppLocalizationsHe extends AppLocalizations {
       'גז חילוץ אינו מספיק למקרה הגרוע ביותר';
 
   @override
+  String get plannerCanvas_bailout_schedule => 'Schedule from the worst case';
+
+  @override
   String plannerCanvas_bailout_required(String liters) {
     return 'נדרש $liters';
   }

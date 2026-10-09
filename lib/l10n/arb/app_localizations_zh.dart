@@ -17925,6 +17925,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get plannerCanvas_bailout_insufficient => '逃生气体不足以应对最坏情况';
 
   @override
+  String get plannerCanvas_bailout_schedule => 'Schedule from the worst case';
+
+  @override
   String plannerCanvas_bailout_required(String liters) {
     return '需要 $liters';
   }

@@ -791,6 +791,73 @@ class _BailoutSection extends StatelessWidget {
               ],
             ),
           ),
+        if (outcome.worstCaseRows.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Text(
+            context.l10n.plannerCanvas_bailout_schedule,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.outline,
+            ),
+          ),
+          const SizedBox(height: 4),
+          _BailoutScheduleTable(rows: outcome.worstCaseRows, units: units),
+        ],
+      ],
+    );
+  }
+}
+
+/// The worst-case bailout point's schedule: depth/duration/RT/gas, read the
+/// same way as the main decompression table (#3137).
+class _BailoutScheduleTable extends StatelessWidget {
+  const _BailoutScheduleTable({required this.rows, required this.units});
+
+  final List<PlanScheduleRow> rows;
+  final UnitFormatter units;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final lines = scheduleLines(rows);
+    final switchStyle = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.primary,
+      fontWeight: FontWeight.w600,
+    );
+
+    Widget cell(String text, {TextStyle? style, int flex = 1}) => Expanded(
+      flex: flex,
+      child: Text(text, style: style ?? theme.textTheme.bodySmall),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final line in lines)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 16,
+                  child: Text(
+                    scheduleRowGlyph(line.row.kind),
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ),
+                cell(units.formatDepth(line.row.depthMeters, decimals: 0)),
+                cell('${line.durationMinutes}′'),
+                cell('${line.runtimeMinutes}′'),
+                cell(
+                  GasMix(
+                    o2: line.row.gasFO2 * 100,
+                    he: line.row.gasFHe * 100,
+                  ).name,
+                  style: line.row.gasSwitch ? switchStyle : null,
+                  flex: 2,
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }

@@ -6,9 +6,11 @@ import 'package:submersion/core/deco/entities/dive_environment.dart';
 import 'package:submersion/core/deco/o2_toxicity_calculator.dart';
 import 'package:submersion/core/deco/schedule_policy.dart';
 import 'package:submersion/core/utils/gas_compressibility.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_planner/domain/entities/plan_segment.dart';
 import 'package:submersion/features/planner/domain/entities/dive_plan.dart'
     as domain;
+import 'package:submersion/features/planner/domain/entities/plan_outcome.dart';
 import 'package:submersion/features/planner/domain/services/plan_engine.dart';
 import 'package:submersion/features/planner/domain/services/segment_chain.dart';
 import 'package:submersion/features/planner/domain/services/tank_role_resolver.dart';
@@ -20,11 +22,17 @@ class BailoutPoint {
   final int ttsSeconds;
   final double litersRequired;
 
+  /// The full OC schedule this point was sized from -- retained so the
+  /// worst-case point can show its stops and gas switches, not just the
+  /// totals (#3137).
+  final DecoSchedule schedule;
+
   const BailoutPoint({
     required this.runtimeSeconds,
     required this.depthMeters,
     required this.ttsSeconds,
     required this.litersRequired,
+    required this.schedule,
   });
 }
 
@@ -37,10 +45,17 @@ class BailoutOutcome {
   /// (compressibility-corrected).
   final double availableLiters;
 
+  /// The worst-case point's OC schedule, as printable table lines: every
+  /// stop on whichever bailout gas is eligible there, the travel leg to the
+  /// first stop its own line, later stops folding their travel time in
+  /// (#3138's convention, kept consistent here).
+  final List<PlanScheduleRow> worstCaseRows;
+
   const BailoutOutcome({
     required this.points,
     required this.worstCase,
     required this.availableLiters,
+    required this.worstCaseRows,
   });
 
   bool get sufficient => worstCase.litersRequired <= availableLiters;
@@ -192,6 +207,7 @@ class BailoutSolver {
                 policy: policy,
                 environment: environment,
               ),
+              schedule: schedule,
             ),
           );
         }
@@ -207,7 +223,139 @@ class BailoutSolver {
       points: points,
       worstCase: worst,
       availableLiters: availableLiters,
+      worstCaseRows: _scheduleRowsFor(
+        worst,
+        bailoutTanks: bailoutTanks,
+        bailoutPlan: bailoutPlan,
+        policy: policy,
+        environment: environment,
+      ),
     );
+  }
+
+  /// The worst-case point's schedule as printable table lines: every stop
+  /// on whichever bailout gas is eligible there (switching at its own MOD,
+  /// same as [AscentGasPlan] anywhere else), travel to the first stop its
+  /// own line, later stops folding their travel time in -- mirrors
+  /// PlanEngine's own schedule-building (`_buildSchedule`) closely enough
+  /// to read the same way, but is self-contained: a bailout point starts
+  /// mid-dive with no authored legs or PlanEngine instance of its own.
+  List<PlanScheduleRow> _scheduleRowsFor(
+    BailoutPoint point, {
+    required List<DiveTank> bailoutTanks,
+    required AscentGasPlan bailoutPlan,
+    required SchedulePolicy policy,
+    required DiveEnvironment environment,
+  }) {
+    final rows = <PlanScheduleRow>[];
+    double? previousFO2;
+    double? previousFHe;
+
+    String? tankForGas(double fO2, double fHe) {
+      for (final tank in bailoutTanks) {
+        final tankFO2 = tank.gasMix.o2 / 100.0;
+        final tankFHe = tank.gasMix.he / 100.0;
+        if ((tankFO2 - fO2).abs() < 0.005 && (tankFHe - fHe).abs() < 0.005) {
+          return tank.id;
+        }
+      }
+      return null;
+    }
+
+    void add({
+      required PlanScheduleRowKind kind,
+      required double depth,
+      required int duration,
+      required int runtime,
+      required double fO2,
+      required double fHe,
+    }) {
+      final lastFO2 = previousFO2;
+      final lastFHe = previousFHe;
+      final switched =
+          lastFO2 == null ||
+          lastFHe == null ||
+          (fO2 - lastFO2).abs() > 0.0005 ||
+          (fHe - lastFHe).abs() > 0.0005;
+      rows.add(
+        PlanScheduleRow(
+          kind: kind,
+          depthMeters: depth,
+          durationSeconds: duration,
+          runtimeSeconds: runtime,
+          gasFO2: fO2,
+          gasFHe: fHe,
+          tankId: tankForGas(fO2, fHe),
+          gasSwitch: switched,
+          ppO2: environment.pressureAtDepth(depth) * fO2,
+          endMeters: GasMix(
+            o2: fO2 * 100,
+            he: fHe * 100,
+          ).end(depth, o2Narcotic: true),
+        ),
+      );
+      previousFO2 = fO2;
+      previousFHe = fHe;
+    }
+
+    var depth = point.depthMeters;
+    var end = 0;
+    var phase = AscentPhase.toFirstStop;
+    final stops = point.schedule.stops;
+    for (var i = 0; i < stops.length; i++) {
+      final stop = stops[i];
+      final travelSeconds = policy.ascentSeconds(
+        fromDepth: depth,
+        toDepth: stop.depthMeters,
+        phase: phase,
+      );
+      if (i == 0 && travelSeconds > 0) {
+        final gas = bailoutPlan.gasForDepth(depth);
+        final fO2 = 1.0 - gas.fN2 - gas.fHe;
+        add(
+          kind: PlanScheduleRowKind.ascent,
+          depth: stop.depthMeters,
+          duration: travelSeconds,
+          runtime: end + travelSeconds,
+          fO2: fO2,
+          fHe: gas.fHe,
+        );
+      }
+      end += travelSeconds + stop.durationSeconds;
+      final stopGas = bailoutPlan.gasForDepth(stop.depthMeters);
+      final stopFO2 = 1.0 - stopGas.fN2 - stopGas.fHe;
+      add(
+        kind: PlanScheduleRowKind.stop,
+        depth: stop.depthMeters,
+        duration: i == 0
+            ? stop.durationSeconds
+            : stop.durationSeconds + travelSeconds,
+        runtime: end,
+        fO2: stopFO2,
+        fHe: stopGas.fHe,
+      );
+      depth = stop.depthMeters;
+      phase = AscentPhase.betweenStops;
+    }
+    if (depth > 0) {
+      final travelSeconds = policy.ascentSeconds(
+        fromDepth: depth,
+        toDepth: 0,
+        phase: AscentPhase.surfacingAfter(phase),
+      );
+      end += travelSeconds;
+      final gas = bailoutPlan.gasForDepth(depth);
+      final fO2 = 1.0 - gas.fN2 - gas.fHe;
+      add(
+        kind: PlanScheduleRowKind.ascent,
+        depth: 0,
+        duration: travelSeconds,
+        runtime: end,
+        fO2: fO2,
+        fHe: gas.fHe,
+      );
+    }
+    return rows;
   }
 
   /// Stressed-SAC surface liters for an OC ascent: the travel legs at the

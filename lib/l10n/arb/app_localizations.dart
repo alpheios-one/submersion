@@ -30157,6 +30157,12 @@ abstract class AppLocalizations {
   /// **'Bailout gas insufficient for the worst case'**
   String get plannerCanvas_bailout_insufficient;
 
+  /// No description provided for @plannerCanvas_bailout_schedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule from the worst case'**
+  String get plannerCanvas_bailout_schedule;
+
   /// No description provided for @plannerCanvas_bailout_required.
   ///
   /// In en, this message translates to:

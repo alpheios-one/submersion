@@ -11745,6 +11745,7 @@
     }
   },
   "plannerCanvas_bailout_insufficient": "Bailout gas insufficient for the worst case",
+  "plannerCanvas_bailout_schedule": "Schedule from the worst case",
   "plannerCanvas_bailout_required": "Required {liters}",
   "@plannerCanvas_bailout_required": {
     "placeholders": {
