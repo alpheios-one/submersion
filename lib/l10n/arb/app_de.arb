@@ -3141,6 +3141,7 @@
   "divePlanner_gasOptions_bestMixEnd": "Best mix END",
   "divePlanner_gasOptions_o2Narcotic": "Treat O₂ as narcotic for this plan",
   "divePlanner_label_tanks": "Flaschen",
+  "divePlanner_tank_unassignedWarning": "In keinem Segment, gilt als Bailout",
   "divePlanner_savedTanks_title": "Gespeicherte Flaschen",
   "divePlanner_savedTanks_save": "Flasche speichern",
   "divePlanner_savedTanks_saveTitle": "Flasche speichern als",

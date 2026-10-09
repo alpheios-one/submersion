@@ -16297,6 +16297,12 @@ abstract class AppLocalizations {
   /// **'Tanks'**
   String get divePlanner_label_tanks;
 
+  /// No description provided for @divePlanner_tank_unassignedWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in any segment, treated as bailout'**
+  String get divePlanner_tank_unassignedWarning;
+
   /// No description provided for @divePlanner_savedTanks_title.
   ///
   /// In en, this message translates to:

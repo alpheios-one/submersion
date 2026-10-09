@@ -6197,6 +6197,7 @@
   "divePlanner_gasOptions_bestMixEnd": "Best mix END",
   "divePlanner_gasOptions_o2Narcotic": "Treat O₂ as narcotic for this plan",
   "divePlanner_label_tanks": "Tanks",
+  "divePlanner_tank_unassignedWarning": "Not in any segment, treated as bailout",
   "divePlanner_savedTanks_title": "Saved tanks",
   "divePlanner_savedTanks_save": "Save a tank",
   "divePlanner_savedTanks_saveTitle": "Save tank as",

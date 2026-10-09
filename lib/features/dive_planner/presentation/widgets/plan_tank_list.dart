@@ -14,6 +14,8 @@ import 'package:submersion/features/dive_planner/presentation/providers/dive_pla
 import 'package:submersion/features/dive_planner/presentation/widgets/plan_saved_tanks_bar.dart';
 import 'package:submersion/features/planner/domain/entities/dive_plan.dart'
     show PlanMode;
+import 'package:submersion/features/planner/domain/services/dive_plan_state_mapper.dart';
+import 'package:submersion/features/planner/domain/services/tank_role_resolver.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/forms/number_field.dart';
 import 'package:submersion/shared/widgets/forms/number_input_validation.dart';
@@ -30,6 +32,9 @@ class PlanTankList extends ConsumerWidget {
     final theme = Theme.of(context);
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);
+    final resolvedRoles = const TankRoleResolver().rolesFor(
+      divePlanFromState(planState),
+    );
 
     return Card(
       child: Padding(
@@ -70,6 +75,12 @@ class PlanTankList extends ConsumerWidget {
             const PlanSavedTanksBar(),
 
             // Tank chips
+            //
+            // A tank the resolver silently dropped into bailout -- not
+            // because the diver ticked that box, but only because no segment
+            // breathes it -- gets a hint on its chip; otherwise it goes
+            // unnoticed until it is missing from the decompression plan
+            // (#3135).
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -77,6 +88,10 @@ class PlanTankList extends ConsumerWidget {
                 return _TankChip(
                   tank: tank,
                   units: units,
+                  unassigned:
+                      planState.mode != PlanMode.oc &&
+                      tank.role != TankRole.bailout &&
+                      resolvedRoles[tank.id] == TankRole.bailout,
                   onEdit: () => _showEditTankDialog(context, ref, tank, units),
                   onDelete: planState.tanks.length > 1
                       ? () => ref
@@ -137,11 +152,16 @@ class _TankChip extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback? onDelete;
 
+  /// True when this tank resolves to bailout only because no segment
+  /// breathes it, not because the diver asked for bailout -- see #3135.
+  final bool unassigned;
+
   const _TankChip({
     required this.tank,
     required this.units,
     required this.onEdit,
     this.onDelete,
+    this.unassigned = false,
   });
 
   @override
@@ -149,10 +169,12 @@ class _TankChip extends StatelessWidget {
     final theme = Theme.of(context);
 
     final tankSize = units.formatTankVolume(tank.volume, tank.workingPressure);
+    final warningLabel = context.l10n.divePlanner_tank_unassignedWarning;
     final tankLabel =
         '${tank.name ?? tank.gasMix.name}, '
         '${units.formatPressure(tank.startPressure)}, '
-        '$tankSize';
+        '$tankSize'
+        '${unassigned ? ', $warningLabel' : ''}';
 
     return Semantics(
       label: tankLabel,
@@ -178,6 +200,24 @@ class _TankChip extends StatelessWidget {
               '${units.formatPressure(tank.startPressure)} • $tankSize',
               style: theme.textTheme.bodySmall,
             ),
+            if (unassigned)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    size: 14,
+                    color: theme.colorScheme.error,
+                  ),
+                  const SizedBox(width: 2),
+                  Text(
+                    warningLabel,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.error,
+                    ),
+                  ),
+                ],
+              ),
           ],
         ),
         onPressed: onEdit,

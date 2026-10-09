@@ -753,5 +753,77 @@ void main() {
       final tile = find.widgetWithText(CheckboxListTile, 'Bailout gas');
       expect(tester.widget<CheckboxListTile>(tile).value, isTrue);
     });
+
+    testWidgets(
+      'warns on a CCR tank no segment breathes and that was not marked '
+      'bailout (#3135)',
+      (tester) async {
+        final container = await pumpList(tester, mode: PlanMode.ccr);
+        container
+            .read(divePlanNotifierProvider.notifier)
+            .addTank(
+              const DiveTank(
+                id: 'extra',
+                name: 'Extra',
+                volume: 3.0,
+                startPressure: 200,
+                gasMix: GasMix(o2: 18, he: 45),
+                role: TankRole.backGas,
+                order: 1,
+              ),
+            );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.descendant(
+            of: find.widgetWithText(InputChip, 'Extra'),
+            matching: find.text('Not in any segment, treated as bailout'),
+          ),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets('does not warn on a tank explicitly marked bailout (#3135)', (
+      tester,
+    ) async {
+      final container = await pumpList(tester, mode: PlanMode.ccr);
+      container
+          .read(divePlanNotifierProvider.notifier)
+          .addTank(
+            const DiveTank(
+              id: 'bo2',
+              name: 'Explicit bailout',
+              volume: 11.1,
+              startPressure: 200,
+              gasMix: GasMix(o2: 50, he: 0),
+              role: TankRole.bailout,
+              order: 1,
+            ),
+          );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Not in any segment, treated as bailout'), findsNothing);
+    });
+
+    testWidgets('does not warn in OC mode (#3135)', (tester) async {
+      final container = await pumpList(tester, mode: PlanMode.oc);
+      container
+          .read(divePlanNotifierProvider.notifier)
+          .addTank(
+            const DiveTank(
+              id: 'extra-oc',
+              name: 'Extra OC',
+              volume: 11.1,
+              startPressure: 200,
+              gasMix: GasMix(o2: 50, he: 0),
+              role: TankRole.backGas,
+              order: 1,
+            ),
+          );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Not in any segment, treated as bailout'), findsNothing);
+    });
   });
 }

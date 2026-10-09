@@ -10136,6 +10136,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get divePlanner_label_tanks => 'Botellas';
 
   @override
+  String get divePlanner_tank_unassignedWarning =>
+      'Not in any segment, treated as bailout';
+
+  @override
   String get divePlanner_savedTanks_title => 'Botellas guardadas';
 
   @override

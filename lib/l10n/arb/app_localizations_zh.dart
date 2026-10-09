@@ -9653,6 +9653,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get divePlanner_label_tanks => '气瓶';
 
   @override
+  String get divePlanner_tank_unassignedWarning =>
+      'Not in any segment, treated as bailout';
+
+  @override
   String get divePlanner_savedTanks_title => '已保存气瓶';
 
   @override

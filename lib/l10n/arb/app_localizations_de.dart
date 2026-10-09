@@ -10137,6 +10137,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get divePlanner_label_tanks => 'Flaschen';
 
   @override
+  String get divePlanner_tank_unassignedWarning =>
+      'In keinem Segment, gilt als Bailout';
+
+  @override
   String get divePlanner_savedTanks_title => 'Gespeicherte Flaschen';
 
   @override
