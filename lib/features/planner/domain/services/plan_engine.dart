@@ -459,6 +459,7 @@ class PlanEngine {
       ascentPlan,
       lastDepth,
       runtime,
+      environment,
     );
 
     // A separate, finely-sampled replay purely for the chart's ceiling curve.
@@ -1329,6 +1330,7 @@ class PlanEngine {
     AscentGasPlan ascentPlan,
     double lastDepth,
     int segmentsRuntime,
+    DiveEnvironment environment,
   ) {
     final rows = <PlanScheduleRow>[];
     final isCcr = plan.mode == domain.PlanMode.ccr;
@@ -1354,6 +1356,21 @@ class PlanEngine {
       // the caller forces it off here; an authored leg can still switch
       // (the diver genuinely changed tanks).
       bool forceNoSwitch = false,
+      // Only set by an authored loop-mode (CCR/SCR/PSCR) leg: the real
+      // inspired ppO2 (e.g. the CCR setpoint), which ambient x fO2 does NOT
+      // reproduce there because fO2 is the carried gas's own fraction, not
+      // what the loop actually delivers. Every other row already stores its
+      // loop-equivalent fraction in fO2 (see CcrLoopAscentGas), so ambient x
+      // fO2 is correct for them.
+      double? ppO2Override,
+      // The depth ppO2/END are computed at, when it differs from the row's
+      // own displayed [depth]. A CCR travel row samples its loop fraction at
+      // the leg's deeper end (gasForDepth(from), the same conservative
+      // approximation open-circuit legs make) but displays the shallower
+      // arrival depth -- ambient x fO2 at that arrival depth would not
+      // reproduce the setpoint at all, so the physics must use the depth the
+      // fraction actually came from.
+      double? physicsDepth,
     }) {
       final lastFO2 = previousFO2;
       final lastFHe = previousFHe;
@@ -1363,6 +1380,7 @@ class PlanEngine {
               lastFHe == null ||
               (fO2 - lastFO2).abs() > _gasFractionEpsilon ||
               (fHe - lastFHe).abs() > _gasFractionEpsilon);
+      final pDepth = physicsDepth ?? depth;
       rows.add(
         PlanScheduleRow(
           kind: kind,
@@ -1374,6 +1392,11 @@ class PlanEngine {
           tankId: tankId,
           gasSwitch: switched,
           airBreakSeconds: airBreakSeconds,
+          ppO2: ppO2Override ?? environment.pressureAtDepth(pDepth) * fO2,
+          endMeters: GasMix(
+            o2: fO2 * 100,
+            he: fHe * 100,
+          ).end(pDepth, o2Narcotic: config.o2Narcotic),
         ),
       );
       previousFO2 = fO2;
@@ -1381,6 +1404,8 @@ class PlanEngine {
     }
 
     for (final leg in legs) {
+      final segment = leg.segment;
+      final segmentIsLoop = _modeFor(plan, segment) != domain.PlanMode.oc;
       add(
         kind: switch (leg.phase) {
           SegmentPhase.descent => PlanScheduleRowKind.descent,
@@ -1394,6 +1419,14 @@ class PlanEngine {
         fO2: leg.gasMix.o2 / 100.0,
         fHe: leg.gasMix.he / 100.0,
         tankId: leg.tankId,
+        ppO2Override: segmentIsLoop
+            ? _breathingFor(
+                plan,
+                leg.gasMix,
+                leg.endDepth,
+                segment: segment,
+              ).inspiredAt(environment.pressureAtDepth(leg.endDepth)).pO2
+            : null,
       );
     }
 
@@ -1409,6 +1442,7 @@ class PlanEngine {
         fHe: gas.fHe,
         tankId: _tankForGas(plan.tanks, fO2, gas.fHe, isCcr: isCcr),
         forceNoSwitch: isCcr,
+        physicsDepth: isCcr ? from : null,
       );
     }
 

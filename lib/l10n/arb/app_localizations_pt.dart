@@ -19111,6 +19111,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get plannerCanvas_table_duration => 'Duração';
 
   @override
+  String get plannerCanvas_table_ppO2 => 'PO2';
+
+  @override
+  String get plannerCanvas_table_end => 'END';
+
+  @override
   String get plannerCanvas_turnRule_allUsable => 'Tudo utilizável';
 
   @override

@@ -18820,6 +18820,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get plannerCanvas_table_duration => 'Duration';
 
   @override
+  String get plannerCanvas_table_ppO2 => 'PO2';
+
+  @override
+  String get plannerCanvas_table_end => 'END';
+
+  @override
   String get plannerCanvas_turnRule_allUsable => 'All usable';
 
   @override

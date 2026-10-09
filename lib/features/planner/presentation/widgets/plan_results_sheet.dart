@@ -404,6 +404,8 @@ class _RuntimeTable extends ConsumerWidget {
             cell(l10n.plannerCanvas_table_duration, style: headerStyle),
             cell(l10n.plannerCanvas_table_runtime, style: headerStyle),
             cell(l10n.plannerCanvas_table_gas, style: headerStyle, flex: 2),
+            cell(l10n.plannerCanvas_table_ppO2, style: headerStyle),
+            cell(l10n.plannerCanvas_table_end, style: headerStyle),
           ],
         ),
         const Divider(height: 12),
@@ -460,6 +462,8 @@ class _RuntimeTable extends ConsumerWidget {
             style: line.row.gasSwitch ? switchStyle : null,
             flex: 2,
           ),
+          cell(line.row.ppO2.toStringAsFixed(2)),
+          cell(units.formatDepth(line.row.endMeters, decimals: 0)),
         ],
       ),
     );

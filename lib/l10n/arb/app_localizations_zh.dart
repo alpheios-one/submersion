@@ -18199,6 +18199,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get plannerCanvas_table_duration => '时长';
 
   @override
+  String get plannerCanvas_table_ppO2 => 'PO2';
+
+  @override
+  String get plannerCanvas_table_end => 'END';
+
+  @override
   String get plannerCanvas_turnRule_allUsable => '全部可用';
 
   @override

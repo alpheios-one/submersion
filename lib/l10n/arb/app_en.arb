@@ -11995,6 +11995,8 @@
   "plannerCanvas_table_gas": "Gas",
   "plannerCanvas_table_runtime": "RT",
   "plannerCanvas_table_duration": "Duration",
+  "plannerCanvas_table_ppO2": "PO2",
+  "plannerCanvas_table_end": "END",
   "plannerCanvas_turnRule_allUsable": "All usable",
   "plannerCanvas_turnRule_custom": "Custom",
   "plannerCanvas_turnRule_halves": "Halves",

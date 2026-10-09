@@ -18683,6 +18683,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get plannerCanvas_table_duration => 'משך';
 
   @override
+  String get plannerCanvas_table_ppO2 => 'PO2';
+
+  @override
+  String get plannerCanvas_table_end => 'END';
+
+  @override
   String get plannerCanvas_turnRule_allUsable => 'הכול שמיש';
 
   @override

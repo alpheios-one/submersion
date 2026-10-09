@@ -30601,6 +30601,18 @@ abstract class AppLocalizations {
   /// **'Duration'**
   String get plannerCanvas_table_duration;
 
+  /// No description provided for @plannerCanvas_table_ppO2.
+  ///
+  /// In en, this message translates to:
+  /// **'PO2'**
+  String get plannerCanvas_table_ppO2;
+
+  /// No description provided for @plannerCanvas_table_end.
+  ///
+  /// In en, this message translates to:
+  /// **'END'**
+  String get plannerCanvas_table_end;
+
   /// No description provided for @plannerCanvas_turnRule_allUsable.
   ///
   /// In en, this message translates to:

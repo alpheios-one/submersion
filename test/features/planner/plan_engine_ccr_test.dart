@@ -252,5 +252,63 @@ void main() {
       );
       expect(outcome.schedule.first.gasSwitch, isTrue);
     });
+
+    test('PO2 column shows the loop setpoint, not the diluent\'s own ambient '
+        'ppO2', () {
+      // _diluent is 18% O2, so at 60 m (salt water default) its own
+      // ambient ppO2 would be well above the 1.3 bar high setpoint --
+      // showing that number instead of the setpoint would be an obvious,
+      // immediately-noticeable wrong reading for a CCR diver.
+      final outcome = engine.compute(_plan());
+      final bottomRow = outcome.schedule.firstWhere(
+        (r) => r.kind == PlanScheduleRowKind.level,
+      );
+      expect(bottomRow.ppO2, closeTo(1.3, 1e-9));
+
+      // The computed ascent's PO2 must also read the setpoint throughout
+      // (high above the 10 m switch depth, low below it), never the
+      // diluent's own fraction times ambient. A travel row samples its
+      // fraction at the leg's deeper end (CcrLoopAscentGas's documented
+      // approximation, same depth splitting prevents it from straddling the
+      // switch depth), so its ppO2 is not bit-exact to ambient(displayed
+      // depth) x setpoint/pAlv -- the water-vapour correction alone is
+      // ~0.0627 bar -- hence the looser tolerance than the exact bottom-leg
+      // assertion above.
+      for (final row in outcome.schedule) {
+        if (row.depthMeters <= 0) continue;
+        final expectedSetpoint = row.depthMeters > 10.0 ? 1.3 : 0.7;
+        expect(
+          row.ppO2,
+          closeTo(expectedSetpoint, 0.05),
+          reason: 'row at ${row.depthMeters} m should read the setpoint',
+        );
+      }
+    });
+
+    test('END column matches GasMix.end() on the row\'s own gas and depth '
+        '(depth-matched rows only)', () {
+      final outcome = engine.compute(_plan());
+      // A computed travel row (kind == ascent) samples its fraction at the
+      // leg's deeper end but is displayed at the shallower arrival depth,
+      // so its END is not directly recomputable from the displayed depth
+      // alone. Every other kind -- descent, level, and stop -- is always
+      // depth-matched (authored legs never split; computed stops sample
+      // exactly their own depth), so this checks those.
+      final depthMatched = outcome.schedule.where(
+        (r) => r.kind != PlanScheduleRowKind.ascent,
+      );
+      expect(depthMatched, isNotEmpty);
+      for (final row in depthMatched) {
+        final expected = GasMix(
+          o2: row.gasFO2 * 100,
+          he: row.gasFHe * 100,
+        ).end(row.depthMeters, o2Narcotic: true);
+        expect(
+          row.endMeters,
+          closeTo(expected, 1e-9),
+          reason: 'row at ${row.depthMeters} m (${row.kind})',
+        );
+      }
+    });
   });
 }

@@ -196,6 +196,44 @@ void main() {
     },
   );
 
+  testWidgets('the table shows a PO2 and an END column', (tester) async {
+    const outcome = PlanOutcome(
+      runtimeSeconds: 240,
+      maxDepth: 18,
+      ndlAtBottom: 600,
+      ttsAtBottom: 120,
+      stops: [],
+      schedule: [
+        PlanScheduleRow(
+          kind: PlanScheduleRowKind.descent,
+          depthMeters: 18,
+          durationSeconds: 240,
+          runtimeSeconds: 240,
+          gasFO2: 0.32,
+          gasFHe: 0,
+          gasSwitch: true,
+          ppO2: 1.26,
+          endMeters: 12,
+        ),
+      ],
+      segmentOutcomes: [],
+      tankUsages: [],
+      cnsEnd: 5,
+      otuTotal: 10,
+      issues: [],
+      endTissue: BuhlmannState(compartments: []),
+      tissueTimeline: [],
+      ceilingTrace: [],
+    );
+    await tester.pumpWidget(_outcomeHarness(outcome));
+    await tester.pumpAndSettle();
+
+    expect(find.text('PO2'), findsOneWidget);
+    expect(find.text('END'), findsOneWidget);
+    expect(find.text('1.26'), findsOneWidget);
+    expect(find.text('12m'), findsOneWidget);
+  });
+
   testWidgets('a line with an air break shows the break minutes after its '
       'duration', (tester) async {
     await tester.pumpWidget(
