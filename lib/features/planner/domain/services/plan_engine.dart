@@ -1337,6 +1337,28 @@ class PlanEngine {
     double? previousFO2;
     double? previousFHe;
 
+    // The loop's real inspired ppO2 at a depth -- always the setpoint
+    // (clamped to alveolar pressure where the diluent can no longer dilute
+    // enough), never ambient x a stored gas fraction. gasFO2/gasFHe on a
+    // computed-ascent row are normalized against alveolar pressure
+    // (CcrLoopAscentGas: fN2 = pN2 / pAlv, and so on), not against raw
+    // ambient pressure -- multiplying that fraction back by ambient
+    // overstates ppO2 by a margin that *grows* as depth shrinks (ambient
+    // and pAlv differ by a fixed ~0.063 bar water-vapour term, which is a
+    // bigger fraction of a small ambient than a large one). A diver saw
+    // this directly: PO2 drifting from 1.30 at depth up to 1.35 near the
+    // surface on a dive with one constant 1.3 bar high setpoint. Asking the
+    // loop model directly for the inspired pO2 is exact at every depth.
+    double? ccrPpO2At(double atDepth) {
+      if (!isCcr || ascentPlan is! CcrLoopAscentGas) return null;
+      final loop = ascentPlan;
+      return ClosedCircuit(
+        setpoint: loop.setpointAt(atDepth),
+        diluentFO2: loop.diluentFO2,
+        diluentFHe: loop.diluentFHe,
+      ).inspiredAt(environment.pressureAtDepth(atDepth)).pO2;
+    }
+
     void add({
       required PlanScheduleRowKind kind,
       required double depth,
@@ -1443,6 +1465,7 @@ class PlanEngine {
         tankId: _tankForGas(plan.tanks, fO2, gas.fHe, isCcr: isCcr),
         forceNoSwitch: isCcr,
         physicsDepth: isCcr ? from : null,
+        ppO2Override: ccrPpO2At(from),
       );
     }
 
@@ -1475,6 +1498,7 @@ class PlanEngine {
         tankId: stop.tankId,
         airBreakSeconds: stop.airBreakSeconds,
         forceNoSwitch: isCcr,
+        ppO2Override: ccrPpO2At(stop.depthMeters),
       );
       depth = stop.depthMeters;
       phase = AscentPhase.betweenStops;

@@ -265,21 +265,21 @@ void main() {
       );
       expect(bottomRow.ppO2, closeTo(1.3, 1e-9));
 
-      // The computed ascent's PO2 must also read the setpoint throughout
-      // (high above the 10 m switch depth, low below it), never the
-      // diluent's own fraction times ambient. A travel row samples its
-      // fraction at the leg's deeper end (CcrLoopAscentGas's documented
-      // approximation, same depth splitting prevents it from straddling the
-      // switch depth), so its ppO2 is not bit-exact to ambient(displayed
-      // depth) x setpoint/pAlv -- the water-vapour correction alone is
-      // ~0.0627 bar -- hence the looser tolerance than the exact bottom-leg
-      // assertion above.
+      // The computed ascent's PO2 must also read the setpoint EXACTLY
+      // throughout (high above the 10 m switch depth, low below it), never
+      // a value that drifts with depth. PO2 is asked directly of the loop
+      // model (ClosedCircuit.inspiredAt) rather than back-derived by
+      // multiplying the stored ambient-normalized gas fraction by ambient
+      // pressure again, which previously overstated it by a margin that
+      // grew at shallow depth (a diver saw this directly: 1.30 at depth,
+      // drifting up to 1.35 near the surface, on a single 1.3 bar
+      // setpoint).
       for (final row in outcome.schedule) {
         if (row.depthMeters <= 0) continue;
         final expectedSetpoint = row.depthMeters > 10.0 ? 1.3 : 0.7;
         expect(
           row.ppO2,
-          closeTo(expectedSetpoint, 0.05),
+          closeTo(expectedSetpoint, 1e-9),
           reason: 'row at ${row.depthMeters} m should read the setpoint',
         );
       }
