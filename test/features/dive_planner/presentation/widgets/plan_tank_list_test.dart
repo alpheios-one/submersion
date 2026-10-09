@@ -659,6 +659,23 @@ void main() {
       expect(find.byType(CheckboxListTile), findsOneWidget);
     });
 
+    testWidgets(
+      'travel gas is absent on CCR, where only diluent and bailout apply '
+      '(#3131)',
+      (tester) async {
+        await pumpList(tester, mode: PlanMode.ccr);
+
+        await tester.tap(find.byIcon(Icons.add));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Also used as travel gas'), findsNothing);
+        expect(
+          find.widgetWithText(CheckboxListTile, 'Bailout gas'),
+          findsOneWidget,
+        );
+      },
+    );
+
     testWidgets('on CCR, ticking it saves the tank with the bailout role', (
       tester,
     ) async {

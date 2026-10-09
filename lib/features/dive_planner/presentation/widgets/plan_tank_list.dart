@@ -359,15 +359,19 @@ class _TankEditDialogState extends State<_TankEditDialog> {
                 ],
               ),
               const SizedBox(height: 8),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                controlAffinity: ListTileControlAffinity.leading,
-                value: _isTravelGas,
-                title: Text(context.l10n.divePlanner_field_travelGas),
-                onChanged: (value) {
-                  setState(() => _isTravelGas = value ?? false);
-                },
-              ),
+              // CCR has no travel-gas concept: TankRoleResolver's loop branch
+              // never consults isTravelGas, so the option is meaningless
+              // there and only confuses a diluent/bailout choice (#3131).
+              if (widget.mode != PlanMode.ccr)
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  value: _isTravelGas,
+                  title: Text(context.l10n.divePlanner_field_travelGas),
+                  onChanged: (value) {
+                    setState(() => _isTravelGas = value ?? false);
+                  },
+                ),
               if (widget.mode != PlanMode.oc)
                 CheckboxListTile(
                   contentPadding: EdgeInsets.zero,
