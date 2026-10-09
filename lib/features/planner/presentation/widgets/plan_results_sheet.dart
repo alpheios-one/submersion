@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -9,7 +10,9 @@ import 'package:submersion/features/dive_planner/presentation/providers/dive_pla
 import 'package:submersion/features/planner/presentation/widgets/plan_kit.dart';
 import 'package:submersion/features/planner/domain/entities/plan_outcome.dart';
 import 'package:submersion/features/planner/domain/services/bailout_solver.dart';
+import 'package:submersion/features/planner/domain/services/dive_plan_state_mapper.dart';
 import 'package:submersion/features/planner/domain/services/schedule_lines.dart';
+import 'package:submersion/features/planner/domain/services/tank_role_resolver.dart';
 import 'package:submersion/features/planner/presentation/mission/mission_results_section.dart';
 import 'package:submersion/features/planner/presentation/providers/plan_canvas_providers.dart';
 import 'package:submersion/features/planner/presentation/widgets/plan_status_chips.dart';
@@ -143,6 +146,16 @@ class PlanResultsSheet extends ConsumerWidget {
     }
 
     final bailout = ref.watch(planBailoutProvider);
+    // Bailout cylinders belong in the bailout section's own gas picture, not
+    // in the per-tank consumption list: they carry no normal-loop
+    // consumption and just clutter the list with an always-empty bar (#3137
+    // follow-up).
+    final resolvedRoles = const TankRoleResolver().rolesFor(
+      divePlanFromState(state),
+    );
+    final loopTankUsages = outcome.tankUsages.where(
+      (u) => resolvedRoles[u.tankId] != TankRole.bailout,
+    );
 
     return ListView(
       controller: controller,
@@ -155,7 +168,7 @@ class PlanResultsSheet extends ConsumerWidget {
         _RuntimeTable(outcome: outcome, units: units),
         const SizedBox(height: 20),
         PlanSectionHeader(context.l10n.divePlanner_label_gasConsumption),
-        for (final usage in outcome.tankUsages)
+        for (final usage in loopTankUsages)
           _GasRow(usage: usage, label: tankLabel(usage.tankId), units: units),
         if (ref.watch(
           divePlanNotifierProvider.select((s) => s.mission != null),
@@ -791,6 +804,21 @@ class _BailoutSection extends StatelessWidget {
               ],
             ),
           ),
+        if (outcome.bailoutTanks.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 12,
+            runSpacing: 2,
+            children: [
+              for (final tank in outcome.bailoutTanks)
+                Text(
+                  '${tank.name ?? tank.gasMix.name} '
+                  '(${units.formatTankVolume(tank.volume, tank.workingPressure)})',
+                  style: theme.textTheme.bodySmall,
+                ),
+            ],
+          ),
+        ],
         if (outcome.worstCaseRows.isNotEmpty) ...[
           const SizedBox(height: 12),
           Text(

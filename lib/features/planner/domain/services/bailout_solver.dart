@@ -52,11 +52,17 @@ class BailoutOutcome {
   /// (#3138's convention, kept consistent here).
   final List<PlanScheduleRow> worstCaseRows;
 
+  /// The bailout-role cylinders [availableLiters] was summed from -- shown
+  /// here rather than in the main per-tank gas list, since they carry no
+  /// normal-loop consumption to chart there.
+  final List<DiveTank> bailoutTanks;
+
   const BailoutOutcome({
     required this.points,
     required this.worstCase,
     required this.availableLiters,
     required this.worstCaseRows,
+    required this.bailoutTanks,
   });
 
   bool get sufficient => worstCase.litersRequired <= availableLiters;
@@ -234,6 +240,7 @@ class BailoutSolver {
           environment: environment,
         ),
       ],
+      bailoutTanks: bailoutTanks,
     );
   }
 

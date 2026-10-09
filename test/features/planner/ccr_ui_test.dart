@@ -121,6 +121,10 @@ void main() {
     expect(find.textContaining('Required'), findsOneWidget);
     // Required/available volumes respect the diver's volume unit (default L).
     expect(find.textContaining(RegExp(r'Required \d+ L')), findsOneWidget);
+    // The bailout tank carries no normal-loop consumption to chart in the
+    // per-tank gas list -- it belongs in the bailout section instead (#3137
+    // follow-up). Only the diluent gets a "used: ..." row there.
+    expect(find.textContaining('used:'), findsOneWidget);
   });
 
   testWidgets('CCR settings edit all setpoints; switch depth accepts 0', (
