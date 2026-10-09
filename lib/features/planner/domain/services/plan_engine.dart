@@ -1449,9 +1449,19 @@ class PlanEngine {
     var depth = lastDepth;
     var end = segmentsRuntime;
     var phase = AscentPhase.toFirstStop;
-    for (final stop in stops) {
+    for (var i = 0; i < stops.length; i++) {
+      final stop = stops[i];
       final travel = stop.arrivalRuntimeSeconds - end;
-      if (travel > 0) {
+      // The first travel leg (bottom phase to the first stop) stays its own
+      // row -- an informative transition. From the second stop on, a real
+      // gas switch always lands exactly at the stop it leads into
+      // (AscentGasPlan's design: a switch-at-MOD never falls strictly
+      // between two 3 m-spaced stops), so a travel-between-stops row would
+      // only ever repeat the previous line's gas -- clutter, not
+      // information. Dropping it loses nothing: scheduleLines() already
+      // derives each printed duration from consecutive runtimeSeconds, so
+      // the travel time folds straight into the stop it leads to (#3138).
+      if (i == 0 && travel > 0) {
         addTravel(depth, stop.depthMeters, travel, stop.arrivalRuntimeSeconds);
       }
       end = stop.arrivalRuntimeSeconds + stop.durationSeconds;

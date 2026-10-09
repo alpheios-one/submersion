@@ -268,7 +268,8 @@ void main() {
     expect(find.text('Depth'), findsWidgets);
     expect(find.text('Duration'), findsWidgets);
     // The table reads like a slate: the authored descent and bottom, then
-    // a travel leg and a stop per computed stop, marked by direction.
+    // a travel leg to the first stop and a line per computed stop, marked
+    // by direction (later stops fold their travel time in, #3138).
     expect(find.text('↘'), findsOneWidget);
     expect(find.text('→'), findsOneWidget);
     expect(find.text('↗'), findsWidgets);
