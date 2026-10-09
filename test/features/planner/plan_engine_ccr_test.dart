@@ -229,5 +229,28 @@ void main() {
         }
       },
     );
+
+    test('the computed ascent never claims a gas switch on a single-diluent '
+        'dive (#3131)', () {
+      // CcrLoopAscentGas expresses the loop's constant-ppO2 composition as
+      // a continuously drifting fraction (O2% rises as ambient pressure
+      // falls on ascent). Comparing consecutive stops' raw fractions, as
+      // the OC switch-detection formula does, flags nearly every stop as
+      // a "switch" to a different fabricated gas even though the diver
+      // never leaves the loop or its one diluent.
+      final outcome = engine.compute(_plan());
+
+      expect(outcome.schedule, isNotEmpty);
+      final switchRows = outcome.schedule.where((r) => r.gasSwitch);
+      expect(
+        switchRows.length,
+        1,
+        reason:
+            'only the first line (establishing the diluent) should show '
+            'a gas; got switches at depths '
+            '${switchRows.map((r) => r.depthMeters).toList()}',
+      );
+      expect(outcome.schedule.first.gasSwitch, isTrue);
+    });
   });
 }

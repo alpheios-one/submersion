@@ -1331,6 +1331,7 @@ class PlanEngine {
     int segmentsRuntime,
   ) {
     final rows = <PlanScheduleRow>[];
+    final isCcr = plan.mode == domain.PlanMode.ccr;
     double? previousFO2;
     double? previousFHe;
 
@@ -1343,14 +1344,25 @@ class PlanEngine {
       required double fHe,
       required String? tankId,
       int airBreakSeconds = 0,
+      // The computed ascent only ever carries one fixed diluent -- see
+      // CcrLoopAscentGas -- so its ppO2-at-constant-setpoint fraction
+      // necessarily drifts with ambient pressure at almost every stop, even
+      // though the diver never leaves the loop. Comparing that fraction
+      // against the fraction epsilon therefore flags a "switch" on nearly
+      // every line and shows a different fabricated gas name each time
+      // (#3131). A CCR computed-ascent line is never a real gas switch, so
+      // the caller forces it off here; an authored leg can still switch
+      // (the diver genuinely changed tanks).
+      bool forceNoSwitch = false,
     }) {
       final lastFO2 = previousFO2;
       final lastFHe = previousFHe;
       final switched =
-          lastFO2 == null ||
-          lastFHe == null ||
-          (fO2 - lastFO2).abs() > _gasFractionEpsilon ||
-          (fHe - lastFHe).abs() > _gasFractionEpsilon;
+          !forceNoSwitch &&
+          (lastFO2 == null ||
+              lastFHe == null ||
+              (fO2 - lastFO2).abs() > _gasFractionEpsilon ||
+              (fHe - lastFHe).abs() > _gasFractionEpsilon);
       rows.add(
         PlanScheduleRow(
           kind: kind,
@@ -1395,12 +1407,8 @@ class PlanEngine {
         runtime: arrival,
         fO2: fO2,
         fHe: gas.fHe,
-        tankId: _tankForGas(
-          plan.tanks,
-          fO2,
-          gas.fHe,
-          isCcr: plan.mode == domain.PlanMode.ccr,
-        ),
+        tankId: _tankForGas(plan.tanks, fO2, gas.fHe, isCcr: isCcr),
+        forceNoSwitch: isCcr,
       );
     }
 
@@ -1422,6 +1430,7 @@ class PlanEngine {
         fHe: stop.gasFHe,
         tankId: stop.tankId,
         airBreakSeconds: stop.airBreakSeconds,
+        forceNoSwitch: isCcr,
       );
       depth = stop.depthMeters;
       phase = AscentPhase.betweenStops;
