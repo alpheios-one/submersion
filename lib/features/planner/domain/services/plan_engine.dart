@@ -1294,7 +1294,12 @@ class PlanEngine {
           airBreakSeconds: stop.airBreakSeconds,
           gasFO2: fO2,
           gasFHe: gas.fHe,
-          tankId: _tankForGas(plan.tanks, fO2, gas.fHe),
+          tankId: _tankForGas(
+            plan.tanks,
+            fO2,
+            gas.fHe,
+            isCcr: plan.mode == domain.PlanMode.ccr,
+          ),
           arrivalRuntimeSeconds: arrival,
         ),
       );
@@ -1390,7 +1395,12 @@ class PlanEngine {
         runtime: arrival,
         fO2: fO2,
         fHe: gas.fHe,
-        tankId: _tankForGas(plan.tanks, fO2, gas.fHe),
+        tankId: _tankForGas(
+          plan.tanks,
+          fO2,
+          gas.fHe,
+          isCcr: plan.mode == domain.PlanMode.ccr,
+        ),
       );
     }
 
@@ -1429,9 +1439,30 @@ class PlanEngine {
 
   /// The carried tank whose mix matches the stop gas (deco/stage roles win
   /// ties so the back gas is not charged for deco stops it did not supply).
-  String? _tankForGas(List<DiveTank> tanks, double fO2, double fHe) {
+  ///
+  /// On a loop plan the diver is never actually breathing a bailout tank
+  /// unless they have bailed out, which this schedule does not model -- so a
+  /// bailout mix must never be offered as a match. Without this filter, a
+  /// dense OC bailout staging can coincidentally fall within tolerance of
+  /// the loop's continuously-shifting inert fraction at almost any stop,
+  /// making the gas column claim a switch that never happened (#3131).
+  String? _tankForGas(
+    List<DiveTank> tanks,
+    double fO2,
+    double fHe, {
+    // Defaults false because _computeTankUsages, the only OC-side caller,
+    // never carries a CCR plan (see the isCcr ? _computeCcrTankUsages(...) :
+    // _computeTankUsages(...) split): every CCR-reachable call site below
+    // sets this explicitly.
+    bool isCcr = false,
+  }) {
     DiveTank? match;
     for (final tank in tanks) {
+      if (isCcr &&
+          tank.role != TankRole.diluent &&
+          tank.role != TankRole.oxygenSupply) {
+        continue;
+      }
       final tankFO2 = tank.gasMix.o2 / 100.0;
       final tankFHe = tank.gasMix.he / 100.0;
       if ((tankFO2 - fO2).abs() < 0.005 && (tankFHe - fHe).abs() < 0.005) {

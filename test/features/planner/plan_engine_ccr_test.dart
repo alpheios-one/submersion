@@ -184,5 +184,50 @@ void main() {
         );
       },
     );
+
+    test(
+      'the gas column never attributes the loop to a bailout tank (#3131)',
+      () {
+        // A dense OC bailout staging, as a technical diver carries for a
+        // deep dive, spans a wide O2 range in fine steps. The loop's
+        // continuously shifting inert fraction can coincidentally fall
+        // within the matching tolerance of one of these at almost any stop,
+        // even though the diver never leaves the loop.
+        final bailoutTanks = [
+          for (var o2 = 10; o2 <= 95; o2++)
+            DiveTank(
+              id: 'bo-$o2',
+              volume: 11.1,
+              startPressure: 207,
+              gasMix: GasMix(o2: o2.toDouble()),
+              role: TankRole.bailout,
+            ),
+        ];
+        const airDiluent = DiveTank(
+          id: 'dil',
+          volume: 3.0,
+          startPressure: 200,
+          gasMix: GasMix(o2: 21),
+          role: TankRole.diluent,
+        );
+        final outcome = engine.compute(
+          _plan(
+            tanks: [airDiluent, _o2Tank, ...bailoutTanks],
+            segments: _segments(gasMix: const GasMix(o2: 21)),
+          ),
+        );
+
+        final bailoutIds = bailoutTanks.map((t) => t.id).toSet();
+        for (final row in outcome.schedule) {
+          expect(
+            bailoutIds.contains(row.tankId),
+            isFalse,
+            reason:
+                'row at ${row.depthMeters} m resolved to a bailout tank '
+                '(${row.tankId}) while the diver is on the loop',
+          );
+        }
+      },
+    );
   });
 }
