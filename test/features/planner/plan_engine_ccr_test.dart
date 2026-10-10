@@ -253,6 +253,23 @@ void main() {
       expect(outcome.schedule.first.gasSwitch, isTrue);
     });
 
+    test('the Gas column shows the real diluent on every computed-ascent '
+        'line, never an interpolated mix (#3131)', () {
+      // CcrLoopAscentGas's own gasForDepth() is normalized against
+      // alveolar pressure for the deco engine's bookkeeping and drifts
+      // continuously with depth -- using it for display fabricated a
+      // different invented gas on nearly every line (a diver saw this
+      // directly: a single Tx 10/70 diluent shown as Tx 12/68, Tx 24/59,
+      // ... Tx 87/10 on the way up). The diluent itself never changes
+      // mid-ascent, so every row's stored gasFO2/gasFHe must equal it
+      // exactly.
+      final outcome = engine.compute(_plan());
+      for (final row in outcome.schedule) {
+        expect(row.gasFO2, closeTo(_diluent.o2 / 100.0, 1e-9));
+        expect(row.gasFHe, closeTo(_diluent.he / 100.0, 1e-9));
+      }
+    });
+
     test('PO2 column shows the loop setpoint, not the diluent\'s own ambient '
         'ppO2', () {
       // _diluent is 18% O2, so at 60 m (salt water default) its own
