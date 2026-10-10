@@ -127,6 +127,51 @@ void main() {
     expect(find.textContaining('used:'), findsOneWidget);
   });
 
+  testWidgets('the O2 supply is not diluent either, so it rides along in the '
+      'bailout section, not the main gas list', (tester) async {
+    tester.view.physicalSize = const Size(500, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      testApp(
+        overrides: overrides(),
+        child: SizedBox(
+          width: 500,
+          height: 700,
+          child: PlanResultsSheet(controller: ScrollController()),
+        ),
+      ),
+    );
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(PlanResultsSheet)),
+    );
+    final notifier = container.read(divePlanNotifierProvider.notifier);
+    notifier.addSimplePlan(maxDepth: 45, bottomTimeMinutes: 25);
+    notifier.updateMode(domain.PlanMode.ccr);
+    notifier.addTank(
+      const DiveTank(
+        id: 'bo',
+        volume: 11.1,
+        startPressure: 207,
+        gasMix: GasMix(o2: 50),
+        role: TankRole.bailout,
+      ),
+    );
+    notifier.addTank(
+      const DiveTank(
+        id: 'o2',
+        name: 'O2 supply',
+        volume: 3.0,
+        startPressure: 200,
+        gasMix: GasMix(o2: 100),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('O2 supply'), findsOneWidget);
+  });
+
   testWidgets('CCR settings edit all setpoints; switch depth accepts 0', (
     tester,
   ) async {
