@@ -175,12 +175,14 @@ class PlanTankUsage extends Equatable {
     return used;
   }
 
-  /// Surface liters left at the end of the plan.
+  /// Surface liters left at the end of the plan. Negative when [litersUsed]
+  /// exceeds [totalLiters] -- the cylinder is asked for more than it holds,
+  /// and the shortfall is exactly as informative as the surplus a diver
+  /// reads on an ordinary line (#3190).
   double? get remainingLiters {
     final total = totalLiters;
     if (total == null) return null;
-    final left = total - litersUsed;
-    return left < 0 ? 0.0 : left;
+    return total - litersUsed;
   }
 
   @override

@@ -255,16 +255,6 @@ class BailoutSolver {
           () {
             final used = ocSchedule.litersByTank[tank.id] ?? 0.0;
             final start = tank.startPressure;
-            final remaining = start != null
-                ? pressureAfterConsuming(
-                    tankSizeLiters: tank.volume ?? 11.0,
-                    startPressureBar: start,
-                    litersConsumed: used,
-                    o2Percent: tank.gasMix.o2,
-                    hePercent: tank.gasMix.he,
-                    model: config.gasModel,
-                  )
-                : null;
             final total = start != null
                 ? gasVolume(
                     tankSizeLiters: tank.volume ?? 11.0,
@@ -274,6 +264,27 @@ class BailoutSolver {
                     model: config.gasModel,
                   )
                 : null;
+            // Negative once used exceeds total: the shortfall, priced as a
+            // pressure the same way the surplus on an ordinary line is, not
+            // floored to 0 as if the cylinder had exactly covered it (#3190).
+            final remaining = start == null
+                ? null
+                : (total != null && used > total)
+                ? -pressureHoldingVolume(
+                    tankSizeLiters: tank.volume ?? 11.0,
+                    litersRequired: used - total,
+                    o2Percent: tank.gasMix.o2,
+                    hePercent: tank.gasMix.he,
+                    model: config.gasModel,
+                  )
+                : pressureAfterConsuming(
+                    tankSizeLiters: tank.volume ?? 11.0,
+                    startPressureBar: start,
+                    litersConsumed: used,
+                    o2Percent: tank.gasMix.o2,
+                    hePercent: tank.gasMix.he,
+                    model: config.gasModel,
+                  );
             return PlanTankUsage(
               tankId: tank.id,
               litersUsed: used,
@@ -283,12 +294,9 @@ class BailoutSolver {
               percentUsed: start != null && start > 0
                   ? (start - (remaining ?? 0)) / start * 100.0
                   : 0.0,
-              // pressureAfterConsuming floors a cylinder at 0 bar rather
-              // than going negative, so a cylinder actually asked for more
-              // than it holds reads identically to one that happened to end
-              // up exactly empty. Reusing reserveViolation's existing
-              // red-highlight treatment is the one visible difference
-              // between the two (#3190).
+              // Reuses reserveViolation's existing red-highlight treatment
+              // to flag that this cylinder's own usage exceeds its own
+              // capacity (#3190).
               reserveViolation: total != null && used > total,
             );
           }(),

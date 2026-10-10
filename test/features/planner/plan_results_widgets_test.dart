@@ -128,6 +128,37 @@ void main() {
     );
   });
 
+  testWidgets(
+    'gas row shows a negative end reading and a two-colour bar when usage '
+    'exceeds the cylinder\'s own capacity (#3190)',
+    (tester) async {
+      await tester.pumpWidget(
+        _outcomeHarness(
+          _noDecoOutcome(
+            tankUsages: const [
+              PlanTankUsage(
+                tankId: 'back',
+                litersUsed: 2500,
+                totalLiters: 2000,
+                startPressure: 200,
+                remainingPressure: -50,
+                percentUsed: 125,
+                reserveViolation: true,
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('end: -500L/-50bar'), findsOneWidget);
+      // Two colour segments (covered share + shortfall), not the ordinary
+      // single-colour LinearProgressIndicator.
+      expect(find.byType(LinearProgressIndicator), findsNothing);
+      expect(find.byType(ColoredBox), findsNWidgets(2));
+    },
+  );
+
   testWidgets('runtime table says no deco above the rows when there are '
       'lines but no stops', (tester) async {
     await tester.pumpWidget(_outcomeHarness(_noDecoOutcome()));

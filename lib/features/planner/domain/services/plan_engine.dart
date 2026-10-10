@@ -710,28 +710,40 @@ class PlanEngine {
         () {
           final used = liters[tank.id] ?? 0.0;
           final start = tank.startPressure;
-          final remaining = start != null
-              ? pressureAfterConsuming(
+          final total = start != null
+              ? gasVolume(
+                  tankSizeLiters: tank.volume ?? 11.0,
+                  pressureBar: start,
+                  o2Percent: tank.gasMix.o2,
+                  hePercent: tank.gasMix.he,
+                  model: config.gasModel,
+                )
+              : null;
+          // Negative once used exceeds total: the shortfall, priced as a
+          // pressure the same way the surplus on an ordinary line is, not
+          // floored to 0 as if the cylinder had exactly covered it (#3190).
+          final remaining = start == null
+              ? null
+              : (total != null && used > total)
+              ? -pressureHoldingVolume(
+                  tankSizeLiters: tank.volume ?? 11.0,
+                  litersRequired: used - total,
+                  o2Percent: tank.gasMix.o2,
+                  hePercent: tank.gasMix.he,
+                  model: config.gasModel,
+                )
+              : pressureAfterConsuming(
                   tankSizeLiters: tank.volume ?? 11.0,
                   startPressureBar: start,
                   litersConsumed: used,
                   o2Percent: tank.gasMix.o2,
                   hePercent: tank.gasMix.he,
                   model: config.gasModel,
-                )
-              : null;
+                );
           return PlanTankUsage(
             tankId: tank.id,
             litersUsed: used,
-            totalLiters: start != null
-                ? gasVolume(
-                    tankSizeLiters: tank.volume ?? 11.0,
-                    pressureBar: start,
-                    o2Percent: tank.gasMix.o2,
-                    hePercent: tank.gasMix.he,
-                    model: config.gasModel,
-                  )
-                : null,
+            totalLiters: total,
             remainingPressure: remaining,
             startPressure: start,
             percentUsed: start != null && start > 0
@@ -863,28 +875,40 @@ class PlanEngine {
         () {
           final used = liters[tank.id] ?? 0.0;
           final start = tank.startPressure;
-          final remaining = start != null
-              ? pressureAfterConsuming(
+          final total = start != null
+              ? gasVolume(
+                  tankSizeLiters: tank.volume ?? 11.0,
+                  pressureBar: start,
+                  o2Percent: tank.gasMix.o2,
+                  hePercent: tank.gasMix.he,
+                  model: config.gasModel,
+                )
+              : null;
+          // Negative once used exceeds total: the shortfall, priced as a
+          // pressure the same way the surplus on an ordinary line is, not
+          // floored to 0 as if the cylinder had exactly covered it (#3190).
+          final remaining = start == null
+              ? null
+              : (total != null && used > total)
+              ? -pressureHoldingVolume(
+                  tankSizeLiters: tank.volume ?? 11.0,
+                  litersRequired: used - total,
+                  o2Percent: tank.gasMix.o2,
+                  hePercent: tank.gasMix.he,
+                  model: config.gasModel,
+                )
+              : pressureAfterConsuming(
                   tankSizeLiters: tank.volume ?? 11.0,
                   startPressureBar: start,
                   litersConsumed: used,
                   o2Percent: tank.gasMix.o2,
                   hePercent: tank.gasMix.he,
                   model: config.gasModel,
-                )
-              : null;
+                );
           return PlanTankUsage(
             tankId: tank.id,
             litersUsed: used,
-            totalLiters: start != null
-                ? gasVolume(
-                    tankSizeLiters: tank.volume ?? 11.0,
-                    pressureBar: start,
-                    o2Percent: tank.gasMix.o2,
-                    hePercent: tank.gasMix.he,
-                    model: config.gasModel,
-                  )
-                : null,
+            totalLiters: total,
             remainingPressure: remaining,
             startPressure: start,
             percentUsed: start != null && start > 0
@@ -1359,27 +1383,22 @@ class PlanEngine {
       ).inspiredAt(environment.pressureAtDepth(atDepth)).pO2;
     }
 
-    // The loop's TRUE gas identity at a depth, for display: the diluent, or
-    // pure O2 once the loop can no longer dilute enough to hold any
-    // setpoint (shallow hypoxic cap). CcrLoopAscentGas.gasForDepth() instead
-    // returns a continuously drifting pAlv-normalized fraction for the deco
-    // engine's own bookkeeping -- using that for the Gas column fabricates
-    // an invented mix on every line even on a single-diluent dive (a diver
-    // saw this directly: Tx 10/70 shown as Tx 12/68, Tx 24/59, ... Tx
-    // 87/10). A diver on one diluent breathes exactly that gas (or pure O2)
-    // the whole dive, never a smooth interpolation between the two.
+    // The loop's TRUE gas identity, for display: always the diluent.
+    // CcrLoopAscentGas.gasForDepth() instead returns a continuously
+    // drifting pAlv-normalized fraction for the deco engine's own
+    // bookkeeping -- using that for the Gas column fabricated an invented
+    // mix on every line even on a single-diluent dive (a diver saw this
+    // directly: Tx 10/70 shown as Tx 12/68, Tx 24/59, ... Tx 87/10). The
+    // diluent valve feeds the same gas regardless of depth -- even once
+    // ambient pressure can no longer support the setpoint and PO2 falls
+    // short of it (ccrPpO2At reports that honestly), the loop is not
+    // somehow switched onto a different cylinder; a diver confirmed this
+    // directly after an earlier version of this function showed "O2" at
+    // the shallowest stops, which does not happen.
     ({double fO2, double fHe})? ccrDisplayGasAt(double atDepth) {
       if (!isCcr || ascentPlan is! CcrLoopAscentGas) return null;
       final loop = ascentPlan;
-      final inspired = ClosedCircuit(
-        setpoint: loop.setpointAt(atDepth),
-        diluentFO2: loop.diluentFO2,
-        diluentFHe: loop.diluentFHe,
-      ).inspiredAt(environment.pressureAtDepth(atDepth));
-      final isPureO2 = inspired.pN2 <= 0 && inspired.pHe <= 0;
-      return isPureO2
-          ? (fO2: 1.0, fHe: 0.0)
-          : (fO2: loop.diluentFO2, fHe: loop.diluentFHe);
+      return (fO2: loop.diluentFO2, fHe: loop.diluentFHe);
     }
 
     void add({

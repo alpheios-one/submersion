@@ -254,8 +254,11 @@ void main() {
         final usage = outcome.bailoutTankUsages.single;
         expect(usage.litersUsed, greaterThan(usage.totalLiters!));
         expect(usage.reserveViolation, isTrue);
-        // pressureAfterConsuming floors at zero rather than negative.
-        expect(usage.remainingPressure, 0.0);
+        // The shortfall, priced as a negative pressure, not floored to 0 as
+        // if the cylinder had exactly covered it.
+        expect(usage.remainingPressure, lessThan(0));
+        expect(usage.remainingLiters, lessThan(0));
+        expect(usage.percentUsed, greaterThan(100));
       },
     );
   });

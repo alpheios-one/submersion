@@ -705,18 +705,53 @@ class _GasRow extends StatelessWidget {
               ),
             ),
           const SizedBox(height: 4),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(3),
-            child: LinearProgressIndicator(
-              value: (usage.percentUsed / 100).clamp(0.0, 1.0),
-              minHeight: 4,
-              color: usage.reserveViolation
-                  ? theme.colorScheme.error
-                  : theme.colorScheme.primary,
-              backgroundColor: theme.colorScheme.surfaceContainerHighest,
-            ),
-          ),
+          _bar(theme),
         ],
+      ),
+    );
+  }
+
+  /// A cylinder that holds enough gas gets the ordinary single-colour bar.
+  /// One that does not gets a bar spanning the full NEED instead of the
+  /// cylinder's own capacity: blue for the share the cylinder actually
+  /// covers, red for the share still missing -- the shortfall is exactly as
+  /// visible as the surplus a diver reads on an ordinary line (#3190).
+  Widget _bar(ThemeData theme) {
+    final total = usage.totalLiters;
+    final overBudget = total != null && usage.litersUsed > total;
+    if (!overBudget) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(3),
+        child: LinearProgressIndicator(
+          value: (usage.percentUsed / 100).clamp(0.0, 1.0),
+          minHeight: 4,
+          color: usage.reserveViolation
+              ? theme.colorScheme.error
+              : theme.colorScheme.primary,
+          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+        ),
+      );
+    }
+    final coveredPermille = ((total / usage.litersUsed) * 1000).round().clamp(
+      1,
+      999,
+    );
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(3),
+      child: SizedBox(
+        height: 4,
+        child: Row(
+          children: [
+            Expanded(
+              flex: coveredPermille,
+              child: ColoredBox(color: theme.colorScheme.primary),
+            ),
+            Expanded(
+              flex: 1000 - coveredPermille,
+              child: ColoredBox(color: theme.colorScheme.error),
+            ),
+          ],
+        ),
       ),
     );
   }
