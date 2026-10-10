@@ -14,8 +14,6 @@ import 'package:submersion/features/dive_planner/presentation/providers/dive_pla
 import 'package:submersion/features/dive_planner/presentation/widgets/plan_saved_tanks_bar.dart';
 import 'package:submersion/features/planner/domain/entities/dive_plan.dart'
     show PlanMode;
-import 'package:submersion/features/planner/domain/services/dive_plan_state_mapper.dart';
-import 'package:submersion/features/planner/domain/services/tank_role_resolver.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/forms/number_field.dart';
 import 'package:submersion/shared/widgets/forms/number_input_validation.dart';
@@ -32,9 +30,6 @@ class PlanTankList extends ConsumerWidget {
     final theme = Theme.of(context);
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);
-    final resolvedRoles = const TankRoleResolver().rolesFor(
-      divePlanFromState(planState),
-    );
 
     return Card(
       child: Padding(
@@ -74,13 +69,10 @@ class PlanTankList extends ConsumerWidget {
             // diver's saved cylinders, each a tap away from joining the plan.
             const PlanSavedTanksBar(),
 
-            // Tank chips
-            //
-            // A tank the resolver silently dropped into bailout -- not
-            // because the diver ticked that box, but only because no segment
-            // breathes it -- gets a hint on its chip; otherwise it goes
-            // unnoticed until it is missing from the decompression plan
-            // (#3135).
+            // Tank chips. Diluent is now the diver's one explicit choice on
+            // a loop plan (#3135 follow-up) -- unticked, a cylinder defaults
+            // to bailout, with no silent fallback to warn about: the chip's
+            // own badge already says which it is.
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -88,10 +80,6 @@ class PlanTankList extends ConsumerWidget {
                 return _TankChip(
                   tank: tank,
                   units: units,
-                  unassigned:
-                      planState.mode != PlanMode.oc &&
-                      tank.role != TankRole.bailout &&
-                      resolvedRoles[tank.id] == TankRole.bailout,
                   onEdit: () => _showEditTankDialog(context, ref, tank, units),
                   onDelete: planState.tanks.length > 1
                       ? () => ref
@@ -152,16 +140,11 @@ class _TankChip extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback? onDelete;
 
-  /// True when this tank resolves to bailout only because no segment
-  /// breathes it, not because the diver asked for bailout -- see #3135.
-  final bool unassigned;
-
   const _TankChip({
     required this.tank,
     required this.units,
     required this.onEdit,
     this.onDelete,
-    this.unassigned = false,
   });
 
   @override
@@ -169,12 +152,10 @@ class _TankChip extends StatelessWidget {
     final theme = Theme.of(context);
 
     final tankSize = units.formatTankVolume(tank.volume, tank.workingPressure);
-    final warningLabel = context.l10n.divePlanner_tank_unassignedWarning;
     final tankLabel =
         '${tank.name ?? tank.gasMix.name}, '
         '${units.formatPressure(tank.startPressure)}, '
-        '$tankSize'
-        '${unassigned ? ', $warningLabel' : ''}';
+        '$tankSize';
 
     return Semantics(
       label: tankLabel,
@@ -200,36 +181,6 @@ class _TankChip extends StatelessWidget {
               '${units.formatPressure(tank.startPressure)} • $tankSize',
               style: theme.textTheme.bodySmall,
             ),
-            if (unassigned)
-              ConstrainedBox(
-                // The chip sits in a Wrap, which never bounds a child's
-                // width itself -- without a cap here, this is the one line
-                // long enough to claim more width than the chip actually
-                // gets and overflow instead of wrapping or eliding.
-                constraints: const BoxConstraints(maxWidth: 180),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.warning_amber_rounded,
-                      size: 14,
-                      color: theme.colorScheme.error,
-                    ),
-                    const SizedBox(width: 2),
-                    Flexible(
-                      child: Text(
-                        warningLabel,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 3,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.error,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
           ],
         ),
         onPressed: onEdit,
@@ -268,7 +219,7 @@ class _TankEditDialogState extends State<_TankEditDialog> {
   late TextEditingController _o2Controller;
   late TextEditingController _heController;
   bool _isTravelGas = false;
-  bool _isBailout = false;
+  bool _isDiluent = false;
 
   /// The volume field's seeded text, so [_save] can tell an untouched field
   /// from an edited one and keep the stored litres exactly (issue #2027).
@@ -308,11 +259,10 @@ class _TankEditDialogState extends State<_TankEditDialog> {
       text: formatDecimalForInput(widget.tank?.gasMix.he ?? 0),
     );
     _isTravelGas = widget.tank?.isTravelGas ?? false;
-    // `role` is no longer a field the diver fills in. The only value that
-    // still carries intent is `bailout`, which TankRoleResolver honours as an
-    // override because a 100% cylinder on a loop plan could equally be the
-    // oxygen supply or a bailout bottle.
-    _isBailout = widget.tank?.role == TankRole.bailout;
+    // `role` is no longer a field the diver fills in, except on a loop plan:
+    // diluent is the one explicit choice there, which TankRoleResolver
+    // honours and never re-derives from anything else (#3135).
+    _isDiluent = widget.tank?.role == TankRole.diluent;
   }
 
   @override
@@ -428,14 +378,14 @@ class _TankEditDialogState extends State<_TankEditDialog> {
                 CheckboxListTile(
                   contentPadding: EdgeInsets.zero,
                   controlAffinity: ListTileControlAffinity.leading,
-                  value: _isBailout,
-                  title: Text(context.l10n.divePlanner_field_bailoutGas),
+                  value: _isDiluent,
+                  title: Text(context.l10n.divePlanner_field_diluentGas),
                   subtitle: Text(
-                    context.l10n.divePlanner_field_bailoutGasHint,
+                    context.l10n.divePlanner_field_diluentGasHint,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   onChanged: (value) {
-                    setState(() => _isBailout = value ?? false);
+                    setState(() => _isDiluent = value ?? false);
                   },
                 ),
             ],
@@ -525,9 +475,9 @@ class _TankEditDialogState extends State<_TankEditDialog> {
         o2: _validated(_o2Controller, blank: 21)!,
         he: _validated(_heController, blank: 0)!,
       ),
-      // Everything except an explicit bailout is derived by
-      // TankRoleResolver; backGas is the neutral "derive me" placeholder.
-      role: _isBailout ? TankRole.bailout : TankRole.backGas,
+      // Everything except an explicit diluent (loop plans only) is derived
+      // by TankRoleResolver; backGas is the neutral "derive me" placeholder.
+      role: _isDiluent ? TankRole.diluent : TankRole.backGas,
       order: widget.tank?.order ?? 0,
       isTravelGas: _isTravelGas,
     );

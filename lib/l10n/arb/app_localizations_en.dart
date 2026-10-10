@@ -9860,6 +9860,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Open-circuit gas carried in case the loop fails';
 
   @override
+  String get divePlanner_field_diluentGas => 'Diluent';
+
+  @override
+  String get divePlanner_field_diluentGasHint =>
+      'Unticked cylinders default to bailout';
+
+  @override
   String get divePlanner_field_hePercent => 'He %';
 
   @override
@@ -9974,10 +9981,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get divePlanner_label_tanks => 'Tanks';
-
-  @override
-  String get divePlanner_tank_unassignedWarning =>
-      'Not in any segment, treated as bailout';
 
   @override
   String get divePlanner_savedTanks_title => 'Saved tanks';

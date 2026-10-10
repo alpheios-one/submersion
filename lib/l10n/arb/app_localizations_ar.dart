@@ -10139,6 +10139,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'غاز الدائرة المفتوحة المحمول في حال تعطل الدائرة';
 
   @override
+  String get divePlanner_field_diluentGas => 'Diluent';
+
+  @override
+  String get divePlanner_field_diluentGasHint =>
+      'Unticked cylinders default to bailout';
+
+  @override
   String get divePlanner_field_hePercent => 'He %';
 
   @override
@@ -10253,10 +10260,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get divePlanner_label_tanks => 'الأسطوانات';
-
-  @override
-  String get divePlanner_tank_unassignedWarning =>
-      'Not in any segment, treated as bailout';
 
   @override
   String get divePlanner_savedTanks_title => 'الأسطوانات المحفوظة';

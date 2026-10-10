@@ -10021,6 +10021,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Offenes Gas, mitgeführt für den Fall eines Kreislaufausfalls';
 
   @override
+  String get divePlanner_field_diluentGas => 'Diluent';
+
+  @override
+  String get divePlanner_field_diluentGasHint =>
+      'Nicht angehakte Flaschen gelten automatisch als Bailout';
+
+  @override
   String get divePlanner_field_hePercent => 'He %';
 
   @override
@@ -10135,10 +10142,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get divePlanner_label_tanks => 'Flaschen';
-
-  @override
-  String get divePlanner_tank_unassignedWarning =>
-      'In keinem Segment, gilt als Bailout';
 
   @override
   String get divePlanner_savedTanks_title => 'Gespeicherte Flaschen';
