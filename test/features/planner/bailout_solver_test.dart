@@ -244,5 +244,19 @@ void main() {
       final total = byId.values.fold<double>(0, (sum, u) => sum + u.litersUsed);
       expect(total, closeTo(outcome.worstCase.litersRequired, 0.5));
     });
+
+    test(
+      'flags a cylinder whose own usage exceeds its own capacity (#3190)',
+      () {
+        final outcome = solver.solve(
+          _plan(tanks: [_diluentTank, _bailout(volume: 3.0, pressure: 100)]),
+        )!;
+        final usage = outcome.bailoutTankUsages.single;
+        expect(usage.litersUsed, greaterThan(usage.totalLiters!));
+        expect(usage.reserveViolation, isTrue);
+        // pressureAfterConsuming floors at zero rather than negative.
+        expect(usage.remainingPressure, 0.0);
+      },
+    );
   });
 }

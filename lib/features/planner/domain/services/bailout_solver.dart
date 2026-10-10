@@ -265,23 +265,31 @@ class BailoutSolver {
                     model: config.gasModel,
                   )
                 : null;
+            final total = start != null
+                ? gasVolume(
+                    tankSizeLiters: tank.volume ?? 11.0,
+                    pressureBar: start,
+                    o2Percent: tank.gasMix.o2,
+                    hePercent: tank.gasMix.he,
+                    model: config.gasModel,
+                  )
+                : null;
             return PlanTankUsage(
               tankId: tank.id,
               litersUsed: used,
-              totalLiters: start != null
-                  ? gasVolume(
-                      tankSizeLiters: tank.volume ?? 11.0,
-                      pressureBar: start,
-                      o2Percent: tank.gasMix.o2,
-                      hePercent: tank.gasMix.he,
-                      model: config.gasModel,
-                    )
-                  : null,
+              totalLiters: total,
               remainingPressure: remaining,
               startPressure: start,
               percentUsed: start != null && start > 0
                   ? (start - (remaining ?? 0)) / start * 100.0
                   : 0.0,
+              // pressureAfterConsuming floors a cylinder at 0 bar rather
+              // than going negative, so a cylinder actually asked for more
+              // than it holds reads identically to one that happened to end
+              // up exactly empty. Reusing reserveViolation's existing
+              // red-highlight treatment is the one visible difference
+              // between the two (#3190).
+              reserveViolation: total != null && used > total,
             );
           }(),
       ],
