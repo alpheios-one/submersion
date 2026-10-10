@@ -100,8 +100,10 @@ class BailoutSolver {
 
   BailoutOutcome? solve(domain.DivePlan inputPlan) {
     if (inputPlan.mode != domain.PlanMode.ccr) return null;
-    // Which cylinders are bailout is partly derived (any open-circuit gas
-    // carried on a loop dive) and partly the diver's explicit override.
+    // Diluent is the diver's one explicit per-tank choice on a loop plan
+    // (TankRoleResolver); every other open-circuit cylinder carried
+    // defaults to bailout, so this is simply whatever the resolver left
+    // over, never a separate derivation of its own.
     final plan = const TankRoleResolver().apply(inputPlan);
     final bailoutTanks = plan.tanks
         .where((t) => t.role == TankRole.bailout)
