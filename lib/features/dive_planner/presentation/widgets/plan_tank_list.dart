@@ -206,9 +206,10 @@ class _TankChip extends StatelessWidget {
                 // width itself -- without a cap here, this is the one line
                 // long enough to claim more width than the chip actually
                 // gets and overflow instead of wrapping or eliding.
-                constraints: const BoxConstraints(maxWidth: 160),
+                constraints: const BoxConstraints(maxWidth: 180),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(
                       Icons.warning_amber_rounded,
@@ -220,7 +221,7 @@ class _TankChip extends StatelessWidget {
                       child: Text(
                         warningLabel,
                         overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
+                        maxLines: 3,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.error,
                         ),
