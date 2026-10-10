@@ -804,20 +804,19 @@ class _BailoutSection extends StatelessWidget {
               ],
             ),
           ),
-        if (outcome.bailoutTanks.isNotEmpty) ...[
+        if (outcome.bailoutTankUsages.isNotEmpty) ...[
           const SizedBox(height: 10),
-          Wrap(
-            spacing: 12,
-            runSpacing: 2,
-            children: [
-              for (final tank in outcome.bailoutTanks)
-                Text(
-                  '${tank.name ?? tank.gasMix.name} '
-                  '(${units.formatTankVolume(tank.volume, tank.workingPressure)})',
-                  style: theme.textTheme.bodySmall,
-                ),
-            ],
-          ),
+          for (final usage in outcome.bailoutTankUsages)
+            _GasRow(
+              usage: usage,
+              label: () {
+                final tank = outcome.bailoutTanks
+                    .where((t) => t.id == usage.tankId)
+                    .firstOrNull;
+                return tank == null ? '--' : (tank.name ?? tank.gasMix.name);
+              }(),
+              units: units,
+            ),
         ],
         if (outcome.worstCaseRows.isNotEmpty) ...[
           const SizedBox(height: 12),

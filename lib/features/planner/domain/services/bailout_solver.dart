@@ -57,12 +57,19 @@ class BailoutOutcome {
   /// normal-loop consumption to chart there.
   final List<DiveTank> bailoutTanks;
 
+  /// Per-cylinder consumption for the worst-case bailout schedule, read the
+  /// same way the main per-tank gas list reads: used/end liters and
+  /// pressure, one row per [bailoutTanks] entry. Sums to the same total as
+  /// [BailoutPoint.litersRequired] for [worstCase].
+  final List<PlanTankUsage> bailoutTankUsages;
+
   const BailoutOutcome({
     required this.points,
     required this.worstCase,
     required this.availableLiters,
     required this.worstCaseRows,
     required this.bailoutTanks,
+    required this.bailoutTankUsages,
   });
 
   bool get sufficient => worstCase.litersRequired <= availableLiters;
@@ -226,21 +233,58 @@ class BailoutSolver {
     for (final point in points) {
       if (point.litersRequired > worst.litersRequired) worst = point;
     }
+    final ocSchedule = _scheduleRowsFor(
+      worst,
+      bailoutTanks: bailoutTanks,
+      bailoutPlan: bailoutPlan,
+      policy: policy,
+      environment: environment,
+      sac: plan.sacStressedEffective,
+    );
     return BailoutOutcome(
       points: points,
       worstCase: worst,
       availableLiters: availableLiters,
       worstCaseRows: [
         ..._legRowsUpTo(worst, legs, plan, environment),
-        ..._scheduleRowsFor(
-          worst,
-          bailoutTanks: bailoutTanks,
-          bailoutPlan: bailoutPlan,
-          policy: policy,
-          environment: environment,
-        ),
+        ...ocSchedule.rows,
       ],
       bailoutTanks: bailoutTanks,
+      bailoutTankUsages: [
+        for (final tank in bailoutTanks)
+          () {
+            final used = ocSchedule.litersByTank[tank.id] ?? 0.0;
+            final start = tank.startPressure;
+            final remaining = start != null
+                ? pressureAfterConsuming(
+                    tankSizeLiters: tank.volume ?? 11.0,
+                    startPressureBar: start,
+                    litersConsumed: used,
+                    o2Percent: tank.gasMix.o2,
+                    hePercent: tank.gasMix.he,
+                    model: config.gasModel,
+                  )
+                : null;
+            return PlanTankUsage(
+              tankId: tank.id,
+              litersUsed: used,
+              totalLiters: start != null
+                  ? gasVolume(
+                      tankSizeLiters: tank.volume ?? 11.0,
+                      pressureBar: start,
+                      o2Percent: tank.gasMix.o2,
+                      hePercent: tank.gasMix.he,
+                      model: config.gasModel,
+                    )
+                  : null,
+              remainingPressure: remaining,
+              startPressure: start,
+              percentUsed: start != null && start > 0
+                  ? (start - (remaining ?? 0)) / start * 100.0
+                  : 0.0,
+            );
+          }(),
+      ],
     );
   }
 
@@ -332,14 +376,17 @@ class BailoutSolver {
   /// PlanEngine's own schedule-building (`_buildSchedule`) closely enough
   /// to read the same way, but is self-contained: a bailout point starts
   /// mid-dive with no authored legs or PlanEngine instance of its own.
-  List<PlanScheduleRow> _scheduleRowsFor(
+  ({List<PlanScheduleRow> rows, Map<String, double> litersByTank})
+  _scheduleRowsFor(
     BailoutPoint point, {
     required List<DiveTank> bailoutTanks,
     required AscentGasPlan bailoutPlan,
     required SchedulePolicy policy,
     required DiveEnvironment environment,
+    required double sac,
   }) {
     final rows = <PlanScheduleRow>[];
+    final litersByTank = <String, double>{};
     double? previousFO2;
     double? previousFHe;
 
@@ -352,6 +399,17 @@ class BailoutSolver {
         }
       }
       return null;
+    }
+
+    // Same per-leg liters formula as _ascentLiters (average depth across a
+    // travel leg, the stop's own depth across a stop), just split by which
+    // tank supplied it instead of summed into one total -- so this always
+    // adds up to exactly the same worst-case total shown next to it.
+    void charge(String? tankId, double seconds, double atDepth) {
+      final id = tankId ?? '';
+      litersByTank[id] =
+          (litersByTank[id] ?? 0) +
+          sac * (seconds / 60.0) * environment.pressureAtDepth(atDepth);
     }
 
     void add({
@@ -415,6 +473,11 @@ class BailoutSolver {
           fO2: fO2,
           fHe: gas.fHe,
         );
+        charge(
+          tankForGas(fO2, gas.fHe),
+          travelSeconds.toDouble(),
+          (depth + stop.depthMeters) / 2.0,
+        );
       }
       end += travelSeconds + stop.durationSeconds;
       final stopGas = bailoutPlan.gasForDepth(stop.depthMeters);
@@ -429,6 +492,14 @@ class BailoutSolver {
         fO2: stopFO2,
         fHe: stopGas.fHe,
       );
+      final stopTankId = tankForGas(stopFO2, stopGas.fHe);
+      if (i > 0) {
+        // The merged-in travel time (#3138) breathes whatever gas carried
+        // the diver INTO this stop -- the same gas the stop itself is on,
+        // per AscentGasPlan's "switch lands at the stop" design.
+        charge(stopTankId, travelSeconds.toDouble(), stop.depthMeters);
+      }
+      charge(stopTankId, stop.durationSeconds.toDouble(), stop.depthMeters);
       depth = stop.depthMeters;
       phase = AscentPhase.betweenStops;
     }
@@ -449,8 +520,9 @@ class BailoutSolver {
         fO2: fO2,
         fHe: gas.fHe,
       );
+      charge(tankForGas(fO2, gas.fHe), travelSeconds.toDouble(), depth / 2.0);
     }
-    return rows;
+    return (rows: rows, litersByTank: litersByTank);
   }
 
   /// Stressed-SAC surface liters for an OC ascent: the travel legs at the
