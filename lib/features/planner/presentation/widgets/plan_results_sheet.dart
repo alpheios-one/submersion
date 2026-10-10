@@ -739,6 +739,7 @@ class _GasRow extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(3),
       child: SizedBox(
+        width: double.infinity,
         height: 4,
         child: Row(
           children: [
