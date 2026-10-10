@@ -201,22 +201,33 @@ class _TankChip extends StatelessWidget {
               style: theme.textTheme.bodySmall,
             ),
             if (unassigned)
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.warning_amber_rounded,
-                    size: 14,
-                    color: theme.colorScheme.error,
-                  ),
-                  const SizedBox(width: 2),
-                  Text(
-                    warningLabel,
-                    style: theme.textTheme.bodySmall?.copyWith(
+              ConstrainedBox(
+                // The chip sits in a Wrap, which never bounds a child's
+                // width itself -- without a cap here, this is the one line
+                // long enough to claim more width than the chip actually
+                // gets and overflow instead of wrapping or eliding.
+                constraints: const BoxConstraints(maxWidth: 160),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      size: 14,
                       color: theme.colorScheme.error,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 2),
+                    Flexible(
+                      child: Text(
+                        warningLabel,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.error,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
           ],
         ),
