@@ -14,6 +14,9 @@ import 'package:submersion/features/divers/presentation/widgets/delete_diver_sna
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/divers/presentation/widgets/diver_switcher_sheet.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/features/documents/domain/entities/document.dart';
+import 'package:submersion/features/documents/presentation/providers/document_providers.dart';
+import 'package:submersion/features/safety/presentation/providers/incident_providers.dart';
 
 final _log = LoggerService.forClass(DiverProfileHubPage);
 
@@ -254,12 +257,53 @@ class DiverProfileHubPage extends ConsumerWidget {
               route: '/settings/diver-profile/medical',
             ),
             const Divider(height: 1),
+            // The near-miss log is the active diver's own safety record, so
+            // it sits with the emergency and medical tiles (issue #3061).
+            Consumer(
+              builder: (context, ref, _) {
+                // .value keeps the last count through a reload, as the
+                // Documents tile does.
+                final incidents = ref.watch(incidentsProvider).value;
+                return _buildSectionTile(
+                  context,
+                  icon: Icons.flag_outlined,
+                  title: context.l10n.safetyHub_incidentsLink,
+                  subtitle: context.l10n.safetyHub_incidentsLink_count(
+                    incidents?.length ?? 0,
+                  ),
+                  route: '/incidents',
+                );
+              },
+            ),
+            const Divider(height: 1),
             _buildSectionTile(
               context,
               icon: Icons.health_and_safety,
               title: context.l10n.settings_profileHub_insurance,
               subtitle: _insuranceSubtitle(context, ref, diver),
-              route: '/settings/diver-profile/insurance',
+              // Insurance is a document now (issue #2613).
+              route: '/documents?type=insurance',
+            ),
+            const Divider(height: 1),
+            Consumer(
+              builder: (context, ref, _) {
+                final personal = ref
+                    .watch(
+                      documentsForOwnerProvider(const DocumentOwner.personal()),
+                    )
+                    // .value keeps the last count through a reload; a
+                    // document change would otherwise flash "None yet".
+                    .value;
+                return _buildSectionTile(
+                  context,
+                  icon: Icons.folder_copy_outlined,
+                  title: context.l10n.documents_profileHub_documents,
+                  subtitle: context.l10n.documents_profileHub_documents_count(
+                    personal?.length ?? 0,
+                  ),
+                  route: '/documents?owner=personal',
+                );
+              },
             ),
             const Divider(height: 1),
             _buildSectionTile(

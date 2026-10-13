@@ -171,8 +171,13 @@ Open it with **Emergency card** in the Dashboard's quick actions, or from
 
 ### How your region is chosen
 
-The card uses the country of your most recent dive's site. When that is not
-known, it uses the worldwide hotline and says so.
+The card uses the country of your most recent dive's site, and shows it under
+the hotline. When that is not known, it uses the worldwide hotline and says so.
+
+To set the region yourself, for example the day before you travel, tap
+**Change region** and pick the country. The card then says the region was set
+manually, and it stays until you change it again. Pick **Automatic (most recent
+dive)** to go back to following your dives.
 
 ### Chambers
 
@@ -204,8 +209,8 @@ non-punitive incident reporting for decades, and it works for the same reason it
 would work here: patterns only become visible if the small things get written
 down.
 
-Open it from **Settings > Manage > Near-miss log**, or choose **Log near-miss**
-from a dive's menu to link the report to that dive.
+Open it from **Settings > Diver Profile > Near-miss log**, or choose
+**Log near-miss** from a dive's menu to link the report to that dive.
 
 ### What a report holds
 
@@ -242,7 +247,7 @@ feeds that item's condition findings (see [Equipment](equipment.md)).
 | Findings for one dive | The dive's details > Safety review |
 | Emergency card | The Dashboard's quick actions, or Settings > Diver Profile > Emergency card |
 | Medical details, contacts, insurance | Settings > Diver Profile |
-| Near-miss log | Settings > Manage > Near-miss log, or a dive's menu |
+| Near-miss log | Settings > Diver Profile > Near-miss log, or a dive's menu |
 
 ## What the Suite Does Not Do
 

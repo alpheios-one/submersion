@@ -1,6 +1,7 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:submersion/core/database/app_sql_functions.dart';
 import 'package:submersion/core/database/database.dart';
 
 /// Schema v250: trip_hides and site_hides, a profile's hidden shared trips
@@ -29,7 +30,11 @@ void main() {
     expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(250));
     expect(AppDatabase.migrationVersions, contains(250));
     expect(AppDatabase.migrationStepCount(249), greaterThanOrEqualTo(1));
-    expect(AppDatabase.minimumCompatibleSchemaVersion, 240);
+    // v275 raised the floor later (#3091); this rung did not move it.
+    expect(
+      AppDatabase.minimumCompatibleSchemaVersion,
+      greaterThanOrEqualTo(240),
+    );
   });
 
   test('upgrading from v249 creates both tables', () async {
@@ -91,7 +96,9 @@ void main() {
   });
 
   test('a fresh database has both tables', () async {
-    final db = AppDatabase(NativeDatabase.memory());
+    final db = AppDatabase(
+      NativeDatabase.memory(setup: registerAppSqlFunctions),
+    );
     addTearDown(db.close);
     expect(await columnsOf(db, 'trip_hides'), contains('trip_id'));
     expect(await columnsOf(db, 'site_hides'), contains('site_id'));

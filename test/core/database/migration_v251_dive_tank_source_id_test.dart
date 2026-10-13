@@ -1,5 +1,6 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/database/app_sql_functions.dart';
 import 'package:submersion/core/database/database.dart';
 
 /// Schema v251: dive_tanks.source_id (issue #2716). Two consolidated sources
@@ -115,7 +116,11 @@ void main() {
   });
 
   test('the column is additive and did not move the sync floor', () {
-    expect(AppDatabase.minimumCompatibleSchemaVersion, 240);
+    // v275 raised the floor later (#3091); this rung did not move it.
+    expect(
+      AppDatabase.minimumCompatibleSchemaVersion,
+      greaterThanOrEqualTo(240),
+    );
   });
 
   test('upgrading from v249 attributes the unambiguous tanks', () async {
@@ -146,7 +151,9 @@ void main() {
   });
 
   test('a fresh database has the column', () async {
-    final db = AppDatabase(NativeDatabase.memory());
+    final db = AppDatabase(
+      NativeDatabase.memory(setup: registerAppSqlFunctions),
+    );
     addTearDown(db.close);
     expect(await columnsOf(db, 'dive_tanks'), contains('source_id'));
   });

@@ -9,6 +9,7 @@ import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_localization.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_profile_series.dart';
+import 'package:submersion/core/utils/elapsed_duration_format.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_fonts.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_shared_components.dart';
@@ -412,13 +413,16 @@ class PdfTemplateNaui extends PdfTemplateBuilder {
                           ),
                           _buildNauiField(
                             l10n.pdf_visibilityShort,
-                            // Measured distance from v144; pre-v144 dives fall
-                            // back to their bucket label.
-                            dive.visibilityMeters != null
-                                ? units.formatDistance(dive.visibilityMeters!)
-                                : dive.visibility != null
-                                ? visibilityName(dive.visibility!, l10n)
-                                : '-',
+                            // Measured distance from v144, a band-picked
+                            // range (issue #3226), else the bucket label.
+                            formatDiveVisibilityPlain(
+                                  meters: dive.visibilityMeters,
+                                  range: dive.visibilityRange,
+                                  legacy: dive.visibility,
+                                  l10n: l10n,
+                                  units: units,
+                                ) ??
+                                '-',
                           ),
                           if (dive.currentStrength != null)
                             _buildNauiField(
@@ -431,8 +435,8 @@ class PdfTemplateNaui extends PdfTemplateBuilder {
                       if (dive.surfaceInterval != null) ...[
                         pw.SizedBox(height: 2),
                         pw.Text(
-                          l10n.pdf_surfaceIntervalShort(
-                            '${dive.surfaceInterval!.inMinutes}',
+                          l10n.pdf_surfaceIntervalSpan(
+                            formatElapsed(l10n, dive.surfaceInterval!),
                           ),
                           style: const pw.TextStyle(
                             fontSize: 8,

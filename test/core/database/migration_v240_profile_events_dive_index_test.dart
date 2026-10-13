@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:submersion/core/database/app_sql_functions.dart';
 import 'package:submersion/core/database/database.dart';
 
 const _index = 'idx_dive_profile_events_dive_id';
@@ -30,11 +31,17 @@ void main() {
     // An older reader stores a scope tombstone as an inert unknown entity
     // type and keeps the events it names for good (#1926), so readers below
     // this rung are held until they update.
-    expect(AppDatabase.minimumCompatibleSchemaVersion, 240);
+    // v275 raised the floor later (#3091); this rung did not move it.
+    expect(
+      AppDatabase.minimumCompatibleSchemaVersion,
+      greaterThanOrEqualTo(240),
+    );
   });
 
   test('a fresh database indexes profile events by dive', () async {
-    final db = AppDatabase(NativeDatabase.memory());
+    final db = AppDatabase(
+      NativeDatabase.memory(setup: registerAppSqlFunctions),
+    );
     addTearDown(db.close);
 
     expect(await _hasIndex(db), isTrue);

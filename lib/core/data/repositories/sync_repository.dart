@@ -17,7 +17,7 @@ import 'package:submersion/core/services/sync/sync_clock.dart';
 enum SyncStatus { synced, pending, conflict }
 
 /// Cloud provider types
-enum CloudProviderType { icloud, googledrive, s3, dropbox }
+enum CloudProviderType { icloud, googledrive, s3, dropbox, webdav }
 
 /// Repository for managing sync metadata and tracking
 class SyncRepository {
@@ -126,6 +126,8 @@ class SyncRepository {
     'dives': (table: 'dives', pk: 'id'),
     'diveSites': (table: 'dive_sites', pk: 'id'),
     'certifications': (table: 'certifications', pk: 'id'),
+    'documents': (table: 'documents', pk: 'id'),
+    'documentPages': (table: 'document_pages', pk: 'id'),
     'serviceRecords': (table: 'service_records', pk: 'id'),
     'serviceKinds': (table: 'service_kinds', pk: 'id'),
     // Editing a schedule never touches the parent equipment row, so a
@@ -178,6 +180,7 @@ class SyncRepository {
     'courseRequirementDives': (table: 'course_requirement_dives', pk: 'id'),
     'diveTags': (table: 'dive_tags', pk: 'id'),
     'diveDiveTypes': (table: 'dive_dive_types', pk: 'id'),
+    'diveCourses': (table: 'dive_courses', pk: 'id'),
     'weightPresetEntries': (table: 'weight_preset_entries', pk: 'id'),
     'diveCenterGearNotes': (table: 'dive_center_gear_notes', pk: 'id'),
     'tideRecords': (table: 'tide_records', pk: 'id'),
@@ -192,6 +195,8 @@ class SyncRepository {
     'equipmentTags': (table: 'equipment_tags', pk: 'id'),
     'equipmentShares': (table: 'equipment_shares', pk: 'id'),
     'tripEquipment': (table: 'trip_equipment', pk: 'id'),
+    'diveComputerConnections': (table: 'dive_computer_connections', pk: 'id'),
+    'sharedLibraryMemberships': (table: 'shared_library_memberships', pk: 'id'),
     'tripHides': (table: 'trip_hides', pk: 'id'),
     'siteHides': (table: 'site_hides', pk: 'id'),
     'equipmentOwnershipEvents': (table: 'equipment_ownership_events', pk: 'id'),

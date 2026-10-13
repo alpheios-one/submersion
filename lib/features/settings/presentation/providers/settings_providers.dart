@@ -24,6 +24,10 @@ import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_finding.dart';
 import 'package:submersion/features/insights/domain/observations/observation_rule_id.dart';
+import 'package:submersion/features/insights/domain/trend_gap_threshold.dart';
+import 'package:submersion/features/equipment/domain/models/equipment_default_view.dart';
+import 'package:submersion/features/dive_log/presentation/profile_colors/profile_metric.dart';
+import 'package:submersion/features/dive_log/presentation/profile_colors/profile_metric_color_overrides.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/gas_model.dart';
@@ -74,6 +78,10 @@ class SettingsKeys {
   /// Device-local: whether media grids draw a provenance badge on every
   /// thumbnail. Health badges are not covered by it.
   static const String mediaProvenanceBadges = 'media_provenance_badges';
+
+  /// Device-local: whether the fullscreen viewers fill the window or take
+  /// the desktop window into OS fullscreen.
+  static const String viewerFullscreenMode = 'viewer_fullscreen_mode';
   static const String defaultDiveType = 'default_dive_type';
   static const String defaultTankVolume = 'default_tank_volume';
   static const String defaultStartPressure = 'default_start_pressure';
@@ -212,7 +220,9 @@ class AppSettings {
   final String placeNameLanguage;
   final String defaultDiveType;
   final double defaultTankVolume;
-  final int defaultStartPressure;
+
+  /// Bar, as a decimal so a value entered in psi keeps its value (#3091).
+  final double defaultStartPressure;
   final String? defaultTankPreset;
   final bool applyDefaultTankToImports;
 
@@ -290,6 +300,17 @@ class AppSettings {
   /// are kept so a save never drops them.
   final Set<String> insightsMutedObservationRules;
 
+  /// Stretches with no dives longer than this collapse into a break on the
+  /// trend charts (issue #3251).
+  final TrendGapThreshold trendGapThreshold;
+
+  /// The statuses the Equipment list shows with no filter set (issue
+  /// #2628). Never empty.
+  final Set<EquipmentStatus> equipmentDefaultStatuses;
+
+  /// The profile-chart metric colours this diver chose (issue #3012).
+  final ProfileMetricColorOverrides profileMetricColors;
+
   /// Bundled chamber ids hidden from the emergency card
   final Set<String> hiddenChamberIds;
 
@@ -321,6 +342,9 @@ class AppSettings {
 
   /// END limit in meters for MND calculations (typically 30)
   final double endLimit;
+
+  /// Whether the ICD calculator warns on isobaric counterdiffusion risk.
+  final bool icdWarningsEnabled;
 
   /// Default data source for NDL metric (computer or calculated)
   final MetricDataSource defaultNdlSource;
@@ -586,6 +610,13 @@ class AppSettings {
   /// uses the automatically computed value. Per-diver, so it syncs.
   final Map<String, double> seascapeVerticalExaggerationOverrides;
 
+  /// Whether this diver has confirmed the planning safety disclaimer (issue
+  /// #3120): a one-time, non-dismissible acknowledgement that the Planning
+  /// and Gas Calculators tools are for planning only and do not replace dive
+  /// training or a dive computer. Per-diver, so it syncs; a new diver on the
+  /// same account must confirm it again.
+  final bool hasAcceptedPlanningDisclaimer;
+
   const AppSettings({
     this.depthUnit = DepthUnit.meters,
     this.temperatureUnit = TemperatureUnit.celsius,
@@ -614,7 +645,7 @@ class AppSettings {
     this.placeNameLanguage = PlaceNameLanguage.defaultCode,
     this.defaultDiveType = 'recreational',
     this.defaultTankVolume = 12.0,
-    this.defaultStartPressure = 200,
+    this.defaultStartPressure = 200.0,
     this.defaultTankPreset = 'al80',
     this.applyDefaultTankToImports = false,
     this.hiddenTankPresetIds = const {},
@@ -641,6 +672,9 @@ class AppSettings {
     this.conditionEngineEnabled = true,
     this.conditionDisabledRules = const {},
     this.insightsMutedObservationRules = const {},
+    this.trendGapThreshold = TrendGapThreshold.year1,
+    this.equipmentDefaultStatuses = factoryDefaultEquipmentStatuses,
+    this.profileMetricColors = ProfileMetricColorOverrides.none,
     this.hiddenChamberIds = const {},
     this.emergencyRegion,
     this.showAscentRateColors = false,
@@ -651,6 +685,7 @@ class AppSettings {
     this.ascentGasSet = AscentGasSet.allCarried,
     this.o2Narcotic = true,
     this.endLimit = 30.0,
+    this.icdWarningsEnabled = true,
     this.defaultNdlSource = MetricDataSource.computer,
     this.defaultDecoStopSource = MetricDataSource.computer,
     this.defaultTtsSource = MetricDataSource.computer,
@@ -739,6 +774,7 @@ class AppSettings {
     this.perdixOverlayY,
     this.seascapeAppearance = const SeascapeAppearance(),
     this.seascapeVerticalExaggerationOverrides = const {},
+    this.hasAcceptedPlanningDisclaimer = false,
   });
 
   /// Compute the current unit preset based on actual unit values
@@ -804,7 +840,7 @@ class AppSettings {
     String? placeNameLanguage,
     String? defaultDiveType,
     double? defaultTankVolume,
-    int? defaultStartPressure,
+    double? defaultStartPressure,
     String? defaultTankPreset,
     bool clearDefaultTankPreset = false,
     bool? applyDefaultTankToImports,
@@ -831,6 +867,9 @@ class AppSettings {
     bool? conditionEngineEnabled,
     Set<String>? conditionDisabledRules,
     Set<String>? insightsMutedObservationRules,
+    TrendGapThreshold? trendGapThreshold,
+    Set<EquipmentStatus>? equipmentDefaultStatuses,
+    ProfileMetricColorOverrides? profileMetricColors,
     Set<String>? hiddenChamberIds,
     String? emergencyRegion,
     bool clearEmergencyRegion = false,
@@ -842,6 +881,7 @@ class AppSettings {
     AscentGasSet? ascentGasSet,
     bool? o2Narcotic,
     double? endLimit,
+    bool? icdWarningsEnabled,
     MetricDataSource? defaultNdlSource,
     MetricDataSource? defaultDecoStopSource,
     MetricDataSource? defaultTtsSource,
@@ -929,6 +969,7 @@ class AppSettings {
     double? perdixOverlayY,
     SeascapeAppearance? seascapeAppearance,
     Map<String, double>? seascapeVerticalExaggerationOverrides,
+    bool? hasAcceptedPlanningDisclaimer,
   }) {
     return AppSettings(
       depthUnit: depthUnit ?? this.depthUnit,
@@ -998,6 +1039,10 @@ class AppSettings {
           conditionDisabledRules ?? this.conditionDisabledRules,
       insightsMutedObservationRules:
           insightsMutedObservationRules ?? this.insightsMutedObservationRules,
+      trendGapThreshold: trendGapThreshold ?? this.trendGapThreshold,
+      equipmentDefaultStatuses:
+          equipmentDefaultStatuses ?? this.equipmentDefaultStatuses,
+      profileMetricColors: profileMetricColors ?? this.profileMetricColors,
       hiddenChamberIds: hiddenChamberIds ?? this.hiddenChamberIds,
       emergencyRegion: clearEmergencyRegion
           ? null
@@ -1010,6 +1055,7 @@ class AppSettings {
       ascentGasSet: ascentGasSet ?? this.ascentGasSet,
       o2Narcotic: o2Narcotic ?? this.o2Narcotic,
       endLimit: endLimit ?? this.endLimit,
+      icdWarningsEnabled: icdWarningsEnabled ?? this.icdWarningsEnabled,
       defaultNdlSource: defaultNdlSource ?? this.defaultNdlSource,
       defaultDecoStopSource:
           defaultDecoStopSource ?? this.defaultDecoStopSource,
@@ -1129,6 +1175,8 @@ class AppSettings {
       seascapeVerticalExaggerationOverrides:
           seascapeVerticalExaggerationOverrides ??
           this.seascapeVerticalExaggerationOverrides,
+      hasAcceptedPlanningDisclaimer:
+          hasAcceptedPlanningDisclaimer ?? this.hasAcceptedPlanningDisclaimer,
     );
   }
 
@@ -1861,8 +1909,20 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
-  Future<void> setDefaultStartPressure(int pressure) async {
-    state = state.copyWith(defaultStartPressure: pressure);
+  /// Lowest and highest default start pressure, in bar.
+  static const double defaultStartPressureMin = 1;
+  static const double defaultStartPressureMax = 400;
+
+  /// Bar. Clamped to [defaultStartPressureMin]..[defaultStartPressureMax];
+  /// a non-finite value is ignored.
+  Future<void> setDefaultStartPressure(double pressure) async {
+    if (!pressure.isFinite) return;
+    state = state.copyWith(
+      defaultStartPressure: pressure.clamp(
+        defaultStartPressureMin,
+        defaultStartPressureMax,
+      ),
+    );
     await _saveSettings();
   }
 
@@ -2029,15 +2089,29 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
-  Future<void> setAscentRateWarning(double value) async {
-    final clamped = value.clamp(3.0, 18.0);
-    state = state.copyWith(ascentRateWarning: clamped);
-    await _saveSettings();
-  }
+  /// Lowest and highest warning ascent rate, in m/min.
+  static const double ascentRateWarningMin = 3.0;
+  static const double ascentRateWarningMax = 18.0;
 
-  Future<void> setAscentRateCritical(double value) async {
-    final clamped = value.clamp(6.0, 20.0);
-    state = state.copyWith(ascentRateCritical: clamped);
+  /// Lowest and highest critical ascent rate, in m/min.
+  static const double ascentRateCriticalMin = 6.0;
+  static const double ascentRateCriticalMax = 20.0;
+
+  /// Sets the profile's ascent-rate colour thresholds together, in m/min.
+  ///
+  /// One call rather than one per threshold because the pair has to stay
+  /// ordered: a critical rate below the warning rate would leave the orange
+  /// band empty. Critical is raised to warning when it falls below it.
+  Future<void> setAscentRateThresholds({
+    required double warning,
+    required double critical,
+  }) async {
+    final w = warning.clamp(ascentRateWarningMin, ascentRateWarningMax);
+    final c = critical.clamp(ascentRateCriticalMin, ascentRateCriticalMax);
+    state = state.copyWith(
+      ascentRateWarning: w,
+      ascentRateCritical: c < w ? w : c,
+    );
     await _saveSettings();
   }
 
@@ -2224,6 +2298,91 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  /// Waits for the diver's settings to load first, as [setAutoTagImports]
+  /// does (#998): a pick from a chart's Range menu while the app is still
+  /// loading would otherwise be overwritten by the load.
+  Future<void> setTrendGapThreshold(TrendGapThreshold value) async {
+    try {
+      await settingsLoaded;
+    } catch (_) {
+      // Already logged by the load; defaults are the fallback.
+    }
+    if (!mounted) return;
+    state = state.copyWith(trendGapThreshold: value);
+    await _saveSettings();
+  }
+
+  /// The default equipment view (issue #2628). Waits for the load like
+  /// [setTrendGapThreshold], so a pick made first is not overwritten. An
+  /// empty set is ignored: the default view always shows something.
+  Future<void> setEquipmentDefaultStatuses(Set<EquipmentStatus> value) async {
+    if (value.isEmpty) return;
+    try {
+      await settingsLoaded;
+    } catch (_) {
+      // Already logged by the load; defaults are the fallback.
+    }
+    if (!mounted) return;
+    state = state.copyWith(equipmentDefaultStatuses: Set.unmodifiable(value));
+    await _saveSettings();
+  }
+
+  /// Adds [status] to, or removes it from, the default equipment view
+  /// (issue #2628). Applied to the settings as they stand after the load, so
+  /// several checklist taps in flight together each land. Removing the last
+  /// status is ignored: the default view always shows something.
+  Future<void> setEquipmentDefaultStatusIncluded(
+    EquipmentStatus status,
+    bool included,
+  ) async {
+    try {
+      await settingsLoaded;
+    } catch (_) {
+      // Already logged by the load; defaults are the fallback.
+    }
+    if (!mounted) return;
+    final current = state.equipmentDefaultStatuses;
+    final next = included ? {...current, status} : current.difference({status});
+    if (next.isEmpty) return;
+    state = state.copyWith(equipmentDefaultStatuses: Set.unmodifiable(next));
+    await _saveSettings();
+  }
+
+  /// [metric] takes [color] (null: its default, or Auto), swapping with any
+  /// metric already showing it (issue #3012). Waits for the load first, as
+  /// [setTrendGapThreshold] does, so an early pick is not overwritten.
+  Future<void> setProfileMetricColor(ProfileMetric metric, Color? color) async {
+    try {
+      await settingsLoaded;
+    } catch (_) {
+      // Already logged by the load; defaults are the fallback.
+    }
+    if (!mounted) return;
+    state = state.copyWith(
+      profileMetricColors: state.profileMetricColors.withColor(metric, color),
+    );
+    await _saveSettings();
+  }
+
+  /// Every profile metric back to its default colour.
+  Future<void> resetProfileMetricColors() async {
+    try {
+      await settingsLoaded;
+    } catch (_) {
+      // Already logged by the load; defaults are the fallback.
+    }
+    if (!mounted) return;
+    state = state.copyWith(
+      profileMetricColors: ProfileMetricColorOverrides.none,
+    );
+    await _saveSettings();
+  }
+
+  Future<void> setIcdWarningsEnabled(bool value) async {
+    state = state.copyWith(icdWarningsEnabled: value);
+    await _saveSettings();
+  }
+
   Future<void> setAscentGasSet(AscentGasSet value) async {
     state = state.copyWith(ascentGasSet: value);
     await _saveSettings();
@@ -2289,7 +2448,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   /// Waits for [settingsLoaded] first: until the diver's row lands, [state]
   /// holds the defaults (or, after a diver switch, the previous diver's
-  /// settings), and a switch flipped on the tag management screen in that
+  /// settings), and a switch flipped in Settings > Data > Import in that
   /// window would be overwritten when the load replaces [state], silently
   /// undoing the diver's choice (issues #998, #2564). A failed load is
   /// already logged by the constructor and leaves the defaults in place,
@@ -2578,6 +2737,13 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setShowDiveFigure(bool value) async {
     state = state.copyWith(showDiveFigure: value);
+    await _saveSettings();
+  }
+
+  /// Records that this diver has confirmed the planning safety disclaimer
+  /// (issue #3120). Never set back to false from the app.
+  Future<void> acceptPlanningDisclaimer() async {
+    state = state.copyWith(hasAcceptedPlanningDisclaimer: true);
     await _saveSettings();
   }
 
@@ -3079,6 +3245,16 @@ final defaultShowGasSwitchMarkersProvider = Provider<bool>((ref) {
   return ref.watch(
     settingsProvider.select((s) => s.defaultShowGasSwitchMarkers),
   );
+});
+
+/// The active diver's gap threshold for every `DiveTrendChart`.
+final trendGapThresholdProvider = Provider<TrendGapThreshold>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.trendGapThreshold));
+});
+
+/// The diver's default equipment view (issue #2628).
+final equipmentDefaultStatusesProvider = Provider<Set<EquipmentStatus>>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.equipmentDefaultStatuses));
 });
 
 final defaultShowLateGasSwitchesProvider = Provider<bool>((ref) {

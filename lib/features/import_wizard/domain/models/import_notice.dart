@@ -58,6 +58,15 @@ enum ImportNoticeKind {
   /// [ImportNotice.count] is the number of photos.
   photosSkipped,
 
+  /// Pictures stored inside a logbook file that Submersion has nowhere to
+  /// keep, such as gear photos and site maps. [ImportNotice.count] is the
+  /// number of pictures.
+  logbookImagesNotImported,
+
+  /// Trips with no dates and no dated dives, so they could not be saved.
+  /// [ImportNotice.names] lists the trips.
+  tripsNotImported,
+
   /// A MacDive XML file carries no certifications or equipment service
   /// records, because MacDive leaves both out of its XML export.
   macdiveXmlOmitsCertsAndService,
@@ -126,6 +135,8 @@ enum ImportNoticeKind {
     columnsNotImported ||
     valuesNotConverted ||
     photosSkipped ||
+    logbookImagesNotImported ||
+    tripsNotImported ||
     macdiveXmlOmitsCertsAndService ||
     macdiveLogbooksNotImported ||
     gearUnavailable ||

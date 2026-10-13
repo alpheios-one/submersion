@@ -5,10 +5,12 @@ import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/features/courses/data/dive_course_links.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_source_links.dart';
+import 'package:submersion/features/dive_log/data/services/dive_consolidation_field_fill.dart';
 import 'package:submersion/features/dive_log/data/services/dive_merge_snapshot.dart';
 import 'package:submersion/features/dive_log/domain/services/dive_consolidation_builder.dart';
 import 'package:submersion/features/dive_log/domain/services/profile_alignment.dart';
@@ -16,6 +18,8 @@ import 'package:submersion/features/dive_log/domain/services/unreadable_series_e
 import 'package:submersion/features/dive_log/domain/entities/tank_shared_computers.dart';
 import 'package:submersion/features/dive_roles/data/repositories/dive_role_link_repository.dart';
 import 'package:submersion/features/dive_roles/domain/services/dive_role_set.dart';
+import 'package:submersion/features/documents/data/repositories/document_repository.dart';
+import 'package:submersion/features/documents/domain/entities/document.dart';
 
 /// Result of a successful consolidation: the target dive id plus the
 /// pre-consolidation snapshot needed to undo it.
@@ -436,6 +440,7 @@ class DiveConsolidationService {
             computerId: s.computerId ?? secRow.computerId,
             sourceId: sourceIdMap[s.sourceId] ?? sourceIdMap[null],
             isPrimary: false,
+            activatedAt: Value(s.activatedAt),
             samples: [for (final p in s.samples) p.shiftedBy(offset)],
             now: now,
           );
@@ -528,6 +533,11 @@ class DiveConsolidationService {
             localUpdatedAt: now,
           );
         }
+
+        // Documents follow the media to the target (issue #2613).
+        await DocumentRepository().reassignOwner(DocumentOwnerKind.dive, [
+          secondary.id,
+        ], targetDiveId);
 
         // Media re-pointed to the target BEFORE the secondary is deleted
         // (FK is setNull).
@@ -668,6 +678,17 @@ class DiveConsolidationService {
           );
         }
 
+        // Courses: union onto the target, which keeps its representative
+        // unless a secondary course starts earlier (#2515).
+        await DiveCourseLinks(_db, _sync).addCourses(
+          [targetDiveId],
+          [
+            for (final r in snapshot.diveCourseRows)
+              if (r.diveId == secondary.id) r.courseId,
+          ],
+          now: now,
+        );
+
         // Sightings: union by speciesId -- the same species seen by both
         // computers is one sighting; keep the target's row, add
         // secondary-only species.
@@ -739,44 +760,18 @@ class DiveConsolidationService {
         }
       }
 
-      // Entry/exit GPS fixes live as scalar columns on the dives row, not as
-      // re-parented child rows, so a secondary's coordinates would be lost
-      // when it is tombstoned below. Adopt them onto the target when the
-      // target has none of its own -- target wins, the same "fill the gap"
-      // rule already applied to weights above and to DiveMergeBuilder's
-      // _firstNonNull(entryLocation) on the sequential-combine path. Without
-      // this, consolidating a dive whose only surface fix came from a
-      // secondary computer drops the coordinates and the detail-page map --
-      // gated on entry/exit/site location -- disappears (#542).
-      final entryFill = plan.primary.entryLocation == null
-          ? plan.secondaries
-                .map((s) => s.entryLocation)
-                .firstWhere((l) => l != null, orElse: () => null)
-          : null;
-      final exitFill = plan.primary.exitLocation == null
-          ? plan.secondaries
-                .map((s) => s.exitLocation)
-                .firstWhere((l) => l != null, orElse: () => null)
-          : null;
-
-      // The same rule for the site and the runtime. A dive logged without
-      // them, say by an earlier file import that dropped them, is repaired by
-      // re-importing the file and consolidating each dive into its
-      // duplicate (#1809).
-      final secondaryRows = [
+      // Scalar columns on the dives row are not re-parented like the child
+      // rows above, so whatever only a secondary recorded is lost when it is
+      // tombstoned below. The target adopts each value it lacks; target
+      // wins, the same "fill the gap" rule applied to weights above. This
+      // keeps a GPS fix from a secondary computer (#542), and repairs a dive
+      // an earlier file import logged without its site or runtime when the
+      // file is re-imported and consolidated (#1809). The column rules live
+      // in dive_consolidation_field_fill.dart (#2932).
+      final fieldFill = consolidationFieldFill(targetRow, [
         for (final secondary in plan.secondaries)
           snapshot.diveRows.firstWhere((r) => r.id == secondary.id),
-      ];
-      final siteFill = targetRow.siteId == null
-          ? secondaryRows
-                .map((r) => r.siteId)
-                .firstWhere((id) => id != null, orElse: () => null)
-          : null;
-      final runtimeFill = targetRow.runtime == null
-          ? secondaryRows
-                .map((r) => r.runtime)
-                .firstWhere((s) => s != null, orElse: () => null)
-          : null;
+      ], targetHasProfile: plan.primary.profile.isNotEmpty);
 
       // Every target cylinder nobody shares is marked as recorded, so the
       // open-time inference (backfillTankSharedComputers) never guesses for
@@ -807,25 +802,10 @@ class DiveConsolidationService {
       await (_db.update(
         _db.dives,
       )..where((t) => t.id.equals(targetDiveId))).write(
-        DivesCompanion(
-          updatedAt: Value(now),
-          entryLatitude: entryFill != null
-              ? Value(entryFill.latitude)
-              : const Value.absent(),
-          entryLongitude: entryFill != null
-              ? Value(entryFill.longitude)
-              : const Value.absent(),
-          exitLatitude: exitFill != null
-              ? Value(exitFill.latitude)
-              : const Value.absent(),
-          exitLongitude: exitFill != null
-              ? Value(exitFill.longitude)
-              : const Value.absent(),
-          siteId: siteFill != null ? Value(siteFill) : const Value.absent(),
-          runtime: runtimeFill != null
-              ? Value(runtimeFill)
-              : const Value.absent(),
-        ),
+        RawValuesInsertable<Dive>({
+          ...fieldFill,
+          _db.dives.updatedAt.name: Variable<int>(now),
+        }),
       );
       await _sync.markRecordPending(
         entityType: 'dives',
@@ -919,6 +899,7 @@ class DiveConsolidationService {
             '${r.diveId}|${r.equipmentId}',
         },
         'diveDiveTypes': {for (final r in snapshot.diveTypeRows) r.id},
+        'diveCourses': {for (final r in snapshot.diveCourseRows) r.id},
         'sightings': {for (final r in snapshot.sightingRows) r.id},
         'diveWeights': {for (final r in snapshot.weightRows) r.id},
         'diveCustomFields': {for (final r in snapshot.customFieldRows) r.id},
@@ -984,6 +965,12 @@ class DiveConsolidationService {
           )..where((t) => t.diveId.equals(mergedId))).get())
             r.id,
         ],
+        'diveCourses': [
+          for (final r in await (_db.select(
+            _db.diveCourses,
+          )..where((t) => t.diveId.equals(mergedId))).get())
+            r.id,
+        ],
         'sightings': [
           for (final r in await (_db.select(
             _db.sightings,
@@ -1032,6 +1019,7 @@ class DiveConsolidationService {
         );
         batch.deleteWhere(_db.diveEquipment, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.diveDiveTypes, (t) => t.diveId.equals(mergedId));
+        batch.deleteWhere(_db.diveCourses, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.diveTags, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.diveBuddies, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.sightings, (t) => t.diveId.equals(mergedId));
@@ -1176,6 +1164,16 @@ class DiveConsolidationService {
           localUpdatedAt: now,
         );
       }
+      for (final r in snapshot.diveCourseRows) {
+        await _db
+            .into(_db.diveCourses)
+            .insert(r.toCompanion(false), mode: InsertMode.insertOrReplace);
+        await _sync.markRecordPending(
+          entityType: 'diveCourses',
+          recordId: r.id,
+          localUpdatedAt: now,
+        );
+      }
       for (final r in snapshot.tagRows) {
         await _db
             .into(_db.diveTags)
@@ -1233,6 +1231,12 @@ class DiveConsolidationService {
           localUpdatedAt: now,
         );
       }
+
+      // File the documents under their restored dives again (#2613).
+      await DocumentRepository().restoreOwners(
+        DocumentOwnerKind.dive,
+        snapshot.documentDiveIds,
+      );
 
       // Restore media pointers.
       for (final entry in snapshot.mediaDiveIds.entries) {

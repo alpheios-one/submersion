@@ -1,9 +1,12 @@
+import 'package:submersion/features/dive_log/presentation/profile_colors/profile_metric.dart';
+import 'package:submersion/features/dive_log/presentation/profile_colors/profile_metric_color_overrides.dart';
 import 'package:flutter/material.dart' hide Visibility;
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 // ignore: implementation_imports
 import 'package:riverpod/src/framework.dart' as riverpod show Override;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:submersion/features/insights/domain/trend_gap_threshold.dart';
 import 'package:submersion/core/built_ins/built_in_catalog.dart';
 import 'package:submersion/features/cylinder_passports/presentation/providers/cylinder_passport_providers.dart';
 import 'package:submersion/features/cylinder_passports/data/services/nfc_tag_service.dart';
@@ -46,6 +49,10 @@ import 'package:submersion/features/trips/domain/entities/trip_day_weather.dart'
 import 'package:submersion/features/trips/presentation/providers/trip_day_weather_providers.dart';
 import 'package:submersion/features/weather/presentation/providers/weather_providers.dart';
 import 'package:submersion/core/constants/o2_cell_unit.dart';
+import 'package:submersion/features/documents/domain/entities/document.dart';
+import 'package:submersion/features/documents/presentation/providers/document_providers.dart';
+import 'package:submersion/features/safety/domain/entities/incident.dart';
+import 'package:submersion/features/safety/presentation/providers/incident_providers.dart';
 
 typedef Override = riverpod.Override;
 
@@ -165,7 +172,7 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setDefaultTankVolume(double volume) async =>
       state = state.copyWith(defaultTankVolume: volume);
   @override
-  Future<void> setDefaultStartPressure(int pressure) async =>
+  Future<void> setDefaultStartPressure(double pressure) async =>
       state = state.copyWith(defaultStartPressure: pressure);
   @override
   Future<void> setDefaultTankPreset(String? presetName) async =>
@@ -240,11 +247,13 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setCnsWarningThreshold(int value) async =>
       state = state.copyWith(cnsWarningThreshold: value);
   @override
-  Future<void> setAscentRateWarning(double value) async =>
-      state = state.copyWith(ascentRateWarning: value);
-  @override
-  Future<void> setAscentRateCritical(double value) async =>
-      state = state.copyWith(ascentRateCritical: value);
+  Future<void> setAscentRateThresholds({
+    required double warning,
+    required double critical,
+  }) async => state = state.copyWith(
+    ascentRateWarning: warning,
+    ascentRateCritical: critical,
+  );
   @override
   Future<void> setShowCeilingOnProfile(bool value) async =>
       state = state.copyWith(showCeilingOnProfile: value);
@@ -378,6 +387,41 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setEndLimit(double value) async =>
       state = state.copyWith(endLimit: value);
+  @override
+  Future<void> setTrendGapThreshold(TrendGapThreshold value) async =>
+      state = state.copyWith(trendGapThreshold: value);
+  @override
+  Future<void> setEquipmentDefaultStatuses(Set<EquipmentStatus> value) async {
+    if (value.isEmpty) return;
+    state = state.copyWith(equipmentDefaultStatuses: value);
+  }
+
+  @override
+  Future<void> setEquipmentDefaultStatusIncluded(
+    EquipmentStatus status,
+    bool included,
+  ) async {
+    final current = state.equipmentDefaultStatuses;
+    final next = included ? {...current, status} : current.difference({status});
+    if (next.isNotEmpty) {
+      state = state.copyWith(equipmentDefaultStatuses: next);
+    }
+  }
+
+  @override
+  Future<void> setProfileMetricColor(
+    ProfileMetric metric,
+    Color? color,
+  ) async => state = state.copyWith(
+    profileMetricColors: state.profileMetricColors.withColor(metric, color),
+  );
+  @override
+  Future<void> resetProfileMetricColors() async => state = state.copyWith(
+    profileMetricColors: ProfileMetricColorOverrides.none,
+  );
+  @override
+  Future<void> setIcdWarningsEnabled(bool value) async =>
+      state = state.copyWith(icdWarningsEnabled: value);
   @override
   Future<void> setAscentGasSet(AscentGasSet value) async =>
       state = state.copyWith(ascentGasSet: value);
@@ -646,6 +690,9 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setShowDiveFigure(bool value) async =>
       state = state.copyWith(showDiveFigure: value);
   @override
+  Future<void> acceptPlanningDisclaimer() async =>
+      state = state.copyWith(hasAcceptedPlanningDisclaimer: true);
+  @override
   Future<void> setShowProfilePanelInTableView(bool value) async =>
       state = state.copyWith(showProfilePanelInTableView: value);
   @override
@@ -748,6 +795,8 @@ Future<List<Override>> getBaseOverrides({
   NavTrack? primaryNavTrack,
   IncomingLinkSource? incomingLinks,
   NfcTagService? nfcTagService,
+  List<Document> ownerDocuments = const [],
+  List<Incident> incidents = const [],
 }) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
@@ -755,7 +804,16 @@ Future<List<Override>> getBaseOverrides({
   return [
     sharedPreferencesProvider.overrideWithValue(prefs),
     settingsProvider.overrideWith(
-      (ref) => settingsNotifier ?? MockSettingsNotifier(),
+      (ref) =>
+          settingsNotifier ??
+          // Pre-accepted by default: most widget tests have nothing to do
+          // with the planning disclaimer (issue #3120), and its modal
+          // dialog would otherwise pop up unasked and block taps on
+          // whatever the test is actually exercising. A test for the
+          // disclaimer itself passes its own [settingsNotifier].
+          MockSettingsNotifier(
+            const AppSettings(hasAcceptedPlanningDisclaimer: true),
+          ),
     ),
     // Widget tests of the app root must never reach the app_links channel.
     incomingLinkSourceProvider.overrideWithValue(
@@ -789,6 +847,15 @@ Future<List<Override>> getBaseOverrides({
     primaryNavTrackForDiveProvider.overrideWith(
       (ref, diveId) async => primaryNavTrack,
     ),
+    // Every owner detail page shows a Documents section (issue #2613); it
+    // reaches the real repository and a database widget tests do not have.
+    documentsForOwnerProvider.overrideWith(
+      (ref, owner) async => ownerDocuments,
+    ),
+    // The Diver Profile hub counts the active diver's near-miss log entries
+    // (issue #3061); without this it reaches the real repository and a
+    // database that widget tests do not have.
+    incidentsProvider.overrideWith((ref) async => incidents),
     // Weather/elevation lookups must never hit the network in widget tests;
     // the default stub fails fast so altitude auto-fill resolves to null.
     weatherHttpClientProvider.overrideWithValue(

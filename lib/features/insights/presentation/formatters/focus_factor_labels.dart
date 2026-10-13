@@ -68,7 +68,12 @@ String focusNumericDifference(
   if (id == FocusFactorId.waterTemp) {
     return '$sign${units.formatTemperatureDelta(magnitude)}';
   }
-  return '$sign${focusNumericValue(id, magnitude, units, l10n)}';
+  // An imperial tank size with no working pressure is an estimate the
+  // formatter marks with a leading "~"; keep it ahead of the sign so the
+  // difference reads "~+6 cuft", not "+~6 cuft" (issue #3018).
+  final value = focusNumericValue(id, magnitude, units, l10n);
+  if (value.startsWith('~')) return '~$sign${value.substring(1)}';
+  return '$sign$value';
 }
 
 /// Display text for one category value, from the stable key the repository
@@ -135,4 +140,48 @@ String focusCategoryLabel(
         FocusFactorId.weight:
       return key;
   }
+}
+
+/// The word after a numeric finding's size: "2.1 m shallower".
+String focusDirectionWord(
+  FocusFactorId id,
+  double difference,
+  AppLocalizations l10n,
+) {
+  final up = difference >= 0;
+  return switch (id) {
+    FocusFactorId.maxDepth || FocusFactorId.avgDepth =>
+      up
+          ? l10n.insights_focus_direction_deeper
+          : l10n.insights_focus_direction_shallower,
+    FocusFactorId.duration =>
+      up
+          ? l10n.insights_focus_direction_longer
+          : l10n.insights_focus_direction_shorter,
+    FocusFactorId.waterTemp =>
+      up
+          ? l10n.insights_focus_direction_warmer
+          : l10n.insights_focus_direction_colder,
+    FocusFactorId.tankVolume =>
+      up
+          ? l10n.insights_focus_direction_larger
+          : l10n.insights_focus_direction_smaller,
+    FocusFactorId.weight =>
+      up
+          ? l10n.insights_focus_direction_moreLead
+          : l10n.insights_focus_direction_lessLead,
+    _ => '',
+  };
+}
+
+/// An unsigned difference in display units, for a sentence that carries the
+/// direction as a word.
+String focusNumericMagnitude(
+  FocusFactorId id,
+  double difference,
+  UnitFormatter units,
+  AppLocalizations l10n,
+) {
+  final signed = focusNumericDifference(id, difference, units, l10n);
+  return signed.replaceFirstMapped(RegExp(r'^(~?)[+-]'), (m) => m.group(1)!);
 }

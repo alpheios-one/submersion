@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/settings/presentation/conflicts/conflict_enum_labels_settings.dart';
 import 'package:submersion/features/settings/presentation/conflicts/conflict_field.dart';
 import 'package:submersion/features/settings/presentation/conflicts/conflict_field_format.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -65,8 +66,19 @@ void main() {
     });
 
     test('renders a stored duration as hours and minutes', () {
-      expect(fmt(metric, FieldKind.durationSeconds, 2700), '45min');
+      expect(fmt(metric, FieldKind.durationSeconds, 2700), '45 min');
       expect(fmt(metric, FieldKind.durationSeconds, 4500), '1h 15m');
+    });
+
+    test('renders a long duration in days, then years', () {
+      expect(fmt(metric, FieldKind.durationMinutes, 3000), '2d 2h 0m');
+      expect(fmt(metric, FieldKind.durationMinutes, 576000), '1y 35d 0h');
+    });
+
+    test('two long durations that differ by minutes still look different', () {
+      // Elsewhere both read "6d 13h"; this dialog exists to tell them apart.
+      expect(fmt(metric, FieldKind.durationMinutes, 9430), '6d 13h 10m');
+      expect(fmt(metric, FieldKind.durationMinutes, 9462), '6d 13h 42m');
     });
 
     test('keeps a sub-minute duration distinguishable', () {
@@ -75,6 +87,16 @@ void main() {
       expect(fmt(metric, FieldKind.durationSeconds, 30), '30s');
       expect(fmt(metric, FieldKind.durationSeconds, 45), '45s');
       expect(fmt(metric, FieldKind.durationSeconds, 0), '0s');
+    });
+
+    test('a career total stays in hours and minutes', () {
+      // Divers count logged time in hours underwater, never days.
+      expect(
+        fmt(metric, FieldKind.totalDurationSeconds, 1150 * 3600 + 30 * 60),
+        '1150h 30m',
+      );
+      expect(fmt(metric, FieldKind.totalDurationSeconds, 2700), '45 min');
+      expect(fmt(metric, FieldKind.totalDurationSeconds, 42), '42s');
     });
 
     test('a negative duration shows itself', () {
@@ -118,6 +140,10 @@ void main() {
     );
     expect(fmt(metric, FieldKind.heightCm, 180.0), metric.formatHeight(180.0));
     expect(fmt(metric, FieldKind.ascentRate, 9.0), metric.formatDepthRate(9.0));
+    expect(
+      fmt(imperial, FieldKind.tideRate, 0.3048),
+      imperial.formatTideRate(0.3048),
+    );
     expect(
       fmt(metric, FieldKind.distance, 850.0),
       metric.formatDistance(850.0),
@@ -171,6 +197,18 @@ void main() {
       );
     },
   );
+
+  test('an enum stored as an integer goes through the labeler too', () {
+    // diver_settings.trend_gap_collapse_months syncs as an int (#3251).
+    expect(
+      fmt(metric, FieldKind.enumValue, 12, enumLabel: trendGapThresholdLabeler),
+      '1 year',
+    );
+    expect(
+      fmt(metric, FieldKind.enumValue, 7, enumLabel: trendGapThresholdLabeler),
+      '7',
+    );
+  });
 
   test('opaque payloads never print raw', () {
     expect(fmt(metric, FieldKind.opaque, '{"a":1}'), 'Changed');

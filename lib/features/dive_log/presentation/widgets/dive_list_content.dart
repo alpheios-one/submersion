@@ -4,13 +4,14 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:submersion/core/router/section_navigation.dart';
+import 'package:submersion/core/router/pushed_route.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/search/dive_search_action.dart';
 import 'package:submersion/core/services/export/csv/codec/csv_export_units.dart';
 import 'package:submersion/core/services/export/uddf/uddf_dives_extras.dart';
 import 'package:submersion/core/services/export/uddf/uddf_source_fetch.dart';
 
 import 'package:submersion/core/constants/card_color.dart';
-import 'package:submersion/core/providers/async_value_extensions.dart';
 import 'package:submersion/core/constants/dive_field.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
@@ -31,11 +32,14 @@ import 'package:submersion/features/dive_log/presentation/providers/highlight_pr
 import 'package:submersion/features/dive_log/presentation/providers/view_config_providers.dart';
 import 'package:submersion/features/dive_log/presentation/helpers/dive_list_sections.dart';
 import 'package:submersion/features/dive_log/presentation/providers/trip_group_collapse_provider.dart';
+import 'package:submersion/features/dive_log/presentation/helpers/dive_list_nav_stops.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_list_item.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/trip_group_header.dart';
 import 'package:submersion/shared/widgets/export_destination_sheet.dart';
 import 'package:submersion/shared/widgets/list_view_mode_toggle.dart';
+import 'package:submersion/shared/widgets/master_detail/keyboard_list_navigator.dart';
 import 'package:submersion/shared/widgets/master_detail/map_view_toggle_button.dart';
+import 'package:submersion/shared/widgets/master_detail/master_detail_form_scope.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 import 'package:submersion/shared/widgets/sort_bottom_sheet.dart';
 import 'package:submersion/features/settings/presentation/providers/csv_unit_mode_provider.dart';
@@ -123,6 +127,11 @@ class DiveListContent extends ConsumerStatefulWidget {
   /// Whether to show the app bar. Set to false when used inside MasterDetailScaffold.
   final bool showAppBar;
 
+  /// Whether the compact header (shown when [showAppBar] is false) leads with
+  /// a back arrow. Set by a dive list pushed over the page that opened it
+  /// (#3292); a page that merely embeds the list owns its own way back.
+  final bool showBackButton;
+
   /// Optional floating action button to display when showAppBar is true.
   final Widget? floatingActionButton;
 
@@ -155,6 +164,7 @@ class DiveListContent extends ConsumerStatefulWidget {
     this.onItemSelected,
     this.selectedId,
     this.showAppBar = true,
+    this.showBackButton = false,
     this.floatingActionButton,
     this.onItemTapForMap,
     this.isMapMode = false,
@@ -848,14 +858,9 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       // query, rather than shipping an export that omits the team. UDDF loads
       // its participants separately, through its extras fetch.
       if (format == _BulkExportFormat.pdf || format == _BulkExportFormat.csv) {
-        final buddiesByDive = await ref
+        selectedDives = await ref
             .read(buddyRepositoryProvider)
-            .getBuddiesForDives(selectedDives.map((d) => d.id).toList());
-        if (buddiesByDive.isNotEmpty) {
-          selectedDives = selectedDives
-              .map((d) => d.copyWith(buddies: buddiesByDive[d.id] ?? const []))
-              .toList();
-        }
+            .withBuddies(selectedDives);
       }
       final exportService = ref.read(exportServiceProvider);
       final settings = ref.read(settingsProvider);
@@ -1028,7 +1033,15 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
   Future<BulkActionOutcome> _openBulkEdit() async {
     final ids = _selectedIds.toList();
     if (ids.isEmpty) return BulkActionOutcome.cancelled;
-    await context.pushNamed('bulkEditDives', extra: ids);
+    // A list pushed over another page (a site's dives, say) has the form
+    // come back to it on save; a go('/dives') would erase that page (#3292).
+    await context.pushNamed(
+      'bulkEditDives',
+      queryParameters: isPushedRoute(context)
+          ? const {'return': 'pop'}
+          : const {},
+      extra: ids,
+    );
     return BulkActionOutcome.completed;
   }
 
@@ -1142,10 +1155,15 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
 
     // Drop checked dives that fell out of the filtered, searched or sorted
     // list, so the count always matches what is on screen and a bulk action
-    // can never reach a dive the user cannot see. pruneTo is a no-op when
-    // nothing changed, which is what keeps this off a rebuild loop.
+    // can never reach a dive the user cannot see. pruneToSettled is a no-op
+    // when nothing changed, which is what keeps this off a rebuild loop.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && paginatedAsync.hasSettled) _selection.pruneTo(visibleIds);
+      if (mounted) {
+        _selection.pruneToSettled(
+          paginatedAsync,
+          (page) => page.dives.map((d) => d.id),
+        );
+      }
     });
 
     return SelectableListScope(
@@ -1413,7 +1431,12 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
           ),
           child: Row(
             children: [
-              const SizedBox(width: 8),
+              // A list pushed over the page that opened it (a site's dives,
+              // say) leads with the way back to that page (#3292).
+              if (widget.showBackButton)
+                const BackButton()
+              else
+                const SizedBox(width: 8),
               // Expanded, and no Spacer: the title must be the row's only
               // flexible child (see trip_list_content for the detail). This
               // bar was already right-aligned with a bare title plus Spacer,
@@ -1696,7 +1719,9 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     // Same pruning the list path does: drop checked dives that fell out of
     // the visible list, so the count always matches what is on screen.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && tableAsync.hasSettled) _selection.pruneTo(visibleIds);
+      if (mounted) {
+        _selection.pruneToSettled(tableAsync, (rows) => rows.map((d) => d.id));
+      }
     });
 
     // The scope carries Escape, Ctrl/Cmd-A and the Android back handling, and
@@ -1828,15 +1853,17 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     final diveTypeListVisibilityPredicate =
         watchDiveTypeListVisibilityPredicate(ref);
 
-    // Check if detailed mode needs full Dive objects for non-summary fields
-    final detailedConfig = ref.watch(detailedCardConfigProvider);
-    final needsFullDive =
-        detailedConfig.extraFields.any(
-          (f) => !DiveField.summaryFields.contains(f),
-        ) ||
-        detailedConfig.slots.any(
-          (s) => !DiveField.summaryFields.contains(s.field),
-        );
+    // Load full Dive objects when the active card shows a field DiveSummary
+    // does not carry. A compact slot can name any field too (#3229).
+    final cardConfig = ref.watch(
+      ref.watch(diveListViewModeProvider) == ListViewMode.compact
+          ? compactCardConfigProvider
+          : detailedCardConfigProvider,
+    );
+    final needsFullDive = [
+      for (final slot in cardConfig.slots) slot.field,
+      ...cardConfig.extraFields,
+    ].any((f) => !DiveField.summaryFields.contains(f));
     final Map<String, Dive> fullDiveLookup;
     if (needsFullDive) {
       final divesAsync = ref.watch(allDivesForTableProvider);
@@ -1873,6 +1900,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     // Taps, ranges and prev/next walk what the diver can actually see, so a
     // shift-range never sweeps up rows folded inside a collapsed trip.
     final visibleDives = visibleDivesOf(sections);
+    final navStops = diveListNavStops(sections);
 
     // One closure over every per-build value, shared by all the sliver
     // builders below. Hoisting these to fields would risk a row reading a
@@ -1886,7 +1914,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       // keeps the home Recent dives list in sync (#506). Nothing here varies
       // with grouping, which is what keeps a grouped card exactly as wide as
       // a loose one (#1193).
-      return DiveListItem(
+      final item = DiveListItem(
         summary: dive,
         diveTypeLabelResolver: diveTypeLabelResolver,
         diveTypeShortLabelResolver: diveTypeShortLabelResolver,
@@ -1905,6 +1933,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
         isHighlighted: isMasterSelected || isHighlighted,
         onTap: () => _handleRowTap(dive.id, visibleDives),
       );
+      return KeyboardListItem(navigationKey: dive.id, child: item);
     }
 
     Widget sliverForEntries(List<DiveListEntry> entries) {
@@ -1922,27 +1951,72 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       child: Column(
         children: [
           Expanded(
-            child: CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                if (ref.watch(diveListGroupingPausedBySortProvider))
-                  SliverToBoxAdapter(
-                    child: _buildGroupingPausedNotice(context),
+            child: KeyboardListNavigator(
+              keys: navStops.keys,
+              currentKey:
+                  widget.selectedId ?? ref.watch(highlightedDiveIdProvider),
+              onMove: (key) {
+                if (navStops.groupOfHeader(key) != null) return;
+                moveListCursor(
+                  context,
+                  canOpen: !_isSelectionMode && widget.onItemSelected != null,
+                  open: () => _handleRowTap(key, visibleDives),
+                  highlight: () =>
+                      ref.read(highlightedDiveIdProvider.notifier).state = key,
+                );
+              },
+              onActivate: (key) {
+                final tripId = navStops.groupOfHeader(key);
+                if (tripId != null) {
+                  ref.read(collapsedTripIdsProvider.notifier).toggle(tripId);
+                } else {
+                  _handleRowTap(key, visibleDives);
+                }
+              },
+              onExpand: (key) {
+                final tripId = navStops.groupOfHeader(key);
+                if (tripId != null && collapsedTripIds.contains(tripId)) {
+                  ref.read(collapsedTripIdsProvider.notifier).expand(tripId);
+                }
+              },
+              onCollapse: (key) {
+                final header = navStops.headerFor(key);
+                if (header == null) return null;
+                final tripId = navStops.groupOfHeader(header)!;
+                if (!collapsedTripIds.contains(tripId)) {
+                  ref.read(collapsedTripIdsProvider.notifier).collapseAll([
+                    tripId,
+                  ]);
+                }
+                return header;
+              },
+              child: CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  if (ref.watch(diveListGroupingPausedBySortProvider))
+                    SliverToBoxAdapter(
+                      child: _buildGroupingPausedNotice(context),
+                    ),
+                  for (final (index, section) in sections.indexed)
+                    if (section is TripSection)
+                      _buildTripSectionSliver(
+                        context,
+                        section,
+                        sliverForEntries,
+                        diveListTripHeaderKey(index, section.tripId),
+                      )
+                    else
+                      sliverForEntries(section.entries),
+                  if (showTrailingRow)
+                    SliverToBoxAdapter(
+                      child: _buildTrailingRow(context, paginatedState),
+                    ),
+                  // Clears the FAB, matching the old list's bottom padding.
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: _kListBottomSpacer),
                   ),
-                for (final section in sections)
-                  if (section is TripSection)
-                    _buildTripSectionSliver(context, section, sliverForEntries)
-                  else
-                    sliverForEntries(section.entries),
-                if (showTrailingRow)
-                  SliverToBoxAdapter(
-                    child: _buildTrailingRow(context, paginatedState),
-                  ),
-                // Clears the FAB, matching the old list's bottom padding.
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: _kListBottomSpacer),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -2072,6 +2146,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     BuildContext context,
     TripSection section,
     Widget Function(List<DiveListEntry>) sliverForEntries,
+    String navigationKey,
   ) {
     final scheme = Theme.of(context).colorScheme;
     final groupIds = section.entries.map((e) => e.dive.id).toList();
@@ -2109,6 +2184,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
                   .read(collapsedTripIdsProvider.notifier)
                   .toggle(section.tripId),
               onOpenTrip: () => context.push('/trips/${section.tripId}'),
+              navigationKey: navigationKey,
               isSelectionMode: _isSelectionMode,
               groupChecked: groupChecked,
               onGroupCheckedChanged: (_) {
@@ -2187,26 +2263,30 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 24),
-          FilledButton.icon(
-            onPressed: () => showAddDiveBottomSheet(
-              context: context,
-              onLogManually: () {
-                if (ResponsiveBreakpoints.isMasterDetail(context)) {
-                  final routerState = GoRouterState.of(context);
-                  context.go('${routerState.uri.path}?mode=new');
-                } else {
-                  context.push('/dives/new');
-                }
-              },
-              onPlanDive: () => context.push(
-                '/dives/new',
-                extra: const DivePrefill(isPlanned: true),
+          // Hidden beside an open form: it reads as the form's submit button
+          // but only reopens the create form (issue #3192).
+          if (!MasterDetailFormScope.isFormOpenOf(context)) ...[
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: () => showAddDiveBottomSheet(
+                context: context,
+                onLogManually: () {
+                  if (ResponsiveBreakpoints.isMasterDetail(context)) {
+                    final routerState = GoRouterState.of(context);
+                    context.goInPlace('${routerState.uri.path}?mode=new');
+                  } else {
+                    context.push('/dives/new');
+                  }
+                },
+                onPlanDive: () => context.push(
+                  '/dives/new',
+                  extra: const DivePrefill(isPlanned: true),
+                ),
               ),
+              icon: const Icon(Icons.add),
+              label: Text(context.l10n.diveLog_empty_logFirstDive),
             ),
-            icon: const Icon(Icons.add),
-            label: Text(context.l10n.diveLog_empty_logFirstDive),
-          ),
+          ],
         ],
       ),
     );

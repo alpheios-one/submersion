@@ -33,6 +33,8 @@ import 'package:submersion/features/safety/data/repositories/incident_repository
 import 'package:submersion/features/cylinder_passports/data/repositories/cylinder_fill_repository.dart';
 import 'package:submersion/features/transmitters/data/repositories/transmitter_repository.dart';
 import 'package:submersion/features/trips/data/repositories/trip_equipment_repository.dart';
+import 'package:submersion/features/documents/data/repositories/document_repository.dart';
+import 'package:submersion/features/documents/domain/entities/document.dart';
 
 /// One item's exposure as [EquipmentRepository.getItemExposure] wires it:
 /// its parent, its parts still fitted, whether it breathes a loop, and the
@@ -579,6 +581,11 @@ class EquipmentRepository {
       // same reasoning as SiteRepository's media cascade.
       await _cascadeMediaForEquipmentDeletion([id]);
       await _db.transaction(() async {
+        // Its documents go with it, tombstoned (issue #2613).
+        await DocumentRepository().deleteForOwner(
+          DocumentOwnerKind.equipment,
+          id,
+        );
         final schedules = await (_db.select(
           _db.serviceSchedules,
         )..where((t) => t.equipmentId.equals(id))).get();
@@ -1000,11 +1007,11 @@ class EquipmentRepository {
         SELECT DISTINCT e.* FROM equipment e
         LEFT JOIN equipment_tags et ON et.equipment_id = e.id
         LEFT JOIN tags t ON t.id = et.tag_id
-        WHERE (LOWER(e.name) LIKE ?
-           OR LOWER(e.brand) LIKE ?
-           OR LOWER(e.model) LIKE ?
-           OR LOWER(e.serial_number) LIKE ?
-           OR LOWER(t.name) LIKE ?)
+        WHERE (unicode_lower(e.name) LIKE ?
+           OR unicode_lower(e.brand) LIKE ?
+           OR unicode_lower(e.model) LIKE ?
+           OR unicode_lower(e.serial_number) LIKE ?
+           OR unicode_lower(t.name) LIKE ?)
         ${visibility.whereClause}
         ORDER BY e.is_active DESC, e.type ASC, e.name COLLATE NOCASE ASC
       ''', variables: variables).get();
@@ -1660,7 +1667,9 @@ class EquipmentRepository {
   /// The regulator last paired with a cylinder preset, for prefilling the
   /// tank editor: the newest dive whose tank of that preset names one.
   /// Operational, not descriptive: an excluded dive still tells us which
-  /// regulator the diver hangs on that cylinder.
+  /// regulator the diver hangs on that cylinder. Only a regulator still in
+  /// the kit, by the same test as [getActiveEquipment]: prefilling a new
+  /// tank with one since retired or sold would put it back in use (#3210).
   // stats-scope-exempt: editor prefill, not a statistic
   Future<String?> getLastRegulatorForPreset(String presetName) async {
     final rows = await _db
@@ -1669,11 +1678,19 @@ class EquipmentRepository {
       SELECT t.regulator_equipment_id AS reg
       FROM dive_tanks t
       JOIN dives d ON d.id = t.dive_id
-      WHERE t.preset_name = ?1 AND t.regulator_equipment_id IS NOT NULL
+      JOIN equipment e ON e.id = t.regulator_equipment_id
+      WHERE t.preset_name = ?1
+        AND e.is_active = 1
+        AND e.status NOT IN (?2, ?3, ?4)
       ORDER BY d.dive_date_time DESC
       LIMIT 1
     ''',
-          variables: [Variable.withString(presetName)],
+          variables: [
+            Variable.withString(presetName),
+            Variable.withString(EquipmentStatus.retired.name),
+            Variable.withString(EquipmentStatus.sold.name),
+            Variable.withString(EquipmentStatus.wanted.name),
+          ],
         )
         .get();
     return rows.isEmpty ? null : rows.first.data['reg'] as String?;

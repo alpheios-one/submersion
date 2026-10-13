@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/built_ins/built_in_catalog.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/data/visibility/shared_item_policy.dart';
+import 'package:submersion/core/services/shared_library/shared_library_models.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/providers/location_service_provider.dart';
 import 'package:submersion/core/services/geocoding/place_lookup.dart';
@@ -14,6 +15,7 @@ import 'package:latlong2/latlong.dart';
 
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/dive_sites/presentation/utils/suggestion_child_fields.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/environment_enum_display.dart';
 import 'package:submersion/features/settings/presentation/providers/hidden_built_ins_provider.dart';
@@ -45,6 +47,8 @@ import 'package:submersion/shared/widgets/forms/edit_form_scaffold.dart';
 import 'package:submersion/shared/widgets/shared_items/shared_item_dialogs.dart';
 import 'package:submersion/shared/widgets/forms/responsive_form_columns.dart';
 import 'package:submersion/shared/widgets/forms/number_input_validation.dart';
+import 'package:submersion/features/shared_library/presentation/providers/shared_library_providers.dart';
+import 'package:submersion/features/site_types/data/repositories/site_type_repository.dart';
 
 /// Seeds a depth field at the single decimal place it has always shown, and an
 /// altitude field at the whole units it has always shown, both in the active
@@ -70,6 +74,10 @@ class SiteEditPage extends ConsumerStatefulWidget {
   /// searched the site picker for (#1501).
   final String? initialName;
 
+  /// A reader's view of a club library site (issue #2567): Save becomes
+  /// Send and writes a suggestion instead of the site.
+  final bool suggest;
+
   const SiteEditPage({
     super.key,
     this.siteId,
@@ -80,6 +88,7 @@ class SiteEditPage extends ConsumerStatefulWidget {
     this.onDeleted,
     this.initialLocation,
     this.initialName,
+    this.suggest = false,
   }) : assert(
          siteId == null || mergeSiteIds == null,
          'siteId and mergeSiteIds are mutually exclusive',
@@ -136,6 +145,7 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
   bool _isInitialized = false;
   bool _hasChanges = false;
   bool _isShared = false;
+  final _suggestionNote = TextEditingController();
   bool _isApplyingInitialValues = false;
   Timer? _altitudeLookupDebounce;
   DiveSite? _originalSite;
@@ -316,6 +326,7 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
 
   @override
   void dispose() {
+    _suggestionNote.dispose();
     _altitudeLookupDebounce?.cancel();
     _nameController.dispose();
     _descriptionController.dispose();
@@ -1174,30 +1185,51 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
             }),
             notesController: _notesController,
             mergeExtras: widget.isMerging ? _mergeExtras : null,
-            showShareToggle: ref
-                .watch(allDiversProvider)
-                .maybeWhen(data: (d) => d.length >= 2, orElse: () => false),
+            showShareToggle:
+                !(_originalSite?.isLibrarySite ?? false) &&
+                ref
+                    .watch(allDiversProvider)
+                    .maybeWhen(data: (d) => d.length >= 2, orElse: () => false),
             isShared: _isShared,
             onShareChanged: _onShareToggled,
             shareLocked: _mayShare() != true,
             shareLockedReason: _shareLockedReason(),
           ),
+          if (_suggestModeShown()) ...[
+            const SizedBox(height: 16),
+            TextFormField(
+              key: const Key('suggestion-note'),
+              controller: _suggestionNote,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: context.l10n.sharedLibrary_suggest_note_label,
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ],
         ],
       ),
     );
 
     return EditFormScaffold(
-      title: widget.isEditing
+      title: _suggestModeShown()
+          ? context.l10n.sharedLibrary_suggest_title
+          : widget.isEditing
           ? context.l10n.diveSites_edit_appBar_editSite
           : widget.isMerging
           ? context.l10n.diveSites_edit_appBar_mergeSites
           : context.l10n.diveSites_edit_appBar_newSite,
+      saveLabel: _suggestModeShown()
+          ? context.l10n.sharedLibrary_suggest_send
+          : null,
       embedded: widget.embedded,
       isSaving: _isLoading,
       hasUnsavedChanges: _hasChanges,
       onSave: _saveSite,
       onCancel: widget.embedded ? _handleCancel : null,
-      headerIcon: widget.isEditing
+      headerIcon: _suggestModeShown()
+          ? Icons.rate_review_outlined
+          : widget.isEditing
           ? Icons.edit
           : widget.isMerging
           ? Icons.merge_type
@@ -1252,6 +1284,9 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     return canDestroySharedItemOnceKnown(
       ref.watch(validatedCurrentDiverIdProvider),
       ownerId: _originalSite?.diverId,
+      // A club library site is deleted through its role-gated action on
+      // the detail page, never through the personal delete (issue #2567).
+      isLibrarySite: _originalSite?.isLibrarySite ?? false,
     );
   }
 
@@ -1787,6 +1822,99 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
         NumberInvalid() => null, // unreachable: validate() ran first
       };
 
+  /// Suggestion mode: asked for, or forced on a club library site this
+  /// profile may not edit, so a deep link to the plain edit route cannot
+  /// write the site (issue #2567). Plain editing while the role loads; the
+  /// save decides again with the settled role.
+  bool _suggestModeShown() {
+    if (widget.suggest) return true;
+    final id = _originalSite?.sharedLibraryId;
+    if (id == null) return false;
+    final role = ref.watch(libraryRoleProvider(id)).valueOrNull;
+    final connected = ref.watch(libraryConnectedHereProvider(id)).valueOrNull;
+    if (role == null || connected == null) return false;
+    return !(connected && canEditLibrarySite(role));
+  }
+
+  Future<bool> _suggestModeAtSave() async {
+    if (widget.suggest) return true;
+    final id = _originalSite?.sharedLibraryId;
+    if (id == null) return false;
+    final role = await _libraryRoleNow(id);
+    return role == null || !canEditLibrarySite(role);
+  }
+
+  /// The profile's effective role in [libraryId] from the store, or null
+  /// when the library is not connected here. Read from the store, not the
+  /// providers: in requested suggestion mode nothing watches them, and a
+  /// one-shot read of a paused stream provider never returns.
+  Future<SharedLibraryRole?> _libraryRoleNow(String libraryId) async {
+    final store = ref.read(sharedLibraryStoreProvider);
+    final library = await store.getLibrary(libraryId);
+    if (library == null) return null;
+    final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
+    final membership = diverId == null
+        ? null
+        : await store.membership(diverId: diverId, libraryId: libraryId);
+    if (membership == null) return SharedLibraryRole.reader;
+    return effectiveRole(
+      listed: library.roles.roleOf(membership.memberId),
+      readOnlyDetected: library.readOnlyDetected,
+    );
+  }
+
+  /// A reader's save on a club library site (issue #2567): the changed
+  /// fields and the note become a suggestion; the site is untouched.
+  Future<void> _sendSuggestion(
+    DiveSite site,
+    bool classificationChanged,
+  ) async {
+    final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
+    if (diverId == null || !mounted) return;
+    var childFields = const <String, Object?>{};
+    if (classificationChanged) {
+      final types = await SiteTypeRepository().getAllSiteTypes(
+        diverId: diverId,
+      );
+      childFields = suggestionChildFields(
+        originalTypeIds: _originalTypeIds,
+        selectedTypeIds: _selectedTypeIds,
+        typeNames: {for (final t in types) t.id: t.name},
+        originalTagIds: _originalTagIds,
+        selectedTags: [for (final t in _selectedTags) (id: t.id, name: t.name)],
+      );
+    }
+    final suggestion = await ref
+        .read(suggestionServiceProvider)
+        .propose(
+          proposed: site,
+          diverId: diverId,
+          note: _suggestionNote.text,
+          childFields: childFields,
+        );
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
+      _hasChanges = false;
+    });
+    final l10n = context.l10n;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          suggestion == null
+              ? l10n.sharedLibrary_suggest_nothingChanged
+              : l10n.sharedLibrary_suggest_sent,
+        ),
+      ),
+    );
+    if (suggestion == null) return;
+    if (widget.onSaved != null) {
+      widget.onSaved!(site.id);
+    } else {
+      await Navigator.of(context).maybePop();
+    }
+  }
+
   Future<void> _saveSite() async {
     // Collapsed sections un-mount their fields, hiding them from
     // Form.validate(); expand everything first so no error can hide.
@@ -1917,6 +2045,25 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
               tagIds: [for (final t in _selectedTags) t.id],
             )
           : null;
+
+      // A club library not connected on this device: neither an edit nor a
+      // suggestion could ever reach it from here (issue #2567).
+      final libraryId = _originalSite?.sharedLibraryId;
+      if (libraryId != null && await _libraryRoleNow(libraryId) == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(context.l10n.sharedLibrary_list_notConnected),
+            ),
+          );
+        }
+        return;
+      }
+
+      if (await _suggestModeAtSave()) {
+        await _sendSuggestion(site, classificationChanged);
+        return;
+      }
 
       MergeSnapshot? mergeSnapshot;
 

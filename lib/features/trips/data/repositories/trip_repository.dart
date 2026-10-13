@@ -22,6 +22,8 @@ import 'package:submersion/features/trips/data/repositories/trip_cylinder_reposi
 import 'package:submersion/features/trips/data/repositories/trip_equipment_repository.dart';
 import 'package:submersion/features/trips/domain/entities/dive_candidate.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart' as domain;
+import 'package:submersion/features/documents/data/repositories/document_repository.dart';
+import 'package:submersion/features/documents/domain/entities/document.dart';
 
 class TripRepository {
   TripRepository({ItineraryDayRepository? itineraryDays})
@@ -98,10 +100,10 @@ class TripRepository {
 
       final results = await _db.customSelect('''
         SELECT * FROM trips
-        WHERE (LOWER(name) LIKE ?
-           OR LOWER(location) LIKE ?
-           OR LOWER(resort_name) LIKE ?
-           OR LOWER(liveaboard_name) LIKE ?)
+        WHERE (unicode_lower(name) LIKE ?
+           OR unicode_lower(location) LIKE ?
+           OR unicode_lower(resort_name) LIKE ?
+           OR unicode_lower(liveaboard_name) LIKE ?)
         ${vis.whereClause}
         ORDER BY start_date DESC
       ''', variables: variables).get();
@@ -372,6 +374,8 @@ class TripRepository {
         await ProfileHidesRepository().deleteHides(SharedItemKind.trip, [id]);
         // Every profile's dives lose the trip, stamped and marked pending.
         await clearDiveTripLinks(_db, _syncRepository, [id], now: now);
+        // Its documents go with it, tombstoned (issue #2613).
+        await DocumentRepository().deleteForOwner(DocumentOwnerKind.trip, id);
 
         // Delete the trip
         await (_db.delete(_db.trips)..where((t) => t.id.equals(id))).go();

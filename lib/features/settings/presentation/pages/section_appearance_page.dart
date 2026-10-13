@@ -9,6 +9,7 @@ import 'package:submersion/features/certifications/presentation/providers/certif
 import 'package:submersion/features/courses/presentation/providers/course_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/settings/presentation/widgets/gradient_preset_picker.dart';
+import 'package:submersion/features/settings/presentation/widgets/viewer_fullscreen_mode_tile.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/providers/table_details_pane_provider.dart';
 
@@ -608,6 +609,22 @@ class SectionAppearancePage extends ConsumerWidget {
         trailing: const Icon(Icons.chevron_right),
         onTap: () => context.push('/settings/default-metrics'),
       ),
+      ListTile(
+        leading: const Icon(Icons.palette_outlined),
+        title: Text(context.l10n.settings_appearance_metricColors),
+        subtitle: Text(
+          settings.profileMetricColors.isEmpty
+              ? context.l10n.settings_appearance_metricColors_subtitleDefault
+              : context.l10n
+                    .settings_appearance_metricColors_subtitleCustomized(
+                      settings.profileMetricColors.count,
+                    ),
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => context.push('/settings/metric-colors'),
+      ),
+      if (ViewerFullscreenModeTile.isSupported)
+        const ViewerFullscreenModeTile(),
     ];
   }
 

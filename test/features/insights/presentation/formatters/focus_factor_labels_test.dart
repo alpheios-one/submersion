@@ -1,6 +1,7 @@
 import 'dart:ui' show Locale;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
 import 'package:submersion/features/insights/domain/focus/focus_factor.dart';
@@ -19,6 +20,7 @@ void main() {
     groupShare: 0.5,
     baselineShare: 0.5,
     groupCount: 1,
+    strength: 0,
     standsOut: false,
   );
 
@@ -51,6 +53,33 @@ void main() {
           typesById: typesById,
         ),
         'DPV',
+      );
+    });
+  });
+
+  /// Issue #3018: the estimate marker of an imperial tank size landed after
+  /// the sign, reading "+~6 cuft".
+  group('tank volume differences', () {
+    const imperial = UnitFormatter(
+      AppSettings(volumeUnit: VolumeUnit.cubicFeet),
+    );
+
+    test('an imperial difference puts the estimate marker before the '
+        'sign', () {
+      expect(
+        focusNumericDifference(FocusFactorId.tankVolume, 2, imperial, en),
+        '~+14 cuft',
+      );
+      expect(
+        focusNumericDifference(FocusFactorId.tankVolume, -2, imperial, en),
+        '~-14 cuft',
+      );
+    });
+
+    test('a metric difference carries no estimate marker', () {
+      expect(
+        focusNumericDifference(FocusFactorId.tankVolume, 2, units, en),
+        '+2 L',
       );
     });
   });

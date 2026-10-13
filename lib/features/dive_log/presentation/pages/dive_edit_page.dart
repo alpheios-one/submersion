@@ -4,12 +4,15 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart' hide Visibility;
 import 'package:go_router/go_router.dart';
+import 'package:submersion/core/text/blank_text.dart';
 import 'package:submersion/core/built_ins/built_in_catalog.dart';
 import 'package:submersion/features/dive_log/data/services/derived_metrics_scheduler.dart';
 import 'package:submersion/features/equipment/presentation/utils/usable_set_items.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/elapsed_duration_format.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/features/equipment/data/services/sensor_summary_scheduler.dart';
+import 'package:submersion/features/gear_passports/presentation/utils/scan_owned_item.dart';
 import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/features/settings/presentation/providers/hidden_built_ins_provider.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
@@ -22,6 +25,7 @@ import 'package:submersion/features/equipment/presentation/utils/equipment_type_
 import 'package:submersion/features/data_quality/data/services/quality_scan_service.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_color.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
+import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/deco/altitude_calculator.dart';
 import 'package:submersion/core/services/location_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
@@ -53,6 +57,8 @@ import 'package:submersion/features/equipment/presentation/providers/equipment_s
 import 'package:submersion/features/equipment/domain/services/equipment_set_selector.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/geofence_suggestion_banner.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/site_suggestion_card.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/visibility_input/visibility_entry.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/visibility_input/visibility_input.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/dive_centers/domain/entities/dive_center.dart';
@@ -84,6 +90,8 @@ import 'package:submersion/features/dive_log/domain/entities/dive_weight.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_mirror_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive_text_suggestion_field.dart';
+import 'package:submersion/features/dive_log/presentation/providers/visibility_input_mode_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/mirror_dive_dialog.dart';
 import 'package:submersion/features/dive_log/presentation/providers/outlier_suggestion_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/custom_field_input_row.dart';
@@ -103,6 +111,7 @@ import 'package:submersion/features/cylinder_configs/presentation/widgets/apply_
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/statistics_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/tank_row.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/the_dive_section.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/suggested_text_row.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/trip_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/computer_source_sheet.dart';
 import 'package:submersion/features/weight_presets/domain/entities/weight_preset.dart';
@@ -127,7 +136,6 @@ import 'package:submersion/features/dive_log/presentation/widgets/scr_settings_p
 import 'package:submersion/features/tides/presentation/providers/tide_providers.dart';
 import 'package:submersion/features/weather/domain/services/altitude_resolver.dart';
 import 'package:submersion/features/weather/presentation/providers/weather_providers.dart';
-import 'package:submersion/features/courses/domain/entities/course.dart';
 import 'package:submersion/features/courses/presentation/providers/course_providers.dart';
 import 'package:submersion/features/courses/presentation/widgets/course_picker.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_type_multi_select_field.dart';
@@ -229,6 +237,11 @@ class DiveEditPage extends ConsumerStatefulWidget {
   /// exclusive with [diveId]). Mirrors `SiteEditPage.mergeSiteIds`.
   final List<String>? bulkDiveIds;
 
+  /// Bulk edit only: leave by popping back to the list that opened the form,
+  /// rather than going to /dives. Set when that list was itself pushed over
+  /// another page, whose back arrow a go() would erase (#3292).
+  final bool bulkPopOnSave;
+
   /// When true, renders without Scaffold wrapper for use in master-detail layout.
   final bool embedded;
 
@@ -254,6 +267,7 @@ class DiveEditPage extends ConsumerStatefulWidget {
     super.key,
     this.diveId,
     this.bulkDiveIds,
+    this.bulkPopOnSave = false,
     this.embedded = false,
     this.onSaved,
     this.onCancel,
@@ -308,7 +322,25 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   /// The site-to-dive-type snap still in flight, which a save waits for so
   /// the types it adds are not lost to a quick tap on Save.
   Future<void>? _pendingDiveTypeSnap;
-  Visibility _selectedVisibility = Visibility.unknown;
+
+  /// The dive's visibility as loaded (issue #3226), saved back untouched
+  /// until the diver types a number or taps a chip.
+  StoredVisibility _originalVisibility = StoredVisibility.none;
+  late VisibilityInputMode _visibilityMode = ref.read(
+    visibilityInputModeProvider,
+  );
+  VisibilityBand? _visibilityBand;
+
+  /// Whether the diver has edited each visibility mode (typed a number,
+  /// tapped a chip). Tracked per mode so a detour through the other mode
+  /// never discards or rounds the stored value.
+  bool _preciseTouched = false;
+  bool _rangeTouched = false;
+
+  bool get _activeVisibilityTouched => switch (_visibilityMode) {
+    VisibilityInputMode.precise => _preciseTouched,
+    VisibilityInputMode.range => _rangeTouched,
+  };
   int _rating = 0;
   // Statistics exclusion (#526 / #1272). Kept independent: unticking the
   // master flag must restore the diver's own gas-only choice rather than
@@ -320,7 +352,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   DiveSite? _selectedSite;
   Trip? _selectedTrip;
   DiveCenter? _selectedDiveCenter;
-  Course? _selectedCourse;
+  // The dive's training courses (#2515).
+  List<String> _selectedCourseIds = const [];
   List<Sighting> _sightings = [];
   Set<String> _originalSightingIds =
       {}; // Track original IDs to detect deletions
@@ -357,11 +390,15 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   // fields but must never trigger mirroring.
   bool _exitMethodLinked = true;
   WaterType? _waterType;
+
+  /// True while [_waterType] is the loaded site's water type standing in for
+  /// a dive that has none of its own (issue #3196). A site change then starts
+  /// from no water type, so the old site's value is never saved as the dive's.
+  bool _waterTypeFromSite = false;
   final _swellHeightController = TextEditingController();
 
-  /// Measured visibility, entered in the diver's depth unit and converted to
-  /// meters on save. Replaces the pre-v144 bucket picker; [_selectedVisibility]
-  /// survives only to carry a legacy dive's band until it gains a number.
+  /// Precise visibility, entered in the diver's depth unit and converted to
+  /// meters on save. The Range mode's pick lives in [_visibilityBand].
   final _visibilityController = TextEditingController();
   final _altitudeController = TextEditingController();
   final _surfacePressureController = TextEditingController();
@@ -375,6 +412,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   final _windSpeedController = TextEditingController();
   final _humidityController = TextEditingController();
   final _weatherDescriptionController = TextEditingController();
+  final _diveOperatorController = TextEditingController();
+  final _boatNameController = TextEditingController();
+  final _boatCaptainController = TextEditingController();
+  final _surfaceConditionsController = TextEditingController();
   bool _isFetchingWeather = false;
 
   // Weight fields - multiple weight entries per dive
@@ -472,7 +513,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   }
 
   bool get _showCourseSection =>
-      _selectedCourse != null || _expanded['course'] == true;
+      _selectedCourseIds.isNotEmpty || _expanded['course'] == true;
 
   bool get _showCustomFieldsSection =>
       _customFields.isNotEmpty || _expanded['customFields'] == true;
@@ -607,7 +648,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         id: _uuid.v4(),
         volume: _defaultPreset?.volumeLiters ?? settings.defaultTankVolume,
         workingPressure: _defaultPreset?.workingPressureBar,
-        startPressure: settings.defaultStartPressure.toDouble(),
+        startPressure: settings.defaultStartPressure,
         endPressure: 50.0,
         gasMix: const GasMix(),
         role: TankRole.backGas,
@@ -669,6 +710,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       _windSpeedController,
       _humidityController,
       _weatherDescriptionController,
+      _diveOperatorController,
+      _boatNameController,
+      _boatCaptainController,
+      _surfaceConditionsController,
     ]) {
       controller.addListener(_markDirty);
     }
@@ -712,6 +757,9 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                 material: preset.material,
                 order: existing.order,
                 presetName: preset.name,
+                // A tag that described nothing still named the cylinder
+                // (issue #2650).
+                passportId: existing.passportId,
               ),
             ];
           }
@@ -799,6 +847,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               : t.material ?? base?.material,
           order: 0,
           presetName: describesCylinder ? t.presetName : base?.presetName,
+          passportId: t.passportId,
         ),
         ..._tanks.skip(1),
       ];
@@ -858,6 +907,63 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     }
   }
 
+  /// Seeds the fields a dive takes from its primary data source: entry and
+  /// exit, bottom time, runtime and water temperature. Call inside setState.
+  void _seedSourceFields(Dive dive, UnitFormatter units) {
+    // A refresh reseeds a form that already holds the previous primary's
+    // values, so clear what the branches below may leave unset.
+    _exitDate = null;
+    _exitTime = null;
+    _durationController.text = '';
+    _runtimeController.text = '';
+    // Use entryTime if available, otherwise fall back to dateTime
+    final entryDateTime = dive.entryTime ?? dive.dateTime;
+    _entryDate = entryDateTime;
+    _entryTime = TimeOfDay.fromDateTime(entryDateTime);
+    // Set exit time if available
+    if (dive.exitTime != null) {
+      _exitDate = dive.exitTime;
+      _exitTime = TimeOfDay.fromDateTime(dive.exitTime!);
+    } else if (dive.bottomTime != null) {
+      // Calculate exit time from entry + bottomTime
+      final exitDateTime = entryDateTime.add(dive.bottomTime!);
+      _exitDate = exitDateTime;
+      _exitTime = TimeOfDay.fromDateTime(exitDateTime);
+    }
+    // Bottom time (stored bottomTime, or auto-calculated from profile)
+    if (dive.bottomTime != null) {
+      _durationController.text = _seedInt(dive.bottomTime!.inMinutes);
+    } else if (dive.profile.isNotEmpty) {
+      // Auto-calculate from profile if no stored duration
+      final calculatedBottomTime = dive.calculateBottomTimeFromProfile();
+      if (calculatedBottomTime != null) {
+        _durationController.text = _seedInt(calculatedBottomTime.inMinutes);
+      }
+    }
+    // Runtime: use stored value, or calculate from entry/exit times
+    if (dive.runtime != null) {
+      _runtimeController.text = _seedInt(dive.runtime!.inMinutes);
+    } else if (dive.entryTime != null && dive.exitTime != null) {
+      final calculatedRuntime = dive.exitTime!.difference(dive.entryTime!);
+      _runtimeController.text = _seedInt(calculatedRuntime.inMinutes);
+    }
+    _waterTempController.text = dive.waterTemp != null
+        ? _seedDecimal(units.convertTemperature(dive.waterTemp!), 0)
+        : '';
+  }
+
+  /// Seeds the depth fields, which a saved profile edit recomputes. Call
+  /// inside setState.
+  void _seedDepthFields(Dive dive, UnitFormatter units) {
+    // Convert stored metric values to user's preferred units
+    _maxDepthController.text = dive.maxDepth != null
+        ? _seedDecimal(units.convertDepth(dive.maxDepth!), 1)
+        : '';
+    _avgDepthController.text = dive.avgDepth != null
+        ? _seedDecimal(units.convertDepth(dive.avgDepth!), 1)
+        : '';
+  }
+
   Future<void> _loadExistingDive() async {
     setState(() => _isLoading = true);
     try {
@@ -867,14 +973,6 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         // Get unit formatter to convert from stored metric to user's preferred units
         final settings = ref.read(settingsProvider);
         final units = UnitFormatter(settings);
-
-        // Load training course if linked (must be done before setState)
-        Course? loadedCourse;
-        if (dive.courseId != null) {
-          loadedCourse = await ref.read(
-            courseByIdProvider(dive.courseId!).future,
-          );
-        }
 
         final hasPrimarySource = await ref
             .read(diveRepositoryProvider)
@@ -889,51 +987,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           _diveNumberController.text = dive.diveNumber != null
               ? _seedInt(dive.diveNumber!)
               : '';
-          // Use entryTime if available, otherwise fall back to dateTime
-          final entryDateTime = dive.entryTime ?? dive.dateTime;
-          _entryDate = entryDateTime;
-          _entryTime = TimeOfDay.fromDateTime(entryDateTime);
-          // Set exit time if available
-          if (dive.exitTime != null) {
-            _exitDate = dive.exitTime;
-            _exitTime = TimeOfDay.fromDateTime(dive.exitTime!);
-          } else if (dive.bottomTime != null) {
-            // Calculate exit time from entry + bottomTime
-            final exitDateTime = entryDateTime.add(dive.bottomTime!);
-            _exitDate = exitDateTime;
-            _exitTime = TimeOfDay.fromDateTime(exitDateTime);
-          }
-          // Bottom time (stored bottomTime, or auto-calculated from profile)
-          if (dive.bottomTime != null) {
-            _durationController.text = _seedInt(dive.bottomTime!.inMinutes);
-          } else if (dive.profile.isNotEmpty) {
-            // Auto-calculate from profile if no stored duration
-            final calculatedBottomTime = dive.calculateBottomTimeFromProfile();
-            if (calculatedBottomTime != null) {
-              _durationController.text = _seedInt(
-                calculatedBottomTime.inMinutes,
-              );
-            }
-          }
-          // Runtime: use stored value, or calculate from entry/exit times
-          if (dive.runtime != null) {
-            _runtimeController.text = _seedInt(dive.runtime!.inMinutes);
-          } else if (dive.entryTime != null && dive.exitTime != null) {
-            final calculatedRuntime = dive.exitTime!.difference(
-              dive.entryTime!,
-            );
-            _runtimeController.text = _seedInt(calculatedRuntime.inMinutes);
-          }
-          // Convert stored metric values to user's preferred units
-          _maxDepthController.text = dive.maxDepth != null
-              ? _seedDecimal(units.convertDepth(dive.maxDepth!), 1)
-              : '';
-          _avgDepthController.text = dive.avgDepth != null
-              ? _seedDecimal(units.convertDepth(dive.avgDepth!), 1)
-              : '';
-          _waterTempController.text = dive.waterTemp != null
-              ? _seedDecimal(units.convertTemperature(dive.waterTemp!), 0)
-              : '';
+          _seedSourceFields(dive, units);
+          _seedDepthFields(dive, units);
           _airTempController.text = dive.airTemp != null
               ? _seedDecimal(units.convertTemperature(dive.airTemp!), 0)
               : '';
@@ -941,7 +996,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           _nameController.text = dive.name ?? '';
           _selectedDiveTypeIds = List.from(dive.diveTypeIds);
           _loadedDiveTypeIds = List.unmodifiable(dive.diveTypeIds);
-          _selectedVisibility = dive.visibility ?? Visibility.unknown;
+          _originalVisibility = StoredVisibility.of(dive);
+          _visibilityMode = _originalVisibility.naturalMode ?? _visibilityMode;
           _visibilityController.text = dive.visibilityMeters != null
               ? _seedDecimal(units.convertDepth(dive.visibilityMeters!), 0)
               : '';
@@ -951,7 +1007,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           _selectedSite = dive.site;
           _selectedTrip = dive.trip;
           _selectedDiveCenter = dive.diveCenter;
-          _selectedCourse = loadedCourse;
+          _selectedCourseIds = List.of(dive.courseIds);
 
           // Load all tanks from the dive
           _loadedTankIds = {for (final t in dive.tanks) t.id};
@@ -972,7 +1028,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           _exitMethod = dive.exitMethod;
           _exitMethodLinked =
               _exitMethod == null || _exitMethod == _entryMethod;
-          _waterType = dive.waterType;
+          // A dive with no water type of its own shows its site's, as the
+          // detail page does; saving then stores it (issue #3196).
+          _waterType = dive.effectiveWaterType;
+          _waterTypeFromSite = dive.waterType == null && _waterType != null;
           _swellHeightController.text = dive.swellHeight != null
               ? _seedDecimal(units.convertDepth(dive.swellHeight!), 1)
               : '';
@@ -997,6 +1056,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               ? _seedDecimal(dive.humidity!, 0)
               : '';
           _weatherDescriptionController.text = dive.weatherDescription ?? '';
+          _diveOperatorController.text = dive.diveOperator ?? '';
+          _boatNameController.text = dive.boatName ?? '';
+          _boatCaptainController.text = dive.boatCaptain ?? '';
+          _surfaceConditionsController.text = dive.surfaceConditions ?? '';
 
           // Load weight entries (weights already stored in kg, conversion happens in display)
           // Migrate legacy single weight to weights list if needed
@@ -1166,6 +1229,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     _windSpeedController.dispose();
     _humidityController.dispose();
     _weatherDescriptionController.dispose();
+    _diveOperatorController.dispose();
+    _boatNameController.dispose();
+    _boatCaptainController.dispose();
+    _surfaceConditionsController.dispose();
     _weightingFeedbackAmountController.dispose();
     super.dispose();
   }
@@ -1245,7 +1312,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                   entries: [
                     if (!_showCourseSection)
                       AddSectionEntry(
-                        label: context.l10n.diveLog_edit_section_trainingCourse,
+                        label:
+                            context.l10n.diveLog_edit_section_trainingCourses,
                         onTap: () => setState(() => _expanded['course'] = true),
                       ),
                     if (!_showCustomFieldsSection)
@@ -1328,6 +1396,11 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   List<BulkMembershipItem> _diveTypeMembers = [];
   MembershipDelta _diveTypeDelta = MembershipDelta.empty;
 
+  // The dives' training courses (#2515).
+  Map<String, int> _courseCounts = {};
+  List<BulkMembershipItem> _courseMembers = [];
+  MembershipDelta _courseDelta = MembershipDelta.empty;
+
   Map<String, int> _buddyCounts = {};
   final Map<String, Buddy> _buddyById = {};
 
@@ -1389,6 +1462,32 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                       : () => setState(() => _selectedDiveCenter = null),
                 ),
               ),
+              for (final (field, label, controller) in [
+                (
+                  BulkField.diveOperator,
+                  l10n.diveLog_edit_row_diveOperator,
+                  _diveOperatorController,
+                ),
+                (
+                  BulkField.boatName,
+                  l10n.diveLog_edit_row_boatName,
+                  _boatNameController,
+                ),
+                (
+                  BulkField.boatCaptain,
+                  l10n.diveLog_edit_row_boatCaptain,
+                  _boatCaptainController,
+                ),
+              ])
+                _gatedRow(
+                  field,
+                  FormRow.text(
+                    label: label,
+                    controller: controller,
+                    alwaysEditing: true,
+                    textCapitalization: TextCapitalization.words,
+                  ),
+                ),
               _gatedRow(
                 BulkField.trip,
                 FormRow.picker(
@@ -1399,19 +1498,6 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                   onClear: _selectedTrip == null
                       ? null
                       : () => _setTrip(null, markDirty: false),
-                ),
-              ),
-              _gatedRow(
-                BulkField.course,
-                FormRow.picker(
-                  label: l10n.diveLog_edit_row_course,
-                  value: _selectedCourse?.name,
-                  placeholder: l10n.diveLog_edit_row_notSet,
-                  onTap: _showBulkCoursePicker,
-                  onClear: _selectedCourse == null
-                      ? null
-                      : () => setState(() => _selectedCourse = null),
-                  clearTooltip: l10n.courses_picker_clearSelection,
                 ),
               ),
               _gatedRow(
@@ -1491,23 +1577,42 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     );
   }
 
+  /// The bulk visibility value: bulk has no stored shape to keep, so the
+  /// active mode's value is the input (issue #3226).
+  StoredVisibility _bulkVisibility(UnitFormatter units) =>
+      resolveVisibilityEntry(
+        mode: _visibilityMode,
+        preciseMeters: _visibilityMetersInput(units),
+        band: _visibilityBand,
+        preciseTouched: true,
+        rangeTouched: true,
+        original: StoredVisibility.none,
+        scale: _visibilityScale,
+      );
+
   BulkScalarInputs _collectScalarInputs(UnitFormatter units) {
+    final bulkVisibility = _bulkVisibility(units);
     // High-value Logistics + notes fields. Extended per group in later tasks.
     return BulkScalarInputs(
       diveCenterId: _selectedDiveCenter?.id,
+      diveOperator: trimmedOrNull(_diveOperatorController.text),
+      boatName: trimmedOrNull(_boatNameController.text),
+      boatCaptain: trimmedOrNull(_boatCaptainController.text),
       tripId: _selectedTrip?.id,
-      courseId: _selectedCourse?.id,
       rating: _rating > 0 ? _rating : null,
       isFavorite: _bulkFavorite,
       excludedFromStats: _bulkExcludedFromStats,
       excludedFromGasStats: _bulkExcludedFromGasStats,
       waterType: _waterType?.name,
-      visibilityMeters: _visibilityMetersInput(units),
+      visibilityMeters: bulkVisibility.meters,
+      visibilityMinMeters: bulkVisibility.range?.minM,
+      visibilityMaxMeters: bulkVisibility.range?.maxM,
       currentDirection: _currentDirection?.name,
       currentStrength: _currentStrength?.name,
       swellHeight: _savedNumber(
         _swellHeightController,
       ).map(units.depthToMeters),
+      surfaceConditions: trimmedOrNull(_surfaceConditionsController.text),
       entryMethod: _entryMethod?.name,
       exitMethod: _exitMethod?.name,
       altitude: _savedNumber(_altitudeController).map(units.altitudeToMeters),
@@ -1745,6 +1850,15 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           onChanged: (d) => setState(() => _diveTypeDelta = d),
         ),
         BulkMembershipEditor(
+          title: l10n.diveLog_edit_section_trainingCourses,
+          total: total,
+          labels: labels,
+          items: _courseMembers,
+          counts: _courseCounts,
+          onAdd: _bulkAddCourses,
+          onChanged: (d) => setState(() => _courseDelta = d),
+        ),
+        BulkMembershipEditor(
           title: l10n.diveLog_edit_section_equipment,
           total: total,
           labels: labels,
@@ -1866,6 +1980,12 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           diveTypeIds: _diveTypeDelta.removeIds,
         ),
       );
+    }
+    for (final (mode, ids) in [
+      (BulkCollectionMode.add, _courseDelta.addIds),
+      (BulkCollectionMode.remove, _courseDelta.removeIds),
+    ]) {
+      if (ids.isNotEmpty) ops.add(DiveCoursesOp(mode: mode, courseIds: ids));
     }
     if (_equipmentDelta.addIds.isNotEmpty) {
       ops.add(
@@ -2003,18 +2123,18 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               value: _waterType,
               options: WaterType.values,
               label: (v) => v.localizedName(context.l10n),
-              onChanged: (v) => setState(() => _waterType = v),
+              onChanged: (v) => setState(() {
+                _waterType = v;
+                _waterTypeFromSite = false;
+              }),
             ),
           ),
         ),
         _gatedRow(
           BulkField.visibility,
-          FormRow.text(
-            label: context.l10n.diveLog_edit_label_visibility,
-            controller: _visibilityController,
-            suffixText: UnitFormatter(ref.read(settingsProvider)).depthSymbol,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputValidator: _bulkValidator(BulkField.visibility),
+          _visibilityInput(
+            units,
+            validator: _bulkValidator(BulkField.visibility),
           ),
         ),
         _gatedRow(
@@ -2050,6 +2170,15 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             keyboardType: TextInputType.number,
             alwaysEditing: true,
             inputValidator: _bulkValidator(BulkField.swellHeight),
+          ),
+        ),
+        _gatedRow(
+          BulkField.surfaceConditions,
+          FormRow.text(
+            label: context.l10n.diveLog_edit_label_surfaceConditions,
+            controller: _surfaceConditionsController,
+            alwaysEditing: true,
+            textCapitalization: TextCapitalization.sentences,
           ),
         ),
         _gatedRow(
@@ -2359,6 +2488,11 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         members: _diveTypeMembers,
       ),
       (
+        title: l10n.diveLog_edit_section_trainingCourses,
+        delta: _courseDelta,
+        members: _courseMembers,
+      ),
+      (
         title: l10n.diveLog_edit_section_equipment,
         delta: _equipmentDelta,
         members: _equipmentMembers,
@@ -2425,10 +2559,15 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       scheduleQualityScan(ids);
       scheduleSensorSummaryRefresh(ids);
       scheduleDerivedMetricsRefresh(ids);
+      if (_bulkEnabled.contains(BulkField.visibility)) {
+        _rememberVisibilityMode(_bulkVisibility(units));
+      }
       if (!mounted) return;
       final messenger = ScaffoldMessenger.of(context);
       if (widget.embedded) {
         widget.onSaved?.call(ids.first);
+      } else if (widget.bulkPopOnSave) {
+        context.pop();
       } else {
         context.go('/dives');
       }
@@ -2675,12 +2814,9 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         .watch(surfaceIntervalProvider(widget.diveId!))
         .valueOrNull;
     if (interval == null) return null;
-    final hours = interval.inHours;
-    final minutes = interval.inMinutes % 60;
-    final text = hours > 0 ? '${hours}h ${minutes}m' : '${minutes}m';
     return FormRow.display(
       label: context.l10n.diveLog_edit_row_surfaceInterval,
-      value: text,
+      value: formatElapsed(context.l10n, interval),
     );
   }
 
@@ -2764,7 +2900,11 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   /// saved values.
   void _assignSite(DiveSite? site) {
     _selectedSite = site;
-    _waterType = waterTypeAfterSiteAssign(_waterType, site);
+    _waterType = waterTypeAfterSiteAssign(
+      _waterTypeFromSite ? null : _waterType,
+      site,
+    );
+    _waterTypeFromSite = false;
     final entryExit = entryExitAfterSiteAssign(
       currentEntry: _entryMethod,
       currentExit: _exitMethod,
@@ -2856,7 +2996,13 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       expanded: _isExpanded('trip', defaultValue: false),
       onToggle: () => _toggleSection('trip', defaultValue: false),
       summary: _tripSummary(),
-      isEmpty: _selectedTrip == null && _selectedDiveCenter == null,
+      isEmpty:
+          _selectedTrip == null &&
+          _selectedDiveCenter == null &&
+          trimmedOrNull(_diveOperatorController.text) == null &&
+          trimmedOrNull(_boatNameController.text) == null &&
+          trimmedOrNull(_boatCaptainController.text) == null,
+      logisticsRows: _logisticsRows(),
       tripName: _selectedTrip?.name,
       tripCaption: _selectedTrip != null
           ? units.formatDateRange(
@@ -2890,7 +3036,29 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   String _tripSummary() => [
     if (_selectedTrip != null) _selectedTrip!.name,
     if (_selectedDiveCenter != null) _selectedDiveCenter!.name,
+    ?trimmedOrNull(_boatNameController.text),
   ].join(' · ');
+
+  List<Widget> _logisticsRows() {
+    final l10n = context.l10n;
+    return [
+      SuggestedTextRow(
+        label: l10n.diveLog_edit_row_diveOperator,
+        controller: _diveOperatorController,
+        field: DiveTextSuggestionField.diveOperator,
+      ),
+      SuggestedTextRow(
+        label: l10n.diveLog_edit_row_boatName,
+        controller: _boatNameController,
+        field: DiveTextSuggestionField.boatName,
+      ),
+      SuggestedTextRow(
+        label: l10n.diveLog_edit_row_boatCaptain,
+        controller: _boatCaptainController,
+        field: DiveTextSuggestionField.boatCaptain,
+      ),
+    ];
+  }
 
   Widget _buildTripSuggestion(DateTime diveDateTime) {
     final suggestedTripAsync = ref.watch(tripForDateProvider(diveDateTime));
@@ -3110,42 +3278,50 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     }
   }
 
-  Future<void> _showBulkCoursePicker() => showCoursePickerSheet(
-    context,
-    selectedCourse: _selectedCourse,
-    onCourseSelected: (course) {
-      _markDirty();
-      setState(() => _selectedCourse = course);
-    },
-  );
+  /// The selected course names for the collapsed section's summary.
+  String _courseSummary() {
+    final names = {
+      for (final c in ref.watch(courseListNotifierProvider).value ?? const [])
+        c.id: c.name,
+    };
+    return [
+      for (final id in _selectedCourseIds)
+        if (names[id] != null) names[id]!,
+    ].join(', ');
+  }
 
   Widget _buildCourseGroupSection() {
     return RareSection(
-      label: context.l10n.diveLog_edit_section_trainingCourse,
+      label: context.l10n.diveLog_edit_section_trainingCourses,
       icon: Icons.school_outlined,
-      expanded: _isExpanded('course', defaultValue: _selectedCourse != null),
+      expanded: _isExpanded(
+        'course',
+        defaultValue: _selectedCourseIds.isNotEmpty,
+      ),
       onToggle: () =>
-          _toggleSection('course', defaultValue: _selectedCourse != null),
-      summary: _selectedCourse?.name ?? '',
-      isEmpty: _selectedCourse == null,
-      emptyInvitation: context.l10n.diveLog_edit_trainingCourseHint,
+          _toggleSection('course', defaultValue: _selectedCourseIds.isNotEmpty),
+      summary: _courseSummary(),
+      isEmpty: _selectedCourseIds.isEmpty,
+      emptyInvitation: context.l10n.diveLog_edit_trainingCoursesHint,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              context.l10n.diveLog_edit_trainingCourseHint,
+              context.l10n.diveLog_edit_trainingCoursesHint,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 12),
-            CoursePicker(
-              selectedCourse: _selectedCourse,
-              onCourseSelected: (course) {
+            CourseMultiSelectField(
+              selectedCourseIds: _selectedCourseIds,
+              onChanged: (ids) {
+                // The picker is a sheet, not a FormField, so Form.onChanged
+                // never sees it.
                 _markDirty();
-                setState(() => _selectedCourse = course);
+                setState(() => _selectedCourseIds = ids);
               },
             ),
           ],
@@ -3289,46 +3465,64 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     },
   );
 
-  /// Opens the profile editor, optionally prompting the user to choose which
-  /// computer's profile to start from when the dive has multiple computers.
+  /// Opens the profile editor, first asking which source's profile to start
+  /// from when more than one source has samples of its own (issue #3066).
   Future<void> _openProfileEditor(String diveId, {String? initialMode}) async {
-    final readings = await ref.read(diveDataSourcesProvider(diveId).future);
+    final sources = await ref.read(diveDataSourcesProvider(diveId).future);
+    // Most dives have one source and can never offer a choice, so only a
+    // multi-source dive pays for hydrating every source's samples.
+    final startable = sources.length < 2
+        ? sources
+        : startableProfileSources(
+            sources,
+            await ref.read(sourceProfilesProvider(diveId).future),
+          );
+    if (!mounted) return;
 
-    // Filter to non-edited (original) sources only
-    final originalReadings = readings
-        .where((r) => r.computerId != null)
-        .toList();
-
-    if (originalReadings.length > 1 && mounted) {
-      // Multi-computer dive: ask which profile to start from
-      final selected = await showModalBottomSheet<DiveDataSource>(
+    // A single source needs no naming: the dive's profile is its own. With
+    // more, name the source even when it is the primary, since the dive's
+    // profile interleaves every source. Saving an edit of another source
+    // makes it primary.
+    DiveDataSource? chosen;
+    if (startable.length > 1) {
+      chosen = await showModalBottomSheet<DiveDataSource>(
         context: context,
-        builder: (context) =>
-            ComputerSourceSelectionSheet(readings: originalReadings),
+        builder: (context) => ComputerSourceSelectionSheet(readings: startable),
       );
-
-      if (selected == null || !mounted) return;
-
-      // Load the selected computer's profile points and push a pre-seeded
-      // editor.  We do this by passing the computerId as a query parameter
-      // so the router / page can load the correct source.
-      context.pushNamed(
-        'editProfile',
-        pathParameters: {'diveId': diveId},
-        queryParameters: {
-          'mode': ?initialMode,
-          'sourceComputerId': ?selected.computerId,
-        },
-      );
-    } else {
-      // Single-computer (or no readings): open editor directly
-      if (!mounted) return;
-      context.pushNamed(
-        'editProfile',
-        pathParameters: {'diveId': diveId},
-        queryParameters: {'mode': ?initialMode},
-      );
+      if (chosen == null || !mounted) return;
+    } else if (sources.length > 1 && startable.length == 1) {
+      // Only one source has samples, and it may not be the primary: the
+      // edit is that source's, not the sample-less primary's.
+      chosen = startable.single;
     }
+    final sourceId = chosen?.id;
+    final promotes = chosen != null && !chosen.isPrimary;
+
+    final saved = await context.pushNamed<bool>(
+      'editProfile',
+      pathParameters: {'diveId': diveId},
+      queryParameters: {'mode': ?initialMode, 'sourceId': ?sourceId},
+    );
+    if (saved == true && mounted) {
+      await _refreshAfterProfileSave(diveId, promoted: promotes);
+    }
+  }
+
+  /// A saved profile edit recomputed the dive's depths, and promoting another
+  /// source also replaced the fields taken from the primary source. Reload
+  /// them so saving this form does not write the old values back.
+  Future<void> _refreshAfterProfileSave(
+    String diveId, {
+    required bool promoted,
+  }) async {
+    final dive = await ref.read(diveRepositoryProvider).getDiveById(diveId);
+    if (dive == null || !mounted) return;
+    final units = UnitFormatter(ref.read(settingsProvider));
+    setState(() {
+      _existingDive = dive;
+      _seedDepthFields(dive, units);
+      if (promoted) _seedSourceFields(dive, units);
+    });
   }
 
   Widget _profileChild() {
@@ -3474,6 +3668,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               primarySourceId: primarySourceId,
             ),
             suggested: _suggestedTankIds.contains(_tanks[i].id),
+            // A saved dive's tanks can show the mix their computer logged.
+            diveId: _existingDive?.id,
             onChanged: (updatedTank) {
               final before = _tanks[i];
               setState(() {
@@ -3864,7 +4060,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           id: _uuid.v4(),
           volume: _defaultPreset?.volumeLiters ?? settings.defaultTankVolume,
           workingPressure: _defaultPreset?.workingPressureBar,
-          startPressure: settings.defaultStartPressure.toDouble(),
+          startPressure: settings.defaultStartPressure,
           endPressure: 50.0,
           gasMix: const GasMix(),
           role: _tanks.isEmpty ? TankRole.backGas : TankRole.stage,
@@ -3983,6 +4179,11 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               label: context.l10n.diveLog_edit_add,
               icon: Icons.add,
               onPressed: _showEquipmentPicker,
+            ),
+            FormOverlineAction(
+              label: context.l10n.gearPassport_scan_action,
+              icon: Icons.qr_code_scanner,
+              onPressed: _scanGear,
             ),
             FormOverlineAction(
               label: context.l10n.equipment_list_sortTooltip,
@@ -4210,6 +4411,28 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     });
   }
 
+  /// Adds the item a scanned tag names to this dive's gear, through the
+  /// same path as the picker so components expand (issue #2652).
+  Future<void> _scanGear() async {
+    final item = await scanOwnedItem(context, ref);
+    if (item == null || !mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    if (_selectedEquipment.any((e) => e.id == item.id)) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.gearPassport_scan_alreadyOnDive(item.name)),
+        ),
+      );
+      return;
+    }
+    await _addGear([item]);
+    if (!mounted) return;
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.gearPassport_scan_added(item.name))),
+    );
+  }
+
   void _showEquipmentPicker() {
     showModalBottomSheet(
       context: context,
@@ -4226,6 +4449,9 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             scrollController: scrollController,
             selectedEquipmentIds: _selectedEquipment.map((e) => e.id).toSet(),
             hideSpare: true,
+            // A dive logged after the fact may have used gear since retired
+            // or sold (#3210).
+            offerLeftKit: true,
             overlapNote: _sharedGearNotes(
               ref
                       .watch(
@@ -4238,9 +4464,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                       .value ??
                   const {},
             ),
-            onEquipmentSelected: (equipment) {
+            // Multi-select, so a full kit goes on in one pass (#2175).
+            onEquipmentConfirmed: (items) {
               Navigator.of(context).pop();
-              _addGear([equipment]);
+              _addGear(items);
             },
           ),
         ),
@@ -4277,6 +4504,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     final equipCounts = await repo.equipmentCountsForDives(ids);
     final tagCounts = await repo.tagCountsForDives(ids);
     final typeCounts = await repo.diveTypeCountsForDives(ids);
+    final courseCounts = await repo.courseCountsForDives(ids);
     final buddyRepo = ref.read(buddyRepositoryProvider);
     final buddyCounts = await buddyRepo.buddyCountsForDives(ids);
     final buddyRoles = await buddyRepo.unanimousBuddyRolesForDives(ids);
@@ -4289,6 +4517,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     );
     final allTags = await ref.read(tagsProvider.future);
     final allTypes = await ref.read(diveTypesProvider.future);
+    final allCourses = await ref.read(allCoursesProvider.future);
     final allBuddies = await buddyRepo.getAllBuddies();
     if (!mounted) return;
 
@@ -4330,6 +4559,16 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             id: id,
             label: typeName[id] ?? id,
             icon: Icons.scuba_diving,
+          ),
+      ]..sort(byLabel);
+      _courseCounts = courseCounts;
+      final courseName = {for (final c in allCourses) c.id: c.name};
+      _courseMembers = [
+        for (final id in courseCounts.keys)
+          BulkMembershipItem(
+            id: id,
+            label: courseName[id] ?? id,
+            icon: Icons.school_outlined,
           ),
       ]..sort(byLabel);
       _buddyCounts = buddyCounts;
@@ -4374,18 +4613,20 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           scrollController: scrollController,
           selectedEquipmentIds: _equipmentMembers.map((e) => e.id).toSet(),
           hideSpare: true,
-          onEquipmentSelected: (equipment) {
+          offerLeftKit: true,
+          onEquipmentConfirmed: (items) {
             setState(() {
-              if (!_equipmentMembers.any((e) => e.id == equipment.id)) {
-                _equipmentMembers = [
-                  ..._equipmentMembers,
-                  BulkMembershipItem(
-                    id: equipment.id,
-                    label: equipment.name,
-                    icon: equipmentTypeIcon(equipment.type),
-                  ),
-                ];
-              }
+              final existing = _equipmentMembers.map((e) => e.id).toSet();
+              _equipmentMembers = [
+                ..._equipmentMembers,
+                for (final item in items)
+                  if (!existing.contains(item.id))
+                    BulkMembershipItem(
+                      id: item.id,
+                      label: item.name,
+                      icon: equipmentTypeIcon(item.type),
+                    ),
+              ];
             });
             Navigator.of(context).pop();
           },
@@ -4534,6 +4775,35 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               id: id,
               label: _diveTypeNames[id] ?? id,
               icon: Icons.scuba_diving,
+            ),
+      ];
+    });
+  }
+
+  /// Opens the course checklist and adds the picked courses as members, each
+  /// starting "on all" in the membership editor (#2515).
+  Future<void> _bulkAddCourses() async {
+    var picked = <String>[];
+    await showCourseMultiPickerSheet(
+      context,
+      selectedCourseIds: const [],
+      onChanged: (ids) => picked = ids,
+    );
+    if (!mounted || picked.isEmpty) return;
+    final names = {
+      for (final c in ref.read(courseListNotifierProvider).value ?? const [])
+        c.id: c.name,
+    };
+    setState(() {
+      final existing = {for (final m in _courseMembers) m.id};
+      _courseMembers = [
+        ..._courseMembers,
+        for (final id in picked)
+          if (!existing.contains(id))
+            BulkMembershipItem(
+              id: id,
+              label: names[id] ?? id,
+              icon: Icons.school_outlined,
             ),
       ];
     });
@@ -4740,7 +5010,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       expanded: _isExpanded('conditions', defaultValue: false),
       onToggle: () => _toggleSection('conditions', defaultValue: false),
       summary: _conditionsSummary(units),
-      isEmpty: _conditionsIsEmpty(),
+      isEmpty: _conditionsIsEmpty(units),
       temperatureSymbol: units.temperatureSymbol,
       waterTempController: _waterTempController,
       airTempController: _airTempController,
@@ -4755,20 +5025,81 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   double? _visibilityMetersInput(UnitFormatter units) =>
       parseVisibilityInput(_visibilityController.text, units);
 
-  /// Caption under the visibility field: the adjective the diver's calibration
-  /// assigns to what they just typed, or, for a legacy dive not yet given a
-  /// number, the range its stored bucket covers.
-  String? _visibilityCaption(UnitFormatter units) {
-    final l10n = context.l10n;
-    final meters = _visibilityMetersInput(units);
-    if (meters != null) {
-      final scale = ref.read(settingsProvider).visibilityScale;
-      return visibilityBandName(scale.bandFor(meters), l10n);
-    }
-    if (_selectedVisibility != Visibility.unknown) {
-      return formatLegacyVisibilityBand(_selectedVisibility, l10n, units);
-    }
-    return null;
+  VisibilityScale get _visibilityScale =>
+      ref.read(settingsProvider).visibilityScale;
+
+  /// Remembers the mode [saved] was entered in for the next new dive. A
+  /// convenience after a save that already succeeded, so a failure is
+  /// logged, never reported as a failed save.
+  void _rememberVisibilityMode(StoredVisibility saved) {
+    final mode = saved.modeToRemember;
+    if (mode == null) return;
+    unawaited(
+      ref
+          .read(visibilityInputModeProvider.notifier)
+          .remember(mode)
+          .catchError(
+            (Object e) =>
+                _log.warning('Could not remember the visibility mode: $e'),
+          ),
+    );
+  }
+
+  /// What a save writes for visibility. See [resolveVisibilityEntry].
+  StoredVisibility _resolvedVisibility(UnitFormatter units) =>
+      resolveVisibilityEntry(
+        mode: _visibilityMode,
+        preciseMeters: _visibilityMetersInput(units),
+        band: _visibilityBand,
+        preciseTouched: _preciseTouched,
+        rangeTouched: _rangeTouched,
+        original: _originalVisibility,
+        scale: _visibilityScale,
+      );
+
+  /// The Range | Precise visibility input (issue #3226), shared by the dive
+  /// form and bulk edit.
+  Widget _visibilityInput(
+    UnitFormatter units, {
+    String? Function(String?)? validator,
+  }) {
+    final scale = ref.watch(settingsProvider).visibilityScale;
+    final band = effectiveVisibilityBand(
+      band: _visibilityBand,
+      rangeTouched: _rangeTouched,
+      original: _originalVisibility,
+      scale: scale,
+    );
+    return VisibilityInput(
+      mode: _visibilityMode,
+      onModeChanged: (m) {
+        setState(() => _visibilityMode = m);
+        _markDirty();
+      },
+      controller: _visibilityController,
+      depthSymbol: units.depthSymbol,
+      inputValidator: validator ?? numberValidator(context),
+      onPreciseChanged: (_) => setState(() => _preciseTouched = true),
+      band: band,
+      onBandChanged: (b) {
+        setState(() {
+          _visibilityBand = b;
+          _rangeTouched = true;
+        });
+        _markDirty();
+      },
+      caption: visibilityEntryCaption(
+        mode: _visibilityMode,
+        preciseMeters: _visibilityMetersInput(units),
+        band: band,
+        preciseTouched: _preciseTouched,
+        rangeTouched: _rangeTouched,
+        original: _originalVisibility,
+        scale: scale,
+        l10n: context.l10n,
+        units: units,
+      ),
+    );
   }
 
   String _conditionsSummary(UnitFormatter units) {
@@ -4776,21 +5107,27 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       if (_waterType != null) _waterType!.localizedName(context.l10n),
       if (_waterTempController.text.isNotEmpty)
         '${_waterTempController.text} ${units.temperatureSymbol}',
-      // Through the formatter rather than hand-concatenated, so the summary
+      // Through the formatters rather than hand-concatenated, so the summary
       // matches how every other distance in the app renders.
-      if (_visibilityMetersInput(units) case final meters?)
-        units.formatDistance(meters)
-      else if (_selectedVisibility != Visibility.unknown)
-        formatLegacyVisibilityBand(_selectedVisibility, context.l10n, units) ??
-            '',
+      ...switch (_resolvedVisibility(units)) {
+        StoredVisibility(:final meters?) => [units.formatDistance(meters)],
+        StoredVisibility(:final range?) => [
+          formatVisibilityRange(range, context.l10n, units),
+        ],
+        StoredVisibility(:final legacy?) => [
+          ?formatLegacyVisibilityBand(legacy, context.l10n, units),
+        ],
+        _ => const <String>[],
+      },
+      ?trimmedOrNull(_surfaceConditionsController.text),
     ].join(' · ');
   }
 
-  bool _conditionsIsEmpty() =>
+  bool _conditionsIsEmpty(UnitFormatter units) =>
       _waterTempController.text.isEmpty &&
       _airTempController.text.isEmpty &&
       _visibilityController.text.isEmpty &&
-      _selectedVisibility == Visibility.unknown &&
+      _resolvedVisibility(units).isEmpty &&
       _waterType == null &&
       _currentDirection == null &&
       _currentStrength == null &&
@@ -4802,42 +5139,23 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       _windSpeedController.text.isEmpty &&
       _cloudCover == null &&
       _precipitation == null &&
-      _weatherDescriptionController.text.isEmpty;
+      _weatherDescriptionController.text.isEmpty &&
+      _surfaceConditionsController.text.trim().isEmpty;
 
   List<Widget> _environmentRows(UnitFormatter units) {
     final l10n = context.l10n;
     final altitudeWarning = _getAltitudeWarning(units);
     return [
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          FormRow.text(
-            label: l10n.diveLog_edit_label_visibility,
-            controller: _visibilityController,
-            suffixText: units.depthSymbol,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            // No input filter: stripping '-' would turn "-5", which saves as
-            // unknown, into 5 m. Unreadable text would otherwise save as
-            // "unknown" too and erase a measured visibility (#1900).
-            inputValidator: numberValidator(context),
-            onChanged: (_) => setState(() {}),
-          ),
-          if (_visibilityCaption(units) case final caption?)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
-              child: Text(
-                caption,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ),
-        ],
-      ),
+      _visibilityInput(units),
       EnumPickerRow<WaterType>(
         label: l10n.diveLog_edit_label_waterType,
         value: _waterType,
         values: WaterType.values,
         displayName: (v) => v.localizedName(l10n),
-        onChanged: (v) => setState(() => _waterType = v),
+        onChanged: (v) => setState(() {
+          _waterType = v;
+          _waterTypeFromSite = false;
+        }),
       ),
       EnumPickerRow<CurrentDirection>(
         label: l10n.diveLog_edit_label_currentDirection,
@@ -4860,6 +5178,12 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         inputFormatters: numberInputFormatters(),
         inputValidator: numberValidator(context),
+      ),
+      SuggestedTextRow(
+        label: l10n.diveLog_edit_label_surfaceConditions,
+        controller: _surfaceConditionsController,
+        field: DiveTextSuggestionField.surfaceConditions,
+        capitalization: TextCapitalization.sentences,
       ),
       Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -5350,7 +5674,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         ..addAll(
           last.tanksForNewDive(
             newId: _uuid.v4,
-            startPressure: settings.defaultStartPressure.toDouble(),
+            startPressure: settings.defaultStartPressure,
             endPressure: 50.0,
           ),
         );
@@ -5849,6 +6173,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       );
 
       // Create dive entity
+      final savedVisibility = _resolvedVisibility(units);
       final dive = Dive(
         id: widget.diveId ?? '',
         diverId: _existingDive?.diverId, // Preserve diver assignment
@@ -5872,13 +6197,12 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         avgDepth: avgDepth,
         waterTemp: waterTemp,
         airTemp: airTemp,
-        // The legacy bucket is carried through untouched so a pre-v144 dive
-        // keeps its band until the diver actually measures one. The repository
-        // clears it as soon as visibilityMeters is present.
-        visibility: _selectedVisibility != Visibility.unknown
-            ? _selectedVisibility
-            : null,
-        visibilityMeters: _visibilityMetersInput(units),
+        // One visibility shape (issue #3226): what the diver entered, or the
+        // stored shape when they left the input alone.
+        visibility: savedVisibility.legacy,
+        visibilityMeters: savedVisibility.meters,
+        visibilityMinMeters: savedVisibility.range?.minM,
+        visibilityMaxMeters: savedVisibility.range?.maxM,
         diveTypeIds: _selectedDiveTypeIds,
         notes: _notesController.text,
         rating: _rating > 0 ? _rating : null,
@@ -5887,7 +6211,11 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             widget.prefill?.importSource ?? _existingDive?.importSource,
         trip: _selectedTrip,
         diveCenter: _selectedDiveCenter,
-        courseId: _selectedCourse?.id,
+        diveOperator: trimmedOrNull(_diveOperatorController.text),
+        boatName: trimmedOrNull(_boatNameController.text),
+        boatCaptain: trimmedOrNull(_boatCaptainController.text),
+        surfaceConditions: trimmedOrNull(_surfaceConditionsController.text),
+        courseIds: _selectedCourseIds,
         tanks: _tanks,
         gear: gearLinksFor(_selectedEquipment, _gearRows),
         // Conditions fields
@@ -6049,6 +6377,9 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         }
       }
 
+      // A new visibility value sets the mode the next new dive opens in.
+      if (_activeVisibilityTouched) _rememberVisibilityMode(savedVisibility);
+
       // Save sightings
       if (savedDiveId != null) {
         final speciesRepository = ref.read(speciesRepositoryProvider);
@@ -6142,22 +6473,16 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         ref.invalidate(navTracksForDiveProvider(savedDiveId));
       }
 
-      // Invalidate course providers if course association changed
+      // Refresh every course the dive joined or left (#2515).
       if (savedDiveId != null) {
-        final oldCourseId = _existingDive?.courseId;
-        final newCourseId = _selectedCourse?.id;
-        // Invalidate old course's dive list if it changed
-        if (oldCourseId != null && oldCourseId != newCourseId) {
-          ref.invalidate(courseDivesProvider(oldCourseId));
-          ref.invalidate(courseDiveCountProvider(oldCourseId));
+        for (final courseId in {
+          ...?_existingDive?.courseIds,
+          ..._selectedCourseIds,
+        }) {
+          ref.invalidate(courseDivesProvider(courseId));
+          ref.invalidate(courseDiveCountProvider(courseId));
         }
-        // Invalidate new course's dive list if set
-        if (newCourseId != null) {
-          ref.invalidate(courseDivesProvider(newCourseId));
-          ref.invalidate(courseDiveCountProvider(newCourseId));
-        }
-        // Always invalidate the courseForDive provider for this dive
-        ref.invalidate(courseForDiveProvider(savedDiveId));
+        ref.invalidate(coursesForDiveProvider(savedDiveId));
       }
 
       // Record tide conditions if the site has coordinates. The recorder

@@ -1,6 +1,7 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:submersion/core/database/app_sql_functions.dart';
 import 'package:submersion/core/database/database.dart';
 
 /// A v260 diver_settings shape: the retired ceiling source column beside a
@@ -41,11 +42,17 @@ void main() {
     // Every build the floor admits stopped reading the column at v137
     // (#755), and an older peer fills the missing key from its column
     // default, so no reader at or above the floor loses anything.
-    expect(AppDatabase.minimumCompatibleSchemaVersion, 240);
+    // v275 raised the floor later (#3091); this rung did not move it.
+    expect(
+      AppDatabase.minimumCompatibleSchemaVersion,
+      greaterThanOrEqualTo(240),
+    );
   });
 
   test('a fresh install has no default_ceiling_source column', () async {
-    final db = AppDatabase(NativeDatabase.memory());
+    final db = AppDatabase(
+      NativeDatabase.memory(setup: registerAppSqlFunctions),
+    );
     addTearDown(db.close);
 
     expect(

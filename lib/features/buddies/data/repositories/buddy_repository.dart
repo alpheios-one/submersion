@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
+import 'package:meta/meta.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
@@ -16,6 +17,9 @@ import 'package:submersion/features/buddies/domain/entities/buddy_with_dive_coun
 import 'package:submersion/features/buddies/domain/entities/legacy_buddy_conversion.dart';
 import 'package:submersion/features/buddies/data/repositories/buddy_conversion_repository.dart';
 import 'package:submersion/features/buddies/data/repositories/buddy_merge_repository.dart';
+import 'package:submersion/features/dive_log/data/repositories/series_id_chunks.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart'
+    as dive_domain;
 import 'package:submersion/features/dive_roles/data/repositories/dive_role_link_repository.dart';
 import 'package:submersion/features/dive_roles/data/repositories/dive_role_repository.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
@@ -25,6 +29,8 @@ import 'package:submersion/features/certification_agencies/domain/certification_
 import 'package:submersion/features/certifications/data/repositories/certification_repository.dart';
 import 'package:submersion/features/certifications/domain/certification_primary.dart';
 import 'package:submersion/features/certifications/domain/certification_title.dart';
+import 'package:submersion/features/documents/data/repositories/document_repository.dart';
+import 'package:submersion/features/documents/domain/entities/document.dart';
 
 // Re-export merge types so callers can import from buddy_repository.dart
 export 'package:submersion/features/buddies/data/repositories/buddy_merge_repository.dart'
@@ -150,8 +156,8 @@ class BuddyRepository {
 
     final results = await _db.customSelect('''
       SELECT * FROM buddies
-      WHERE (LOWER(name) LIKE ?
-         OR LOWER(email) LIKE ?
+      WHERE (unicode_lower(name) LIKE ?
+         OR unicode_lower(email) LIKE ?
          OR phone LIKE ?)
       $diverFilter
       ORDER BY name COLLATE NOCASE ASC
@@ -253,7 +259,7 @@ class BuddyRepository {
           .customSelect(
             '''
         SELECT * FROM buddies
-        WHERE LOWER(name) = LOWER(?) $scope
+        WHERE unicode_lower(name) = unicode_lower(?) $scope
         LIMIT 1
       ''',
             variables: [
@@ -361,7 +367,15 @@ class BuddyRepository {
         // deleteCertification() emits an event per cert, which would fire
         // observers mid-transaction. We tombstone here (the FK cascade writes
         // no deletion_log) and emit a single notify after commit instead.
-        for (final cert in await _certRepo.getCertificationsByBuddy(id)) {
+        final certs = await _certRepo.getCertificationsByBuddy(id);
+        // The buddy's documents and their certifications' documents go
+        // with them, tombstoned (issue #2613).
+        final documents = DocumentRepository();
+        await documents.deleteForOwners(DocumentOwnerKind.certification, [
+          for (final cert in certs) cert.id,
+        ]);
+        await documents.deleteForOwner(DocumentOwnerKind.buddy, id);
+        for (final cert in certs) {
           await (_db.delete(
             _db.certifications,
           )..where((t) => t.id.equals(cert.id))).go();
@@ -533,6 +547,29 @@ class BuddyRepository {
           .add(domain.BuddyWithRole(buddy: buddy, roles: roles));
     }
     return byDive;
+  }
+
+  /// [dives] with [dive_domain.Dive.buddies] loaded from the `dive_buddies`
+  /// junction, in batched [getBuddiesForDives] queries.
+  ///
+  /// For dives read through `getDiveById` or `getDivesByIds`, which leave the
+  /// junction unloaded (only `getAllDives` hydrates it), when the caller shows
+  /// or exports the people on them (#3039). The ids are bound in runs of
+  /// [chunkSize], since a whole trip or a large export selection has no upper
+  /// bound and each id is one SQL variable.
+  Future<List<dive_domain.Dive>> withBuddies(
+    List<dive_domain.Dive> dives, {
+    @visibleForTesting int chunkSize = kSeriesIdChunkSize,
+  }) async {
+    final ids = dives.map((d) => d.id).toSet().toList();
+    final byDive = <String, List<domain.BuddyWithRole>>{};
+    for (final chunk in seriesIdChunks(ids, size: chunkSize)) {
+      byDive.addAll(await getBuddiesForDives(chunk));
+    }
+    return [
+      for (final dive in dives)
+        dive.copyWith(buddies: byDive[dive.id] ?? const []),
+    ];
   }
 
   /// [getBuddiesForDives] plus each person's derived primary certification,
@@ -875,7 +912,8 @@ class BuddyRepository {
       final conditions = <String>[
         if (diverId != null) 'b.diver_id = ?',
         if (query != null && query.isNotEmpty)
-          '(LOWER(b.name) LIKE ? OR LOWER(b.email) LIKE ? OR b.phone LIKE ?)',
+          '(unicode_lower(b.name) LIKE ? OR unicode_lower(b.email) LIKE ? '
+              'OR b.phone LIKE ?)',
       ];
       final where = conditions.isEmpty
           ? ''

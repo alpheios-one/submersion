@@ -15,6 +15,7 @@ import 'package:submersion/features/connections/domain/entities/connection_node.
 import 'package:submersion/features/connections/domain/entities/graph_selection.dart';
 import 'package:submersion/features/connections/domain/entities/node_ref.dart';
 import 'package:submersion/features/connections/domain/views/map_spec.dart';
+import 'package:submersion/features/connections/domain/views/timeline_days.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
 
@@ -95,7 +96,9 @@ class ConnectionsRepository {
     final needle = text.trim();
     if (needle.isEmpty) return const [];
     final reader = ConnectionsReader(_db);
-    final pattern = '%${escapeLike(needle)}%';
+    // Lowered to meet unicode_lower on the label: LIKE folds ASCII only
+    // (#3032).
+    final pattern = '%${escapeLike(needle.toLowerCase())}%';
     final hits = <ConnectionNode>[
       for (final kind in ConnectionKind.values)
         ...await reader.nodes(
@@ -113,11 +116,9 @@ class ConnectionsRepository {
     return hits.take(limit).toList();
   }
 
-  /// First and last calendar year of the dives in scope, or null when there
-  /// are none. Drives the year slider.
-  Future<({int first, int last})?> diveYearSpan({
-    required String? diverId,
-  }) async {
+  /// First and last calendar day of the dives in scope, or null when there
+  /// are none. Drives the timeline slider.
+  Future<DayRange?> diveDateSpan({required String? diverId}) async {
     final scope = diveScopeSql(
       diverId: diverId,
       filter: const DiveFilterState(),
@@ -134,8 +135,8 @@ class ConnectionsRepository {
     final last = rows.single.readNullable<int>('last_ms');
     if (first == null || last == null) return null;
     return (
-      first: wallClockUtcFromMillis(first).year,
-      last: wallClockUtcFromMillis(last).year,
+      start: calendarDay(wallClockUtcFromMillis(first)),
+      end: calendarDay(wallClockUtcFromMillis(last)),
     );
   }
 
@@ -197,6 +198,7 @@ class ConnectionsRepository {
           TableUpdateQuery.onTable(_db.trips),
           TableUpdateQuery.onTable(_db.diveCenters),
           TableUpdateQuery.onTable(_db.courses),
+          TableUpdateQuery.onTable(_db.diveCourses),
         ]),
       )
       .debounce(DiveRepository.changeTickDebounce);

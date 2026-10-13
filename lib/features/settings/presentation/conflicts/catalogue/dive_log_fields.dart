@@ -633,6 +633,14 @@ final Map<String, ConflictField> diveLogFields = {
     FieldKind.enumValue,
     enumLabel: visibilityLabeler,
   ),
+  'visibilityMaxMeters': ConflictField(
+    (l) => DiveField.visibility.localizedDisplayName(l),
+    FieldKind.distance,
+  ),
+  'visibilityMinMeters': ConflictField(
+    (l) => DiveField.visibility.localizedDisplayName(l),
+    FieldKind.distance,
+  ),
   'visibilityMeters': ConflictField(
     (l) => DiveField.visibility.localizedDisplayName(l),
     FieldKind.distance,
@@ -711,6 +719,11 @@ final Map<String, ConflictField> diveLogOverrides = {
     (l) => l.settings_conflict_field_diveProfileEvents_source,
     FieldKind.enumValue,
     enumLabel: eventSourceLabeler,
+  ),
+  // When this generation last went live for its source (v283, issue #3189).
+  'diveProfileSeries.activatedAt': ConflictField(
+    (l) => l.settings_conflict_field_lastUsedAt,
+    FieldKind.dateTime,
   ),
   'diveSafetyFindings.severity': ConflictField(
     (l) => l.settings_conflict_field_diveSafetyFindings_severity,

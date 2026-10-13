@@ -60,6 +60,48 @@ extension DiverMigrations on AppDatabase {
     await _assertShowDiveFigureColumn();
   }
 
+  /// v275: retypes diver_settings.default_start_pressure from INTEGER to
+  /// REAL (issue #3091), so a start pressure entered in psi is stored
+  /// exactly rather than rounded to whole bar. SQLite has no ALTER COLUMN,
+  /// so the value moves through a REAL twin that then takes the old name.
+  /// No index, trigger or view names the column. Idempotent, and a no-op
+  /// when the table is absent or the column is already REAL, so it is safe
+  /// to call from both onUpgrade and the beforeOpen backstop.
+  Future<void> _retypeDefaultStartPressureColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final type = [
+      for (final c in cols)
+        if (c.read<String>('name') == 'default_start_pressure')
+          c.read<String>('type').toUpperCase(),
+    ];
+    if (type.isEmpty) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN default_start_pressure '
+        'REAL NOT NULL DEFAULT 200.0',
+      );
+      return;
+    }
+    if (type.single == 'REAL') return;
+    await customStatement(
+      'ALTER TABLE diver_settings ADD COLUMN default_start_pressure_v275 '
+      'REAL NOT NULL DEFAULT 200.0',
+    );
+    await customStatement(
+      'UPDATE diver_settings SET default_start_pressure_v275 = '
+      'CAST(default_start_pressure AS REAL)',
+    );
+    await customStatement(
+      'ALTER TABLE diver_settings DROP COLUMN default_start_pressure',
+    );
+    await customStatement(
+      'ALTER TABLE diver_settings '
+      'RENAME COLUMN default_start_pressure_v275 TO default_start_pressure',
+    );
+  }
+
   /// v261: drops diver_settings.default_ceiling_source (issue #767). The
   /// ceiling line lost its source toggle at v137 (#755), and nothing has
   /// read the column since. No index, trigger or view names it, so SQLite's
@@ -211,6 +253,19 @@ extension DiverMigrations on AppDatabase {
   /// and idempotent so both onUpgrade and the beforeOpen backstop can call it.
   Future<void> _assertHiddenBuiltInIdsColumn() =>
       _addColumnIfMissing('diver_settings', 'hidden_built_in_ids', 'TEXT');
+
+  /// v274: diver_settings.has_accepted_planning_disclaimer (issue #3120), the
+  /// one-time confirmation of the Planning/Gas Calculators safety disclaimer.
+  /// Defaults off, so an existing diver sees the dialog once after upgrading.
+  /// PRAGMA-guarded and idempotent so both onUpgrade and the beforeOpen
+  /// backstop can call it.
+  Future<void> _assertHasAcceptedPlanningDisclaimerColumn() =>
+      _addColumnIfMissing(
+        'diver_settings',
+        'has_accepted_planning_disclaimer',
+        'INTEGER NOT NULL DEFAULT 0 '
+            'CHECK (has_accepted_planning_disclaimer IN (0, 1))',
+      );
 
   /// v133: diver_settings deco stop band columns. PRAGMA-guarded and
   /// idempotent so it is safe to call from both onUpgrade and the beforeOpen
@@ -645,4 +700,94 @@ extension DiverMigrations on AppDatabase {
       );
     }
   }
+
+  /// v276: diver_settings.icd_warnings_enabled (issue #3121). Column only,
+  /// defaulting on; re-asserted in beforeOpen.
+  Future<void> _assertIcdWarningsColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('icd_warnings_enabled')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN icd_warnings_enabled '
+        'INTEGER NOT NULL DEFAULT 1 '
+        'CHECK (icd_warnings_enabled IN (0, 1))',
+      );
+    }
+  }
+
+  /// v281: diver_settings.trend_gap_collapse_months (issue #3251). Column
+  /// only, defaulting to a year; re-asserted in beforeOpen. No CHECK: a peer
+  /// value outside 0, 6, 12, 24 reads as 12 rather than failing the upsert.
+  Future<void> _assertTrendGapCollapseColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('trend_gap_collapse_months')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN trend_gap_collapse_months '
+        'INTEGER NOT NULL DEFAULT 12',
+      );
+    }
+  }
+
+  /// v284: diver_settings.profile_color_* (issue #3012). Nullable ARGB ints,
+  /// no default and no backfill: null is the metric's default colour.
+  /// Re-asserted in beforeOpen.
+  Future<void> _assertProfileMetricColorColumns() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    for (final column in _profileMetricColorColumns) {
+      if (!names.contains(column)) {
+        await customStatement(
+          'ALTER TABLE diver_settings ADD COLUMN $column INTEGER',
+        );
+      }
+    }
+  }
+
+  /// v286: diver_settings.equipment_default_statuses (issue #2628). Column
+  /// only, nullable and never backfilled; re-asserted in beforeOpen.
+  Future<void> _assertEquipmentDefaultStatusesColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('equipment_default_statuses')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN equipment_default_statuses TEXT',
+      );
+    }
+  }
 }
+
+const List<String> _profileMetricColorColumns = [
+  'profile_color_depth',
+  'profile_color_temperature',
+  'profile_color_pressure',
+  'profile_color_heart_rate',
+  'profile_color_sac',
+  'profile_color_max_depth',
+  'profile_color_ceiling',
+  'profile_color_ndl',
+  'profile_color_tts',
+  'profile_color_gtr',
+  'profile_color_cns',
+  'profile_color_otu',
+  'profile_color_pp_o2',
+  'profile_color_pp_n2',
+  'profile_color_pp_he',
+  'profile_color_mod',
+  'profile_color_density',
+  'profile_color_gf',
+  'profile_color_surface_gf',
+  'profile_color_mean_depth',
+];

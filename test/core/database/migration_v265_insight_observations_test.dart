@@ -1,6 +1,7 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:submersion/core/database/app_sql_functions.dart';
 import 'package:submersion/core/database/database.dart';
 
 /// Schema v265: insight_observation_dismissals and
@@ -38,7 +39,11 @@ void main() {
       AppDatabase.migrationStepCount(264),
       AppDatabase.migrationStepCount(265) + 1,
     );
-    expect(AppDatabase.minimumCompatibleSchemaVersion, 240);
+    // v275 raised the floor later (#3091); this rung did not move it.
+    expect(
+      AppDatabase.minimumCompatibleSchemaVersion,
+      greaterThanOrEqualTo(240),
+    );
   });
 
   test('upgrading from v264 adds the table and the nullable column', () async {
@@ -89,7 +94,9 @@ void main() {
   });
 
   test('a fresh database has both', () async {
-    final db = AppDatabase(NativeDatabase.memory());
+    final db = AppDatabase(
+      NativeDatabase.memory(setup: registerAppSqlFunctions),
+    );
     addTearDown(db.close);
     expect(
       await columnsOf(db, 'insight_observation_dismissals'),

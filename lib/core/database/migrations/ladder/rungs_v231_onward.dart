@@ -288,5 +288,115 @@ extension RungsFromV231 on AppDatabase {
       await _migrateTdiCertificationStructure();
     }
     if (from < 273) await reportProgress();
+    // v274: diver_settings.has_accepted_planning_disclaimer (issue #3120).
+    // Column-only rung, no backfill: an existing diver reads false and sees
+    // the disclaimer dialog once. Re-asserted in beforeOpen.
+    if (from < 274) {
+      await _assertHasAcceptedPlanningDisclaimerColumn();
+    }
+    if (from < 274) await reportProgress();
+    // v275: diver_settings.default_start_pressure retyped INTEGER to REAL
+    // (issue #3091). Re-asserted in beforeOpen.
+    if (from < 275) {
+      await _retypeDefaultStartPressureColumn();
+    }
+    if (from < 275) await reportProgress();
+    // v276: diver_settings.icd_warnings_enabled (issue #3121). Column
+    // only, defaulting on; re-asserted in beforeOpen.
+    if (from < 276) {
+      await _assertIcdWarningsColumn();
+    }
+    if (from < 276) await reportProgress();
+    // v277: documents store (issue #2613). Tables re-asserted in beforeOpen;
+    // the data copy runs here only, never on open.
+    if (from < 277) {
+      await _assertDocumentsSchema();
+      await _migrateLegacyDocuments();
+    }
+    if (from < 277) await reportProgress();
+    // v278: dives.visibility_min_meters / visibility_max_meters (issue
+    // #3226). Columns only; re-asserted in beforeOpen.
+    if (from < 278) {
+      await _assertVisibilityRangeColumns();
+    }
+    if (from < 278) await reportProgress();
+    // v279: dive_computer_connections (issue #3106). Table only;
+    // re-asserted in beforeOpen.
+    if (from < 279) {
+      await _assertDiveComputerConnectionSchema();
+      // Once, before this build writes any hex: every 8-digit Shearwater
+      // download serial is still libdivecomputer's decimal here. The
+      // every-open heal leaves 8 digits alone, since afterwards they can be
+      // hex (issue #3106).
+      await _healShearwaterDownloadSerialsOnUpgrade();
+    }
+    if (from < 279) await reportProgress();
+    // v280: no data change (issue #2361). Carries the sync floor past the
+    // builds that cannot parse AccountKind.webdav.
+    if (from < 280) await reportProgress();
+    // v281: diver_settings.trend_gap_collapse_months (issue #3251). Column
+    // only, defaulting to a year; re-asserted in beforeOpen. Renumbered from
+    // 278, 279 and 280, which #3226, #3106 and #2361 shipped first.
+    if (from < 281) {
+      await _assertTrendGapCollapseColumn();
+    }
+    if (from < 281) await reportProgress();
+    // v283: dive_profile_series.activated_at (issue #3189). The column and
+    // its one-time backfill; re-asserted in beforeOpen.
+    if (from < 283) {
+      await _assertProfileSeriesActivatedAt();
+    }
+    if (from < 283) await reportProgress();
+    // v284: diver_settings.profile_color_* (issue #3012). Columns only, null
+    // meaning the default colour; re-asserted in beforeOpen. Renumbered from
+    // 282, which PR #3133 holds, after #3296 shipped 283.
+    if (from < 284) {
+      await _assertProfileMetricColorColumns();
+    }
+    if (from < 284) await reportProgress();
+    // v285: nav_tracks.source_metadata (issue #3047). Column only, no
+    // backfill; re-asserted in beforeOpen through _assertNavTracksSchema.
+    if (from < 285) {
+      await _assertNavTrackSourceMetadataColumn();
+    }
+    if (from < 285) await reportProgress();
+    // v286: diver_settings.equipment_default_statuses (issue #2628). Column
+    // only; re-asserted in beforeOpen.
+    if (from < 286) {
+      await _assertEquipmentDefaultStatusesColumn();
+    }
+    if (from < 286) await reportProgress();
+    // v287: dive_tanks.passport_id (issue #2650). Column only, no backfill:
+    // nothing recorded which tag an older tank came from. Re-asserted in
+    // beforeOpen; the index is in performance_indexes.dart. Renumbered from
+    // 285 and 286, which #3306 and #3319 shipped first.
+    if (from < 287) {
+      await _assertTankPassportIdColumn();
+    }
+    if (from < 287) await reportProgress();
+    // v288: the dive_courses junction and the certification-side course link
+    // (issue #2515). Schema re-asserted and links re-seeded in beforeOpen;
+    // the certification backfill runs here only.
+    if (from < 288) {
+      await _assertDiveCourseSchema();
+      await seedDiveCourseLinks(this);
+      await backfillCertificationCourseLinks(this);
+    }
+    if (from < 288) await reportProgress();
+    // v289: shared dive-site library tables and dive_sites.shared_library_id
+    // (issue #2567). Idempotent; re-asserted in beforeOpen. Renumbered from
+    // 288 after #2515 shipped 288.
+    if (from < 289) {
+      await _assertSharedLibrarySchema();
+    }
+    if (from < 289) await reportProgress();
+    // v290: dive_plan_segments.split_at_configured_rate (issue #3264).
+    // Column only, defaulting off; re-asserted in beforeOpen. Renumbered
+    // from 277, 282 then 286, as earlier rungs shipped or were claimed
+    // first.
+    if (from < 290) {
+      await _assertSegmentSplitAtRateColumn();
+    }
+    if (from < 290) await reportProgress();
   }
 }

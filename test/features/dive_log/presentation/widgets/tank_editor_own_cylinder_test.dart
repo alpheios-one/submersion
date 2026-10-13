@@ -134,6 +134,7 @@ void main() {
     Future<void> Function(EquipmentItem)? onOwnCylinderUsed,
     List<EquipmentItem>? gear,
     List<dynamic> extra = const [],
+    DiveTank tank = const DiveTank(id: 'tank-1'),
   }) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
@@ -161,7 +162,7 @@ void main() {
           home: Scaffold(
             body: SingleChildScrollView(
               child: TankEditor(
-                tank: const DiveTank(id: 'tank-1'),
+                tank: tank,
                 tankNumber: 1,
                 onChanged: onChanged,
                 onOwnCylinderUsed: onOwnCylinderUsed,
@@ -207,6 +208,34 @@ void main() {
     expect(used!.id, faber.id);
   });
 
+  testWidgets('a picked cylinder stamps its passport id (#2650)', (
+    tester,
+  ) async {
+    DiveTank? changed;
+    await pump(
+      tester,
+      onChanged: (t) => changed = t,
+      onOwnCylinderUsed: (_) async {},
+    );
+    await pick(tester, faber);
+    expect(changed!.passportId, '8f3a5c1e-1b2c-4d5e-8f90-1234567890ab');
+  });
+
+  testWidgets('a picked cylinder with no passport id clears one (#2650)', (
+    tester,
+  ) async {
+    DiveTank? changed;
+    await pump(
+      tester,
+      onChanged: (t) => changed = t,
+      onOwnCylinderUsed: (_) async {},
+      tank: const DiveTank(id: 'tank-1', passportId: 'p-old'),
+    );
+    await pick(tester, bare);
+    expect(changed!.volume, 11.1);
+    expect(changed!.passportId, isNull);
+  });
+
   testWidgets('a cylinder with no fills keeps the tank mix', (tester) async {
     DiveTank? changed;
     await pump(
@@ -219,6 +248,29 @@ void main() {
     expect(changed!.volume, 11.1);
     expect(changed!.workingPressure, 207);
     expect(changed!.gasMix.o2, 21);
+  });
+
+  testWidgets('a tank the dive computer recorded keeps its mix (#3021)', (
+    tester,
+  ) async {
+    DiveTank? changed;
+    await pump(
+      tester,
+      onChanged: (t) => changed = t,
+      onOwnCylinderUsed: (_) async {},
+      tank: const DiveTank(
+        id: 'tank-1',
+        gasMix: GasMix(o2: 28),
+        computerId: 'dc1',
+        sourceTankIndex: 0,
+      ),
+    );
+    await pick(tester, faber);
+
+    // The spec fills from the cylinder; the fill's EAN32 does not replace
+    // the EAN28 the computer logged.
+    expect(changed!.volume, 12);
+    expect(changed!.gasMix.o2, 28);
   });
 
   testWidgets('offers only the tank gear in use, and says what picking does', (

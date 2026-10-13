@@ -50,6 +50,7 @@ class _HeldPassports extends CylinderPassportRepository {
   Future<String?> findEquipmentIdByPassportId(
     String passportId, {
     String? diverId,
+    EquipmentType? type,
   }) async {
     await gate;
     return null;
@@ -321,6 +322,48 @@ void main() {
     expect(changed!.tripCylinderId, isNull);
     expect(changed!.gasMix.o2, 32);
     expect(changed!.startPressure, 205);
+  });
+
+  testWidgets('picking a slot clears the passport id (#2650)', (tester) async {
+    DiveTank? changed;
+    await _pump(
+      tester,
+      equipment: const [],
+      tripId: 't1',
+      slots: [filledSlot('a', pressure: 205, o2: 32)],
+      tank: const DiveTank(id: 'tank-1', passportId: 'p-1'),
+      onChanged: (t) => changed = t,
+    );
+    await _openTripCylinderPicker(tester);
+    await tester.tap(find.textContaining('Truck a').last);
+    await tester.pumpAndSettle();
+
+    expect(changed!.tripCylinderId, 'a');
+    expect(changed!.passportId, isNull);
+  });
+
+  // None unlinks the slot; it is not a cylinder choice, so a scanned tag
+  // stays (issue #2650).
+  testWidgets('None keeps the passport id (#2650)', (tester) async {
+    DiveTank? changed;
+    await _pump(
+      tester,
+      equipment: const [],
+      tripId: 't1',
+      slots: [filledSlot('a')],
+      tank: const DiveTank(
+        id: 'tank-1',
+        tripCylinderId: 'a',
+        passportId: 'p-1',
+      ),
+      onChanged: (t) => changed = t,
+    );
+    await _openTripCylinderPicker(tester);
+    await tester.tap(find.text('None').last);
+    await tester.pumpAndSettle();
+
+    expect(changed!.tripCylinderId, isNull);
+    expect(changed!.passportId, 'p-1');
   });
 
   testWidgets('a suggested link says so', (tester) async {

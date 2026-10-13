@@ -19,6 +19,10 @@ import 'package:submersion/features/media/domain/entities/media_source_type.dart
 import 'package:submersion/features/media/domain/entities/site_attachment_category.dart';
 import 'package:submersion/features/media/presentation/helpers/site_attachment_labels.dart';
 import 'package:submersion/features/media/presentation/match_confidence_display.dart';
+import 'package:submersion/features/equipment/domain/models/equipment_default_view.dart';
+import 'package:submersion/features/equipment/presentation/utils/equipment_default_view_label.dart';
+import 'package:submersion/features/insights/domain/trend_gap_threshold.dart';
+import 'package:submersion/features/insights/presentation/formatters/trend_gap_label.dart';
 import 'package:submersion/features/media/presentation/widgets/media_info_panel.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:submersion/features/settings/presentation/conflicts/conflict_enum_labels.dart';
@@ -256,3 +260,18 @@ String? themeModeLabeler(AppLocalizations l10n, String stored) =>
       'system' => l10n.settings_appearance_theme_system,
       _ => null,
     };
+
+final ConflictEnumLabeler trendGapThresholdLabeler = enumLabeler(
+  TrendGapThreshold.values,
+  (l, v) => trendGapThresholdLabel(v, l),
+  storedAs: (v) => '${v.months}',
+);
+
+/// The stored default equipment view (issue #2628), or null for a value
+/// this build cannot read, which the dialog then shows raw.
+String? equipmentDefaultStatusesLabeler(AppLocalizations l10n, String stored) {
+  final statuses = tryDecodeEquipmentDefaultStatuses(stored);
+  return statuses == null
+      ? null
+      : equipmentDefaultStatusesLabel(statuses, l10n);
+}

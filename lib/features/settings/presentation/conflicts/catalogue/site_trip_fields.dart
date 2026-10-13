@@ -331,7 +331,7 @@ final Map<String, ConflictField> siteTripFields = {
   ),
   'rateOfChange': ConflictField(
     (l) => l.settings_conflict_field_rateOfChange,
-    FieldKind.number,
+    FieldKind.tideRate,
   ),
   'region': ConflictField(
     (l) => SiteField.region.localizedDisplayName(l),
@@ -356,6 +356,10 @@ final Map<String, ConflictField> siteTripFields = {
   'source': ConflictField(
     (l) => l.settings_conflict_field_source,
     FieldKind.shortText,
+  ),
+  'sourceMetadata': ConflictField(
+    (l) => l.settings_conflict_field_sourceMetadata,
+    FieldKind.opaque,
   ),
   'sourceRef': ConflictField(
     (l) => l.settings_conflict_field_sourceRef,
@@ -440,6 +444,35 @@ final Map<String, ConflictField> siteTripFields = {
 
 /// Columns whose meaning depends on the entity, keyed `entity.column`.
 final Map<String, ConflictField> siteTripOverrides = {
+  // Club libraries (issue #2567).
+  'diveSites.sharedLibraryId': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibrary,
+    FieldKind.shortText,
+  ),
+  'sharedLibraryMemberships.libraryId': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibrary,
+    FieldKind.shortText,
+  ),
+  'sharedLibraryMemberships.memberId': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibraryMember,
+    FieldKind.shortText,
+  ),
+  'sharedLibraryMemberships.displayName': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibraryDisplayName,
+    FieldKind.shortText,
+  ),
+  'sharedLibraryMemberships.libraryName': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibraryName,
+    FieldKind.shortText,
+  ),
+  'sharedLibraryMemberships.backendKind': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibraryBackend,
+    FieldKind.shortText,
+  ),
+  'sharedLibraryMemberships.locationHint': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibraryLocation,
+    FieldKind.shortText,
+  ),
   'checklistTemplateItems.category': ConflictField(
     (l) => l.settings_conflict_field_checklistTemplateItems_category,
     FieldKind.shortText,

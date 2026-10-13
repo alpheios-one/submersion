@@ -1592,6 +1592,33 @@ void main() {
       );
     });
 
+    testWidgets('counts pictures stored inside the logbook', (tester) async {
+      await expectCard(
+        tester,
+        const ImportNotice(
+          kind: ImportNoticeKind.logbookImagesNotImported,
+          count: 3,
+        ),
+        title: 'Some pictures not imported',
+        bodyFragment: '3 pictures stored in the logbook file',
+        countLine: null,
+      );
+    });
+
+    testWidgets('names the trips that had no dates', (tester) async {
+      await expectCard(
+        tester,
+        const ImportNotice(
+          kind: ImportNoticeKind.tripsNotImported,
+          count: 2,
+          names: ['Red Sea', 'Lake weekend'],
+        ),
+        title: 'Some trips not imported',
+        bodyFragment: 'could not be imported: Red Sea, Lake weekend.',
+        countLine: null,
+      );
+    });
+
     testWidgets('says which dives lost the site the file named', (
       tester,
     ) async {

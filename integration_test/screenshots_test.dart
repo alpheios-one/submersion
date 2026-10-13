@@ -22,6 +22,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/app.dart';
+import 'package:submersion/core/database/app_sql_functions.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/database_service.dart';
@@ -89,7 +90,7 @@ void main() {
     prefs = await SharedPreferences.getInstance();
 
     // Create in-memory database for testing
-    testDb = AppDatabase(NativeDatabase.memory());
+    testDb = AppDatabase(NativeDatabase.memory(setup: registerAppSqlFunctions));
     DatabaseService.instance.setTestDatabase(testDb);
 
     // Seed with test data - prefer UDDF import for consistent data
@@ -554,6 +555,11 @@ void main() {
         200,
         scrollable: find.byType(Scrollable).first,
       );
+      // scrollUntilVisible stops once the tile is built, and a ListView
+      // builds tiles in its cache extent below the screen, so a tile pushed
+      // down by a new Appearance setting is found but not tappable.
+      await tester.ensureVisible(navBarTile.first);
+      await _settle(tester);
       await tester.tap(navBarTile.first);
       await _settle(tester);
     }

@@ -171,8 +171,11 @@ class DiverSettings extends Table {
       text().withDefault(const Constant('recreational'))();
   RealColumn get defaultTankVolume =>
       real().withDefault(const Constant(12.0))();
-  IntColumn get defaultStartPressure =>
-      integer().withDefault(const Constant(200))();
+
+  /// Bar. REAL since v275 so a pressure entered in psi keeps its value
+  /// (issue #3091); whole bar before that.
+  RealColumn get defaultStartPressure =>
+      real().withDefault(const Constant(200.0))();
   TextColumn get defaultTankPreset =>
       text().nullable().withDefault(const Constant('al80'))();
   BoolColumn get applyDefaultTankToImports =>
@@ -208,6 +211,8 @@ class DiverSettings extends Table {
   // coverage:ignore-end
   BoolColumn get o2Narcotic => boolean().withDefault(const Constant(true))();
   RealColumn get endLimit => real().withDefault(const Constant(30.0))();
+  BoolColumn get icdWarningsEnabled =>
+      boolean().withDefault(const Constant(true))();
   BoolColumn get useDiveComputerCnsData =>
       boolean().withDefault(const Constant(false))();
   // The per-metric data sources stay at DEFAULT 1 (calculated) even though a
@@ -426,6 +431,37 @@ class DiverSettings extends Table {
   // v122: days before a trip to nag about gear due before trip end.
   IntColumn get tripServiceLeadDays =>
       integer().withDefault(const Constant(14))();
+  // v281: calendar months a stretch with no dives must exceed before the
+  // trend charts collapse it into a break (issue #3251); 0 is off. Any
+  // other value reads as 12. Codegen input, never executed.
+  // coverage:ignore-start
+  IntColumn get trendGapCollapseMonths =>
+      integer().withDefault(const Constant(12))();
+  // coverage:ignore-end
+  // v284: per-diver profile metric colours (issue #3012), ARGB ints; null is
+  // the metric's default (or Auto). Codegen input, never executed.
+  // coverage:ignore-start
+  IntColumn get profileColorDepth => integer().nullable()();
+  IntColumn get profileColorTemperature => integer().nullable()();
+  IntColumn get profileColorPressure => integer().nullable()();
+  IntColumn get profileColorHeartRate => integer().nullable()();
+  IntColumn get profileColorSac => integer().nullable()();
+  IntColumn get profileColorMaxDepth => integer().nullable()();
+  IntColumn get profileColorCeiling => integer().nullable()();
+  IntColumn get profileColorNdl => integer().nullable()();
+  IntColumn get profileColorTts => integer().nullable()();
+  IntColumn get profileColorGtr => integer().nullable()();
+  IntColumn get profileColorCns => integer().nullable()();
+  IntColumn get profileColorOtu => integer().nullable()();
+  IntColumn get profileColorPpO2 => integer().nullable()();
+  IntColumn get profileColorPpN2 => integer().nullable()();
+  IntColumn get profileColorPpHe => integer().nullable()();
+  IntColumn get profileColorMod => integer().nullable()();
+  IntColumn get profileColorDensity => integer().nullable()();
+  IntColumn get profileColorGf => integer().nullable()();
+  IntColumn get profileColorSurfaceGf => integer().nullable()();
+  IntColumn get profileColorMeanDepth => integer().nullable()();
+  // coverage:ignore-end
   // Data source badge visibility (v55)
   BoolColumn get showDataSourceBadges =>
       boolean().withDefault(const Constant(true))();
@@ -463,6 +499,14 @@ class DiverSettings extends Table {
       boolean().withDefault(const Constant(false))();
   BoolColumn get showDetailsPaneCourses =>
       boolean().withDefault(const Constant(false))();
+  // v274: one-time confirmation of the planning safety disclaimer (issue
+  // #3120). Off by default; the app never resets it back to false.
+  BoolColumn get hasAcceptedPlanningDisclaimer =>
+      boolean().withDefault(const Constant(false))();
+  // v286: the statuses the Equipment list's default view shows (issue
+  // #2628), a JSON array of EquipmentStatus names. Null reads as the factory
+  // default, everything but retired, sold and wanted gear.
+  TextColumn get equipmentDefaultStatuses => text().nullable()();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,14 +25,18 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/shared/models/entity_table_config.dart';
 import 'package:submersion/shared/providers/entity_table_config_providers.dart';
 import 'package:submersion/shared/selection/select_items_menu_entries.dart';
+import 'package:submersion/shared/selection/selection_controller.dart';
 import 'package:submersion/core/query/domain/query_node.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_query_providers.dart';
 import 'package:submersion/features/query/presentation/providers/query_id_set_providers.dart';
 import 'package:submersion/features/query/presentation/widgets/query_chips_frame.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
+import 'package:submersion/shared/widgets/master_detail/master_detail_form_scope.dart';
 
+import '../../../../helpers/list_create_router.dart';
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/select_items_menu.dart';
+import '../../../../helpers/keyboard_navigation_contract.dart';
 import '../../../../helpers/selection_contract.dart';
 import '../../../../helpers/test_app.dart';
 
@@ -113,6 +119,10 @@ Future<List<Override>> _buildOverrides({
 
 /// Mutable source for the contract test's filter step, so the visible
 /// list can be narrowed mid-test the way a real filter would.
+/// Moved to make the buddies source reload while holding its previous
+/// value, the way a dependency change does in the app.
+final _buddyReloadProvider = StateProvider<int>((ref) => 0);
+
 final _visibleBuddiesProvider = StateProvider<List<BuddyWithDiveCount>>(
   (ref) => const [],
 );
@@ -121,6 +131,7 @@ Future<List<Override>> _buildPhoneOverrides({
   required List<BuddyWithDiveCount> buddies,
   ListViewMode viewMode = ListViewMode.detailed,
   String? highlightedBuddyId,
+  FutureOr<List<BuddyWithDiveCount>> Function(Ref ref)? loadBuddies,
 }) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
@@ -129,7 +140,9 @@ Future<List<Override>> _buildPhoneOverrides({
     sharedPreferencesProvider.overrideWithValue(prefs),
     settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
     currentDiverIdProvider.overrideWith((ref) => MockCurrentDiverIdNotifier()),
-    allBuddiesWithDiveCountProvider.overrideWith((ref) => buddies),
+    allBuddiesWithDiveCountProvider.overrideWith(
+      loadBuddies ?? (ref) => buddies,
+    ),
     buddyListNotifierProvider.overrideWith((ref) => _MockBuddyListNotifier()),
     buddyListViewModeProvider.overrideWith((ref) => viewMode),
     // Detailed rows resolve the usual-role chip through the role map; keep
@@ -223,11 +236,75 @@ void main() {
         },
         visibleAfterFilter: 1,
       );
+
+      await verifyKeyboardNavigationContract(
+        tester,
+        build: (onItemSelected) => testApp(
+          overrides: overrides,
+          locale: const Locale('en'),
+          child: BuddyListContent(
+            showAppBar: true,
+            onItemSelected: onItemSelected,
+          ),
+        ),
+        firstRow: find.text('Aaa Buddy'),
+      );
     });
   });
 
   // The desktop pane's own header (showAppBar: false) carries a second
   // overflow menu, with the same "Select items" entry at its top.
+  group('a reload holding its previous value', () {
+    for (final mode in [ListViewMode.detailed, ListViewMode.table]) {
+      testWidgets('keeps the checks (${mode.name})', (tester) async {
+        final controller = SelectionController();
+        addTearDown(controller.dispose);
+        final all = [
+          _makeBuddy(id: 'b1', name: 'Alice'),
+          _makeBuddy(id: 'b2', name: 'Bob'),
+        ];
+        await tester.pumpWidget(
+          testApp(
+            overrides: await _buildPhoneOverrides(
+              buddies: all,
+              viewMode: mode,
+              // A source that reloads from a moved dependency while it still
+              // holds the previous rows.
+              loadBuddies: (ref) {
+                ref.watch(_buddyReloadProvider);
+                return Future.delayed(
+                  const Duration(milliseconds: 50),
+                  () => all,
+                );
+              },
+            ),
+            locale: const Locale('en'),
+            child: BuddyListContent(
+              showAppBar: true,
+              selectionController: controller,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        controller.enterExplicit();
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('selection_select_all')));
+        await tester.pumpAndSettle();
+        expect(find.text('2 selected'), findsOneWidget);
+
+        ProviderScope.containerOf(
+          tester.element(find.byType(BuddyListContent)),
+        ).read(_buddyReloadProvider.notifier).state++;
+        // Two frames inside the reload: one builds, the next runs the prune.
+        await tester.pump();
+        await tester.pump();
+        expect(find.text('2 selected'), findsOneWidget);
+        await tester.pumpAndSettle();
+        expect(find.text('2 selected'), findsOneWidget);
+      });
+    }
+  });
+
   group('compact bar "Select items"', () {
     testWidgets('is first in the menu and enters selection', (tester) async {
       final all = <BuddyWithDiveCount>[
@@ -904,6 +981,82 @@ void main() {
       await pumpWithQuery(tester, ids: {'b2'}, viewMode: ListViewMode.table);
       expect(find.text('Bob'), findsOneWidget);
       expect(find.text('Alice'), findsNothing);
+    });
+  });
+
+  group('empty state beside an open form (issue #3192)', () {
+    Future<GoRouter> pumpEmptyInRouter(
+      WidgetTester tester, {
+      required double width,
+    }) async {
+      final overrides = await _buildOverrides(buddies: []);
+      return pumpListInCreateRouter(
+        tester,
+        overrides: overrides,
+        content: const BuddyListContent(showAppBar: true),
+        listPath: '/buddies',
+        width: width,
+      );
+    }
+
+    testWidgets('the create button opens the full-page form when narrow', (
+      tester,
+    ) async {
+      final router = await pumpEmptyInRouter(tester, width: 900);
+
+      await tester.tap(find.text('Add your first buddy'));
+      await tester.pumpAndSettle();
+
+      expect(router.state.uri.toString(), '/buddies/new');
+      expect(find.text(kFullPageCreateForm), findsOneWidget);
+    });
+
+    testWidgets('the create button opens the pane form beside a detail pane', (
+      tester,
+    ) async {
+      final router = await pumpEmptyInRouter(tester, width: 1400);
+
+      await tester.tap(find.text('Add your first buddy'));
+      await tester.pumpAndSettle();
+
+      expect(router.state.uri.toString(), '/buddies?mode=new');
+    });
+
+    Future<void> pumpEmpty(
+      WidgetTester tester, {
+      required bool isFormOpen,
+    }) async {
+      final overrides = await _buildOverrides(buddies: []);
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          // The assertions match English button labels.
+          locale: const Locale('en'),
+          child: MasterDetailFormScope(
+            isFormOpen: isFormOpen,
+            child: const BuddyListContent(showAppBar: true),
+          ),
+        ),
+      );
+      await tester.pump();
+    }
+
+    testWidgets('offers the create button when no form is open', (
+      tester,
+    ) async {
+      await pumpEmpty(tester, isFormOpen: false);
+
+      expect(find.text('Add your first buddy'), findsOneWidget);
+    });
+
+    testWidgets('hides the create button while a form is open beside it', (
+      tester,
+    ) async {
+      await pumpEmpty(tester, isFormOpen: true);
+
+      // Beside an open form it reads as the form's submit button, but it only
+      // reopens the create form, so nothing gets saved (issue #3192).
+      expect(find.text('Add your first buddy'), findsNothing);
     });
   });
 }

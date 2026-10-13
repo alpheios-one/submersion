@@ -6,10 +6,12 @@ import 'package:submersion/features/insights/domain/trend_range.dart';
 /// family key so each chart keeps its own aggregation and overlay choices.
 abstract final class TrendChartIds {
   static const depth = 'depth';
+  static const runtime = 'runtime';
   static const bottomTime = 'bottom-time';
   static const sac = 'sac';
   static const weight = 'weight';
   static const waterTemp = 'water-temp';
+  static const airTemp = 'air-temp';
 }
 
 /// How one trend chart is drawn. Raw per-dive by default: the whole point of

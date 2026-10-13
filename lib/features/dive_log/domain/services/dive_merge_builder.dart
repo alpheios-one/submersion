@@ -262,6 +262,14 @@ class DiveMergeBuilder {
           if (seenTagIds.add(t.id)) t,
     ];
 
+    // Courses: ordered union, the earliest dive's courses first (#2515).
+    final mergedCourseIds = <String>[];
+    for (final d in sorted) {
+      for (final c in d.courseIds) {
+        if (!mergedCourseIds.contains(c)) mergedCourseIds.add(c);
+      }
+    }
+
     // Dive types: ordered union (first dive's representative type stays first).
     final mergedDiveTypeIds = <String>[];
     for (final d in sorted) {
@@ -317,6 +325,13 @@ class DiveMergeBuilder {
       }
     }
 
+    // Visibility comes whole from one source, by the same precedence every
+    // reader uses (issue #3226): picking each column independently could
+    // pair one source's measurement with another's range.
+    final visibilitySource =
+        sorted.where((d) => d.visibilityMeters != null).firstOrNull ??
+        sorted.where((d) => d.visibilityRange != null).firstOrNull ??
+        sorted.where((d) => d.visibility != null).firstOrNull;
     final mergedDive = Dive(
       id: mergedId,
       diverId: first.diverId,
@@ -351,8 +366,10 @@ class DiveMergeBuilder {
       // yielding to another role as DiveRoleSet.normalize has it.
       diverRoleIds: DiveRoleSet.union([for (final d in sorted) d.diverRoleIds]),
       rating: _firstNonNull(sorted, (d) => d.rating),
-      visibility: _firstNonNull(sorted, (d) => d.visibility),
-      visibilityMeters: _firstNonNull(sorted, (d) => d.visibilityMeters),
+      visibility: visibilitySource?.visibility,
+      visibilityMeters: visibilitySource?.visibilityMeters,
+      visibilityMinMeters: visibilitySource?.visibilityMinMeters,
+      visibilityMaxMeters: visibilitySource?.visibilityMaxMeters,
       waterTemp: _firstNonNull(sorted, (d) => d.waterTemp),
       airTemp: _firstNonNull(sorted, (d) => d.airTemp),
       currentDirection: _firstNonNull(sorted, (d) => d.currentDirection),
@@ -392,7 +409,7 @@ class DiveMergeBuilder {
       loopO2Avg: _firstNonNull(sorted, (d) => d.loopO2Avg),
       loopVolume: _firstNonNull(sorted, (d) => d.loopVolume),
       scrubber: _firstNonNull(sorted, (d) => d.scrubber),
-      courseId: _firstNonNull(sorted, (d) => d.courseId),
+      courseIds: mergedCourseIds,
       importSource: _firstNonNull(sorted, (d) => d.importSource),
       importId: _firstNonNull(sorted, (d) => d.importId),
       diveTypeIds: mergedDiveTypeIds,
@@ -404,6 +421,10 @@ class DiveMergeBuilder {
       precipitation: _firstNonNull(sorted, (d) => d.precipitation),
       humidity: _firstNonNull(sorted, (d) => d.humidity),
       weatherDescription: _firstNonNull(sorted, (d) => d.weatherDescription),
+      diveOperator: _firstNonNull(sorted, (d) => d.diveOperator),
+      boatName: _firstNonNull(sorted, (d) => d.boatName),
+      boatCaptain: _firstNonNull(sorted, (d) => d.boatCaptain),
+      surfaceConditions: _firstNonNull(sorted, (d) => d.surfaceConditions),
       weatherSource: _firstNonNull(sorted, (d) => d.weatherSource),
       weatherFetchedAt: _firstNonNull(sorted, (d) => d.weatherFetchedAt),
     );

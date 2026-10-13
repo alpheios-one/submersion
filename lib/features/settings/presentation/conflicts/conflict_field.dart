@@ -25,6 +25,9 @@ enum FieldKind {
   heightCm,
   ascentRate,
 
+  /// A tide's vertical rate in metres per hour, signed (rising positive).
+  tideRate,
+
   /// A gas rate in litres per minute (SAC, RMV).
   rmv,
   latitude,
@@ -35,6 +38,10 @@ enum FieldKind {
   durationSeconds,
   durationMinutes,
   durationHours,
+
+  /// A career total in seconds (a diver's prior dive time): shown in hours
+  /// and minutes, never days, as divers count logged time.
+  totalDurationSeconds,
 
   /// A real instant, shown in the device's time zone.
   dateTime,

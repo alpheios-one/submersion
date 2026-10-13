@@ -111,6 +111,8 @@ String queryLabelForKey(AppLocalizations l10n, String key) {
       return l10n.query_dives_airTemp;
     case 'query_dives_avgDepth':
       return l10n.query_dives_avgDepth;
+    case 'query_dives_boatCaptain':
+      return l10n.query_dives_boatCaptain;
     case 'query_dives_boatName':
       return l10n.query_dives_boatName;
     case 'query_dives_bottomTime':
@@ -457,6 +459,8 @@ String queryLabelForKey(AppLocalizations l10n, String key) {
       return l10n.query_sites_city;
     case 'query_sites_coordinates':
       return l10n.query_sites_coordinates;
+    case 'query_sites_library':
+      return l10n.query_sites_library;
     case 'query_sites_country':
       return l10n.query_sites_country;
     case 'query_sites_difficulty':

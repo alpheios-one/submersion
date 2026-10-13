@@ -1,6 +1,7 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:submersion/core/database/app_sql_functions.dart';
 import 'package:submersion/core/database/database.dart';
 
 /// Schema v253: dive_safety_reviews.inputs_hash, the fingerprint of the diver
@@ -47,11 +48,17 @@ void main() {
       AppDatabase.migrationStepCount(252),
       AppDatabase.migrationStepCount(253) + 1,
     );
-    expect(AppDatabase.minimumCompatibleSchemaVersion, 240);
+    // v275 raised the floor later (#3091); this rung did not move it.
+    expect(
+      AppDatabase.minimumCompatibleSchemaVersion,
+      greaterThanOrEqualTo(240),
+    );
   });
 
   test('a fresh database has the column', () async {
-    final db = AppDatabase(NativeDatabase.memory());
+    final db = AppDatabase(
+      NativeDatabase.memory(setup: registerAppSqlFunctions),
+    );
     addTearDown(db.close);
     expect(await columnsOf(db, 'dive_safety_reviews'), contains('inputs_hash'));
   });

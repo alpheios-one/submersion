@@ -29,6 +29,9 @@ import 'package:submersion/features/media/data/repositories/media_row_restore.da
 import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 import 'package:submersion/features/planner/data/repositories/dive_plan_dive_links.dart';
+import 'package:submersion/features/documents/data/repositories/document_repository.dart';
+import 'package:submersion/features/documents/domain/entities/document.dart';
+import 'package:submersion/core/services/shared_library/library_edit_stamper.dart';
 
 export 'package:submersion/features/dive_sites/data/repositories/site_links.dart'
     show SiteLinks, SiteUsage;
@@ -62,6 +65,7 @@ class SiteRepository {
   final MediaDeletionCoordinator _mediaDeletionCoordinator;
   AppDatabase get _db => DatabaseService.instance.database;
   final SyncRepository _syncRepository = SyncRepository();
+  final LibraryEditStamper _libraryStamper = LibraryEditStamper();
   final SiteClassificationRepository _classification =
       SiteClassificationRepository();
   final _uuid = const Uuid();
@@ -173,6 +177,7 @@ class SiteRepository {
                 entryMethod: Value(site.entryMethod?.name),
                 exitMethod: Value(site.exitMethod?.name),
                 isShared: Value(site.isShared),
+                sharedLibraryId: Value(site.sharedLibraryId),
                 createdAt: Value(now),
                 updatedAt: Value(now),
               ),
@@ -239,6 +244,20 @@ class SiteRepository {
     try {
       _log.info('Updating site: ${site.id}');
       final now = DateTime.now().millisecondsSinceEpoch;
+      // A library site records which fields this save changes (issue
+      // #2567); the comparison needs the row as it was.
+      final before = await getSiteById(site.id);
+      final libraryEdit = before?.isLibrarySite ?? false;
+      final typesBefore = libraryEdit && classification != null
+          ? (await _classification.getTypesForSite(
+              site.id,
+            )).map((t) => t.id).toSet()
+          : const <String>{};
+      final tagsBefore = libraryEdit && classification != null
+          ? (await _classification.getTagsForSite(
+              site.id,
+            )).map((t) => t.id).toSet()
+          : const <String>{};
 
       var companion = DiveSitesCompanion(
         name: Value(site.name),
@@ -302,6 +321,20 @@ class SiteRepository {
         }
         await _writeClassification(site.id, classification);
       });
+      if (libraryEdit && before != null) {
+        final changed = LibraryEditStamper.changedFields(before, site);
+        if (classification != null) {
+          if (classification.typeIds.toSet() != typesBefore) {
+            changed.add('siteTypes');
+          }
+          if (classification.tagIds.toSet() != tagsBefore) changed.add('tags');
+        }
+        await _libraryStamper.stamp(
+          site.id,
+          changed,
+          actingDiverId: actingDiverId,
+        );
+      }
       SyncEventBus.notifyLocalChange();
       _log.info('Updated site: ${site.id}');
     } catch (e, stackTrace) {
@@ -372,6 +405,7 @@ class SiteRepository {
   }) async {
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
+      final before = await getSiteById(siteId);
       final changed = await _db.transaction(() async {
         final row = await (_db.select(
           _db.diveSites,
@@ -407,6 +441,15 @@ class SiteRepository {
         recordId: siteId,
         localUpdatedAt: now,
       );
+      if (before?.isLibrarySite ?? false) {
+        final after = await getSiteById(siteId);
+        if (after != null) {
+          await _libraryStamper.stamp(
+            siteId,
+            LibraryEditStamper.changedFields(before!, after),
+          );
+        }
+      }
       SyncEventBus.notifyLocalChange();
       return true;
     } catch (e, stackTrace) {
@@ -427,6 +470,10 @@ class SiteRepository {
   ) async {
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
+      // A club library clock goes only on a column whose value changes
+      // (issue #2567): rewriting the same altitude must not beat a newer
+      // edit by another member.
+      final before = await getSiteById(siteId);
       await (_db.update(_db.diveSites)..where((t) => t.id.equals(siteId)))
           .write(patch.copyWith(updatedAt: Value(now)));
       await _syncRepository.markRecordPending(
@@ -434,6 +481,15 @@ class SiteRepository {
         recordId: siteId,
         localUpdatedAt: now,
       );
+      if (before != null && before.isLibrarySite) {
+        final after = await getSiteById(siteId);
+        if (after != null) {
+          await _libraryStamper.stamp(
+            siteId,
+            LibraryEditStamper.changedFields(before, after),
+          );
+        }
+      }
       SyncEventBus.notifyLocalChange();
     } catch (e, stackTrace) {
       _log.error(
@@ -578,6 +634,7 @@ class SiteRepository {
     List<String> ids, {
     required bool cascadeMedia,
     bool undoable = false,
+    Set<String> skipTombstones = const {},
   }) async {
     final split = cascadeMedia
         ? await _mediaRepository.partitionMediaForSiteDeletion(ids)
@@ -600,13 +657,30 @@ class SiteRepository {
         SharedItemKind.site,
         ids,
       );
+      // The sites' documents go with them, tombstoned (issue #2613), kept
+      // for the undo. A merge re-points them to the survivor first.
+      final documents = undoable
+          ? await DocumentRepository().captureForOwners(
+              DocumentOwnerKind.site,
+              ids,
+            )
+          : const <DocumentSnapshotEntry>[];
+      await DocumentRepository().deleteForOwners(DocumentOwnerKind.site, ids);
       await (_db.delete(_db.diveSites)..where((t) => t.id.isIn(ids))).go();
-      // One batch for every tombstone, not a transaction per site.
-      await _syncRepository.logDeletions(
-        entityType: 'diveSites',
-        recordIds: ids,
-      );
+      // One batch for every tombstone, not a transaction per site. A club
+      // library site has no personal tombstone (issue #2567).
+      final tombstoned = [
+        for (final id in ids)
+          if (!skipTombstones.contains(id)) id,
+      ];
+      if (tombstoned.isNotEmpty) {
+        await _syncRepository.logDeletions(
+          entityType: 'diveSites',
+          recordIds: tombstoned,
+        );
+      }
       return cleared.copyWith(
+        documents: documents,
         hides: hides,
         children: children,
         media: doomedMedia,
@@ -652,6 +726,7 @@ class SiteRepository {
     String id, {
     bool cascadeMedia = true,
     String? actingDiverId,
+    bool? logTombstones,
   }) async {
     try {
       final ownership = await _siteOwnership([id], actingDiverId);
@@ -663,7 +738,15 @@ class SiteRepository {
       // tombstone for the peers, as deleteTrip does.
       if (ownership.allowed.isEmpty) return true;
       _log.info('Deleting site: $id');
-      await _deleteSiteRows([id], cascadeMedia: cascadeMedia);
+      // A club library site leaves no personal tombstone (issue #2567)
+      // unless the caller says otherwise.
+      final tombstone =
+          logTombstones ?? !((await getSiteById(id))?.isLibrarySite ?? false);
+      await _deleteSiteRows(
+        [id],
+        cascadeMedia: cascadeMedia,
+        skipTombstones: tombstone ? const {} : {id},
+      );
       SyncEventBus.notifyLocalChange();
       _log.info('Deleted site: $id');
       return true;
@@ -714,6 +797,8 @@ class SiteRepository {
       );
       return restored;
     });
+    // After the commit: each save is its own transaction and notifies.
+    await DocumentRepository().restoreSnapshot(links.documents);
     SyncEventBus.notifyLocalChange();
     await _mediaDeletionCoordinator.repairRestoredMedia(restoredMedia);
   }
@@ -754,11 +839,18 @@ class SiteRepository {
       }
       if (allowed.isEmpty) return const SiteLinks();
       _log.info('Bulk deleting ${allowed.length} sites');
+      // Club library sites among them leave no personal tombstone (issue
+      // #2567).
+      final libraryIds = {
+        for (final site in await getSitesByIds(allowed))
+          if (site.isLibrarySite) site.id,
+      };
       // The site list offers Undo (issue #2718).
       final links = await _deleteSiteRows(
         allowed,
         cascadeMedia: cascadeMedia,
         undoable: true,
+        skipTombstones: libraryIds,
       );
       SyncEventBus.notifyLocalChange();
       _log.info('Bulk deleted ${allowed.length} sites');
@@ -907,6 +999,12 @@ class SiteRepository {
         // links away.
         await _classification.relinkForMerge(duplicateIds, survivorId);
 
+        // The duplicates' documents move to the survivor (issue #2613).
+        final documents = await DocumentRepository().reassignOwner(
+          DocumentOwnerKind.site,
+          duplicateIds,
+          survivorId,
+        );
         // Every profile's hide of a merged-away site (issue #2594), kept
         // for the undo (issue #2710).
         final hides = await ProfileHidesRepository().deleteHides(
@@ -922,7 +1020,7 @@ class SiteRepository {
             recordId: duplicateId,
           );
         }
-        return (plans: movedPlans, hides: hides);
+        return (plans: movedPlans, hides: hides, documents: documents);
       });
 
       SyncEventBus.notifyLocalChange();
@@ -963,6 +1061,7 @@ class SiteRepository {
         siteTypeIdsBySite: typeIdsBySite,
         siteTagIdsBySite: tagIdsBySite,
         deletedHides: merged.hides,
+        documentOriginalSiteIds: merged.documents,
       );
     } catch (e, stackTrace) {
       _log.error(
@@ -1092,6 +1191,12 @@ class SiteRepository {
             localUpdatedAt: now,
           );
         }
+
+        // 4a. Re-point documents back to their original sites (#2613)
+        await DocumentRepository().restoreOwners(
+          DocumentOwnerKind.site,
+          snapshot.documentOriginalSiteIds,
+        );
 
         // 4b. Re-point site features back to their original sites
         for (final entry in snapshot.featureOriginalSiteIds.entries) {
@@ -1384,9 +1489,40 @@ class SiteRepository {
         entryMethod: Value(site.entryMethod?.name),
         exitMethod: Value(site.exitMethod?.name),
         isShared: Value(site.isShared),
+        sharedLibraryId: Value(site.sharedLibraryId),
         updatedAt: Value(now),
       ),
     );
+  }
+
+  /// Points every row that references [from] at [to] (issue #2567): dives,
+  /// plans, media, documents, features, species, types and tags. The merge
+  /// helpers do the work; [from] is left as an empty site for the caller to
+  /// delete, whose delete would otherwise take the documents with it.
+  Future<void> relinkSiteReferences({
+    required String from,
+    required String to,
+  }) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _relinkDives([from], to, now);
+    await _relinkPlans([from], to, now);
+    await _relinkMedia([from], to, now);
+    await _relinkSiteFeatures([from], to, now);
+    await DocumentRepository().reassignOwner(DocumentOwnerKind.site, [
+      from,
+    ], to);
+    await _classification.relinkForMerge([from], to);
+    await _mergeExpectedSpecies(
+      orderedSiteIds: [to, from],
+      survivorId: to,
+      now: now,
+    );
+  }
+
+  /// Whether any dive or plan on this device links to [siteId].
+  Future<bool> hasLinks(String siteId) async {
+    final usage = await countLinksToSites(_db, [siteId]);
+    return usage.dives > 0 || usage.plans > 0;
   }
 
   Future<void> _relinkDives(
@@ -1627,7 +1763,12 @@ class MergeSnapshot {
     this.siteTypeIdsBySite = const {},
     this.siteTagIdsBySite = const {},
     this.deletedHides = const [],
+    this.documentOriginalSiteIds = const {},
   });
+
+  /// Document id -> the site it was filed under before the merge
+  /// (issue #2613).
+  final Map<String, String> documentOriginalSiteIds;
 }
 
 /// Lightweight snapshot of a site_species row for undo.

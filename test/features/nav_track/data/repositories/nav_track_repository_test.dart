@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:submersion/core/database/app_sql_functions.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/sync_clock.dart';
@@ -105,6 +106,55 @@ void main() {
   });
 
   group('insertImportedRoute', () {
+    test('keeps the source metadata as-is (#3047)', () async {
+      const metadata = {
+        'DiveRouteQuality': 0,
+        'QualityFeatures': [16, 0.10000000149011612],
+      };
+      final id = await repo.insertImportedRoute(
+        points: _samplePoints(),
+        source: NavTrackSource.suuntoRoute,
+        sourceRef: 'suunto:NS-1:2026-10-09T10:00:00.000Z',
+        sourceMetadata: metadata,
+      );
+
+      expect((await repo.getById(id))!.sourceMetadata, metadata);
+    });
+
+    test('stores no source metadata when the source carried none', () async {
+      final id = await repo.insertImportedRoute(
+        points: _samplePoints(),
+        source: NavTrackSource.seacraftEnc,
+        sourceRef: '008.DAT.csv',
+      );
+
+      final row = await db
+          .customSelect(
+            "SELECT source_metadata FROM nav_tracks WHERE id = '$id'",
+          )
+          .getSingle();
+      expect(row.read<String?>('source_metadata'), isNull);
+      expect((await repo.getById(id))!.sourceMetadata, isNull);
+    });
+
+    test(
+      'reads unreadable stored metadata as none and still loads the route',
+      () async {
+        final id = await repo.insertImportedRoute(
+          points: _samplePoints(),
+          source: NavTrackSource.suuntoRoute,
+          sourceRef: 'suunto:NS-1:x',
+        );
+        await db.customStatement(
+          "UPDATE nav_tracks SET source_metadata = '[1,2]' WHERE id = '$id'",
+        );
+
+        final route = await repo.getById(id);
+        expect(route, isNotNull);
+        expect(route!.sourceMetadata, isNull);
+      },
+    );
+
     test('stores the route and its summary stats', () async {
       final points = _samplePoints();
       final id = await repo.insertImportedRoute(
@@ -1053,7 +1103,12 @@ void main() {
     test('never select the points column', () async {
       // Swap in a database that logs the SQL it runs.
       await tearDownTestDatabase();
-      db = AppDatabase(NativeDatabase.memory(logStatements: true));
+      db = AppDatabase(
+        NativeDatabase.memory(
+          setup: registerAppSqlFunctions,
+          logStatements: true,
+        ),
+      );
       DatabaseService.instance.setTestDatabase(db);
       await db.customStatement('PRAGMA foreign_keys = ON');
       await _insertMinimalDive(db, 'd1');

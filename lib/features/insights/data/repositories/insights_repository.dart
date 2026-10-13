@@ -1,10 +1,12 @@
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart' show compute, visibleForTesting;
 
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/dive_stats_scope.dart';
+import 'package:submersion/core/domain/visibility/visibility_range.dart';
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
@@ -15,13 +17,16 @@ import 'package:submersion/features/buddies/domain/services/legacy_name_parser.d
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_times_sql.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/data/sql/multi_cylinder_sac_sql.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/dive_sites/domain/entities/site_dive_statistics.dart';
 import 'package:submersion/features/dive_sites/query/site_query_entity.dart'
     show dartWhitespaceSqlChars;
+import 'package:submersion/features/insights/data/repositories/visibility_band_sql.dart';
 import 'package:submersion/features/insights/data/dive_filter_sql.dart';
 import 'package:submersion/features/insights/data/series_profile_aggregates.dart';
+import 'package:submersion/features/insights/domain/conditions/conditions_row.dart';
 import 'package:submersion/features/insights/domain/entities/species_insights.dart';
 import 'package:submersion/features/insights/domain/focus/focus_factor_row.dart';
 import 'package:submersion/features/insights/domain/suit_thickness_stats.dart';
@@ -31,7 +36,9 @@ import 'package:submersion/features/insights/domain/water_temp_bands.dart';
 export 'package:submersion/features/insights/domain/trend_aggregation.dart'
     show TrendDataPoint;
 
+part 'insights_repository_conditions.dart';
 part 'insights_repository_focus.dart';
+part 'insights_repository_focus_series.dart';
 
 /// Per-dive outcome of the recorded (non-computed) deco classification.
 ///
@@ -302,7 +309,7 @@ class InsightsRepository {
           COALESCE(d.runtime, d.bottom_time) AS duration_sec,
           t.start_pressure,
           t.end_pressure,
-          t.volume,
+          ${consumptionVolumeSql('t')} AS volume,
           t.o2_percent,
           t.he_percent
         FROM dives d
@@ -311,7 +318,6 @@ class InsightsRepository {
           AND COALESCE(d.runtime, d.bottom_time) > 0
           AND d.avg_depth > 0
           AND t.start_pressure > t.end_pressure
-          AND t.volume > 0
         ORDER BY d.dive_date_time
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
@@ -327,7 +333,8 @@ class InsightsRepository {
         final diveId = row.read<String>('dive_id');
         final startP = row.read<double>('start_pressure');
         final endP = row.read<double>('end_pressure');
-        final vol = row.read<double>('volume');
+        final vol = row.read<double?>('volume');
+        if (vol == null) continue;
         final o2 = row.read<double>('o2_percent');
         final he = row.read<double>('he_percent');
         final dateTimeMs = row.read<int>('dive_date_time');
@@ -394,8 +401,9 @@ class InsightsRepository {
 
   /// SAC rate of every dive in scope, in pressure per minute, ordered by date.
   ///
-  /// Does not require tank volume: uses the pressure drop of the dive's single
-  /// back-gas tank normalised to surface pressure.
+  /// Does not require tank volume: the back-gas pressure drop plus every
+  /// other breathed cylinder's converted to it, normalised to surface
+  /// pressure, as `Dive.sac` computes it (issue #3109).
   Future<List<TrendDataPoint>> getSacPressurePerDive({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
@@ -406,29 +414,18 @@ class InsightsRepository {
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
-        SELECT
-          d.id AS dive_id,
-          d.dive_date_time AS dive_date_time,
-          (t.start_pressure - t.end_pressure) / (COALESCE(d.runtime, d.bottom_time) / 60.0) / ((d.avg_depth / 10.0) + 1) AS sac
-        FROM dives d
-        JOIN dive_tanks t ON t.id = (
-          SELECT t2.id FROM dive_tanks t2
-          WHERE t2.dive_id = d.id
-            AND t2.start_pressure > t2.end_pressure
-            AND (
-              t2.tank_role = 'backGas'
-              OR NOT EXISTS (
-                SELECT 1 FROM dive_tanks t3
-                WHERE t3.dive_id = d.id AND t3.tank_role = 'backGas'
-              )
-            )
-          ORDER BY t2.tank_order, t2.rowid
-          LIMIT 1
+        SELECT * FROM (
+          SELECT
+            d.id AS dive_id,
+            d.dive_date_time AS dive_date_time,
+            ${diveSacPressureSql('d')} AS sac
+          FROM dives d
+          WHERE 1 = 1 $diverFilter ${df.clause}
+            AND COALESCE(d.runtime, d.bottom_time) > 0
+            AND d.avg_depth > 0
         )
-        WHERE 1 = 1 $diverFilter ${df.clause}
-          AND COALESCE(d.runtime, d.bottom_time) > 0
-          AND d.avg_depth > 0
-        ORDER BY d.dive_date_time
+        WHERE sac IS NOT NULL
+        ORDER BY dive_date_time
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
       return results
@@ -453,7 +450,13 @@ class InsightsRepository {
     }
   }
 
-  /// Get gas mix distribution (Air, Nitrox, Trimix)
+  /// Get gas mix distribution (Air, Nitrox, Trimix).
+  ///
+  /// A dive breathing more than one mix (air back gas with a nitrox deco
+  /// tank, say) counts once under each, so the counts can sum to more than
+  /// the number of dives. `percentage` is each mix's share of those summed
+  /// counts, not of dives, which is why the Gas page draws bars rather than
+  /// a pie (issue #3048).
   Future<List<DistributionSegment>> getGasMixDistribution({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
@@ -523,7 +526,7 @@ class InsightsRepository {
           ds.name AS site_name,
           t.start_pressure,
           t.end_pressure,
-          t.volume,
+          ${consumptionVolumeSql('t')} AS volume,
           t.o2_percent,
           t.he_percent
         FROM dives d
@@ -532,7 +535,6 @@ class InsightsRepository {
         WHERE COALESCE(d.runtime, d.bottom_time) > 0
           AND d.avg_depth > 0
           AND t.start_pressure > t.end_pressure
-          AND t.volume > 0
          
           $diverFilter ${df.clause}
         ORDER BY d.dive_date_time
@@ -556,7 +558,8 @@ class InsightsRepository {
         final diveId = row.read<String>('dive_id');
         final o2 = row.read<double>('o2_percent');
         final he = row.read<double>('he_percent');
-        final vol = row.read<double>('volume');
+        final vol = row.read<double?>('volume');
+        if (vol == null) continue;
         final used =
             gasVolume(
               tankSizeLiters: vol,
@@ -641,32 +644,20 @@ class InsightsRepository {
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
-        SELECT
-          d.id,
-          d.dive_number,
-          ds.name AS site_name,
-          d.dive_date_time,
-          (t.start_pressure - t.end_pressure) / (COALESCE(d.runtime, d.bottom_time) / 60.0) / ((d.avg_depth / 10.0) + 1) AS sac
-        FROM dives d
-        JOIN dive_tanks t ON t.id = (
-          SELECT t2.id FROM dive_tanks t2
-          WHERE t2.dive_id = d.id
-            AND t2.start_pressure > t2.end_pressure
-            AND (
-              t2.tank_role = 'backGas'
-              OR NOT EXISTS (
-                SELECT 1 FROM dive_tanks t3
-                WHERE t3.dive_id = d.id AND t3.tank_role = 'backGas'
-              )
-            )
-          ORDER BY t2.tank_order, t2.rowid
-          LIMIT 1
+        SELECT * FROM (
+          SELECT
+            d.id,
+            d.dive_number,
+            ds.name AS site_name,
+            d.dive_date_time,
+            ${diveSacPressureSql('d')} AS sac
+          FROM dives d
+          LEFT JOIN dive_sites ds ON ds.id = d.site_id
+          WHERE COALESCE(d.runtime, d.bottom_time) > 0
+            AND d.avg_depth > 0
+            $diverFilter ${df.clause}
         )
-        LEFT JOIN dive_sites ds ON ds.id = d.site_id
-        WHERE COALESCE(d.runtime, d.bottom_time) > 0
-          AND d.avg_depth > 0
-         
-          $diverFilter ${df.clause}
+        WHERE sac IS NOT NULL
         ORDER BY sac ASC
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
@@ -715,7 +706,7 @@ class InsightsRepository {
           t.tank_role,
           t.start_pressure,
           t.end_pressure,
-          t.volume,
+          ${consumptionVolumeSql('t')} AS volume,
           t.o2_percent,
           t.he_percent,
           d.avg_depth,
@@ -727,7 +718,6 @@ class InsightsRepository {
           AND t.start_pressure > t.end_pressure
           AND COALESCE(d.runtime, d.bottom_time) > 0
           AND d.avg_depth > 0
-          AND t.volume > 0
          
           $diverFilter ${df.clause}
         ''', variables: params.map((p) => Variable(p)).toList()).get();
@@ -738,7 +728,8 @@ class InsightsRepository {
         final role = row.read<String>('tank_role');
         final o2 = row.read<double>('o2_percent');
         final he = row.read<double>('he_percent');
-        final vol = row.read<double>('volume');
+        final vol = row.read<double?>('volume');
+        if (vol == null) continue;
         final used =
             gasVolume(
               tankSizeLiters: vol,
@@ -1198,11 +1189,7 @@ class InsightsRepository {
       // Threshold variables come first: they appear before the diver and
       // filter placeholders in the statement below, and Drift binds
       // positionally.
-      final scaleParams = [
-        scale.excellentAtOrAboveM,
-        scale.goodAtOrAboveM,
-        scale.moderateAtOrAboveM,
-      ];
+      final scaleParams = VisibilityBandSql.params(scale);
       final params = diverId != null
           ? [...scaleParams, diverId, ...df.params]
           : [...scaleParams, ...df.params];
@@ -1210,18 +1197,14 @@ class InsightsRepository {
       final results = await _db.customSelect('''
         SELECT bucket, COUNT(*) AS count FROM (
           SELECT CASE
-            WHEN visibility_meters IS NOT NULL THEN
-              CASE
-                WHEN visibility_meters >= ? THEN 'excellent'
-                WHEN visibility_meters >= ? THEN 'good'
-                WHEN visibility_meters >= ? THEN 'moderate'
-                ELSE 'poor'
-              END
+            ${VisibilityBandSql.whenBranches('')}
             ELSE 'legacy_' || visibility
           END AS bucket
           FROM dives
           WHERE (
             visibility_meters IS NOT NULL
+            OR visibility_min_meters IS NOT NULL
+            OR visibility_max_meters IS NOT NULL
             OR (visibility IS NOT NULL AND visibility != '')
           ) $diverFilter ${df.clause}
         )
@@ -1236,8 +1219,9 @@ class InsightsRepository {
       final total = counts.values.fold<int>(0, (sum, c) => sum + c);
       if (total == 0) return [];
 
-      // Calibrated bands first, best to worst, then whatever legacy buckets
-      // remain. The legacy segments shrink naturally as old dives are edited.
+      // Calibrated bands first, best to worst, then ranges that cross a band
+      // edge (issue #3226), then whatever legacy buckets remain. The legacy
+      // segments shrink naturally as old dives are edited.
       final ordered = <String>[
         ...[
           VisibilityBand.excellent,
@@ -1245,6 +1229,8 @@ class InsightsRepository {
           VisibilityBand.moderate,
           VisibilityBand.poor,
         ].map((b) => b.name).where(counts.containsKey),
+        if (counts.containsKey(visibilityRangeSpanningKey))
+          visibilityRangeSpanningKey,
         ...counts.keys.where((k) => k.startsWith('legacy_')).toList()..sort(),
       ];
 
@@ -2026,7 +2012,7 @@ class InsightsRepository {
         FROM dive_sites ds
         JOIN dives d ON d.site_id = ds.id
         WHERE TRIM(ds.country, $dartWhitespaceSqlChars) != '' $diverFilter ${df.clause}
-        GROUP BY LOWER(TRIM(ds.country, $dartWhitespaceSqlChars))
+        GROUP BY unicode_lower(TRIM(ds.country, $dartWhitespaceSqlChars))
         ORDER BY dive_count DESC
         LIMIT ?
         ''', variables: params.map((p) => Variable(p)).toList()).get();
@@ -2072,8 +2058,8 @@ class InsightsRepository {
         FROM dive_sites ds
         JOIN dives d ON d.site_id = ds.id
         WHERE TRIM(ds.region, $dartWhitespaceSqlChars) != '' $diverFilter ${df.clause}
-        GROUP BY LOWER(TRIM(ds.region, $dartWhitespaceSqlChars)),
-          LOWER(NULLIF(TRIM(ds.country, $dartWhitespaceSqlChars), ''))
+        GROUP BY unicode_lower(TRIM(ds.region, $dartWhitespaceSqlChars)),
+          unicode_lower(NULLIF(TRIM(ds.country, $dartWhitespaceSqlChars), ''))
         ORDER BY dive_count DESC
         LIMIT ?
         ''', variables: params.map((p) => Variable(p)).toList()).get();
@@ -2503,27 +2489,13 @@ class InsightsRepository {
           MAX(effective_si / 60.0) AS max_si
         FROM (
           SELECT
-            COALESCE(
-              d.surface_interval_seconds,
-              CASE
-                WHEN d.entry_time IS NOT NULL
-                THEN (
-                  d.entry_time - (
-                    SELECT MAX(d2.exit_time)
-                    FROM dives d2
-                    WHERE d2.diver_id = d.diver_id
-                      AND d2.exit_time IS NOT NULL
-                      AND d2.exit_time < d.entry_time
-                      -- The scope applies to the preceding dive as well: a
-                      -- surface interval measured from an excluded dive is
-                      -- as wrong as one measured to it. The user filter has
-                      -- never reached this inner alias.
-                      ${DiveStatsScope.and(alias: 'd2')}
-                  )
-                ) / 1000.0
-                ELSE NULL
-              END
-            ) AS effective_si
+            ${diveSurfaceIntervalSecondsSql(
+        'd',
+        // The scope applies to the preceding dive as well: a surface
+        // interval measured from an excluded dive is as wrong as one
+        // measured to it. The user filter never reaches this alias.
+        previousScope: DiveStatsScope.and(alias: kSurfaceIntervalPreviousAlias),
+      )} AS effective_si
           FROM dives d
           WHERE 1=1 $diverFilter ${df.clause}
         )
@@ -3021,7 +2993,7 @@ class InsightsRepository {
              AVG(d.max_depth) AS avg_max_depth
       FROM dives d
       JOIN dive_sites ds ON d.site_id = ds.id
-      WHERE LOWER(ds.name) = LOWER(?) AND d.diver_id = ?
+      WHERE unicode_lower(ds.name) = unicode_lower(?) AND d.diver_id = ?
             ${DiveStatsScope.and(alias: 'd')}
     ''',
           variables: [

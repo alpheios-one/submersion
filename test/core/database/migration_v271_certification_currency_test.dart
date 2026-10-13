@@ -1,5 +1,6 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/database/app_sql_functions.dart';
 import 'package:submersion/core/database/database.dart';
 
 /// v271 (issue #2267): the certification currency tables and the seeded
@@ -56,7 +57,11 @@ void main() {
       AppDatabase.migrationStepCount(270),
       AppDatabase.migrationStepCount(271) + 1,
     );
-    expect(AppDatabase.minimumCompatibleSchemaVersion, 240);
+    // v275 raised the floor later (#3091); this rung did not move it.
+    expect(
+      AppDatabase.minimumCompatibleSchemaVersion,
+      greaterThanOrEqualTo(240),
+    );
   });
 
   test('a v270 database upgrades and gains the three tables', () async {
@@ -212,7 +217,9 @@ void main() {
   });
 
   test('a fresh install seeds the same eleven built-ins', () async {
-    final fresh = AppDatabase(NativeDatabase.memory());
+    final fresh = AppDatabase(
+      NativeDatabase.memory(setup: registerAppSqlFunctions),
+    );
     addTearDown(fresh.close);
 
     final row = await fresh
@@ -227,7 +234,9 @@ void main() {
   test('a fresh database matches the upgraded one', () async {
     final upgraded = AppDatabase(setupDb());
     addTearDown(upgraded.close);
-    final fresh = AppDatabase(NativeDatabase.memory());
+    final fresh = AppDatabase(
+      NativeDatabase.memory(setup: registerAppSqlFunctions),
+    );
     addTearDown(fresh.close);
 
     for (final table in const [

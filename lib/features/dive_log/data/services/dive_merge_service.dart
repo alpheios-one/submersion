@@ -21,6 +21,8 @@ import 'package:submersion/features/dive_log/domain/services/dive_merge_builder.
 import 'package:submersion/features/dive_roles/data/repositories/dive_role_link_repository.dart';
 import 'package:submersion/features/dive_roles/domain/services/dive_role_set.dart';
 import 'package:submersion/features/tags/data/repositories/tag_repository.dart';
+import 'package:submersion/features/documents/data/repositories/document_repository.dart';
+import 'package:submersion/features/documents/domain/entities/document.dart';
 
 /// Result of a successful merge: the new dive plus the pre-merge snapshot
 /// needed to undo it.
@@ -366,6 +368,7 @@ class DiveMergeService {
             computerId: s.computerId,
             sourceId: s.sourceId,
             isPrimary: s.isPrimary,
+            activatedAt: Value(s.activatedAt),
             samples: [
               for (final p in s.samples)
                 p.shiftedBy(result.segmentOffsetsSeconds[s.diveId] ?? 0),
@@ -427,6 +430,7 @@ class DiveMergeService {
               ? null
               : mergedSourceIdFor(d.diveId, d.sourceId),
           isPrimary: d.isPrimary,
+          activatedAt: d.activatedAt,
           samples: d.samples,
           now: now,
         );
@@ -637,6 +641,13 @@ class DiveMergeService {
         );
       }
 
+      // 12b. Documents follow the media to the merged dive (issue #2613).
+      await DocumentRepository().reassignOwner(
+        DocumentOwnerKind.dive,
+        diveIds,
+        mergedId,
+      );
+
       // 13. Delete sources through the tombstone-logging path.
       await _diveRepo.bulkDeleteDives(diveIds);
     });
@@ -680,6 +691,7 @@ class DiveMergeService {
         );
         batch.deleteWhere(_db.diveEquipment, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.diveDiveTypes, (t) => t.diveId.equals(mergedId));
+        batch.deleteWhere(_db.diveCourses, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.diveTags, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.diveBuddies, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.sightings, (t) => t.diveId.equals(mergedId));
@@ -816,6 +828,16 @@ class DiveMergeService {
           localUpdatedAt: now,
         );
       }
+      for (final r in snapshot.diveCourseRows) {
+        await _db
+            .into(_db.diveCourses)
+            .insert(r.toCompanion(false), mode: InsertMode.insertOrReplace);
+        await _sync.markRecordPending(
+          entityType: 'diveCourses',
+          recordId: r.id,
+          localUpdatedAt: now,
+        );
+      }
       for (final r in snapshot.tagRows) {
         await _db
             .into(_db.diveTags)
@@ -872,6 +894,12 @@ class DiveMergeService {
         );
       }
 
+      // File the documents under their restored source dives (#2613).
+      await DocumentRepository().restoreOwners(
+        DocumentOwnerKind.dive,
+        snapshot.documentDiveIds,
+      );
+
       // Restore media pointers.
       for (final entry in snapshot.mediaDiveIds.entries) {
         await (_db.update(
@@ -906,6 +934,7 @@ class _SeriesDraft {
     required this.sourceId,
     required this.isPrimary,
     required this.samples,
+    this.activatedAt = const Value.absent(),
     this.synthetic = false,
   });
 
@@ -913,6 +942,10 @@ class _SeriesDraft {
   final String? computerId;
   final String? sourceId;
   final bool isPrimary;
+
+  /// The original series' activation time, carried so the merged copies
+  /// rank as the originals did (issue #3189); absent for a synthetic fill.
+  final Value<int?> activatedAt;
   final bool synthetic;
   final List<ProfileSample> samples;
 }

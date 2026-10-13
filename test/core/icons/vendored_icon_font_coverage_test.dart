@@ -94,6 +94,14 @@ void main() {
       'arm_clamp': SubmersionIcons.armClamp,
       'video_light': SubmersionIcons.videoLight,
       'float_arm': SubmersionIcons.floatArm,
+      'vest': SubmersionIcons.vest,
+      'socks': SubmersionIcons.socks,
+      'tank_back_gas': SubmersionIcons.tankBackGas,
+      'tank_sidemount_left': SubmersionIcons.tankSidemountLeft,
+      'tank_sidemount_right': SubmersionIcons.tankSidemountRight,
+      'tank_slung': SubmersionIcons.tankSlung,
+      'tank_pony': SubmersionIcons.tankPony,
+      'tank_rebreather': SubmersionIcons.tankRebreather,
     };
     final cmap = cmaps[SubmersionIcons.fontFamily]!;
     for (final entry in drawn.entries) {

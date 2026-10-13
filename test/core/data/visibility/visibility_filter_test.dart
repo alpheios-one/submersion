@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/data/visibility/shared_item_policy.dart';
 import 'package:submersion/core/data/visibility/visibility_filter.dart';
+import 'package:submersion/core/database/app_sql_functions.dart';
 import 'package:submersion/core/database/database.dart';
 
 void main() {
@@ -48,7 +49,9 @@ void main() {
       expect(
         frag.whereClause,
         equals(
-          ' WHERE (trips.diver_id = ? OR trips.is_shared = 1)'
+          ' WHERE (trips.diver_id = ? OR trips.is_shared = 1 OR '
+          'trips.shared_library_id IN (SELECT library_id FROM '
+          'shared_library_memberships WHERE diver_id = ?))'
           ' AND trips.id NOT IN '
           '(SELECT site_id FROM site_hides WHERE diver_id = ?)',
         ),
@@ -68,7 +71,7 @@ void main() {
     late AppDatabase db;
 
     setUp(() async {
-      db = AppDatabase(NativeDatabase.memory());
+      db = AppDatabase(NativeDatabase.memory(setup: registerAppSqlFunctions));
       const t = 1700000000000;
       for (final id in ['A', 'B', 'C']) {
         await db
@@ -143,7 +146,7 @@ void main() {
     late AppDatabase db;
 
     setUp(() async {
-      db = AppDatabase(NativeDatabase.memory());
+      db = AppDatabase(NativeDatabase.memory(setup: registerAppSqlFunctions));
       const t = 1700000000000;
       for (final id in ['A', 'B', 'C']) {
         await db
@@ -214,7 +217,7 @@ void main() {
     late AppDatabase db;
 
     setUp(() async {
-      db = AppDatabase(NativeDatabase.memory());
+      db = AppDatabase(NativeDatabase.memory(setup: registerAppSqlFunctions));
       const t = 1700000000000;
       for (final id in ['A', 'B', 'C']) {
         await db

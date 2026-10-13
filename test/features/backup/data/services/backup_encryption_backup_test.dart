@@ -7,8 +7,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
+import 'package:submersion/core/services/sync/crypto/encryption_key_store.dart';
 import 'package:submersion/core/services/sync/crypto/keyslots.dart';
 import 'package:submersion/core/services/sync/crypto/sync_envelope.dart';
+import 'package:submersion/core/services/sync/sync_preferences.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
 import 'package:submersion/features/backup/domain/entities/backup_record.dart';
 import 'package:submersion/features/backup/data/services/backup_encryption_key_store.dart';
@@ -26,7 +28,7 @@ const _fastKdf = KdfParams(m: 1024, t: 3, p: 1);
 
 class _FakeBackupDatabaseAdapter implements BackupDatabaseAdapter {
   @override
-  Future<void> backup(String destinationPath) async {
+  Future<void> backup(String destinationPath, {String? note}) async {
     final file = File(destinationPath);
     await file.parent.create(recursive: true);
     await file.writeAsString('fake backup data');
@@ -47,6 +49,18 @@ class _FakeBackupDatabaseAdapter implements BackupDatabaseAdapter {
 
   @override
   String? get databaseKeyHex => null;
+}
+
+class _NoteRecordingAdapter extends _FakeBackupDatabaseAdapter {
+  String? lastNote;
+  String? lastPath;
+
+  @override
+  Future<void> backup(String destinationPath, {String? note}) async {
+    lastNote = note;
+    lastPath = destinationPath;
+    await super.backup(destinationPath, note: note);
+  }
 }
 
 /// Per-file temp root, so the backup service's fixed `Submersion/Backups`
@@ -152,6 +166,52 @@ void main() {
     // the local artifact.
     final cloudBytes = await cloud.downloadFile(files.single.id);
     expect(cloudBytes, equals(localBytes));
+  });
+
+  test('backup encryption ON: a device locked for sync encryption still '
+      'uploads its .sbe (issue #3089)', () async {
+    await enableBackupEncryption();
+    await preferences.setCloudBackupEnabled(true);
+    final prefs = await SharedPreferences.getInstance();
+    final syncPreferences = SyncPreferences(prefs);
+    await syncPreferences.setSyncEncryptionEnabled(true);
+    // Sync encryption on, but no sync key on this device: locked.
+    final service = BackupService(
+      dbAdapter: _FakeBackupDatabaseAdapter(),
+      preferences: preferences,
+      cloudProvider: cloud,
+      backupEncryptionKeyStore: backupKeyStore,
+      encryptionKeyStore: EncryptionKeyStore(storage: InMemoryKeychain()),
+      syncPreferences: syncPreferences,
+    );
+
+    final record = await service.performBackup();
+
+    expect(record.location, BackupLocation.both);
+    final files = await cloud.listFiles(
+      folderId: await cloud.createFolder('Submersion Backups'),
+      namePattern: 'submersion_backup_',
+    );
+    expect(files.single.name, endsWith('.sbe'));
+    expect(await service.isCloudBackupBlockedByEncryptionLock(), isFalse);
+  });
+
+  test('backup encryption ON: the note is stamped into the plaintext copy '
+      'before it is encrypted', () async {
+    await enableBackupEncryption();
+    final adapter = _NoteRecordingAdapter();
+    final service = BackupService(
+      dbAdapter: adapter,
+      preferences: preferences,
+      backupEncryptionKeyStore: backupKeyStore,
+    );
+
+    final record = await service.performBackup(note: 'Encrypted trip');
+
+    expect(adapter.lastNote, 'Encrypted trip');
+    expect(adapter.lastPath, endsWith('.db'));
+    expect(record.filename, endsWith('.sbe'));
+    expect(record.note, 'Encrypted trip');
   });
 
   test('exportBackupToTemp encrypts to .sbe when enabled', () async {

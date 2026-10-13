@@ -7,6 +7,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/dive_roles/presentation/dive_role_list_display.dart';
 import 'package:submersion/features/dive_types/presentation/dive_type_display.dart';
+import 'package:submersion/core/text/blank_text.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/equipment/domain/models/equipment_arrangement.dart';
 import 'package:submersion/features/equipment/domain/services/equipment_arranger.dart';
@@ -21,6 +22,7 @@ import 'package:submersion/core/services/pdf_templates/pdf_profile_chart.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_profile_series.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_shared_components.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_template_builder.dart';
+import 'package:submersion/core/utils/elapsed_duration_format.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -361,7 +363,7 @@ class PdfTemplateDetailed extends PdfTemplateBuilder {
       if (dive.surfaceInterval != null)
         _Field(
           l10n.pdf_surfaceInterval,
-          _duration(dive.surfaceInterval!, l10n),
+          formatElapsed(l10n, dive.surfaceInterval!),
         ),
       ..._gasConsumptionFields(dive, units, l10n),
     ];
@@ -371,11 +373,11 @@ class PdfTemplateDetailed extends PdfTemplateBuilder {
   /// `AppSettings.gasConsumptionDisplay` as the dive detail page does.
   ///
   /// SAC and RMV are two quantities rather than one value in two units
-  /// (discussions #354, #803): [Dive.sac] is a bar/min pressure drop on the
-  /// reference cylinder, [Dive.rmvFor] is L/min summed over every cylinder
-  /// that carries pressures and a volume. So RMV is read from the entity, not
-  /// scaled from SAC by a cylinder volume -- bar/min from a 12 L back gas and
-  /// a 7 L stage cannot be averaged.
+  /// (discussions #354, #803): [Dive.sac] is a bar/min pressure drop in bar
+  /// of the reference cylinder, [Dive.rmvFor] is L/min summed over every
+  /// cylinder that carries pressures and a volume. So RMV is read from the
+  /// entity, not scaled from SAC by a cylinder volume -- bar/min from a 12 L
+  /// back gas and a 7 L stage cannot be averaged.
   ///
   /// A lane the dive cannot supply is omitted. The one exception mirrors the
   /// detail page: an RMV-only diver whose cylinders have no volumes still
@@ -483,13 +485,15 @@ class PdfTemplateDetailed extends PdfTemplateBuilder {
         _Field(l10n.pdf_waterTemp, units.formatTemperature(dive.waterTemp)),
       if (dive.airTemp != null)
         _Field(l10n.pdf_airTemp, units.formatTemperature(dive.airTemp)),
-      if (dive.visibilityMeters != null)
-        _Field(
-          l10n.pdf_visibility,
-          units.formatDistance(dive.visibilityMeters!),
-        )
-      else if (dive.visibility != null)
-        _Field(l10n.pdf_visibility, visibilityName(dive.visibility!, l10n)),
+      if (formatDiveVisibilityPlain(
+            meters: dive.visibilityMeters,
+            range: dive.visibilityRange,
+            legacy: dive.visibility,
+            l10n: l10n,
+            units: units,
+          )
+          case final visibility?)
+        _Field(l10n.pdf_visibility, visibility),
       if (dive.currentStrength != null)
         _Field(l10n.pdf_current, dive.currentStrength!.localizedName(l10n)),
       if (dive.currentDirection != null)
@@ -497,6 +501,8 @@ class PdfTemplateDetailed extends PdfTemplateBuilder {
           l10n.pdf_currentDirection,
           dive.currentDirection!.localizedName(l10n),
         ),
+      if (trimmedOrNull(dive.surfaceConditions) case final text?)
+        _Field(l10n.pdf_surfaceConditions, text),
       if (dive.effectiveWaterType != null)
         _Field(
           l10n.pdf_waterType,
@@ -538,6 +544,12 @@ class PdfTemplateDetailed extends PdfTemplateBuilder {
         _Field(l10n.pdf_diveMaster, dive.diveMaster!),
       if (dive.diveCenter != null)
         _Field(l10n.pdf_diveCenter, dive.diveCenter!.name),
+      if (trimmedOrNull(dive.diveOperator) case final text?)
+        _Field(l10n.pdf_diveOperator, text),
+      if (trimmedOrNull(dive.boatName) case final text?)
+        _Field(l10n.pdf_boatName, text),
+      if (trimmedOrNull(dive.boatCaptain) case final text?)
+        _Field(l10n.pdf_boatCaptain, text),
       if (dive.trip != null) _Field(l10n.pdf_trip, dive.trip!.name),
     ];
   }
@@ -893,14 +905,6 @@ class PdfTemplateDetailed extends PdfTemplateBuilder {
         ],
       ),
     ];
-  }
-
-  String _duration(Duration d, AppLocalizations l10n) {
-    final hours = d.inHours;
-    final minutes = d.inMinutes % 60;
-    return hours > 0
-        ? l10n.pdf_hoursMinutes('$hours', '$minutes')
-        : l10n.pdf_minutesShort('$minutes');
   }
 }
 

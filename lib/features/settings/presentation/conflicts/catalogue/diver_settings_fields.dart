@@ -1,4 +1,5 @@
 import 'package:submersion/features/settings/presentation/conflicts/conflict_enum_labels.dart';
+import 'package:submersion/features/settings/presentation/conflicts/catalogue/profile_color_fields.dart';
 import 'package:submersion/features/settings/presentation/conflicts/conflict_field.dart';
 
 /// Conflict labels and value kinds for the diver's settings (#694). Generated from a
@@ -304,6 +305,11 @@ final Map<String, ConflictField> diverSettingsFields = {
     (l) => l.settings_conflict_field_endLimit,
     FieldKind.depth,
   ),
+  'equipmentDefaultStatuses': ConflictField(
+    (l) => l.settings_conflict_field_equipmentDefaultStatuses,
+    FieldKind.enumValue,
+    enumLabel: equipmentDefaultStatusesLabeler,
+  ),
   'equipmentListViewMode': ConflictField(
     (l) => l.settings_conflict_field_equipmentListViewMode,
     FieldKind.enumValue,
@@ -327,6 +333,10 @@ final Map<String, ConflictField> diverSettingsFields = {
     (l) => l.settings_conflict_field_gtrReservePressure,
     FieldKind.pressure,
   ),
+  'hasAcceptedPlanningDisclaimer': ConflictField(
+    (l) => l.settings_conflict_field_hasAcceptedPlanningDisclaimer,
+    FieldKind.boolean,
+  ),
   'hiddenBuiltInIds': ConflictField(
     (l) => l.settings_conflict_field_hiddenBuiltInIds,
     FieldKind.opaque,
@@ -342,6 +352,10 @@ final Map<String, ConflictField> diverSettingsFields = {
   'highO2ThresholdPercent': ConflictField(
     (l) => l.settings_conflict_field_highO2ThresholdPercent,
     FieldKind.percent,
+  ),
+  'icdWarningsEnabled': ConflictField(
+    (l) => l.settings_conflict_field_icdWarningsEnabled,
+    FieldKind.boolean,
   ),
   'insightsMutedObservationRules': ConflictField(
     (l) => l.settings_conflict_field_insightsMutedObservationRules,
@@ -555,6 +569,11 @@ final Map<String, ConflictField> diverSettingsFields = {
     (l) => l.settings_conflict_field_tripServiceLeadDays,
     FieldKind.number,
   ),
+  'trendGapCollapseMonths': ConflictField(
+    (l) => l.settings_conflict_field_trendGapCollapseMonths,
+    FieldKind.enumValue,
+    enumLabel: trendGapThresholdLabeler,
+  ),
   'useDiveComputerCnsData': ConflictField(
     (l) => l.settings_conflict_field_useDiveComputerCnsData,
     FieldKind.boolean,
@@ -586,6 +605,7 @@ final Map<String, ConflictField> diverSettingsFields = {
     FieldKind.enumValue,
     enumLabel: weightUnitLabeler,
   ),
+  ...profileColorConflictFields,
 };
 
 /// Columns whose meaning depends on the entity, keyed `entity.column`.

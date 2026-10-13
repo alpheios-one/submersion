@@ -74,6 +74,7 @@ apply to the item's type.
   on (tap either to see them), purchase details and how long you have owned it.
 - **Location:** where the item is now. **Move** sends it somewhere else.
 - **Cylinder passport:** for a Tank. See [Cylinder Passports](cylinder-passports.md).
+- **Gear passport:** for any other item. See [Gear Tags](gear-tags.md).
 - **Service clocks:** what maintenance is due, and when.
 - **Exposure:** how hard the item has been used.
 - **Condition findings:** trends worth a look, when there are any.
@@ -266,6 +267,9 @@ Manage presets in **Settings > Manage > Tank Presets**:
   default is AL80, and deleting the starred preset resets it to AL80.
 - **Also apply to imported dives:** fill in missing tank data on imported dives
   from the default preset. Values a dive already has are kept.
+- **Default start pressure:** the start pressure filled in on every new tank,
+  and on imported tanks with none when **Also apply to imported dives** is on.
+  Enter it in your pressure unit; the default is 200 bar (about 2900 psi).
 - **Show in tank pickers:** switch off the built-in presets you never use. The
   default preset is always shown.
 - **Add tank preset:** create your own.
@@ -279,8 +283,8 @@ active items, items with service due, the total value of your gear and of your
 wanted gear, and your most recent items.
 
 Select several items to act on them together: **Retire Equipment** or
-**Reactivate**, **Edit tags**, **Move to location**, **Print labels** (passport
-labels for cylinders), or **Delete**.
+**Reactivate**, **Edit tags**, **Move to location**, **Print labels** (tag
+labels for any gear you own), or **Delete**.
 
 ### Sharing gear between diver profiles
 
@@ -292,6 +296,7 @@ See [Diver Profile & Multi-Diver](diver-profile.md).
 ## See also
 
 - [Cylinder Passports](cylinder-passports.md): spec, fills and tags for your cylinders
+- [Gear Tags](gear-tags.md): QR labels and NFC tags for the rest of your gear
 - [Logging Dives](dive-logging.md): tanks and equipment on a dive
 - [Trips](trips.md): the gear you pack for a trip
 - [Weight Planner](weight-planner.md): how your gear feeds the weight estimate

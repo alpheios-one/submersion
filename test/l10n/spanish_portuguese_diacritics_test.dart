@@ -39,6 +39,10 @@ void main() {
       'estas': _Homograph('the demonstrative estas, and the verb estás'),
       'como': _Homograph('como meaning as, and the interrogative cómo'),
       'cuando': _Homograph('the relative cuando, and the interrogative cuándo'),
+      'cuanto': _Homograph(
+        'the relative/conjunction cuanto (e.g. en cuanto, as soon as), and '
+        'the interrogative cuánto/cuántos, how much/many',
+      ),
       'donde': _Homograph('the relative donde, and the interrogative dónde'),
       'si': _Homograph('the conditional si, and sí meaning yes'),
       'min': _Homograph('min, the minutes unit, and mín. for mínimo'),
@@ -55,7 +59,6 @@ void main() {
       'fallo': _Homograph(
         'the noun fallo, and the past tense falló',
         keys: {
-          'divePlanner_field_bailoutGasHint',
           'equipmentObservation_tag_switchFault',
           'equipmentObservation_tag_screenFault',
           'equipmentObservation_tag_connectionFault',
@@ -180,6 +183,7 @@ void main() {
           'surfaceInterval_result_beyondHorizon',
           'startup_interruptedRestore_bodyWithDate',
           'startup_interruptedRestore_body',
+          'safetyHub_tissueLoading_about_body',
         },
       ),
       'habitat': _Homograph(

@@ -327,7 +327,7 @@ final Map<String, ConflictField> peoplePlanningFields = {
   ),
   'priorDiveTimeSeconds': ConflictField(
     (l) => l.settings_conflict_field_priorDiveTimeSeconds,
-    FieldKind.durationSeconds,
+    FieldKind.totalDurationSeconds,
   ),
   'problemSolvingMinutes': ConflictField(
     (l) => l.settings_conflict_field_problemSolvingMinutes,
@@ -404,6 +404,10 @@ final Map<String, ConflictField> peoplePlanningFields = {
   'sourceValueNumber': ConflictField(
     (l) => l.settings_conflict_field_sourceValueNumber,
     FieldKind.number,
+  ),
+  'splitAtConfiguredRate': ConflictField(
+    (l) => l.settings_conflict_field_splitAtConfiguredRate,
+    FieldKind.boolean,
   ),
   'startDateTime': ConflictField(
     (l) => l.settings_conflict_field_startDateTime,

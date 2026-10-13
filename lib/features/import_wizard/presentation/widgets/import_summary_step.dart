@@ -553,6 +553,16 @@ _FileNoticeWording? _fileNoticeWording(
       body: l10n.universalImport_summary_noticePhotosSkippedBody(notice.count),
       action: null,
     ),
+    ImportNoticeKind.logbookImagesNotImported => (
+      title: l10n.universalImport_summary_noticeLogbookImagesTitle,
+      body: l10n.universalImport_summary_noticeLogbookImagesBody(notice.count),
+      action: null,
+    ),
+    ImportNoticeKind.tripsNotImported => (
+      title: l10n.universalImport_summary_noticeTripsNotImportedTitle,
+      body: l10n.universalImport_summary_noticeTripsNotImportedBody(names),
+      action: null,
+    ),
     ImportNoticeKind.macdiveXmlOmitsCertsAndService => (
       title: l10n.universalImport_summary_noticeMacdiveXmlCertsTitle,
       body: l10n.universalImport_summary_noticeMacdiveXmlCertsBody,
