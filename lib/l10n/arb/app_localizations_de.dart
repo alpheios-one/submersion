@@ -50427,7 +50427,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get transmitters_field_label_helper =>
-      'Wird der Name der Flasche im Tauchgang, sobald dieser Sender zugeordnet ist';
+      'Sobald dieser Sender zugeordnet ist, wird dies der Name der Flasche im Tauchgang';
 
   @override
   String get transmitters_field_serial => 'Seriennummer des Senders';

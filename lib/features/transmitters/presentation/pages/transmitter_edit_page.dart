@@ -173,11 +173,9 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
 
   Future<void> _applyGear(EquipmentItem item) async {
     final settings = ref.read(settingsProvider);
-    final missingSize = item.volumeL == null && item.workingPressureBar == null;
     setState(() {
       _equipmentId = item.id;
       _equipmentName = item.name;
-      _missingSizeHint = missingSize;
       if (item.tankMaterial != null) _material = item.tankMaterial;
       if (item.volumeL != null || item.workingPressureBar != null) {
         _fillSpecFields(
@@ -187,11 +185,19 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
           item.workingPressureBar,
         );
       }
+      // A cylinder with no size of its own leaves an already-filled field
+      // (an existing entry's saved spec, or one set from a preset) alone,
+      // so the hint reflects what the fields will actually show, not just
+      // whether this particular pick carried a size.
+      _missingSizeHint =
+          _volumeController.text.isEmpty &&
+          _workingPressureController.text.isEmpty;
     });
     if (_roleTouched) return;
+    final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
     final role = await ref
         .read(transmitterRepositoryProvider)
-        .lastRoleForEquipment(item.id);
+        .lastRoleForEquipment(item.id, diverId: diverId);
     if (!mounted) return;
     setState(() => _role = role);
   }

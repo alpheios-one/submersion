@@ -382,6 +382,43 @@ void main() {
     },
   );
 
+  test(
+    "lastRoleForEquipment ignores another profile's history on a cylinder "
+    'shared with it (#3378)',
+    () async {
+      await seedDiverAndDive(dateTime: DateTime.utc(2026, 9, 1, 10));
+      await seedDiverAndDive(
+        diveId: 'd2',
+        diverId: 'diver-2',
+        dateTime: DateTime.utc(2026, 9, 10, 10),
+      );
+      final db = DatabaseService.instance.database;
+      await db.customStatement(
+        "INSERT INTO equipment (id, diver_id, name, type, created_at, "
+        "updated_at) VALUES ('tank1', 'diver-1', 'Shared AL80', 'tank', 1, "
+        "1)",
+      );
+      await seedTank(
+        id: 'k1',
+        diveId: 'd1',
+        equipmentId: 'tank1',
+        role: 'backGas',
+      );
+      // A more recent dive on the same shared cylinder, but another
+      // profile's own - must never supply diver-1's suggested role.
+      await seedTank(
+        id: 'k2',
+        diveId: 'd2',
+        equipmentId: 'tank1',
+        role: 'sidemountLeft',
+      );
+
+      final role = await repo.lastRoleForEquipment('tank1', diverId: 'diver-1');
+
+      expect(role, TankRole.backGas);
+    },
+  );
+
   test('delete removes the row and logs a tombstone', () async {
     await seedDiverAndDive();
     final created = await repo.create(_entry());

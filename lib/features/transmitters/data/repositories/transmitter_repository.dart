@@ -60,20 +60,31 @@ class TransmitterRepository {
     return row == null ? null : _map(row);
   }
 
-  /// The most recently logged [TankRole] among dives that used
-  /// [equipmentId] as a cylinder, ordered by dive date descending - a
+  /// The most recently logged [TankRole] among [diverId]'s own dives that
+  /// used [equipmentId] as a cylinder, ordered by dive date descending - a
   /// sensible default when a diver links a transmitter to that cylinder
   /// (issue #3367), never a value that overrides a role they already set.
-  /// Falls back to [TankRole.backGas] when the cylinder has no dive
-  /// history, matching that column's own default.
-  Future<TankRole> lastRoleForEquipment(String equipmentId) async {
+  /// Scoped to the diver: the picker also offers cylinders shared from
+  /// another profile, whose dive history is that profile's own and must
+  /// never leak into this one's suggestion. Falls back to
+  /// [TankRole.backGas] when the cylinder has no dive history for this
+  /// diver, matching that column's own default.
+  Future<TankRole> lastRoleForEquipment(
+    String equipmentId, {
+    String? diverId,
+  }) async {
     final row = await _db
         .customSelect(
           'SELECT dt.tank_role AS tank_role FROM dive_tanks dt '
           'JOIN dives d ON d.id = dt.dive_id '
           'WHERE dt.equipment_id = ? '
+          'AND (? IS NULL OR d.diver_id = ?) '
           'ORDER BY d.dive_date_time DESC LIMIT 1',
-          variables: [Variable<String>(equipmentId)],
+          variables: [
+            Variable<String>(equipmentId),
+            Variable<String>(diverId),
+            Variable<String>(diverId),
+          ],
           readsFrom: {_db.diveTanks, _db.dives},
         )
         .getSingleOrNull();

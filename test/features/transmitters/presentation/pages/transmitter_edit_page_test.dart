@@ -424,6 +424,45 @@ void main() {
     },
   );
 
+  testWidgets(
+    'picking a cylinder with no size on file keeps an already-filled size '
+    'and skips the hint (#3378)',
+    (tester) async {
+      await DatabaseService.instance.database.customStatement(
+        "INSERT INTO equipment (id, diver_id, name, type, created_at, "
+        "updated_at) VALUES ('tank1', 'diver-1', 'Fresh AL80', 'tank', 1, 1)",
+      );
+      await TransmitterRepository().create(
+        Transmitter(
+          id: 'e1',
+          diverId: 'diver-1',
+          transmitterSerial: '555',
+          label: 'AL80',
+          volumeL: 11.1,
+          workingPressureBar: 207,
+          createdAt: DateTime.utc(2026, 9, 1),
+          updatedAt: DateTime.utc(2026, 9, 1),
+        ),
+      );
+      await _pumpPage(
+        tester,
+        _buildPage(diverIdNotifier, prefs, transmitterId: 'e1'),
+      );
+
+      await tester.tap(find.text('Cylinder from gear'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Fresh AL80'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('transmitter_missing_size_hint')),
+        findsNothing,
+        reason: 'the saved size from before the pick is still on screen',
+      );
+      expect(find.widgetWithText(TextFormField, '11.1'), findsOneWidget);
+    },
+  );
+
   testWidgets('shows volume in cubic feet and stores liters', (tester) async {
     final settings = MockSettingsNotifier();
     await settings.setVolumeUnit(VolumeUnit.cubicFeet);
