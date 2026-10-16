@@ -51182,7 +51182,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get transmitters_field_label_helper =>
-      'Becomes the tank\'s name in the dive once this sender is matched';
+      'يصبح اسم الأسطوانة في الغطسة بمجرد مطابقة جهاز الإرسال هذا';
 
   @override
   String get transmitters_field_serial => 'الرقم التسلسلي لجهاز الإرسال';
@@ -51202,14 +51202,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get transmitters_field_gear_subtitle =>
-      'The tank this sender reports pressure for';
+      'الأسطوانة التي يبلغ جهاز الإرسال هذا عن ضغطها';
 
   @override
   String get transmitters_field_transmitterGear => 'جهاز إرسال من المعدات';
 
   @override
   String get transmitters_field_transmitterGear_subtitle =>
-      'Battery/service tracking, not matching';
+      'تتبع البطارية/الصيانة، لا يُستخدم للمطابقة';
 
   @override
   String get transmitters_field_material => 'المادة';
@@ -51219,7 +51219,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get transmitters_hint_missingSize =>
-      'This cylinder has no size or pressure on file, so size will stay empty on the dive';
+      'لا يوجد حجم أو ضغط مسجل لهذه الأسطوانة، لذا سيبقى الحجم فارغًا في الغطسة';
 
   @override
   String get transmitters_validation_key =>

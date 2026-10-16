@@ -50261,7 +50261,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get transmitters_field_label_helper =>
-      'Becomes the tank\'s name in the dive once this sender is matched';
+      'A jeladó párosítása után ez lesz a palack neve a merülésben';
 
   @override
   String get transmitters_field_serial => 'Jeladó sorozatszáma';
@@ -50281,14 +50281,14 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get transmitters_field_gear_subtitle =>
-      'The tank this sender reports pressure for';
+      'A palack, amelynek nyomását ez a jeladó jelenti';
 
   @override
   String get transmitters_field_transmitterGear => 'Jeladó a felszerelésből';
 
   @override
   String get transmitters_field_transmitterGear_subtitle =>
-      'Battery/service tracking, not matching';
+      'Akkumulátor-/szervizkövetés, nem használt a párosításhoz';
 
   @override
   String get transmitters_field_material => 'Anyag';
@@ -50298,7 +50298,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get transmitters_hint_missingSize =>
-      'This cylinder has no size or pressure on file, so size will stay empty on the dive';
+      'Ehhez a palackhoz nincs rögzítve méret vagy nyomás, ezért a méret üres marad a merülésben';
 
   @override
   String get transmitters_validation_key =>

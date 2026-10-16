@@ -49462,7 +49462,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get transmitters_field_label_helper =>
-      'Becomes the tank\'s name in the dive once this sender is matched';
+      'הופך לשם המיכל בצלילה ברגע שהמשדר הזה משויך';
 
   @override
   String get transmitters_field_serial => 'מספר סידורי של המשדר';
@@ -49482,14 +49482,14 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get transmitters_field_gear_subtitle =>
-      'The tank this sender reports pressure for';
+      'המיכל שעבורו משדר זה מדווח על הלחץ';
 
   @override
   String get transmitters_field_transmitterGear => 'משדר מהציוד';
 
   @override
   String get transmitters_field_transmitterGear_subtitle =>
-      'Battery/service tracking, not matching';
+      'מעקב סוללה/תחזוקה, לא משמש להתאמה';
 
   @override
   String get transmitters_field_material => 'חומר';
@@ -49499,7 +49499,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get transmitters_hint_missingSize =>
-      'This cylinder has no size or pressure on file, so size will stay empty on the dive';
+      'למיכל זה אין גודל או לחץ רשומים, לכן הגודל יישאר ריק בצלילה';
 
   @override
   String get transmitters_validation_key =>

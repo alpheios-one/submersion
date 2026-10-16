@@ -50650,7 +50650,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get transmitters_field_label_helper =>
-      'Becomes the tank\'s name in the dive once this sender is matched';
+      'Devient le nom de la bouteille dans la plongée une fois cet émetteur associé';
 
   @override
   String get transmitters_field_serial => 'Numéro de série de l\'émetteur';
@@ -50670,14 +50670,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get transmitters_field_gear_subtitle =>
-      'The tank this sender reports pressure for';
+      'La bouteille dont cet émetteur signale la pression';
 
   @override
   String get transmitters_field_transmitterGear => 'Émetteur de l’équipement';
 
   @override
   String get transmitters_field_transmitterGear_subtitle =>
-      'Battery/service tracking, not matching';
+      'Suivi de la batterie/de l\'entretien, sans lien avec la correspondance';
 
   @override
   String get transmitters_field_material => 'Matériau';
@@ -50687,7 +50687,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get transmitters_hint_missingSize =>
-      'This cylinder has no size or pressure on file, so size will stay empty on the dive';
+      'Cette bouteille n\'a ni taille ni pression enregistrées, la taille restera donc vide dans la plongée';
 
   @override
   String get transmitters_validation_key =>

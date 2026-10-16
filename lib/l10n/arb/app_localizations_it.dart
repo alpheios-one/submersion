@@ -50529,7 +50529,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get transmitters_field_label_helper =>
-      'Becomes the tank\'s name in the dive once this sender is matched';
+      'Diventa il nome della bombola nell\'immersione una volta che questo trasmettitore viene abbinato';
 
   @override
   String get transmitters_field_serial => 'Numero di serie del trasmettitore';
@@ -50549,7 +50549,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get transmitters_field_gear_subtitle =>
-      'The tank this sender reports pressure for';
+      'La bombola di cui questo trasmettitore segnala la pressione';
 
   @override
   String get transmitters_field_transmitterGear =>
@@ -50557,7 +50557,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get transmitters_field_transmitterGear_subtitle =>
-      'Battery/service tracking, not matching';
+      'Monitoraggio di batteria/manutenzione, non usato per l\'abbinamento';
 
   @override
   String get transmitters_field_material => 'Materiale';
@@ -50567,7 +50567,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get transmitters_hint_missingSize =>
-      'This cylinder has no size or pressure on file, so size will stay empty on the dive';
+      'Questa bombola non ha dimensione o pressione registrate, quindi la dimensione resterà vuota nell\'immersione';
 
   @override
   String get transmitters_validation_key =>
