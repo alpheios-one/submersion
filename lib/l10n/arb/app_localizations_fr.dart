@@ -50649,6 +50649,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get transmitters_field_label => 'Libellé';
 
   @override
+  String get transmitters_field_label_helper =>
+      'Becomes the tank\'s name in the dive once this sender is matched';
+
+  @override
   String get transmitters_field_serial => 'Numéro de série de l\'émetteur';
 
   @override
@@ -50665,13 +50669,25 @@ class AppLocalizationsFr extends AppLocalizations {
   String get transmitters_field_gear => 'Bouteille de l\'équipement';
 
   @override
+  String get transmitters_field_gear_subtitle =>
+      'The tank this sender reports pressure for';
+
+  @override
   String get transmitters_field_transmitterGear => 'Émetteur de l’équipement';
+
+  @override
+  String get transmitters_field_transmitterGear_subtitle =>
+      'Battery/service tracking, not matching';
 
   @override
   String get transmitters_field_material => 'Matériau';
 
   @override
   String get transmitters_gear_none => 'Aucune';
+
+  @override
+  String get transmitters_hint_missingSize =>
+      'This cylinder has no size or pressure on file, so size will stay empty on the dive';
 
   @override
   String get transmitters_validation_key =>

@@ -58,6 +58,8 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
   final _workingPressureController = TextEditingController();
 
   TankRole _role = TankRole.backGas;
+  bool _roleTouched = false;
+  bool _missingSizeHint = false;
   TankMaterial? _material;
   String? _computerId;
   String? _presetName;
@@ -109,6 +111,7 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
           ? ''
           : '${entry.channelIndex! + 1}';
       _role = entry.role;
+      _roleTouched = true;
       _material = entry.material;
       _presetName = entry.presetName;
       _equipmentId = entry.equipmentId;
@@ -158,6 +161,7 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
     setState(() {
       _presetName = preset.name;
       _material = preset.material;
+      _missingSizeHint = false;
       _fillSpecFields(
         UnitFormatter(settings),
         settings,
@@ -167,11 +171,13 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
     });
   }
 
-  void _applyGear(EquipmentItem item) {
+  Future<void> _applyGear(EquipmentItem item) async {
     final settings = ref.read(settingsProvider);
+    final missingSize = item.volumeL == null && item.workingPressureBar == null;
     setState(() {
       _equipmentId = item.id;
       _equipmentName = item.name;
+      _missingSizeHint = missingSize;
       if (item.tankMaterial != null) _material = item.tankMaterial;
       if (item.volumeL != null || item.workingPressureBar != null) {
         _fillSpecFields(
@@ -182,6 +188,12 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
         );
       }
     });
+    if (_roleTouched) return;
+    final role = await ref
+        .read(transmitterRepositoryProvider)
+        .lastRoleForEquipment(item.id);
+    if (!mounted) return;
+    setState(() => _role = role);
   }
 
   Future<void> _pickGear() async {
@@ -197,9 +209,9 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
           scrollController: scrollController,
           selectedEquipmentIds: {?_equipmentId},
           typeFilter: EquipmentType.tank,
-          onEquipmentSelected: (item) {
-            _applyGear(item);
-            Navigator.of(context).pop();
+          onEquipmentSelected: (item) async {
+            await _applyGear(item);
+            if (context.mounted) Navigator.of(context).pop();
           },
         ),
       ),
@@ -404,6 +416,7 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
                     controller: _labelController,
                     decoration: InputDecoration(
                       labelText: l10n.transmitters_field_label,
+                      helperText: l10n.transmitters_field_label_helper,
                     ),
                     textCapitalization: TextCapitalization.words,
                   ),
@@ -468,7 +481,7 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<TankRole>(
-                    key: const Key('transmitter_role'),
+                    key: ValueKey('transmitter_role-${_role.name}'),
                     initialValue: _role,
                     decoration: InputDecoration(
                       labelText: l10n.transmitters_field_role,
@@ -480,9 +493,21 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
                           child: Text(role.localizedName(l10n)),
                         ),
                     ],
-                    onChanged: (role) => setState(() => _role = role ?? _role),
+                    onChanged: (role) => setState(() {
+                      _role = role ?? _role;
+                      _roleTouched = true;
+                    }),
                   ),
                   const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: Text(
+                      l10n.transmitters_field_gear_subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
                   ListTile(
                     key: const Key('transmitter_gear'),
                     contentPadding: EdgeInsets.zero,
@@ -497,9 +522,19 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
                             onPressed: () => setState(() {
                               _equipmentId = null;
                               _equipmentName = null;
+                              _missingSizeHint = false;
                             }),
                           ),
                     onTap: _pickGear,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: Text(
+                      l10n.transmitters_field_transmitterGear_subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ),
                   ListTile(
                     key: const Key('transmitter_transmitter_gear'),
@@ -588,7 +623,10 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
                             decimal: true,
                           ),
                           validator: _positive,
-                          onChanged: (_) => setState(() => _presetName = null),
+                          onChanged: (_) => setState(() {
+                            _presetName = null;
+                            _missingSizeHint = false;
+                          }),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -602,12 +640,27 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
                           ),
                           keyboardType: TextInputType.number,
                           validator: _positive,
-                          onChanged: (_) => setState(() => _presetName = null),
+                          onChanged: (_) => setState(() {
+                            _presetName = null;
+                            _missingSizeHint = false;
+                          }),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  if (_missingSizeHint)
+                    Padding(
+                      key: const Key('transmitter_missing_size_hint'),
+                      padding: const EdgeInsets.only(top: 4, bottom: 16),
+                      child: Text(
+                        l10n.transmitters_hint_missingSize,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    )
+                  else
+                    const SizedBox(height: 16),
                   DropdownButtonFormField<TankMaterial?>(
                     key: const Key('transmitter_material'),
                     initialValue: _material,

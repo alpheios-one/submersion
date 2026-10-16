@@ -50260,6 +50260,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get transmitters_field_label => 'Címke';
 
   @override
+  String get transmitters_field_label_helper =>
+      'Becomes the tank\'s name in the dive once this sender is matched';
+
+  @override
   String get transmitters_field_serial => 'Jeladó sorozatszáma';
 
   @override
@@ -50276,13 +50280,25 @@ class AppLocalizationsHu extends AppLocalizations {
   String get transmitters_field_gear => 'Palack a felszerelésből';
 
   @override
+  String get transmitters_field_gear_subtitle =>
+      'The tank this sender reports pressure for';
+
+  @override
   String get transmitters_field_transmitterGear => 'Jeladó a felszerelésből';
+
+  @override
+  String get transmitters_field_transmitterGear_subtitle =>
+      'Battery/service tracking, not matching';
 
   @override
   String get transmitters_field_material => 'Anyag';
 
   @override
   String get transmitters_gear_none => 'Nincs';
+
+  @override
+  String get transmitters_hint_missingSize =>
+      'This cylinder has no size or pressure on file, so size will stay empty on the dive';
 
   @override
   String get transmitters_validation_key =>

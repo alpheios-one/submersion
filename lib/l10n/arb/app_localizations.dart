@@ -80046,6 +80046,12 @@ abstract class AppLocalizations {
   /// **'Label'**
   String get transmitters_field_label;
 
+  /// No description provided for @transmitters_field_label_helper.
+  ///
+  /// In en, this message translates to:
+  /// **'Becomes the tank\'s name in the dive once this sender is matched'**
+  String get transmitters_field_label_helper;
+
   /// No description provided for @transmitters_field_serial.
   ///
   /// In en, this message translates to:
@@ -80076,11 +80082,23 @@ abstract class AppLocalizations {
   /// **'Cylinder from gear'**
   String get transmitters_field_gear;
 
+  /// No description provided for @transmitters_field_gear_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The tank this sender reports pressure for'**
+  String get transmitters_field_gear_subtitle;
+
   /// No description provided for @transmitters_field_transmitterGear.
   ///
   /// In en, this message translates to:
   /// **'Transmitter from gear'**
   String get transmitters_field_transmitterGear;
+
+  /// No description provided for @transmitters_field_transmitterGear_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery/service tracking, not matching'**
+  String get transmitters_field_transmitterGear_subtitle;
 
   /// No description provided for @transmitters_field_material.
   ///
@@ -80093,6 +80111,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'None'**
   String get transmitters_gear_none;
+
+  /// No description provided for @transmitters_hint_missingSize.
+  ///
+  /// In en, this message translates to:
+  /// **'This cylinder has no size or pressure on file, so size will stay empty on the dive'**
+  String get transmitters_hint_missingSize;
 
   /// No description provided for @transmitters_validation_key.
   ///

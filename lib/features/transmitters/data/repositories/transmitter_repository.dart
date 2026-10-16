@@ -60,6 +60,30 @@ class TransmitterRepository {
     return row == null ? null : _map(row);
   }
 
+  /// The most recently logged [TankRole] among dives that used
+  /// [equipmentId] as a cylinder, ordered by dive date descending - a
+  /// sensible default when a diver links a transmitter to that cylinder
+  /// (issue #3367), never a value that overrides a role they already set.
+  /// Falls back to [TankRole.backGas] when the cylinder has no dive
+  /// history, matching that column's own default.
+  Future<TankRole> lastRoleForEquipment(String equipmentId) async {
+    final row = await _db
+        .customSelect(
+          'SELECT dt.tank_role AS tank_role FROM dive_tanks dt '
+          'JOIN dives d ON d.id = dt.dive_id '
+          'WHERE dt.equipment_id = ? '
+          'ORDER BY d.dive_date_time DESC LIMIT 1',
+          variables: [Variable<String>(equipmentId)],
+          readsFrom: {_db.diveTanks, _db.dives},
+        )
+        .getSingleOrNull();
+    final tankRole = row?.read<String>('tank_role');
+    return TankRole.values.firstWhere(
+      (e) => e.name == tankRole,
+      orElse: () => TankRole.backGas,
+    );
+  }
+
   /// The normalised serials of every registry row that names [equipmentId]
   /// as its transmitter gear item (condition phase 3b): the condition engine
   /// keys a transmitter item's gap entries on them. Not the row's
