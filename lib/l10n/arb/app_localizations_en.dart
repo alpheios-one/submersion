@@ -49738,7 +49738,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get transmitters_field_label_helper =>
-      'Becomes the tank\'s name in the dive once this sender is matched';
+      'Becomes the cylinder\'s name on the dive once this transmitter is matched';
 
   @override
   String get transmitters_field_serial => 'Transmitter serial';
@@ -49758,7 +49758,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get transmitters_field_gear_subtitle =>
-      'The tank this sender reports pressure for';
+      'The cylinder this transmitter reports pressure for';
 
   @override
   String get transmitters_field_transmitterGear => 'Transmitter from gear';

@@ -62,8 +62,8 @@ Widget _buildPage(
 
 // The page now carries field helper text and per-field explanations
 // (issue #3367), tall enough that the default test surface needs a
-// scroll - pick a surface generous enough that every field stays onstage,
-// matching the pattern in edit_form_scaffold_test.dart.
+// scroll, so pick a surface generous enough that every field stays
+// onstage, matching the pattern in edit_form_scaffold_test.dart.
 Future<void> _pumpPage(WidgetTester tester, Widget page) async {
   tester.view.physicalSize = const Size(900, 1600);
   tester.view.devicePixelRatio = 1.0;

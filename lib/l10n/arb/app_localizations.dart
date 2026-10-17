@@ -80049,7 +80049,7 @@ abstract class AppLocalizations {
   /// No description provided for @transmitters_field_label_helper.
   ///
   /// In en, this message translates to:
-  /// **'Becomes the tank\'s name in the dive once this sender is matched'**
+  /// **'Becomes the cylinder\'s name on the dive once this transmitter is matched'**
   String get transmitters_field_label_helper;
 
   /// No description provided for @transmitters_field_serial.
@@ -80085,7 +80085,7 @@ abstract class AppLocalizations {
   /// No description provided for @transmitters_field_gear_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'The tank this sender reports pressure for'**
+  /// **'The cylinder this transmitter reports pressure for'**
   String get transmitters_field_gear_subtitle;
 
   /// No description provided for @transmitters_field_transmitterGear.

@@ -15104,7 +15104,7 @@
   "transmitters_field_transmitterGear_subtitle": "Batterie-/Wartungs-Tracking, nicht für die Zuordnung",
   "transmitters_field_material": "Material",
   "transmitters_gear_none": "Keine",
-  "transmitters_hint_missingSize": "Für diese Flasche sind keine Grösse oder kein Druck hinterlegt, daher bleibt die Grösse beim Tauchgang leer",
+  "transmitters_hint_missingSize": "Für diese Flasche sind keine Größe oder kein Druck hinterlegt, daher bleibt die Größe beim Tauchgang leer",
   "transmitters_validation_key": "Gib eine Seriennummer ein oder wähle Tauchcomputer und Kanal",
   "transmitters_validation_positive": "Gib einen Wert größer als null ein",
   "transmitters_validation_duplicate": "Bereits {label} zugewiesen",

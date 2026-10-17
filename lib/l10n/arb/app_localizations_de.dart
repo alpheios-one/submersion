@@ -50464,7 +50464,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get transmitters_hint_missingSize =>
-      'Für diese Flasche sind keine Grösse oder kein Druck hinterlegt, daher bleibt die Grösse beim Tauchgang leer';
+      'Für diese Flasche sind keine Größe oder kein Druck hinterlegt, daher bleibt die Größe beim Tauchgang leer';
 
   @override
   String get transmitters_validation_key =>

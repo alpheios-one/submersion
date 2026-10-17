@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/constants/tank_preset_display.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
@@ -48,6 +51,8 @@ class TransmitterEditPage extends ConsumerStatefulWidget {
 }
 
 class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
+  static final _log = LoggerService.forClass(TransmitterEditPage);
+
   final _formKey = GlobalKey<FormState>();
   final _uuid = const Uuid();
 
@@ -59,6 +64,11 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
 
   TankRole _role = TankRole.backGas;
   bool _roleTouched = false;
+
+  /// Bumped only when the page sets [_role] itself (a suggestion from the
+  /// picked cylinder's history), so the Role dropdown, which reads its
+  /// value once, remounts then and not on the diver's own picks.
+  int _roleFieldGeneration = 0;
   bool _missingSizeHint = false;
   TankMaterial? _material;
   String? _computerId;
@@ -194,12 +204,29 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
           _workingPressureController.text.isEmpty;
     });
     if (_roleTouched) return;
-    final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
-    final role = await ref
-        .read(transmitterRepositoryProvider)
-        .lastRoleForEquipment(item.id, diverId: diverId);
-    if (!mounted) return;
-    setState(() => _role = role);
+    final TankRole role;
+    try {
+      final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
+      role = await ref
+          .read(transmitterRepositoryProvider)
+          .lastRoleForEquipment(item.id, diverId: diverId);
+    } catch (e, stackTrace) {
+      // The suggestion is a convenience: a failed lookup leaves Role as it
+      // is rather than blocking the pick.
+      _log.warning(
+        'Could not suggest a role from the cylinder history',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return;
+    }
+    // The diver may have chosen a Role, or picked another cylinder, while
+    // the lookup ran; a late answer must not overwrite either.
+    if (!mounted || _roleTouched || _equipmentId != item.id) return;
+    setState(() {
+      _role = role;
+      _roleFieldGeneration++;
+    });
   }
 
   Future<void> _pickGear() async {
@@ -215,9 +242,11 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
           scrollController: scrollController,
           selectedEquipmentIds: {?_equipmentId},
           typeFilter: EquipmentType.tank,
-          onEquipmentSelected: (item) async {
-            await _applyGear(item);
-            if (context.mounted) Navigator.of(context).pop();
+          onEquipmentSelected: (item) {
+            // Close first: the role suggestion runs a query, and the sheet
+            // should not wait on it.
+            Navigator.of(context).pop();
+            unawaited(_applyGear(item));
           },
         ),
       ),
@@ -487,7 +516,7 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<TankRole>(
-                    key: ValueKey('transmitter_role-${_role.name}'),
+                    key: ValueKey('transmitter_role-$_roleFieldGeneration'),
                     initialValue: _role,
                     decoration: InputDecoration(
                       labelText: l10n.transmitters_field_role,
@@ -505,15 +534,7 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
                     }),
                   ),
                   const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 2),
-                    child: Text(
-                      l10n.transmitters_field_gear_subtitle,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
+                  _FieldNote(l10n.transmitters_field_gear_subtitle),
                   ListTile(
                     key: const Key('transmitter_gear'),
                     contentPadding: EdgeInsets.zero,
@@ -533,15 +554,7 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
                           ),
                     onTap: _pickGear,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 2),
-                    child: Text(
-                      l10n.transmitters_field_transmitterGear_subtitle,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
+                  _FieldNote(l10n.transmitters_field_transmitterGear_subtitle),
                   ListTile(
                     key: const Key('transmitter_transmitter_gear'),
                     contentPadding: EdgeInsets.zero,
@@ -655,15 +668,10 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
                     ],
                   ),
                   if (_missingSizeHint)
-                    Padding(
+                    _FieldNote(
+                      l10n.transmitters_hint_missingSize,
                       key: const Key('transmitter_missing_size_hint'),
                       padding: const EdgeInsets.only(top: 4, bottom: 16),
-                      child: Text(
-                        l10n.transmitters_hint_missingSize,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
                     )
                   else
                     const SizedBox(height: 16),
@@ -689,6 +697,33 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
                 ],
               ),
             ),
+    );
+  }
+}
+
+/// Muted explanatory line beside a field: the shared FormCaption style,
+/// without its overline indent, since these sit flush with the fields.
+class _FieldNote extends StatelessWidget {
+  const _FieldNote(
+    this.text, {
+    super.key,
+    this.padding = const EdgeInsets.only(bottom: 2),
+  });
+
+  final String text;
+  final EdgeInsets padding;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: padding,
+      child: Text(
+        text,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+      ),
     );
   }
 }
