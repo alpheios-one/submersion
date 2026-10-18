@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/services/shared_library/backup/library_backup_service.dart';
+import 'package:submersion/core/services/shared_library/shared_library_membership_service.dart';
 import 'package:submersion/core/services/shared_library/shared_library_models.dart';
 import 'package:submersion/core/services/shared_library/shared_library_service.dart';
 import 'package:submersion/core/services/shared_library/shared_library_store.dart';
@@ -14,6 +16,7 @@ import 'package:submersion/features/shared_library/presentation/providers/shared
 import 'package:submersion/features/shared_library/presentation/providers/shared_library_sync_notifier.dart';
 
 import '../../../../helpers/fake_cloud_storage_provider.dart';
+import '../../../../helpers/shared_library_test_keys.dart';
 import '../../../../helpers/test_database.dart';
 
 void main() {
@@ -36,9 +39,9 @@ void main() {
       await store.upsertLibrary(
         const SharedLibrary(
           id: 'L',
-          name: 'Club',
+          name: 'Reef Survey',
           connectedAccountId: 'acc',
-          prefix: 'club',
+          prefix: 'site-sync',
         ),
       );
       await store.upsertMembership(
@@ -48,7 +51,7 @@ void main() {
           libraryId: 'L',
           memberId: 'm',
           displayName: 'Ann',
-          libraryName: 'Club',
+          libraryName: 'Reef Survey',
           backendKind: 's3',
         ),
       );
@@ -67,8 +70,8 @@ void main() {
       final cloud = FakeCloudStorageProvider();
       await SharedLibraryTransport(
         cloud,
-        prefix: 'club',
-      ).writeManifest({'id': 'L', 'name': 'Club', 'formatVersion': 1});
+        prefix: 'site-sync',
+      ).writeManifest({'id': 'L', 'name': 'Reef Survey', 'formatVersion': 2});
       final container = ProviderContainer(
         overrides: [
           validatedCurrentDiverIdProvider.overrideWith((ref) async => 'd1'),
@@ -188,9 +191,9 @@ void main() {
       await store.upsertLibrary(
         const SharedLibrary(
           id: 'L',
-          name: 'Club',
+          name: 'Reef Survey',
           connectedAccountId: 'acc',
-          prefix: 'club',
+          prefix: 'site-sync',
         ),
       );
       final container = ProviderContainer(
@@ -205,6 +208,69 @@ void main() {
       expect(await store.getLibrary('L'), isNull);
     },
   );
+
+  for (final owner in [true, false]) {
+    test(
+      owner
+          ? "an owner's healthy sync makes the daily backup when due"
+          : "a reader's sync makes no backup",
+      () async {
+        await setUpTestDatabase();
+        addTearDown(tearDownTestDatabase);
+        await DiverRepository().createDiver(
+          Diver(
+            id: 'd1',
+            name: 'Ann',
+            createdAt: DateTime(2026),
+            updatedAt: DateTime(2026),
+          ),
+        );
+        final roles = await signedTestRoles(
+          owners: owner ? {'m'} : {'o'},
+          members: {'m'},
+        );
+        final store = SharedLibraryStore();
+        await store.upsertLibrary(
+          SharedLibrary(
+            id: 'L',
+            name: 'Reef Survey',
+            connectedAccountId: 'acc',
+            prefix: 'site-sync',
+            roles: roles,
+          ),
+        );
+        await store.upsertMembership(
+          SharedLibraryMembership(
+            id: 'ms',
+            diverId: 'd1',
+            libraryId: 'L',
+            memberId: 'm',
+            displayName: 'Ann',
+            libraryName: 'Reef Survey',
+            backendKind: 's3',
+            signingKey: await testMemberKey('m'),
+          ),
+        );
+        final cloud = FakeCloudStorageProvider();
+        final t = SharedLibraryTransport(cloud, prefix: 'site-sync');
+        await t.writeManifest({'id': 'L', 'formatVersion': 2});
+        await t.writeRoles(roles);
+        final backups = _RecordingBackups();
+        final container = ProviderContainer(
+          overrides: [
+            validatedCurrentDiverIdProvider.overrideWith((ref) async => 'd1'),
+            sharedLibraryTransportFactoryProvider.overrideWithValue(
+              (lib) async => SharedLibraryTransport(cloud, prefix: lib.prefix),
+            ),
+            libraryBackupServiceProvider.overrideWithValue(backups),
+          ],
+        );
+        addTearDown(container.dispose);
+        await container.read(sharedLibrarySyncProvider.notifier).syncAll();
+        expect(backups.due, owner ? ['L'] : isEmpty);
+      },
+    );
+  }
 }
 
 /// Lists one connected library, then fails when the sync reads it.
@@ -219,14 +285,19 @@ class _BrokenStore extends SharedLibraryStore {
       libraryId: 'L',
       memberId: 'm',
       displayName: 'Ann',
-      libraryName: 'Club',
+      libraryName: 'Reef Survey',
       backendKind: 's3',
     ),
   ];
 
   @override
   Future<List<SharedLibrary>> getLibraries() async => const [
-    SharedLibrary(id: 'L', name: 'Club', connectedAccountId: 'a', prefix: 'p'),
+    SharedLibrary(
+      id: 'L',
+      name: 'Reef Survey',
+      connectedAccountId: 'a',
+      prefix: 'p',
+    ),
   ];
 
   @override
@@ -245,4 +316,32 @@ class _SlowStore extends SharedLibraryStore {
     await release.future;
     return const [];
   }
+}
+
+/// Records when an automatic backup was asked for.
+class _RecordingBackups extends LibraryBackupService {
+  _RecordingBackups()
+    : super(
+        store: SharedLibraryStore(),
+        memberships: SharedLibraryMembershipService(
+          store: SharedLibraryStore(),
+          transportFor: ({required account, required prefix}) =>
+              throw UnimplementedError(),
+        ),
+        backupsDirectory: () async => '',
+      );
+
+  final due = <String>[];
+
+  @override
+  Future<bool> backUpIfDue({
+    required String libraryId,
+    required String diverId,
+  }) =>
+      // A turn of its own, as the real one takes: the sync must have ended
+      // its turn by now, or this never runs.
+      SyncCoordinator.run(() async {
+        due.add(libraryId);
+        return true;
+      });
 }

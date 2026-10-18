@@ -26,6 +26,7 @@ import 'package:submersion/features/courses/domain/entities/course.dart';
 import 'package:submersion/features/courses/presentation/providers/course_providers.dart';
 import 'package:submersion/features/courses/presentation/widgets/course_card.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
+import 'package:submersion/shared/widgets/section_header_title.dart';
 import 'package:submersion/core/query/domain/query_node.dart';
 import 'package:submersion/core/query/domain/query_subject.dart';
 import 'package:submersion/features/courses/domain/models/course_filter_state.dart';
@@ -52,6 +53,9 @@ class CourseListContent extends ConsumerStatefulWidget {
   /// use. Left null, the list owns its own.
   final SelectionController? selectionController;
 
+  /// Replaces the header's own title, as Training's tab switch does (#3437).
+  final SectionHeaderTitle? headerTitle;
+
   const CourseListContent({
     super.key,
     this.onItemSelected,
@@ -59,6 +63,7 @@ class CourseListContent extends ConsumerStatefulWidget {
     this.showAppBar = true,
     this.floatingActionButton,
     this.selectionController,
+    this.headerTitle,
   });
 
   @override
@@ -198,57 +203,57 @@ class _CourseListContentState extends ConsumerState<CourseListContent> {
       child: ValueListenableBuilder<SelectionState>(
         valueListenable: _selection,
         builder: (context, selection, _) => Scaffold(
-          appBar: selection.isActive
-              ? _buildSelectionBar(visibleCourses, SelectionBarShell.appBar)
-              : AppBar(
-                  title: FeatureAppBarTitle(
-                    featureId: 'courses',
-                    title: context.l10n.courses_title,
-                    subtitle: courseListCountLabel(context, ref),
-                  ),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.sort),
-                      tooltip: context.l10n.courses_action_sort,
-                      onPressed: () => _showSortSheet(context),
-                    ),
-                    QueryFilterButton(
-                      active: ref.watch(courseFilterProvider).query != null,
-                      onPressed: _openQueryFilter,
-                    ),
-                    PopupMenuButton<String>(
-                      icon: const Icon(Icons.more_vert),
-                      onSelected: (value) {
-                        if (value.startsWith('view_')) {
-                          final mode = ListViewMode.fromName(
-                            value.replaceFirst('view_', ''),
+          appBar: _pinAppBar(
+            selection.isActive
+                ? _buildSelectionBar(visibleCourses, SelectionBarShell.appBar)
+                : _buildPhoneAppBar(
+                    context,
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.sort),
+                        tooltip: context.l10n.courses_action_sort,
+                        onPressed: () => _showSortSheet(context),
+                      ),
+                      QueryFilterButton(
+                        active: ref.watch(courseFilterProvider).query != null,
+                        onPressed: _openQueryFilter,
+                      ),
+                      PopupMenuButton<String>(
+                        icon: const Icon(Icons.more_vert),
+                        onSelected: (value) {
+                          if (value.startsWith('view_')) {
+                            final mode = ListViewMode.fromName(
+                              value.replaceFirst('view_', ''),
+                            );
+                            ref
+                                    .read(courseListViewModeProvider.notifier)
+                                    .state =
+                                mode;
+                          }
+                        },
+                        itemBuilder: (context) {
+                          final currentMode = ref.read(
+                            courseListViewModeProvider,
                           );
-                          ref.read(courseListViewModeProvider.notifier).state =
-                              mode;
-                        }
-                      },
-                      itemBuilder: (context) {
-                        final currentMode = ref.read(
-                          courseListViewModeProvider,
-                        );
-                        return [
-                          ...selectItemsMenuEntries(
-                            context,
-                            onSelect: _selection.enterExplicit,
-                          ),
-                          ...ListViewModeToggle.menuItems(
-                            context,
-                            currentMode: currentMode,
-                            modes: const [
-                              ListViewMode.detailed,
-                              ListViewMode.table,
-                            ],
-                          ),
-                        ];
-                      },
-                    ),
-                  ],
-                ),
+                          return [
+                            ...selectItemsMenuEntries(
+                              context,
+                              onSelect: _selection.enterExplicit,
+                            ),
+                            ...ListViewModeToggle.menuItems(
+                              context,
+                              currentMode: currentMode,
+                              modes: const [
+                                ListViewMode.detailed,
+                                ListViewMode.table,
+                              ],
+                            ),
+                          ];
+                        },
+                      ),
+                    ],
+                  ),
+          ),
           body: Column(
             children: [
               _buildFilterChips(context),
@@ -471,6 +476,39 @@ class _CourseListContentState extends ConsumerState<CourseListContent> {
     );
   }
 
+  /// [bar], or [bar] held still by the header's host while Training's tabs
+  /// slide, so only the list under it moves (#3465).
+  PreferredSizeWidget _pinAppBar(PreferredSizeWidget bar) =>
+      widget.headerTitle?.pinAppBar(bar) ?? bar;
+
+  /// The phone app bar: the plain title with its actions beside it, or a
+  /// [SectionHeaderTitle] with the actions on a row under it.
+  AppBar _buildPhoneAppBar(
+    BuildContext context, {
+    required List<Widget> actions,
+  }) {
+    final subtitle = courseListCountLabel(context, ref);
+    final header = widget.headerTitle;
+    if (header == null) {
+      return AppBar(
+        title: FeatureAppBarTitle(
+          featureId: 'courses',
+          title: context.l10n.courses_title,
+          subtitle: subtitle,
+        ),
+        actions: actions,
+      );
+    }
+    return AppBar(
+      // 8 here plus the switch's own 8px label padding puts the first name
+      // at the 16px every other app bar title sits at, as Equipment's does.
+      titleSpacing: 8,
+      toolbarHeight: header.appBarHeight(context, subtitle),
+      title: header.build(context, SectionHeaderSlot.appBar, subtitle),
+      bottom: sectionHeaderActionsRow(actions),
+    );
+  }
+
   Widget _buildCompactAppBar(BuildContext context) {
     final viewMode = ref.watch(courseListViewModeProvider);
 
@@ -485,22 +523,9 @@ class _CourseListContentState extends ConsumerState<CourseListContent> {
           ),
         ),
       ),
-      child: Row(
-        children: [
-          const SizedBox(width: 8),
-          // Expanded, and no Spacer: the title must be the row's only flexible
-          // child, or Spacer takes half the free space and the leftover half
-          // lands after the last icon (see trip_list_content for the detail).
-          Expanded(
-            child: FeatureAppBarTitle(
-              featureId: 'courses',
-              title: context.l10n.courses_title,
-              subtitle: courseListCountLabel(context, ref),
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-            ),
-          ),
+      child: _compactBarRow(
+        context,
+        icons: [
           if (viewMode != ListViewMode.table)
             IconButton(
               icon: const Icon(Icons.sort, size: 20),
@@ -539,6 +564,39 @@ class _CourseListContentState extends ConsumerState<CourseListContent> {
           ),
         ],
       ),
+    );
+  }
+
+  /// The pane bar's content: the plain title with [icons] beside it, or a
+  /// [SectionHeaderTitle] with [icons] on a row under it.
+  Widget _compactBarRow(BuildContext context, {required List<Widget> icons}) {
+    final subtitle = courseListCountLabel(context, ref);
+    final header = widget.headerTitle;
+    if (header != null) {
+      return SectionHeaderRows(
+        title: header.build(context, SectionHeaderSlot.pane, subtitle),
+        titleWidth: header.paneTitleWidth?.call(context),
+        actions: icons,
+      );
+    }
+    return Row(
+      children: [
+        const SizedBox(width: 8),
+        // Expanded, and no Spacer: the title must be the row's only flexible
+        // child, or Spacer takes half the free space and the leftover half
+        // lands after the last icon (see trip_list_content for the detail).
+        Expanded(
+          child: FeatureAppBarTitle(
+            featureId: 'courses',
+            title: context.l10n.courses_title,
+            subtitle: subtitle,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+          ),
+        ),
+        ...icons,
+      ],
     );
   }
 
@@ -614,24 +672,23 @@ class _CourseListContentState extends ConsumerState<CourseListContent> {
             _handleRowTap(courses.firstWhere((c) => c.id == id)),
         child: ListView.builder(
           controller: _scrollController,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          // CourseCard carries its own side margin, as the other sections'
+          // tiles do; the bottom padding keeps the last card clear of the FAB.
+          padding: const EdgeInsets.only(bottom: 80),
           itemCount: courses.length,
           itemBuilder: (context, index) {
             final course = courses[index];
             return KeyboardListItem(
               navigationKey: course.id,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: CourseCard(
-                  course: course,
-                  isSelected:
-                      widget.selectedId == course.id ||
-                      ref.watch(highlightedCourseIdProvider) == course.id,
-                  onTap: () => _handleRowTap(course),
-                  isSelectionMode: _isSelectionMode,
-                  isChecked: _selectedIds.contains(course.id),
-                  onCheckChanged: (_) => _selection.toggle(course.id),
-                ),
+              child: CourseCard(
+                course: course,
+                isSelected:
+                    widget.selectedId == course.id ||
+                    ref.watch(highlightedCourseIdProvider) == course.id,
+                onTap: () => _handleRowTap(course),
+                isSelectionMode: _isSelectionMode,
+                isChecked: _selectedIds.contains(course.id),
+                onCheckChanged: (_) => _selection.toggle(course.id),
               ),
             );
           },

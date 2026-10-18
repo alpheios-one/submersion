@@ -126,6 +126,18 @@ Finder _focusedHolds(String text) {
   );
 }
 
+/// Finds [key]'s row.
+Finder _row(String key) => find.byWidgetPredicate(
+  (widget) => widget is KeyboardListItem && widget.navigationKey == key,
+);
+
+/// A host's row paints only its text, so a rectangle or path drawn within it
+/// is an outline around the row, like the focus ring #3438 removed.
+final Matcher _paintsNoOutline = allOf([
+  for (final method in const [#drawRect, #drawRRect, #drawDRRect, #drawPath])
+    paintsExactlyCountTimes(method, 0),
+]);
+
 void main() {
   testWidgets('Down and Up move from the current key and report it', (
     tester,
@@ -143,10 +155,9 @@ void main() {
   });
 
   testWidgets('a single mouse click runs the row\'s tap', (tester) async {
-    // On desktop focus highlighting starts in the traditional mode, so the
-    // click that focuses the list also draws the focus ring on the clicked
-    // row. Drawing it must not rebuild the row's contents, or the tap still
-    // in progress is lost and every row needs a second click to open (#3208).
+    // A click right after keyboard use, too: nothing about the row may
+    // change mid-click, or the tap still in progress is lost and every row
+    // needs a second click to open (#3208).
     useDesktopFocusHighlighting();
     final taps = <String>[];
     await tester.pumpWidget(
@@ -174,10 +185,66 @@ void main() {
       ),
     );
 
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+
     await clickWithMouse(tester, find.byKey(const ValueKey('row-a')));
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
     await clickWithMouse(tester, find.byKey(const ValueKey('row-b')));
 
     expect(taps, ['a', 'b']);
+  });
+
+  testWidgets('a press in a row\'s margin focuses the list there', (
+    tester,
+  ) async {
+    // Card rows sit inside a margin that keeps neighbouring cards apart. A
+    // press there still belongs to the row: the list takes focus and the
+    // arrows carry on from it.
+    final log = <String>[];
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: KeyboardListNavigator(
+            keys: const ['a', 'b', 'c'],
+            currentKey: null,
+            onMove: (key) => log.add('move:$key'),
+            child: ListView(
+              children: [
+                for (final key in const ['a', 'b', 'c'])
+                  KeyboardListItem(
+                    navigationKey: key,
+                    child: Padding(
+                      key: ValueKey('row-$key'),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 4,
+                      ),
+                      child: InkWell(
+                        onTap: () {},
+                        child: SizedBox(height: 40, child: Text(key)),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tapAt(
+      tester.getTopLeft(find.byKey(const ValueKey('row-b'))) +
+          const Offset(4, 2),
+    );
+    await tester.pumpAndSettle();
+    expect(_primary?.debugLabel, KeyboardListNavigator.focusDebugLabel);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(log, ['move:c']);
   });
 
   testWidgets('a click moves the cursor the arrows continue from', (
@@ -409,6 +476,47 @@ void main() {
       findsOneWidget,
       reason: 'the third Tab leaves the list rather than walking its rows',
     );
+  });
+
+  group('the keyboard cursor draws no ring around its row (#3438)', () {
+    // Desktop highlighting, where the ring used to show: a clicked or
+    // keyboard-reached row is marked by its list's own highlight fill alone.
+    testWidgets('a mouse click leaves the clicked row plain', (tester) async {
+      useDesktopFocusHighlighting();
+      await tester.pumpWidget(const _Host(keys: ['a', 'b', 'c']));
+
+      await clickWithMouse(tester, find.byKey(const ValueKey('row-b')));
+
+      expect(_primary?.debugLabel, KeyboardListNavigator.focusDebugLabel);
+      expect(_row('b'), _paintsNoOutline);
+    });
+
+    testWidgets('an arrow after a click leaves the cursor row plain', (
+      tester,
+    ) async {
+      useDesktopFocusHighlighting();
+      await tester.pumpWidget(const _Host(keys: ['a', 'b', 'c']));
+      await clickWithMouse(tester, find.byKey(const ValueKey('row-a')));
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+
+      expect(_row('b'), _paintsNoOutline);
+    });
+
+    testWidgets('Tab into the list leaves the current row plain', (
+      tester,
+    ) async {
+      useDesktopFocusHighlighting();
+      await tester.pumpWidget(const _Host(keys: ['a', 'b', 'c'], initial: 'b'));
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+
+      expect(_primary?.debugLabel, KeyboardListNavigator.focusDebugLabel);
+      expect(_row('b'), _paintsNoOutline);
+    });
   });
 
   testWidgets('modified arrows are left to other handlers', (tester) async {

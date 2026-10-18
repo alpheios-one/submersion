@@ -49,7 +49,7 @@ void main() {
     await store.upsertLibrary(
       const SharedLibrary(
         id: 'L',
-        name: 'Club',
+        name: 'Reef Survey',
         connectedAccountId: 'a',
         prefix: 'p',
       ),
@@ -61,7 +61,7 @@ void main() {
         libraryId: 'L',
         memberId: 'r',
         displayName: 'Ray',
-        libraryName: 'Club',
+        libraryName: 'Reef Survey',
         backendKind: 's3',
       ),
     );
@@ -70,7 +70,11 @@ void main() {
 
   tearDown(tearDownTestDatabase);
 
-  Future<void> pump(WidgetTester tester, {required bool suggest}) async {
+  Future<void> pump(
+    WidgetTester tester, {
+    required bool suggest,
+    bool pushed = false,
+  }) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -84,7 +88,21 @@ void main() {
           locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: SiteEditPage(siteId: 's', suggest: suggest),
+          home: pushed
+              ? Builder(
+                  builder: (context) => Scaffold(
+                    body: TextButton(
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) =>
+                              SiteEditPage(siteId: 's', suggest: suggest),
+                        ),
+                      ),
+                      child: const Text('open'),
+                    ),
+                  ),
+                )
+              : SiteEditPage(siteId: 's', suggest: suggest),
         ),
       ),
     );
@@ -135,6 +153,33 @@ void main() {
     },
   );
 
+  testWidgets('sending a suggestion leaves without asking to discard', (
+    tester,
+  ) async {
+    await pump(tester, suggest: true, pushed: true);
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('suggestion-note')),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.enterText(find.byKey(const Key('suggestion-note')), 'x');
+    await tester.scrollUntilVisible(
+      find.text('Site Name *').first,
+      -100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.enterText(_rowField('Site Name *'), 'Bluer');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Send'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Discard changes?'), findsNothing);
+    expect(find.byType(SiteEditPage), findsNothing);
+    expect(await SharedLibraryStore().suggestions('L'), hasLength(1));
+  });
+
   testWidgets('a library site hides the Share with all profiles toggle', (
     tester,
   ) async {
@@ -176,6 +221,32 @@ void main() {
     expect((await SharedLibraryStore().suggestions('L')).single.fields, {
       'hazards': 'from a reader',
     });
+  });
+
+  testWidgets('a reader keeps their own notes without suggesting them', (
+    tester,
+  ) async {
+    await pump(tester, suggest: true);
+    await tester.scrollUntilVisible(
+      find.text('Life & notes').first,
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Life & notes').first);
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      _rowField('General Notes'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.enterText(_rowField('General Notes'), 'only mine');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Send'));
+    await tester.pumpAndSettle();
+
+    expect((await SiteRepository().getSiteById('s'))!.notes, 'only mine');
+    expect(await SharedLibraryStore().suggestions('L'), isEmpty);
+    expect(find.text('Your notes and rating are saved.'), findsOneWidget);
   });
 
   testWidgets('an editor reaching the edit route edits the site', (

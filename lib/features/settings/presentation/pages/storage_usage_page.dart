@@ -3,17 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/storage/storage_category.dart';
 import 'package:submersion/core/utils/byte_format.dart';
+import 'package:submersion/features/settings/presentation/providers/database_reclaim_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/storage_gc_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/storage_usage_providers.dart';
+import 'package:submersion/features/settings/presentation/widgets/cloud_storage_group.dart';
+import 'package:submersion/features/settings/presentation/widgets/database_reclaim_row.dart';
+import 'package:submersion/features/settings/presentation/widgets/storage_reclaim_card.dart';
 import 'package:submersion/features/settings/presentation/widgets/unrecognized_backups_notice.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// Reports how many bytes the app holds on this device, by category.
+/// Reports how many bytes the app holds on this device, by category, and in
+/// the cloud as of the last scan (issue #3396).
 ///
-/// Measurement only. Nothing here deletes anything: the categories that can be
-/// reclaimed today are reclaimed from the pages that already own that action,
-/// and the ones that cannot be reclaimed safely at all (exports live beside the
-/// database and are user-visible in the Files app; every backup is a full copy
-/// of the database) are shown here precisely so the user can decide for
+/// The rows only measure. The one action that deletes is the reclaim card at
+/// the top, which runs the storage cleanup: Submersion's own leftovers only,
+/// under the cleanup's safety rules, never a backup, an export or a diver's
+/// source media. The categories it does not touch (exports live beside the
+/// database and are user-visible in the Files app; every backup is a full
+/// copy of the database) are shown here precisely so the user can decide for
 /// themselves.
 ///
 /// The one exception is [UnrecognizedBackupsNotice], which appears under the
@@ -43,6 +50,8 @@ class StorageUsagePage extends ConsumerWidget {
               for (final category in categories) {
                 ref.invalidate(storageCategorySizeProvider(category.id));
               }
+              ref.invalidate(databaseSpaceProvider);
+              ref.invalidate(deviceReclaimableBytesProvider);
             },
           ),
         ],
@@ -50,14 +59,20 @@ class StorageUsagePage extends ConsumerWidget {
       body: ListView(
         children: [
           _TotalHeader(categories: categories),
+          const StorageReclaimCard(),
           for (final group in StorageGroup.values)
             if (grouped[group] != null) ...[
               _GroupHeader(group: group),
-              for (final category in grouped[group]!)
+              for (final category in grouped[group]!) ...[
                 StorageUsageRow(category: category),
+                // How much of the file a compaction would give back.
+                if (category.id == StorageCategoryId.database)
+                  DatabaseReclaimRow(),
+              ],
               if (group == StorageGroup.backups)
                 const UnrecognizedBackupsNotice(),
             ],
+          const CloudStorageGroup(),
           const SizedBox(height: 32),
         ],
       ),
@@ -99,6 +114,16 @@ class _TotalHeader extends ConsumerWidget {
       }
     }
 
+    // The cloud figures come from the last scan. Before any scan the header
+    // is the device total alone, with no cloud line claiming otherwise; an
+    // area that could not be measured leaves the sum short of the truth.
+    final cloud = ref.watch(storageGcStateProvider).value?.cloudUsage;
+    final cloudBytes = cloud?.totalBytes;
+    if (cloud?.partial ?? false) incomplete = true;
+    final muted = theme.textTheme.labelMedium?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
       child: Column(
@@ -108,12 +133,23 @@ class _TotalHeader extends ConsumerWidget {
             incomplete
                 ? context.l10n.settings_storageUsage_totalPartial
                 : context.l10n.settings_storageUsage_total,
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+            style: muted,
           ),
           const SizedBox(height: 4),
-          Text(formatBytes(total), style: theme.textTheme.headlineMedium),
+          Text(
+            formatBytes(total + (cloudBytes ?? 0)),
+            style: theme.textTheme.headlineMedium,
+          ),
+          if (cloudBytes != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              context.l10n.settings_storageUsage_totalSplit(
+                formatBytes(total),
+                formatBytes(cloudBytes),
+              ),
+              style: muted,
+            ),
+          ],
         ],
       ),
     );

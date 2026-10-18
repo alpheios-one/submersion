@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:submersion/core/services/shared_library/shared_library_models.dart';
 
-/// One site as stored in `sites/<id>.json` of a club library (issue #2567).
+/// One site as stored in `sites/<id>.json` of a shared site library (issue #2567).
 ///
 /// Every value in [fields] is plain JSON: scalars for the site columns and
 /// lists for the children (`siteTypes`, `tags`, `species`, `features`).
@@ -43,8 +43,6 @@ class SiteDocument {
     'island',
     'country',
     'region',
-    'rating',
-    'notes',
     'hazards',
     'accessNotes',
     'mooringNumber',
@@ -57,6 +55,10 @@ class SiteDocument {
     'species',
     'features',
   ];
+
+  /// The member's own: kept on the library site row, never uploaded, and
+  /// dropped from documents written by older builds (issue #2567).
+  static const Set<String> privateFields = {'notes', 'rating'};
 
   /// The fields that are lists of children rather than a site column.
   static const Set<String> listFields = {
@@ -84,7 +86,7 @@ class SiteDocument {
     if (rawClocks is Map) {
       for (final entry in rawClocks.entries) {
         final value = entry.value;
-        if (value is! Map) continue;
+        if (value is! Map || privateFields.contains(entry.key)) continue;
         try {
           clocks[entry.key as String] = FieldClock.fromJson(
             value.cast<String, dynamic>(),
@@ -101,7 +103,10 @@ class SiteDocument {
       id: id,
       deleted: json['deleted'] == true,
       fields: rawFields is Map
-          ? Map<String, Object?>.from(rawFields)
+          ? {
+              for (final e in rawFields.entries)
+                if (!privateFields.contains(e.key)) '${e.key}': e.value,
+            }
           : const {},
       clocks: clocks,
       extra: {
@@ -116,8 +121,16 @@ class SiteDocument {
     'id': id,
     'formatVersion': SharedLibraryLayout.formatVersion,
     'deleted': deleted,
-    'fields': fields,
-    'clocks': {for (final e in clocks.entries) e.key: e.value.toJson()},
+    // Never a member's private fields, nor when they were edited: a state
+    // from an older build may still hold their clocks.
+    'fields': {
+      for (final e in fields.entries)
+        if (!privateFields.contains(e.key)) e.key: e.value,
+    },
+    'clocks': {
+      for (final e in clocks.entries)
+        if (!privateFields.contains(e.key)) e.key: e.value.toJson(),
+    },
   };
 
   static Uint8List encode(SiteDocument doc) =>

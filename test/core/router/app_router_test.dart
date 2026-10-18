@@ -11,6 +11,8 @@ import 'package:submersion/features/tracks/domain/track_kind.dart';
 import 'package:submersion/features/tracks/presentation/pages/tracks_map_page.dart';
 import 'package:submersion/features/tracks/presentation/pages/tracks_page.dart';
 import 'package:submersion/core/router/track_locations.dart';
+import 'package:submersion/core/router/training_locations.dart';
+import 'package:submersion/features/training/presentation/pages/training_page.dart';
 import 'package:submersion/core/constants/feature_flags.dart';
 import 'package:submersion/core/router/app_router.dart';
 import 'package:submersion/features/connections/presentation/connections_links.dart';
@@ -34,6 +36,10 @@ import 'package:submersion/features/settings/presentation/pages/site_detail_sect
 import 'package:submersion/features/settings/presentation/widgets/appearance_settings_tiles.dart';
 import 'package:submersion/features/settings/presentation/widgets/unrecognized_backups_notice.dart';
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
+import 'package:submersion/features/settings/presentation/pages/data_settings_pane.dart';
+import 'package:submersion/features/settings/presentation/pages/lightroom_settings_page.dart';
+import 'package:submersion/features/shared_library/presentation/pages/connect_shared_library_page.dart';
+import 'package:submersion/features/shared_library/presentation/pages/shared_library_members_page.dart';
 import 'package:submersion/features/settings/presentation/pages/profile_metric_colors_page.dart';
 import 'package:submersion/features/trips/presentation/helpers/trip_edit_navigation.dart';
 import 'package:submersion/features/trips/presentation/pages/trip_edit_page.dart';
@@ -41,6 +47,9 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
 import 'package:submersion/features/dive_log/presentation/pages/dive_list_page.dart';
 import 'package:submersion/features/dive_log/presentation/navigation/open_dive_list.dart';
+import 'package:submersion/features/trips/presentation/navigation/open_trip_list.dart';
+import 'package:submersion/features/trips/presentation/pages/trip_list_page.dart';
+import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
 import 'package:submersion/features/dive_log/presentation/pages/bulk_dive_edit_page.dart';
 
 /// Finds a [GoRoute] by name in a route tree recursively.
@@ -411,6 +420,47 @@ void main() {
         '/tracks/underwater/r1/3d',
       );
       expect(await redirect('gps-logger', '/planning/gps-logger'), '/tracks');
+    });
+
+    testWidgets('Training opens on Certifications, and both tab addresses '
+        'build the one Training host (#3437)', (tester) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      GoRouterState stateAt(String path) => GoRouterState(
+        router.configuration,
+        uri: Uri.parse(path),
+        matchedLocation: path,
+        fullPath: path,
+        pathParameters: const {},
+        pageKey: ValueKey(path),
+      );
+
+      final training = _findRouteByPath(
+        router.configuration.routes,
+        kTrainingLocation,
+      );
+      expect(
+        await training!.redirect!(capturedContext, stateAt(kTrainingLocation)),
+        '/certifications',
+      );
+
+      for (final tab in TrainingTab.values) {
+        final route = _findRouteByPath(router.configuration.routes, tab.path);
+        final page = route!.pageBuilder!(capturedContext, stateAt(tab.path));
+        expect(page.key, kTrainingHostPageKey, reason: tab.path);
+        final child = (page as NoTransitionPage<void>).child;
+        expect(child, isA<TrainingPage>(), reason: tab.path);
+        expect((child as TrainingPage).tab, tab);
+      }
     });
 
     test('old planning gps-logger path is a redirect', () {
@@ -1458,6 +1508,95 @@ void main() {
       expect(widget.runtimeType.toString(), 'EquipmentConditionSettingsPage');
     });
 
+    test('the Safety sub-pages live under the safety route', () {
+      expect(router.namedLocation('safetySettings'), '/settings/safety');
+      expect(
+        router.namedLocation('safetyReviewSettings'),
+        '/settings/safety/review',
+      );
+      expect(
+        router.namedLocation('decompressionSettings'),
+        '/settings/safety/decompression',
+      );
+    });
+
+    testWidgets('the Safety routes build the hub and its sub-pages', (
+      tester,
+    ) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      String built(String name, String location) {
+        final route = _findRouteByName(router.configuration.routes, name);
+        expect(route, isNotNull, reason: name);
+        final state = GoRouterState(
+          router.configuration,
+          uri: Uri.parse(location),
+          matchedLocation: location,
+          fullPath: location,
+          pathParameters: const {},
+          pageKey: ValueKey(location),
+        );
+        return route!.builder!(capturedContext, state).runtimeType.toString();
+      }
+
+      expect(built('safetySettings', '/settings/safety'), 'SafetyHubPage');
+      expect(
+        built('safetyReviewSettings', '/settings/safety/review'),
+        'SafetyReviewSettingsPage',
+      );
+      expect(
+        built('decompressionSettings', '/settings/safety/decompression'),
+        'DecompressionSettingsPage',
+      );
+    });
+
+    testWidgets('on a desktop window the old Decompression section link opens '
+        'in the Safety pane', (tester) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      final route = _findRouteByName(
+        router.configuration.routes,
+        'settingsSection',
+      );
+      final target = await route!.redirect!(
+        capturedContext,
+        GoRouterState(
+          router.configuration,
+          uri: Uri.parse('/settings/section/decompression'),
+          matchedLocation: '/settings/section/decompression',
+          fullPath: '/settings/section/:sectionId',
+          pathParameters: const {'sectionId': 'decompression'},
+          pageKey: const ValueKey('/settings/section/decompression'),
+        ),
+      );
+
+      expect(target, '/settings?selected=safety&safetyPage=decompression');
+    });
+
     test('a section child route exists under /settings', () {
       final route = _findRouteByName(
         router.configuration.routes,
@@ -1493,7 +1632,7 @@ void main() {
         'own', (tester) async {
       // SettingsSectionDetailPage supplies a Scaffold and an AppBar, so a
       // deep link to /settings/section/safety would stack a second app bar
-      // on top of SafetySettingsPage's. Fixing only the list tile leaves the
+      // on top of SafetyHubPage's. Fixing only the list tile leaves the
       // URL reachable; the route itself has to normalize it.
       late BuildContext capturedContext;
       await tester.pumpWidget(
@@ -1533,6 +1672,11 @@ void main() {
 
       // Sections whose content is its own Scaffold with its own AppBar.
       expect(await redirectFor('safety'), '/settings/safety');
+      // Decompression moved under Safety (#3395); old links follow it.
+      expect(
+        await redirectFor('decompression'),
+        '/settings/safety/decompression',
+      );
       expect(await redirectFor('debug'), '/settings/debug-logs');
       expect(await redirectFor('profile'), '/settings/diver-profile');
       // Has a dedicated page too, so the route stays canonical.
@@ -1864,6 +2008,46 @@ void main() {
     });
   });
 
+  group('trips route (#3350)', () {
+    testWidgets('hands a pushed list its return snapshot', (tester) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      GoRouterState stateFor(Object? extra) => GoRouterState(
+        router.configuration,
+        uri: Uri.parse('/trips'),
+        matchedLocation: '/trips',
+        fullPath: '/trips',
+        pathParameters: const {},
+        extra: extra,
+        pageKey: const ValueKey('/trips'),
+      );
+      TripListPage pageFor(Object? extra) {
+        final page = _findRouteByName(
+          router.configuration.routes,
+          'trips',
+        )!.pageBuilder!(capturedContext, stateFor(extra));
+        return (page as NoTransitionPage<void>).child as TripListPage;
+      }
+
+      const ret = TripListReturn(
+        filter: TripFilterState(equipmentId: 'e1'),
+        highlightedTripId: 't1',
+      );
+      expect(pageFor(ret).returnTo, same(ret));
+      expect(pageFor(null).returnTo, isNull);
+      expect(pageFor('unrelated').returnTo, isNull);
+    });
+  });
+
   group('bulk edit route (#3292)', () {
     testWidgets('return=pop tells the form to pop on save', (tester) async {
       late BuildContext capturedContext;
@@ -1896,6 +2080,116 @@ void main() {
 
       expect(pageAt('/dives/bulk-edit?return=pop').popOnSave, isTrue);
       expect(pageAt('/dives/bulk-edit').popOnSave, isFalse);
+    });
+  });
+
+  group('Settings > Data pane (#3467)', () {
+    // Every page reached from Settings > Data. The pane builds these from its
+    // own table, so each must build the same page the router does.
+    const locations = [
+      '/settings/backup',
+      '/settings/cloud-sync',
+      '/settings/cloud-sync/s3-config',
+      '/settings/cloud-sync/webdav-config',
+      '/settings/shared-libraries',
+      '/settings/shared-libraries/connect?prefix=club',
+      '/settings/shared-libraries/lib1',
+      '/settings/shared-libraries/lib1/members',
+      '/settings/shared-libraries/lib1/suggestions',
+      '/settings/shared-libraries/lib1/backups',
+      '/settings/shared-libraries/lib1/connection',
+      '/settings/photos-media',
+      '/settings/photos-media/setup',
+      '/settings/media-sources',
+      '/settings/media-sources/network-sources',
+      '/settings/media-storage',
+      '/settings/media-storage/transfers',
+      '/settings/connected-accounts',
+      '/settings/storage',
+      '/settings/storage-usage',
+      '/settings/storage-usage/unrecognized-backups',
+      '/settings/offline-maps',
+      '/settings/fix-dive-times',
+      '/settings/link-buddy-names',
+      '/settings/retype-other-gear',
+      '/settings/data-quality',
+    ];
+
+    testWidgets('each location builds the page its route builds', (
+      tester,
+    ) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      for (final location in locations) {
+        final uri = Uri.parse(location);
+        final match = router.configuration.findMatch(uri);
+        expect(match.isError, isFalse, reason: location);
+        final route = match.last.route;
+        final routed = route.builder!(
+          capturedContext,
+          GoRouterState(
+            router.configuration,
+            uri: uri,
+            matchedLocation: match.last.matchedLocation,
+            fullPath: match.fullPath,
+            pathParameters: match.pathParameters,
+            pageKey: ValueKey(location),
+          ),
+        );
+        final pane = dataPanePage(uri);
+        expect(pane, isNotNull, reason: location);
+        expect(pane.runtimeType, routed.runtimeType, reason: location);
+      }
+    });
+
+    test('Lightroom opens in the pane only while its UI is enabled', () {
+      addTearDown(() => lightroomUiEnabled = false);
+      final lightroom = Uri.parse('/settings/lightroom');
+
+      lightroomUiEnabled = false;
+      expect(dataPanePage(lightroom), isNull);
+
+      lightroomUiEnabled = true;
+      expect(dataPanePage(lightroom), isA<LightroomSettingsPage>());
+      expect(
+        router.configuration.findMatch(lightroom).fullPath,
+        '/settings/lightroom',
+      );
+    });
+
+    test('pages read their parameters from the location', () {
+      final library =
+          dataPanePage(Uri.parse('/settings/shared-libraries/lib1/members'))
+              as SharedLibraryMembersPage;
+      expect(library.libraryId, 'lib1');
+      final connect =
+          dataPanePage(
+                Uri.parse('/settings/shared-libraries/connect?prefix=club'),
+              )
+              as ConnectSharedLibraryPage;
+      expect(connect.initialPrefix, 'club');
+    });
+
+    test('pages outside Settings > Data are not in the pane', () {
+      for (final location in [
+        '/settings/appearance',
+        '/settings/safety/review',
+        '/settings/debug-logs',
+        '/settings',
+        '/dives/abc',
+      ]) {
+        expect(dataPanePage(Uri.parse(location)), isNull, reason: location);
+      }
     });
   });
 }

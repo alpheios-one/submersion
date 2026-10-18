@@ -9,7 +9,7 @@ import 'package:submersion/features/shared_library/presentation/widgets/library_
 import 'package:submersion/features/shared_library/presentation/widgets/site_attribution_line.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// Each field of a club library site with its last editor and time
+/// Each field of a shared site library site with its last editor and time
 /// (issue #2567).
 Future<void> showSiteEditHistorySheet(
   BuildContext context, {
@@ -35,8 +35,11 @@ class SiteEditHistorySheet extends ConsumerWidget {
         ref.watch(libraryMemberNamesProvider(libraryId)).value ??
         const <String, String>{};
     // Growable: the first frame has no state yet and sort mutates in place.
-    final entries = <MapEntry<String, FieldClock>>[...?state?.clocks.entries]
-      ..sort((a, b) => b.value.hlc.compareTo(a.value.hlc));
+    // A field nobody is known to have edited has no history to show.
+    final entries = <MapEntry<String, FieldClock>>[
+      for (final e in state?.clocks.entries ?? <MapEntry<String, FieldClock>>[])
+        if (e.value.marksEdit) e,
+    ]..sort((a, b) => b.value.hlc.compareTo(a.value.hlc));
     return SafeArea(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -59,13 +62,7 @@ class SiteEditHistorySheet extends ConsumerWidget {
                     subtitle: Text(
                       l10n.sharedLibrary_site_lastEdited(
                         memberDisplayName(names, e.value.memberId),
-                        libraryDateLabel(
-                          ref,
-                          DateTime.fromMillisecondsSinceEpoch(
-                            e.value.hlc.physicalTime,
-                            isUtc: true,
-                          ),
-                        ),
+                        libraryDateLabel(ref, e.value.editedAt),
                       ),
                     ),
                   ),

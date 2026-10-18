@@ -110,7 +110,10 @@ class MediaStoreResolver {
           (at) => unstamped.copyWith(remoteUploadedAt: at),
         ),
         (
-          StoreKeys.renditionKey(hash, ext: isVideo ? 'mp4' : 'jpg'),
+          StoreKeys.renditionKey(
+            hash,
+            ext: StoreKeys.renditionExtension(isVideo: isVideo),
+          ),
           (at) => unstamped.copyWith(remoteCompressedUploadedAt: at),
         ),
       ],
@@ -257,7 +260,11 @@ class MediaStoreResolver {
         item.mediaType == MediaType.document;
     File? staging;
     try {
-      final cached = await _cache.get(hash, MediaCacheKind.thumb);
+      // The cheap hit first: one stat, no index read and write. [get] still
+      // finds a thumbnail cached before they were all stored as JPEG.
+      final cached =
+          await _cache.peekThumb(hash) ??
+          await _cache.get(hash, MediaCacheKind.thumb);
       if (cached != null) {
         return FileData(
           file: cached,
@@ -306,7 +313,9 @@ class MediaStoreResolver {
     MediaItem item,
     String hash,
   ) async {
-    final ext = item.mediaType == MediaType.video ? 'mp4' : 'jpg';
+    final ext = StoreKeys.renditionExtension(
+      isVideo: item.mediaType == MediaType.video,
+    );
     File? staging;
     try {
       final cached = await _cache.get(

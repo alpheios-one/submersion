@@ -2,7 +2,7 @@ import 'package:drift/drift.dart';
 
 import 'package:submersion/core/database/tables/diver_tables.dart';
 
-/// A club library this device connected (issue #2567). Device-local: the
+/// A shared site library this device connected (issue #2567). Device-local: the
 /// credentials live on the connected account, the role and member caches
 /// are refreshed from the folder on every sync.
 @DataClassName('SharedLibraryRow')
@@ -15,11 +15,39 @@ class SharedLibraries extends Table {
   BoolColumn get readOnlyDetected =>
       boolean().withDefault(const Constant(false))();
 
-  /// `{"owners": [...], "editors": [...]}` as last read from roles.json.
+  /// The last `roles.json` this device trusted: signed by an owner of the
+  /// one trusted before it, or self-consistent at join.
   TextColumn get rolesJson => text().withDefault(const Constant('{}'))();
   IntColumn get lastSyncAt => integer().nullable()();
   TextColumn get lastError => text().nullable()();
   IntColumn get createdAt => integer()();
+
+  /// The folder holds a `roles.json` this device refused (not an owner's).
+  BoolColumn get rolesRejected =>
+      boolean().withDefault(const Constant(false))();
+
+  /// An ownership reset waiting for this member's answer.
+  TextColumn get pendingRolesJson => text().nullable()();
+
+  /// The manifest's encryption state as last read.
+  BoolColumn get encrypted => boolean().withDefault(const Constant(false))();
+  TextColumn get keyId => text().nullable()();
+
+  /// When this device last made an automatic backup (owners only).
+  IntColumn get lastAutoBackupAt => integer().nullable()();
+
+  /// Whether this device has taken up the private notes an earlier build
+  /// left on its library site rows: done once, at the first sync.
+  BoolColumn get notesBackfilled =>
+      boolean().withDefault(const Constant(false))();
+
+  /// A library key another device of a profile sent while this device still
+  /// named an older one: taken up once the manifest names it.
+  TextColumn get spareKeyId => text().nullable()();
+  TextColumn get spareKey => text().nullable()();
+
+  /// The library's description from its `info.json` (issue #3389).
+  TextColumn get description => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -33,6 +61,10 @@ class SharedLibraryMembers extends Table {
   TextColumn get memberId => text()();
   TextColumn get displayName => text()();
   IntColumn get joinedAt => integer()();
+
+  /// The key on the card, and whether its signature matched it.
+  TextColumn get publicKey => text().nullable()();
+  BoolColumn get cardVerified => boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {libraryId, memberId};
@@ -59,6 +91,15 @@ class SharedLibraryMemberships extends Table {
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
   TextColumn get hlc => text().nullable()();
+
+  /// The profile's Ed25519 signing key pair, base64, the same on every
+  /// membership row of the profile; carried by personal sync.
+  TextColumn get signingPublicKey => text().nullable()();
+  TextColumn get signingPrivateKey => text().nullable()();
+
+  /// The unlocked key of an encrypted library, base64, with its id.
+  TextColumn get libraryKeyId => text().nullable()();
+  TextColumn get libraryKey => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -110,6 +151,52 @@ class SharedSiteSuggestions extends Table {
   /// `pending`, `uploaded` or `withdrawn`.
   TextColumn get status => text().withDefault(const Constant('pending'))();
   TextColumn get remoteModifiedTime => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// An owner's library backup known to this device (issue #2567).
+/// Device-local; the copy in the library's storage has its own index.
+@DataClassName('SharedLibraryBackupRow')
+class SharedLibraryBackups extends Table {
+  TextColumn get backupId => text()();
+  TextColumn get libraryId => text()();
+  IntColumn get createdAt => integer()();
+  TextColumn get note => text().withDefault(const Constant(''))();
+  BoolColumn get pinned => boolean().withDefault(const Constant(false))();
+  BoolColumn get automatic => boolean().withDefault(const Constant(false))();
+  BoolColumn get beforeRestore =>
+      boolean().withDefault(const Constant(false))();
+  IntColumn get siteCount => integer().withDefault(const Constant(0))();
+  IntColumn get memberCount => integer().withDefault(const Constant(0))();
+  IntColumn get sizeBytes => integer().withDefault(const Constant(0))();
+
+  /// The zip on this device, or null when only the storage holds it.
+  TextColumn get localPath => text().nullable()();
+  BoolColumn get inStorage => boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column> get primaryKey => {backupId};
+}
+
+/// A profile's private notes and rating on a shared site library site
+/// (issue #2567): never in the library, carried to the profile's other
+/// devices by personal sync, which keeps library site rows out. The id is
+/// `<diverId>:<siteId>`, so two devices writing it offline meet on one row.
+/// No FK to dive_sites: a device that has not connected the library holds
+/// the notes before the site arrives.
+@DataClassName('LibrarySiteNoteRow')
+class LibrarySiteNotes extends Table {
+  TextColumn get id => text()();
+  TextColumn get diverId =>
+      text().references(Divers, #id, onDelete: KeyAction.cascade)();
+  TextColumn get siteId => text()();
+  TextColumn get notes => text().withDefault(const Constant(''))();
+  RealColumn get rating => real().nullable()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  TextColumn get hlc => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};

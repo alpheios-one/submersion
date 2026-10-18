@@ -11,7 +11,7 @@ import 'package:submersion/core/services/shared_library/site_document.dart';
 import 'package:submersion/core/services/sync/sync_coordinator.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 
-/// Moves sites into and out of a club library (issue #2567): push converts
+/// Moves sites into and out of a shared site library (issue #2567): push converts
 /// a personal site in place, delete stamps the tombstone and detaches the
 /// local row, undelete wins the site back with a newer clock.
 class SharedSitePublisher {
@@ -31,7 +31,7 @@ class SharedSitePublisher {
     if (library == null) throw StateError('$libraryId is not connected here');
     final role = effectiveRole(
       listed: library.roles.roleOf(memberId),
-      readOnlyDetected: library.readOnlyDetected,
+      readOnlyDetected: library.writesHeld,
     );
     if (!canDeleteLibrarySite(role)) {
       throw StateError('a reader cannot delete in $libraryId');
@@ -101,6 +101,16 @@ class SharedSitePublisher {
         ),
       );
     });
+    // Its notes and rating stay the profile's: kept for personal sync,
+    // which no longer carries the site row.
+    if (row.notes.isNotEmpty || row.rating != null) {
+      await _store.putSiteNotes(
+        diverId: diverId,
+        siteId: siteId,
+        notes: row.notes,
+        rating: row.rating,
+      );
+    }
     SyncEventBus.notifyLocalChange();
   }
 

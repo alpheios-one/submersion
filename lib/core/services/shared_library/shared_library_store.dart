@@ -1,156 +1,21 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/shared_library/crypto/library_cipher.dart';
+import 'package:submersion/core/services/shared_library/crypto/library_signer.dart';
 import 'package:submersion/core/services/shared_library/shared_library_models.dart';
+import 'package:submersion/core/services/shared_library/shared_site_models.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 
-/// Per library site: the field clocks and this device's dirty flag.
-class SharedSiteState {
-  const SharedSiteState({
-    required this.siteId,
-    required this.libraryId,
-    this.clocks = const {},
-    this.remoteModifiedTime,
-    this.dirty = false,
-    this.deleted = false,
-    this.lastEditorMemberId,
-    this.lastEditedAtMs,
-  });
+export 'package:submersion/core/services/shared_library/shared_site_models.dart';
 
-  final String siteId;
-  final String libraryId;
-  final Map<String, FieldClock> clocks;
-  final String? remoteModifiedTime;
-  final bool dirty;
-  final bool deleted;
-  final String? lastEditorMemberId;
-  final int? lastEditedAtMs;
-
-  SharedSiteState copyWith({
-    Map<String, FieldClock>? clocks,
-    String? remoteModifiedTime,
-    bool clearRemoteModifiedTime = false,
-    bool? dirty,
-    bool? deleted,
-    String? lastEditorMemberId,
-    int? lastEditedAtMs,
-  }) => SharedSiteState(
-    siteId: siteId,
-    libraryId: libraryId,
-    clocks: clocks ?? this.clocks,
-    remoteModifiedTime: clearRemoteModifiedTime
-        ? null
-        : (remoteModifiedTime ?? this.remoteModifiedTime),
-    dirty: dirty ?? this.dirty,
-    deleted: deleted ?? this.deleted,
-    lastEditorMemberId: lastEditorMemberId ?? this.lastEditorMemberId,
-    lastEditedAtMs: lastEditedAtMs ?? this.lastEditedAtMs,
-  );
-}
-
-/// A proposed edit from a reader: outgoing until uploaded, incoming on an
-/// owner's device until accepted or dismissed.
-class SharedSiteSuggestion {
-  const SharedSiteSuggestion({
-    required this.id,
-    required this.libraryId,
-    required this.siteId,
-    required this.memberId,
-    required this.memberName,
-    this.note = '',
-    this.fields = const {},
-    required this.createdAt,
-    required this.direction,
-    this.status = 'pending',
-    this.remoteModifiedTime,
-  });
-
-  static const outgoing = 'outgoing';
-  static const incoming = 'incoming';
-  static const pending = 'pending';
-  static const uploaded = 'uploaded';
-  static const withdrawn = 'withdrawn';
-
-  /// An owner accepted or dismissed it while its file could not be
-  /// deleted: kept so the next sync neither re-imports nor shows it, and
-  /// retries the delete.
-  static const resolved = 'resolved';
-
-  final String id;
-  final String libraryId;
-  final String siteId;
-  final String memberId;
-  final String memberName;
-  final String note;
-  final Map<String, Object?> fields;
-  final DateTime createdAt;
-  final String direction;
-  final String status;
-  final String? remoteModifiedTime;
-
-  SharedSiteSuggestion copyWith({String? status, String? remoteModifiedTime}) =>
-      SharedSiteSuggestion(
-        id: id,
-        libraryId: libraryId,
-        siteId: siteId,
-        memberId: memberId,
-        memberName: memberName,
-        note: note,
-        fields: fields,
-        createdAt: createdAt,
-        direction: direction,
-        status: status ?? this.status,
-        remoteModifiedTime: remoteModifiedTime ?? this.remoteModifiedTime,
-      );
-
-  /// The wire form written to `suggestions/<id>.json`.
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'siteId': siteId,
-    'memberId': memberId,
-    'memberName': memberName,
-    'note': note,
-    'fields': fields,
-    'createdAt': createdAt.toUtc().toIso8601String(),
-  };
-
-  factory SharedSiteSuggestion.fromJson(
-    Map<String, dynamic> json, {
-    required String libraryId,
-    required String direction,
-    String? remoteModifiedTime,
-  }) {
-    final id = json['id'];
-    final siteId = json['siteId'];
-    if (id is! String || id.isEmpty || siteId is! String || siteId.isEmpty) {
-      throw const FormatException('suggestion without an id or siteId');
-    }
-    final rawFields = json['fields'];
-    return SharedSiteSuggestion(
-      id: id,
-      libraryId: libraryId,
-      siteId: siteId,
-      memberId: (json['memberId'] as String?) ?? '',
-      memberName: (json['memberName'] as String?) ?? '',
-      note: (json['note'] as String?) ?? '',
-      fields: rawFields is Map
-          ? Map<String, Object?>.from(rawFields)
-          : const {},
-      createdAt:
-          DateTime.tryParse((json['createdAt'] as String?) ?? '') ??
-          DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
-      direction: direction,
-      remoteModifiedTime: remoteModifiedTime,
-    );
-  }
-}
-
-/// Device-local storage for club libraries, their member and role caches,
+/// Device-local storage for shared site libraries, their member and role caches,
 /// per-site clocks and suggestions, plus the synced membership rows
 /// (issue #2567).
 class SharedLibraryStore {
@@ -162,6 +27,7 @@ class SharedLibraryStore {
   final _uuid = const Uuid();
 
   static const membershipEntity = 'sharedLibraryMemberships';
+  static const siteNotesEntity = 'librarySiteNotes';
 
   // Libraries
 
@@ -182,6 +48,18 @@ class SharedLibraryStore {
             rolesJson: Value(jsonEncode(lib.roles.toJson())),
             lastSyncAt: Value(lib.lastSyncAt?.millisecondsSinceEpoch),
             lastError: Value(lib.lastError),
+            rolesRejected: Value(lib.rolesRejected),
+            pendingRolesJson: Value(
+              lib.pendingRoles == null
+                  ? null
+                  : jsonEncode(lib.pendingRoles!.toJson()),
+            ),
+            encrypted: Value(lib.encrypted),
+            keyId: Value(lib.keyId),
+            lastAutoBackupAt: Value(
+              lib.lastAutoBackupAt?.millisecondsSinceEpoch,
+            ),
+            description: Value(lib.description),
             createdAt:
                 existing?.createdAt ?? DateTime.now().millisecondsSinceEpoch,
           ),
@@ -230,6 +108,15 @@ class SharedLibraryStore {
     bool? readOnlyDetected,
     SharedLibraryRoles? roles,
     String? name,
+    String? description,
+    bool clearDescription = false,
+    bool? rolesRejected,
+    SharedLibraryRoles? pendingRoles,
+    bool clearPendingRoles = false,
+    bool? encrypted,
+    String? keyId,
+    bool clearKeyId = false,
+    DateTime? lastAutoBackupAt,
   }) async {
     await (_db.update(
       _db.sharedLibraries,
@@ -248,20 +135,46 @@ class SharedLibraryStore {
             ? const Value.absent()
             : Value(jsonEncode(roles.toJson())),
         name: name == null ? const Value.absent() : Value(name),
+        description: clearDescription
+            ? const Value(null)
+            : description == null
+            ? const Value.absent()
+            : Value(description),
+        rolesRejected: rolesRejected == null
+            ? const Value.absent()
+            : Value(rolesRejected),
+        pendingRolesJson: clearPendingRoles
+            ? const Value(null)
+            : pendingRoles == null
+            ? const Value.absent()
+            : Value(jsonEncode(pendingRoles.toJson())),
+        encrypted: encrypted == null ? const Value.absent() : Value(encrypted),
+        keyId: clearKeyId
+            ? const Value(null)
+            : keyId == null
+            ? const Value.absent()
+            : Value(keyId),
+        lastAutoBackupAt: lastAutoBackupAt == null
+            ? const Value.absent()
+            : Value(lastAutoBackupAt.millisecondsSinceEpoch),
       ),
     );
   }
 
-  SharedLibrary _libraryFromRow(SharedLibraryRow row) {
-    SharedLibraryRoles roles;
+  static SharedLibraryRoles? _rolesFrom(String? json) {
+    if (json == null) return null;
     try {
-      final decoded = jsonDecode(row.rolesJson);
-      roles = decoded is Map<String, dynamic>
+      final decoded = jsonDecode(json);
+      return decoded is Map<String, dynamic>
           ? SharedLibraryRoles.fromJson(decoded)
-          : SharedLibraryRoles.empty;
+          : null;
     } on FormatException {
-      roles = SharedLibraryRoles.empty;
+      return null;
     }
+  }
+
+  SharedLibrary _libraryFromRow(SharedLibraryRow row) {
+    final roles = _rolesFrom(row.rolesJson) ?? SharedLibraryRoles.empty;
     return SharedLibrary(
       id: row.id,
       name: row.name,
@@ -274,6 +187,14 @@ class SharedLibraryStore {
           ? null
           : DateTime.fromMillisecondsSinceEpoch(row.lastSyncAt!),
       lastError: row.lastError,
+      rolesRejected: row.rolesRejected,
+      pendingRoles: _rolesFrom(row.pendingRolesJson),
+      encrypted: row.encrypted,
+      keyId: row.keyId,
+      lastAutoBackupAt: row.lastAutoBackupAt == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(row.lastAutoBackupAt!),
+      description: row.description,
     );
   }
 
@@ -295,6 +216,8 @@ class SharedLibraryStore {
               memberId: m.memberId,
               displayName: m.displayName,
               joinedAt: m.joinedAt.millisecondsSinceEpoch,
+              publicKey: Value(m.publicKey),
+              cardVerified: Value(m.cardVerified),
             ),
         ]),
       );
@@ -316,6 +239,8 @@ class SharedLibraryStore {
             r.joinedAt,
             isUtc: true,
           ),
+          publicKey: r.publicKey,
+          cardVerified: r.cardVerified,
         ),
     ];
   }
@@ -326,12 +251,16 @@ class SharedLibraryStore {
 
   // Memberships (synced)
 
+  /// Writes [m]. Keys it does not carry are kept, never erased: the
+  /// profile's signing key comes from its other memberships, and only
+  /// [setLibraryKey] clears a library key.
   Future<void> upsertMembership(SharedLibraryMembership m) async {
     final now = DateTime.now().millisecondsSinceEpoch;
     await _db.transaction(() async {
       final existing = await (_db.select(
         _db.sharedLibraryMemberships,
       )..where((t) => t.id.equals(m.id))).getSingleOrNull();
+      final profileKey = m.signingKey ?? await signingKeyForDiver(m.diverId);
       await _db
           .into(_db.sharedLibraryMemberships)
           .insertOnConflictUpdate(
@@ -346,6 +275,14 @@ class SharedLibraryStore {
               locationHint: Value(m.locationHint),
               createdAt: existing?.createdAt ?? now,
               updatedAt: now,
+              signingPublicKey: Value(
+                profileKey?.publicKey ?? existing?.signingPublicKey,
+              ),
+              signingPrivateKey: Value(
+                profileKey?.privateKey ?? existing?.signingPrivateKey,
+              ),
+              libraryKeyId: Value(m.libraryKeyId ?? existing?.libraryKeyId),
+              libraryKey: Value(m.libraryKey ?? existing?.libraryKey),
             ),
           );
       await _sync.markRecordPending(
@@ -400,6 +337,277 @@ class SharedLibraryStore {
     SyncEventBus.notifyLocalChange();
   }
 
+  /// [diverId]'s private notes and rating on the library site [siteId],
+  /// or null when the profile has none there.
+  Future<({String notes, double? rating})?> siteNotes({
+    required String diverId,
+    required String siteId,
+  }) async {
+    final row = await (_db.select(
+      _db.librarySiteNotes,
+    )..where((t) => t.id.equals('$diverId:$siteId'))).getSingleOrNull();
+    return row == null ? null : (notes: row.notes, rating: row.rating);
+  }
+
+  /// Takes up private notes and ratings that sit only on [libraryId]'s site
+  /// rows (written by a build before they were kept apart) as [diverId]'s,
+  /// so personal sync carries them. Once per library on this device, before
+  /// its first pull here: a row a later pull adopts may hold stale notes of
+  /// its own, and a row with any profile's record holds that record's
+  /// notes, so neither is taken up.
+  Future<void> backfillSiteNotes({
+    required String libraryId,
+    required String diverId,
+  }) async {
+    final library = await (_db.select(
+      _db.sharedLibraries,
+    )..where((t) => t.id.equals(libraryId))).getSingleOrNull();
+    if (library == null || library.notesBackfilled) return;
+    final rows = await _db
+        .customSelect(
+          'SELECT id, notes, rating FROM dive_sites '
+          'WHERE shared_library_id = ? '
+          "AND (notes <> '' OR rating IS NOT NULL) "
+          'AND NOT EXISTS (SELECT 1 FROM library_site_notes n '
+          'WHERE n.site_id = dive_sites.id)',
+          variables: [Variable.withString(libraryId)],
+          readsFrom: {_db.diveSites, _db.librarySiteNotes},
+        )
+        .get();
+    for (final r in rows) {
+      await putSiteNotes(
+        diverId: diverId,
+        siteId: r.read<String>('id'),
+        notes: r.read<String>('notes'),
+        rating: r.read<double?>('rating'),
+      );
+    }
+    await (_db.update(_db.sharedLibraries)
+          ..where((t) => t.id.equals(libraryId)))
+        .write(const SharedLibrariesCompanion(notesBackfilled: Value(true)));
+  }
+
+  /// Keeps [diverId]'s private notes and rating on the library site
+  /// [siteId] for personal sync to carry to the profile's other devices.
+  Future<void> putSiteNotes({
+    required String diverId,
+    required String siteId,
+    required String notes,
+    required double? rating,
+  }) async {
+    final id = '$diverId:$siteId';
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _db.transaction(() async {
+      final existing = await (_db.select(
+        _db.librarySiteNotes,
+      )..where((t) => t.id.equals(id))).getSingleOrNull();
+      await _db
+          .into(_db.librarySiteNotes)
+          .insertOnConflictUpdate(
+            LibrarySiteNotesCompanion.insert(
+              id: id,
+              diverId: diverId,
+              siteId: siteId,
+              notes: Value(notes),
+              rating: Value(rating),
+              createdAt: existing?.createdAt ?? now,
+              updatedAt: now,
+            ),
+          );
+      await _sync.markRecordPending(
+        entityType: siteNotesEntity,
+        recordId: id,
+        localUpdatedAt: now,
+      );
+    });
+    SyncEventBus.notifyLocalChange();
+  }
+
+  /// The profile's signing key, from any of its memberships: the same one
+  /// on every device, should two have made keys before personal sync met.
+  /// A library itself signs with its own membership's key.
+  Future<LibrarySigningKey?> signingKeyForDiver(String diverId) async {
+    final row =
+        await (_db.select(_db.sharedLibraryMemberships)
+              ..where(
+                (t) =>
+                    t.diverId.equals(diverId) &
+                    t.signingPrivateKey.isNotNull() &
+                    t.signingPublicKey.isNotNull(),
+              )
+              ..orderBy([(t) => OrderingTerm.asc(t.id)])
+              ..limit(1))
+            .getSingleOrNull();
+    if (row == null) return null;
+    return LibrarySigningKey(
+      publicKey: row.signingPublicKey!,
+      privateKey: row.signingPrivateKey!,
+    );
+  }
+
+  /// The profile's signing key, made and written to every one of its
+  /// memberships when it has none yet (issue #2567).
+  Future<LibrarySigningKey> ensureSigningKey(String diverId) async {
+    final have = await signingKeyForDiver(diverId);
+    if (have != null) return have;
+    final made = await LibrarySigner.generate();
+    // Only where no key landed meanwhile: two first callers agree on the
+    // key whichever wrote first.
+    await _writeKeys(
+      diverId,
+      SharedLibraryMembershipsCompanion(
+        signingPublicKey: Value(made.publicKey),
+        signingPrivateKey: Value(made.privateKey),
+      ),
+      onlyWithoutSigningKey: true,
+    );
+    return await signingKeyForDiver(diverId) ?? made;
+  }
+
+  /// The key of [libraryId] when any local profile holds it: the
+  /// library's current key first, so another profile's key from before a
+  /// passphrase change never stands in for it. With [keyId], that key or
+  /// none.
+  Future<LibraryCipher?> libraryCipherFor(
+    String libraryId, {
+    String? keyId,
+  }) async {
+    final current = (keyId ?? (await getLibrary(libraryId))?.keyId)
+        ?.toLowerCase();
+    final rows =
+        await (_db.select(_db.sharedLibraryMemberships)..where(
+              (t) =>
+                  t.libraryId.equals(libraryId) &
+                  t.libraryKey.isNotNull() &
+                  t.libraryKeyId.isNotNull(),
+            ))
+            .get();
+    final row =
+        rows.firstWhereOrNull(
+          (r) => r.libraryKeyId!.toLowerCase() == current,
+        ) ??
+        (keyId == null ? rows.firstOrNull : null);
+    if (row == null) return null;
+    return LibraryCipher.fromExported(
+      keyId: row.libraryKeyId!,
+      key: row.libraryKey!,
+    );
+  }
+
+  /// The key [keyId] of [libraryId]: a local profile's, else the spare key
+  /// personal sync kept aside, taken up for [diverId] ([takeSpareKey]).
+  /// Null when neither is that key.
+  Future<LibraryCipher?> cipherNamed(
+    String libraryId, {
+    required String keyId,
+    required String diverId,
+  }) async =>
+      await libraryCipherFor(libraryId, keyId: keyId) ??
+      await takeSpareKey(libraryId, keyId: keyId, diverId: diverId);
+
+  /// Keeps [key] aside as the spare key of [libraryId], taken up only once
+  /// the manifest names [keyId] ([takeSpareKey]).
+  Future<void> keepSpareKey(
+    String libraryId, {
+    required String keyId,
+    required String key,
+  }) => (_db.update(_db.sharedLibraries)..where((t) => t.id.equals(libraryId)))
+      .write(
+        SharedLibrariesCompanion(
+          spareKeyId: Value(keyId),
+          spareKey: Value(key),
+        ),
+      );
+
+  /// Forgets the spare key of [libraryId], as when its key is dropped.
+  Future<void> clearSpareKey(String libraryId) =>
+      (_db.update(
+        _db.sharedLibraries,
+      )..where((t) => t.id.equals(libraryId))).write(
+        const SharedLibrariesCompanion(
+          spareKeyId: Value(null),
+          spareKey: Value(null),
+        ),
+      );
+
+  /// Takes up the spare key of [libraryId] when it is [keyId]: stored as
+  /// [diverId]'s key (personal sync carries it on), and returned. Null when
+  /// no spare key is that one.
+  Future<LibraryCipher?> takeSpareKey(
+    String libraryId, {
+    required String keyId,
+    required String diverId,
+  }) async {
+    final row = await (_db.select(
+      _db.sharedLibraries,
+    )..where((t) => t.id.equals(libraryId))).getSingleOrNull();
+    final spareId = row?.spareKeyId;
+    final spare = row?.spareKey;
+    if (spareId == null ||
+        spare == null ||
+        spareId.toLowerCase() != keyId.toLowerCase()) {
+      return null;
+    }
+    await setLibraryKey(
+      diverId: diverId,
+      libraryId: libraryId,
+      keyId: spareId,
+      key: spare,
+    );
+    await clearSpareKey(libraryId);
+    return LibraryCipher.fromExported(keyId: spareId, key: spare);
+  }
+
+  /// Stores (or, with no [key], clears) the unlocked key of [libraryId]
+  /// on the profile's membership: the one write allowed to erase it.
+  Future<void> setLibraryKey({
+    required String diverId,
+    required String libraryId,
+    String? keyId,
+    String? key,
+  }) => _writeKeys(
+    diverId,
+    SharedLibraryMembershipsCompanion(
+      libraryKeyId: Value(key == null ? null : keyId),
+      libraryKey: Value(key),
+    ),
+    libraryId: libraryId,
+  );
+
+  Future<void> _writeKeys(
+    String diverId,
+    SharedLibraryMembershipsCompanion keys, {
+    String? libraryId,
+    bool onlyWithoutSigningKey = false,
+  }) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _db.transaction(() async {
+      final rows =
+          await (_db.select(_db.sharedLibraryMemberships)..where(
+                (t) =>
+                    t.diverId.equals(diverId) &
+                    (libraryId == null
+                        ? const Constant(true)
+                        : t.libraryId.equals(libraryId)) &
+                    (onlyWithoutSigningKey
+                        ? t.signingPrivateKey.isNull()
+                        : const Constant(true)),
+              ))
+              .get();
+      for (final r in rows) {
+        await (_db.update(_db.sharedLibraryMemberships)
+              ..where((t) => t.id.equals(r.id)))
+            .write(keys.copyWith(updatedAt: Value(now)));
+        await _sync.markRecordPending(
+          entityType: membershipEntity,
+          recordId: r.id,
+          localUpdatedAt: now,
+        );
+      }
+    });
+    SyncEventBus.notifyLocalChange();
+  }
+
   /// The member id this profile uses in every library: the one on an
   /// existing membership, else a fresh one.
   Future<String> memberIdForDiver(String diverId) async {
@@ -421,6 +629,14 @@ class SharedLibraryStore {
         libraryName: r.libraryName,
         backendKind: r.backendKind,
         locationHint: r.locationHint,
+        signingKey: r.signingPublicKey == null || r.signingPrivateKey == null
+            ? null
+            : LibrarySigningKey(
+                publicKey: r.signingPublicKey!,
+                privateKey: r.signingPrivateKey!,
+              ),
+        libraryKeyId: r.libraryKeyId,
+        libraryKey: r.libraryKey,
       );
 
   // Site state
@@ -465,6 +681,33 @@ class SharedLibraryStore {
           lastEditorMemberId: Value(s.lastEditorMemberId),
           lastEditedAtMs: Value(s.lastEditedAtMs),
         ),
+      );
+
+  // Backups (device-local)
+
+  Future<void> putBackup(SharedLibraryBackupsCompanion row) =>
+      _db.into(_db.sharedLibraryBackups).insertOnConflictUpdate(row);
+
+  Future<List<SharedLibraryBackupRow>> backupRows(String libraryId) =>
+      (_db.select(
+        _db.sharedLibraryBackups,
+      )..where((t) => t.libraryId.equals(libraryId))).get();
+
+  Future<SharedLibraryBackupRow?> backupRow(String backupId) => (_db.select(
+    _db.sharedLibraryBackups,
+  )..where((t) => t.backupId.equals(backupId))).getSingleOrNull();
+
+  Future<void> deleteBackupRow(String backupId) => (_db.delete(
+    _db.sharedLibraryBackups,
+  )..where((t) => t.backupId.equals(backupId))).go();
+
+  /// Forgets when [libraryId]'s documents were last read, so the next
+  /// pull reads every one again.
+  Future<void> clearRemoteStamps(String libraryId) =>
+      (_db.update(
+        _db.sharedSiteStates,
+      )..where((t) => t.libraryId.equals(libraryId))).write(
+        const SharedSiteStatesCompanion(remoteModifiedTime: Value(null)),
       );
 
   Future<void> deleteSiteState(String siteId) => (_db.delete(

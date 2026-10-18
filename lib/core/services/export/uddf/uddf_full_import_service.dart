@@ -1729,9 +1729,9 @@ class UddfFullImportService {
           if (depth != null) {
             gs['depth'] = double.tryParse(depth);
           }
-          gs['tankRef'] = UddfImportParsers.getElementText(
-            gsElement,
-            'tankref',
+          gs['tankRef'] = UddfImportParsers.resolveGasSwitchTankRef(
+            UddfImportParsers.getElementText(gsElement, 'tankref'),
+            (diveData['tanks'] as List<Map<String, dynamic>>?) ?? const [],
           );
           gs['gasMix'] = UddfImportParsers.getElementText(gsElement, 'gasmix');
           final o2 = UddfImportParsers.getElementText(gsElement, 'o2fraction');
@@ -1746,10 +1746,10 @@ class UddfFullImportService {
         }
         if (switchesList.isNotEmpty) {
           // Merge with waypoint-level <switchmix> entries already parsed
-          // from the samples (files like Submersion's own exports carry
-          // both). The top-level entry wins for a shared timestamp because
-          // it carries the richer tankref/depth payload; waypoint-only
-          // timestamps (e.g. the t=0 initial-mix marker) must survive.
+          // from the samples, for a file that carries both. The top-level
+          // entry wins for a shared timestamp because it carries the richer
+          // tankref/depth payload; waypoint-only timestamps (e.g. another
+          // app's t=0 initial-mix marker) must survive.
           final existing =
               (diveData['gasSwitches'] as List<Map<String, dynamic>>?) ??
               const <Map<String, dynamic>>[];
@@ -2434,7 +2434,23 @@ class UddfFullImportService {
           ? const <String>[]
           : UddfImportParsers.parseO2SensorOrder(document);
 
-      for (final waypoint in samplesElement.findElements('waypoint')) {
+      // Submersion's own writers mark the starting mix with a <switchmix> on
+      // the first waypoint. It is not a switch: the backup carries the real
+      // ones in <gasswitches> and every cylinder in <tankdata>, so reading it
+      // as one added a gas switch to every dive and an air cylinder to a dive
+      // with none (issue #1878). Other apps' markers are real switches.
+      final submersionStartMarker = UddfImportParsers.writtenBySubmersion(
+        diveElement,
+      );
+      // A dives-only export from before #1875 declares no <tankdata> at all,
+      // so there the marker is still read as the dive's starting gas, the
+      // only record of its cylinder, though never as a switch.
+      final ignoreStartMarker =
+          submersionStartMarker &&
+          UddfImportParsers.documentDeclaresTanks(diveElement);
+
+      for (final (index, waypoint)
+          in samplesElement.findElements('waypoint').indexed) {
         final point = <String, dynamic>{};
 
         final timeText = UddfImportParsers.getElementText(waypoint, 'divetime');
@@ -2462,7 +2478,10 @@ class UddfFullImportService {
           }
         }
 
-        final switchMix = waypoint.findElements('switchmix').firstOrNull;
+        final isStartMarker = index == 0 && submersionStartMarker;
+        final switchMix = (isStartMarker && ignoreStartMarker)
+            ? null
+            : waypoint.findElements('switchmix').firstOrNull;
         if (switchMix != null) {
           final rawMixRef = switchMix.getAttribute('ref');
           final mixRef = rawMixRef?.trim();
@@ -2475,7 +2494,7 @@ class UddfFullImportService {
             // tankRef), plus `gasMixRef` so the importer can resolve the
             // MacDive-style gas-UUID reference to a tank.
             final timestamp = point['timestamp'] as int?;
-            if (timestamp != null) {
+            if (timestamp != null && !isStartMarker) {
               final entry = <String, dynamic>{
                 'timestamp': timestamp,
                 'gasMixRef': mixRef,

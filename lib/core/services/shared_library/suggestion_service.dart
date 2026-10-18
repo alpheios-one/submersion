@@ -63,7 +63,7 @@ class SuggestionService {
         ? SharedLibraryRole.reader
         : effectiveRole(
             listed: library.roles.roleOf(membership.memberId),
-            readOnlyDetected: library.readOnlyDetected,
+            readOnlyDetected: library.writesHeld,
           );
     if (!canSuggestOnLibrarySite(role)) {
       throw StateError('only a reader suggests changes in $libraryId');
@@ -103,9 +103,10 @@ class SuggestionService {
     await _store.deleteSuggestion(suggestionId);
   }
 
-  /// Owner: applies the fields with clocks under the suggester, dirties
-  /// the site, then removes the suggestion here and in the folder. A
-  /// suggestion whose site is gone is dismissed instead.
+  /// Owner: applies the fields as the owner's own edit (signed by the
+  /// owner, the only key here), dirties the site, then removes the
+  /// suggestion here and in the folder. A suggestion whose site is gone is
+  /// dismissed instead.
   Future<void> accept(String suggestionId, {required String diverId}) async {
     final s = await _store.getSuggestion(suggestionId);
     if (s == null) return;
@@ -116,18 +117,25 @@ class SuggestionService {
       await dismiss(suggestionId, diverId: diverId);
       return;
     }
-    await _bridge.apply(
-      SiteDocument(id: s.siteId, fields: s.fields),
-      libraryId: s.libraryId,
-      vocabularyDiverId: diverId,
-      fields: s.fields.keys.toSet(),
-    );
-    await _stamper.stamp(
-      s.siteId,
-      s.fields.keys.toSet(),
-      actingDiverId: diverId,
-      asMemberId: s.memberId,
-    );
+    // Only shared document fields: a suggestion from an older or altered
+    // build may carry an owner's private notes or rating, never applied.
+    final fields = {
+      for (final e in s.fields.entries)
+        if (SiteDocument.fieldNames.contains(e.key)) e.key: e.value,
+    };
+    if (fields.isNotEmpty) {
+      await _bridge.apply(
+        SiteDocument(id: s.siteId, fields: fields),
+        libraryId: s.libraryId,
+        vocabularyDiverId: diverId,
+        fields: fields.keys.toSet(),
+      );
+      await _stamper.stamp(
+        s.siteId,
+        fields.keys.toSet(),
+        actingDiverId: diverId,
+      );
+    }
     await _finish(s, SharedSiteSuggestion.resolved);
     SyncEventBus.notifyLocalChange();
   }
@@ -197,7 +205,7 @@ class SuggestionService {
     if (library == null) return true;
     try {
       final t = await _transportFor(library);
-      await t.deleteSuggestion(s.id);
+      await t.deleteSuggestion(s.fileId);
       return true;
     } on CloudStorageException catch (e) {
       _log.warning('Could not delete suggestion ${s.id} remotely: $e');

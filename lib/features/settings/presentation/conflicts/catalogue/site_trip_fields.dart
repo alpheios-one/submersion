@@ -444,7 +444,7 @@ final Map<String, ConflictField> siteTripFields = {
 
 /// Columns whose meaning depends on the entity, keyed `entity.column`.
 final Map<String, ConflictField> siteTripOverrides = {
-  // Club libraries (issue #2567).
+  // Shared site libraries (issue #2567).
   'diveSites.sharedLibraryId': ConflictField(
     (l) => l.settings_conflict_field_sharedLibrary,
     FieldKind.shortText,
@@ -472,6 +472,23 @@ final Map<String, ConflictField> siteTripOverrides = {
   'sharedLibraryMemberships.locationHint': ConflictField(
     (l) => l.settings_conflict_field_sharedLibraryLocation,
     FieldKind.shortText,
+  ),
+  // Keys: opaque, so a conflict never shows them.
+  'sharedLibraryMemberships.signingPublicKey': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibrarySigningKey,
+    FieldKind.opaque,
+  ),
+  'sharedLibraryMemberships.signingPrivateKey': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibrarySigningKey,
+    FieldKind.opaque,
+  ),
+  'sharedLibraryMemberships.libraryKeyId': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibraryKey,
+    FieldKind.opaque,
+  ),
+  'sharedLibraryMemberships.libraryKey': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibraryKey,
+    FieldKind.opaque,
   ),
   'checklistTemplateItems.category': ConflictField(
     (l) => l.settings_conflict_field_checklistTemplateItems_category,

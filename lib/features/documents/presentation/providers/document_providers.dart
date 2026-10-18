@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:submersion/core/database/compaction/database_compaction_monitor.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/documents/data/repositories/document_repository.dart';
@@ -27,6 +30,7 @@ final allDocumentsProvider = FutureProvider<List<DocumentListEntry>>((
 ) async {
   final repo = ref.watch(documentRepositoryProvider);
   ref.invalidateSelfWhen(repo.watchChanges());
+  ref.invalidateSelfWhen(repo.watchOwnerChanges());
   final diverId = await ref.watch(validatedCurrentDiverIdProvider.future);
   if (diverId == null) return const [];
   return repo.getAllForDiver(diverId);
@@ -46,6 +50,7 @@ final documentEntryProvider = FutureProvider.family<DocumentListEntry?, String>(
   (ref, id) async {
     final repo = ref.watch(documentRepositoryProvider);
     ref.invalidateSelfWhen(repo.watchChanges());
+    ref.invalidateSelfWhen(repo.watchOwnerChanges());
     return repo.getEntryById(id);
   },
 );
@@ -100,7 +105,12 @@ class DocumentMutations {
   }
 
   /// Deletes [id]; the repository cancels its reminders on every delete.
-  Future<void> delete(String id) => _repo.delete(id);
+  /// A document can hold tens of MB of pages, so a delete is when the next
+  /// launch may be worth a compaction.
+  Future<void> delete(String id) async {
+    await _repo.delete(id);
+    unawaited(_ref.read(databaseCompactionMonitorProvider)());
+  }
 
   /// Puts documents an undone delete removed back, with the reminders the
   /// delete cancelled.

@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/data/visibility/shared_item_policy.dart';
 import 'package:submersion/core/data/visibility/visibility_filter.dart';
+import 'package:submersion/core/database/app_sql_functions.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/dive_stats_scope.dart';
 import 'package:submersion/core/performance/perf_timer.dart';
@@ -248,6 +249,22 @@ class SiteRepository {
       // #2567); the comparison needs the row as it was.
       final before = await getSiteById(site.id);
       final libraryEdit = before?.isLibrarySite ?? false;
+      // A library site this profile may not edit (a reader's, say through
+      // an import) keeps the library's values: only the profile's private
+      // notes and rating are saved, which never leave it.
+      if (libraryEdit &&
+          !await _libraryStamper.mayEdit(
+            site.id,
+            actingDiverId: actingDiverId,
+          )) {
+        site = before!.copyWith(
+          notes: site.notes,
+          rating: site.rating,
+          clearRating: site.rating == null,
+        );
+        metadataPatch = null;
+        classification = null;
+      }
       final typesBefore = libraryEdit && classification != null
           ? (await _classification.getTypesForSite(
               site.id,
@@ -334,6 +351,16 @@ class SiteRepository {
           changed,
           actingDiverId: actingDiverId,
         );
+        // The profile's private notes and rating: never in the library,
+        // kept for personal sync to carry to its other devices.
+        if (before.notes != site.notes || before.rating != site.rating) {
+          await _libraryStamper.keepPrivate(
+            site.id,
+            notes: site.notes,
+            rating: site.rating,
+            actingDiverId: actingDiverId,
+          );
+        }
       }
       SyncEventBus.notifyLocalChange();
       _log.info('Updated site: ${site.id}');
@@ -406,6 +433,12 @@ class SiteRepository {
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
       final before = await getSiteById(siteId);
+      // A library site this profile may not edit (a reader's) keeps the
+      // library's values: the change could never be uploaded.
+      if ((before?.isLibrarySite ?? false) &&
+          !await _libraryStamper.mayEdit(siteId)) {
+        return false;
+      }
       final changed = await _db.transaction(() async {
         final row = await (_db.select(
           _db.diveSites,
@@ -470,10 +503,17 @@ class SiteRepository {
   ) async {
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
-      // A club library clock goes only on a column whose value changes
+      // A shared site library clock goes only on a column whose value changes
       // (issue #2567): rewriting the same altitude must not beat a newer
       // edit by another member.
       final before = await getSiteById(siteId);
+      // As for location details: a library site this profile may not edit
+      // keeps the library's values.
+      if (before != null &&
+          before.isLibrarySite &&
+          !await _libraryStamper.mayEdit(siteId)) {
+        return;
+      }
       await (_db.update(_db.diveSites)..where((t) => t.id.equals(siteId)))
           .write(patch.copyWith(updatedAt: Value(now)));
       await _syncRepository.markRecordPending(
@@ -667,7 +707,7 @@ class SiteRepository {
           : const <DocumentSnapshotEntry>[];
       await DocumentRepository().deleteForOwners(DocumentOwnerKind.site, ids);
       await (_db.delete(_db.diveSites)..where((t) => t.id.isIn(ids))).go();
-      // One batch for every tombstone, not a transaction per site. A club
+      // One batch for every tombstone, not a transaction per site. A library
       // library site has no personal tombstone (issue #2567).
       final tombstoned = [
         for (final id in ids)
@@ -738,7 +778,7 @@ class SiteRepository {
       // tombstone for the peers, as deleteTrip does.
       if (ownership.allowed.isEmpty) return true;
       _log.info('Deleting site: $id');
-      // A club library site leaves no personal tombstone (issue #2567)
+      // A shared site library site leaves no personal tombstone (issue #2567)
       // unless the caller says otherwise.
       final tombstone =
           logTombstones ?? !((await getSiteById(id))?.isLibrarySite ?? false);
@@ -839,7 +879,7 @@ class SiteRepository {
       }
       if (allowed.isEmpty) return const SiteLinks();
       _log.info('Bulk deleting ${allowed.length} sites');
-      // Club library sites among them leave no personal tombstone (issue
+      // Shared site library sites among them leave no personal tombstone (issue
       // #2567).
       final libraryIds = {
         for (final site in await getSitesByIds(allowed))
@@ -1278,22 +1318,27 @@ class SiteRepository {
     }
   }
 
-  /// Search sites by name or location
+  /// Search sites by name or location, ignoring case.
+  ///
+  /// Each column is folded by `unicode_lower` to meet the Dart-lowered
+  /// needle: LIKE folds ASCII only, so "österreich" missed "Österreich"
+  /// (#3377).
   Future<List<domain.DiveSite>> searchSites(
     String query, {
     String? diverId,
   }) async {
     try {
       return await PerfTimer.measure('searchSites', () async {
+        final needle = query.toLowerCase();
         final searchQuery = _db.select(_db.diveSites)
           ..where(
             (t) =>
-                t.name.contains(query) |
-                t.country.contains(query) |
-                t.region.contains(query) |
-                t.city.contains(query) |
-                t.island.contains(query) |
-                t.bodyOfWater.contains(query),
+                t.name.unicodeLower().contains(needle) |
+                t.country.unicodeLower().contains(needle) |
+                t.region.unicodeLower().contains(needle) |
+                t.city.unicodeLower().contains(needle) |
+                t.island.unicodeLower().contains(needle) |
+                t.bodyOfWater.unicodeLower().contains(needle),
           )
           ..orderBy([(t) => OrderingTerm.asc(t.name.collate(Collate.noCase))]);
 

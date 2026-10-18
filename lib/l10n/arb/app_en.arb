@@ -8712,6 +8712,7 @@
   "cylinderConfigs_fieldVolume": "Volume",
   "cylinderConfigs_fieldWorkingPressure": "Working pressure",
   "cylinderConfigs_fieldMaterial": "Material",
+  "cylinderConfigs_fieldGasMix": "Gas mix",
   "cylinderConfigs_sectionTitle": "Configurations",
   "equipment_serviceClocks_hoursSource": "Counted from logged dive time",
   "equipment_serviceClocks_hoursUsedAndLeft": "{used} of {total} hours, {remaining} left",
@@ -10079,18 +10080,18 @@
   },
   "gasCalculators_icd_disabledNotice": "The ICD assessment is turned off in Settings > Decompression.",
   "gasCalculators_icd_suggestionsTitle": "Make it comply",
-  "gasCalculators_icd_suggestionKeepA": "Keep the current gas, set the switched-to gas's He to {he}%",
-  "@gasCalculators_icd_suggestionKeepA": {
+  "gasCalculators_icd_suggestionSetHe": "Set He to {he}%",
+  "@gasCalculators_icd_suggestionSetHe": {
     "placeholders": {
       "he": {
         "type": "String"
       }
     }
   },
-  "gasCalculators_icd_suggestionKeepB": "Keep the switched-to gas, set the current gas's He to {he}%",
-  "@gasCalculators_icd_suggestionKeepB": {
+  "gasCalculators_icd_suggestionSetO2": "Set O2 to {o2}%",
+  "@gasCalculators_icd_suggestionSetO2": {
     "placeholders": {
-      "he": {
+      "o2": {
         "type": "String"
       }
     }
@@ -11458,7 +11459,6 @@
   "nav_buddies": "Buddies",
   "nav_certifications": "Certifications",
   "nav_courses": "Courses",
-  "nav_coursesSubtitle": "Training & Education",
   "nav_diveCenters": "Dive Centers",
   "nav_dives": "Dives",
   "nav_equipment": "Equipment",
@@ -12006,6 +12006,8 @@
   "nav_tooltip_expandMenu": "Expand menu",
   "nav_tracks": "Tracks",
   "nav_tracksSubtitle": "GPS and underwater tracks",
+  "nav_training": "Training",
+  "nav_trainingSubtitle": "Certifications and courses",
   "nav_transfer": "Transfer",
   "nav_trips": "Trips",
   "@nav_buddies": {
@@ -12017,8 +12019,11 @@
   "@nav_courses": {
     "description": "Navigation label for courses section"
   },
-  "@nav_coursesSubtitle": {
-    "description": "Subtitle for courses menu item"
+  "@nav_training": {
+    "description": "Navigation label for the Training section, which holds the certifications and courses tabs"
+  },
+  "@nav_trainingSubtitle": {
+    "description": "Subtitle for the Training menu item in the More sheet"
   },
   "@nav_diveCenters": {
     "description": "Navigation label for dive centers section"
@@ -12254,6 +12259,14 @@
         "type": "String"
       },
       "value": {
+        "type": "String"
+      }
+    }
+  },
+  "plannerCanvas_issue_ceilingViolated": "The profile goes above the {ceiling} decompression ceiling, skipping required stops",
+  "@plannerCanvas_issue_ceilingViolated": {
+    "placeholders": {
+      "ceiling": {
         "type": "String"
       }
     }
@@ -13104,6 +13117,106 @@
   "sharedLibrary_connect_account_label": "Storage account",
   "sharedLibrary_connect_prefix_label": "Folder (prefix)",
   "sharedLibrary_connect_prefix_help": "A folder inside submersion-sites, at the top of the bucket or server, such as site-sync.",
+  "sharedLibrary_connect_reservedFolder": "A library folder cannot start with sites, members, suggestions or backups.",
+  "sharedLibrary_connect_folderChars": "A library folder cannot contain *, ? or dollar signs.",
+  "@sharedLibrary_connect_folderChars": {"description": "Connect page: the typed library folder holds a character storage access policies treat as a wildcard or variable"},
+  "sharedLibrary_setup_title": "How to set up storage",
+  "sharedLibrary_setup_where": "This library lives in {folder} at the top of the bucket or server, beside submersion-sync and submersion-media.",
+  "@sharedLibrary_setup_where": {"placeholders": {"folder": {"type": "String"}}},
+  "sharedLibrary_setup_keys": "Give owners and editors keys that read and write the library folder. Give everyone else keys that read it and write only members/ and suggestions/. The storage, not the app, is what stops a key from writing.",
+  "sharedLibrary_setup_s3Full": "S3 policy for owners and editors",
+  "sharedLibrary_setup_s3Reader": "S3 policy for readers",
+  "sharedLibrary_setup_webdav": "WebDAV: share the folder read-only with readers, and members/ and suggestions/ writable where your server allows it (for example Nextcloud share permissions).",
+  "sharedLibrary_setup_copy": "Copy",
+  "sharedLibrary_setup_copied": "Policy copied",
+  "sharedLibrary_recovery_title": "Keep this recovery code",
+  "sharedLibrary_recovery_body": "Whoever has this code can make themselves an owner of the library, and open it if it is encrypted. Store it somewhere safe, apart from the storage keys. It is shown only now.",
+  "sharedLibrary_recovery_stored": "I have stored it",
+  "sharedLibrary_roles_rejected": "The roles file was changed by someone who is not an owner. This device keeps the last roles an owner signed.",
+  "sharedLibrary_members_pending": "Waiting for approval",
+  "sharedLibrary_members_approve": "Approve",
+  "sharedLibrary_members_reject": "Reject",
+  "sharedLibrary_members_fingerprint": "Key {fingerprint}",
+  "@sharedLibrary_members_fingerprint": {"placeholders": {"fingerprint": {"type": "String"}}},
+  "sharedLibrary_members_unsignedCard": "Card not signed by its member",
+  "sharedLibrary_members_rejectTitle": "Reject {name}?",
+  "@sharedLibrary_members_rejectTitle": {"placeholders": {"name": {"type": "String"}}},
+  "sharedLibrary_members_rejectBody": "Their card is removed and nothing they write counts. Only new storage keys stop them from writing files at all.",
+  "sharedLibrary_members_left": "Left the library",
+  "sharedLibrary_members_removeRole": "Remove role",
+  "sharedLibrary_owner_onlyOne": "Only one owner. If they lose access, only the recovery code can restore it.",
+  "sharedLibrary_owner_addOwner": "Choose another owner",
+  "sharedLibrary_owner_newCode": "New recovery code",
+  "sharedLibrary_owner_newCodeHelp": "Replaces the old code, for example if it may have leaked.",
+  "sharedLibrary_owner_recover": "Recover ownership",
+  "sharedLibrary_owner_recoverHelp": "With the library's recovery code, become an owner.",
+  "sharedLibrary_owner_recoverPrompt": "Recovery code",
+  "sharedLibrary_owner_wrongCode": "That is not this library's recovery code.",
+  "sharedLibrary_owner_recovered": "You are now an owner.",
+  "sharedLibrary_owner_reset": "Reset ownership",
+  "sharedLibrary_owner_resetHelp": "Only if no owner and no recovery code are left. Every member must accept it.",
+  "sharedLibrary_owner_resetConfirm": "Make yourself the only owner? Every other member's device asks them to accept this, and stops writing to the library until they do.",
+  "sharedLibrary_owner_resetPrompt": "Ownership of {library} was reset by {name} (key {fingerprint}). Until you accept, this device only reads the library.",
+  "@sharedLibrary_owner_resetPrompt": {"placeholders": {"library": {"type": "String"}, "name": {"type": "String"}, "fingerprint": {"type": "String"}}},
+  "sharedLibrary_owner_resetAccept": "Accept",
+  "sharedLibrary_connect_untrusted": "This library's roles are not signed by one of its owners. Ask an owner to check it.",
+  "sharedLibrary_retired": "This library was made by a test build of Submersion. Create it again.",
+  "sharedLibrary_encrypted_probe": "Encrypted library. Enter the passphrase or the recovery code.",
+  "sharedLibrary_encrypted_passphrase": "Passphrase or recovery code",
+  "sharedLibrary_encrypted_unlock": "Unlock",
+  "sharedLibrary_encrypted_wrong": "That passphrase does not open this library.",
+  "sharedLibrary_backups_title": "Backups",
+  "@sharedLibrary_backups_title": {"description": "Title of a shared site library backups page, and its entry on the library page"},
+  "sharedLibrary_backups_subtitle": "Back up the library and restore it",
+  "sharedLibrary_backups_backUpNow": "Back up now",
+  "sharedLibrary_backups_import": "Import a backup",
+  "sharedLibrary_backups_note": "Note (optional)",
+  "sharedLibrary_backups_automatic": "Automatic",
+  "sharedLibrary_backups_beforeRestore": "Before a restore",
+  "sharedLibrary_backups_onDevice": "On this device",
+  "sharedLibrary_backups_inStorage": "In storage",
+  "sharedLibrary_backups_both": "On this device and in storage",
+  "sharedLibrary_backups_summary": "Sites: {sites} · {size}",
+  "@sharedLibrary_backups_summary": {"description": "Second line of a shared site library backup: how many dive sites it holds and its file size", "placeholders": {"sites": {"type": "int"}, "size": {"type": "String"}}},
+  "sharedLibrary_backups_pin": "Pin",
+  "sharedLibrary_backups_unpin": "Unpin",
+  "sharedLibrary_backups_delete": "Delete",
+  "sharedLibrary_backups_deleteConfirm": "Delete this backup?",
+  "sharedLibrary_backups_deleteWhere": "Delete this backup from where?",
+  "sharedLibrary_backups_export": "Export",
+  "sharedLibrary_backups_restore": "Restore",
+  "sharedLibrary_backups_restoreConfirm": "Restore the library to how it was on {date}? Every member gets this version on their next sync. A pinned backup of the library as it is now is made first.",
+  "@sharedLibrary_backups_restoreConfirm": {"description": "Asks an owner to confirm restoring a shared site library backup; date is when the backup was made", "placeholders": {"date": {"type": "String"}}},
+  "sharedLibrary_backups_restoreDone": "Library restored",
+  "sharedLibrary_backups_oldKey": "This backup was sealed with an earlier passphrase. Enter that passphrase or the recovery code from that time.",
+  "sharedLibrary_backups_empty": "No backups yet. Owners' devices make one each day, and Back up now makes one at once.",
+  "sharedLibrary_backups_importRefused": "That file is not a backup of this library.",
+  "sharedLibrary_backups_ownersOnly": "Only owners manage backups.",
+  "sharedLibrary_backups_done": "Backup made",
+  "sharedLibrary_library_myKey": "Your key {fingerprint}",
+  "@sharedLibrary_library_myKey": {"description": "The member's own signing key fingerprint on a shared site library page, to compare with what an owner sees before approving", "placeholders": {"fingerprint": {"type": "String"}}},
+  "sharedLibrary_suggest_held": "{count, plural, =1{1 suggestion waits until you approve its author} other{{count} suggestions wait until you approve their authors}}",
+  "@sharedLibrary_suggest_held": {"description": "Shown to a shared site library owner: suggestions by members not yet approved, held until approval", "placeholders": {"count": {"type": "int"}}},
+  "sharedLibrary_restoreInto_action": "Restore from a backup file",
+  "@sharedLibrary_restoreInto_action": {"description": "Connect page button for an empty folder: restore a shared site library backup file into it"},
+  "sharedLibrary_restoreInto_needsKey": "This backup is encrypted. Enter its passphrase or recovery code.",
+  "sharedLibrary_restoreInto_refused": "That file is not a library backup made by an owner.",
+  "sharedLibrary_restoreInto_oldStillThere": "The library is still in its old folder too. Members there keep using that copy until they connect to this folder.",
+  "sharedLibrary_encrypted_locked": "Enter the passphrase for {library}.",
+  "@sharedLibrary_encrypted_locked": {"placeholders": {"library": {"type": "String"}}},
+  "sharedLibrary_encrypted_changed": "The passphrase of {library} changed. Enter the new one.",
+  "@sharedLibrary_encrypted_changed": {"placeholders": {"library": {"type": "String"}}},
+  "sharedLibrary_encryption_title": "Encryption",
+  "sharedLibrary_encryption_statusOn": "Encrypted with a passphrase",
+  "sharedLibrary_encryption_statusOff": "Not encrypted: anyone with storage access can read it",
+  "sharedLibrary_encryption_on": "Turn on encryption",
+  "sharedLibrary_encryption_onHelp": "Members enter the passphrase once per profile. Only the passphrase or the recovery code opens the library. A new recovery code replaces the old one for every owner.",
+  "sharedLibrary_encryption_off": "Turn off encryption",
+  "sharedLibrary_encryption_offConfirm": "Every file is rewritten readable by anyone with storage access. Turn off encryption?",
+  "sharedLibrary_encryption_change": "Change passphrase",
+  "sharedLibrary_encryption_changeHelp": "Makes a new key and a new recovery code. A new recovery code replaces the old one for every owner. Share the new passphrase only with the members who stay.",
+  "sharedLibrary_encryption_passphrase": "Passphrase",
+  "sharedLibrary_encryption_confirm": "Passphrase again",
   "sharedLibrary_connect_probe_action": "Check",
   "sharedLibrary_connect_join_action": "Join {name}",
   "@sharedLibrary_connect_join_action": {"placeholders": {"name": {"type": "String"}}},
@@ -13135,6 +13248,8 @@
   "sharedLibrary_library_rename_label": "Display name",
   "sharedLibrary_members_setRole": "Change role",
   "sharedLibrary_members_lastOwner": "The last owner cannot be demoted.",
+  "sharedLibrary_members_keyChanged": "This member's key changed. Compare the new key in person, then approve it.",
+  "sharedLibrary_members_rolesOutOfDate": "The roles changed since this device last trusted them. Leave the library and join it again to take up the change, then try again.",
   "sharedLibrary_picker_none": "No shared site library here lets you add sites.",
   "sharedLibrary_list_notConnected": "Not connected on this device",
   "sharedLibrary_connect_exists": "Someone created a library here meanwhile. Check again to join it.",
@@ -13145,6 +13260,13 @@
   "@sharedLibrary_site_lastEdited": {"placeholders": {"name": {"type": "String"}, "when": {"type": "String"}}},
   "sharedLibrary_site_history": "Edit history",
   "sharedLibrary_site_addToLibrary": "Add to shared site library",
+  "sharedLibrary_add_confirm_title": "Add {name} to {library}?",
+  "@sharedLibrary_add_confirm_title": {"placeholders": {"name": {"type": "String"}, "library": {"type": "String"}}},
+  "sharedLibrary_add_confirm_titleMany": "{count, plural, =1{Add {count} site to {library}?} other{Add {count} sites to {library}?}}",
+  "@sharedLibrary_add_confirm_titleMany": {"placeholders": {"count": {"type": "int"}, "library": {"type": "String"}}},
+  "sharedLibrary_add_confirm_shared": "Every member will see: name, location, depths, description, hazards, access, entry and exit, mooring, parking, site types, tags, species and features.",
+  "sharedLibrary_add_confirm_private": "Stays yours: your notes and rating. Dives and photos never leave your personal library.",
+  "sharedLibrary_add_confirm_action": "Add",
   "sharedLibrary_site_chooseLibrary": "Choose a library",
   "sharedLibrary_site_added": "Added to {name}",
   "@sharedLibrary_site_added": {"placeholders": {"name": {"type": "String"}}},
@@ -13159,6 +13281,7 @@
   "sharedLibrary_suggest_send": "Send",
   "sharedLibrary_suggest_sent": "Suggestion sent",
   "sharedLibrary_suggest_nothingChanged": "Nothing changed.",
+  "sharedLibrary_suggest_savedPrivate": "Your notes and rating are saved.",
   "sharedLibrary_suggest_pending": "{count, plural, =1{1 suggestion pending} other{{count} suggestions pending}}",
   "@sharedLibrary_suggest_pending": {"placeholders": {"count": {"type": "int"}}},
   "sharedLibrary_suggest_withdraw": "Withdraw",
@@ -13176,6 +13299,33 @@
   "sharedLibrary_groupBy_library": "Library",
   "sharedLibrary_groupBy_personalGroup": "Personal",
   "sharedLibrary_bulk_addToLibrary": "Add to shared site library",
+  "sharedLibrary_about_title": "About",
+  "sharedLibrary_about_edit_title": "Edit library details",
+  "sharedLibrary_about_name_label": "Library name",
+  "sharedLibrary_about_description_label": "Description",
+  "sharedLibrary_about_description_help": "What this library holds and who it is for. Every member sees it.",
+  "sharedLibrary_about_nameRequired": "Enter a name",
+  "sharedLibrary_connection_title": "Connection on this device",
+  "sharedLibrary_connection_s3": "S3 account",
+  "sharedLibrary_connection_s3Bucket": "S3 account, bucket {bucket}",
+  "@sharedLibrary_connection_s3Bucket": {"placeholders": {"bucket": {"type": "String"}}},
+  "sharedLibrary_connection_webdav": "WebDAV account",
+  "sharedLibrary_connection_webdavServer": "WebDAV account, {server}",
+  "@sharedLibrary_connection_webdavServer": {"placeholders": {"server": {"type": "String"}}},
+  "sharedLibrary_connection_accountMissing": "This account is no longer on this device",
+  "sharedLibrary_connection_folder": "Folder",
+  "sharedLibrary_connection_change": "Change connection",
+  "sharedLibrary_connection_check": "Check location",
+  "sharedLibrary_connection_same": "Found {name} here. This is the same library.",
+  "@sharedLibrary_connection_same": {"placeholders": {"name": {"type": "String"}}},
+  "sharedLibrary_connection_save": "Save connection",
+  "sharedLibrary_connection_olderCopy": "This copy looks older than the one you have been syncing with.",
+  "sharedLibrary_connection_saveAnyway": "Save anyway",
+  "sharedLibrary_connection_different": "This folder holds a different library ({name}). Your connection is unchanged.",
+  "@sharedLibrary_connection_different": {"placeholders": {"name": {"type": "String"}}},
+  "sharedLibrary_connection_differentUnnamed": "This folder holds a different library. Your connection is unchanged.",
+  "sharedLibrary_connection_none": "No library found in this folder. Your connection is unchanged.",
+  "sharedLibrary_connection_saved": "Connection updated",
   "settings_cloudSync_adopt_confirm": "Adopt Restored Library",
   "settings_cloudSync_adopt_dialogContent": "The library was replaced from a backup on \"{deviceName}\" ({date}). Adopting replaces this device's data with the restored library. A safety backup of this device's current data will be created first.",
   "@settings_cloudSync_adopt_dialogContent": {
@@ -13678,6 +13828,10 @@
   "settings_conflict_field_sharedLibraryName": "Library name",
   "settings_conflict_field_sharedLibraryBackend": "Storage type",
   "settings_conflict_field_sharedLibraryLocation": "Library location",
+  "settings_conflict_field_sharedLibrarySigningKey": "Signing key",
+  "@settings_conflict_field_sharedLibrarySigningKey": {"description": "Sync conflict label for a shared site library membership's signing key (its value is never shown)"},
+  "settings_conflict_field_sharedLibraryKey": "Library key",
+  "@settings_conflict_field_sharedLibraryKey": {"description": "Sync conflict label for a shared site library membership's encryption key (its value is never shown)"},
   "settings_conflict_field_isTravelGas": "Travel gas",
   "settings_conflict_field_issueTags": "Issues",
   "settings_conflict_field_itemType": "Item type",
@@ -14108,8 +14262,83 @@
       }
     }
   },
+  "documents_export_action": "Export all documents",
+  "documents_export_title": "Export documents",
+  "documents_export_summary": "Documents: {documents}, files: {files}",
+  "@documents_export_summary": {
+    "placeholders": {
+      "documents": {
+        "type": "int"
+      },
+      "files": {
+        "type": "int"
+      }
+    }
+  },
+  "documents_export_password": "Password",
+  "documents_export_confirmPassword": "Confirm password",
+  "documents_export_showPassword": "Show password",
+  "documents_export_hidePassword": "Hide password",
+  "documents_export_passwordTooShort": "Use at least 8 characters",
+  "documents_export_passwordCharacters": "Use only letters A to Z, digits, spaces and common symbols, so the ZIP opens on every computer",
+  "documents_export_passwordMismatch": "Passwords do not match",
+  "documents_export_note": "This password cannot be recovered. The ZIP opens by double-clicking on a computer, not on a phone. The protection keeps out casual snooping but is not strong encryption, and file and folder names stay readable without the password.",
+  "documents_export_start": "Export",
+  "documents_export_cancel": "Cancel",
+  "documents_export_progress": "File {done} of {total}",
+  "@documents_export_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "documents_export_nothing": "There are no documents to export",
+  "documents_export_done": "Documents exported",
+  "documents_export_failed": "Export failed: {error}",
+  "@documents_export_failed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "documents_export_cancelled": "Export cancelled",
+  "documents_export_fileNamePrefix": "Submersion documents",
+  "documents_export_unknownRecord": "Unknown",
+  "documents_export_front": "front",
+  "documents_export_back": "back",
+  "documents_export_page": "page {n}",
+  "@documents_export_page": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "documents_export_manifest_title": "Title",
+  "documents_export_manifest_type": "Type",
+  "documents_export_manifest_kind": "Filed under (kind)",
+  "documents_export_manifest_filedUnder": "Filed under",
+  "documents_export_manifest_issuer": "Issuer",
+  "documents_export_manifest_reference": "Reference number",
+  "documents_export_manifest_issueDate": "Issue date",
+  "documents_export_manifest_expiryDate": "Expiry date",
+  "documents_export_manifest_notes": "Notes",
+  "documents_export_manifest_emergencyPhone": "Emergency phone",
+  "documents_export_manifest_phone": "Phone",
+  "documents_export_manifest_page": "Page",
+  "documents_export_manifest_side": "Side",
+  "documents_export_manifest_path": "Path in ZIP",
   "documents_filter_all": "All",
   "documents_detail_owner": "Filed under",
+  "documents_owner_pickerTitle": "File under",
+  "documents_owner_search": "Search",
+  "documents_owner_none": "Nothing to file under yet",
+  "documents_owner_locked": "A card stays with its certification",
   "documents_profileHub_documents": "Documents",
   "documents_profileHub_documents_count": "{count, plural, =0{None yet} =1{{count} document} other{{count} documents}}",
   "@documents_profileHub_documents_count": {
@@ -14313,6 +14542,55 @@
   "settings_data_syncTime_hoursAgo": "{count}h ago",
   "settings_data_syncTime_justNow": "Just now",
   "settings_data_syncTime_minutesAgo": "{count}m ago",
+  "dataHealth_feature_backup": "Backup",
+  "dataHealth_feature_sync": "Sync",
+  "dataHealth_feature_libraries": "Libraries",
+  "dataHealth_feature_media": "Media",
+  "dataHealth_level_healthy": "Healthy",
+  "dataHealth_level_attention": "Needs attention",
+  "dataHealth_level_failing": "Failing",
+  "dataHealth_level_notSetUp": "Not set up",
+  "dataHealth_semantics": "{feature}: {status}",
+  "@dataHealth_semantics": {"placeholders": {"feature": {"type": "String"}, "status": {"type": "String"}}},
+  "dataHealth_backup_autoOff": "Recommended: turn on automatic backups",
+  "dataHealth_backup_failed": "Last backup failed: {when}",
+  "@dataHealth_backup_failed": {"placeholders": {"when": {"type": "String"}}},
+  "dataHealth_backup_overdue": "Backup overdue (last: {when})",
+  "@dataHealth_backup_overdue": {"placeholders": {"when": {"type": "String"}}},
+  "dataHealth_backup_never": "No backup yet",
+  "dataHealth_backup_cloudCopyMissing": "Last backup did not reach the cloud",
+  "dataHealth_backup_noOffDeviceCopy": "No copy off this device",
+  "dataHealth_sync_off": "Recommended: turn on cloud sync",
+  "dataHealth_sync_needsPassphrase": "Sync paused: enter your passphrase",
+  "dataHealth_sync_awaitingAdoption": "Sync paused: the cloud library was replaced",
+  "dataHealth_sync_signedOut": "Sync paused: sign in again",
+  "dataHealth_sync_failed": "Last sync failed: {when}",
+  "@dataHealth_sync_failed": {"placeholders": {"when": {"type": "String"}}},
+  "dataHealth_sync_offline": "Offline (last synced: {when})",
+  "@dataHealth_sync_offline": {"placeholders": {"when": {"type": "String"}}},
+  "dataHealth_sync_conflicts": "{count, plural, one{{count} sync conflict to resolve} other{{count} sync conflicts to resolve}}",
+  "@dataHealth_sync_conflicts": {"placeholders": {"count": {"type": "int"}}},
+  "dataHealth_sync_peersHeld": "Another device needs attention before it can sync",
+  "dataHealth_sync_autoOff": "Recommended: turn on automatic sync",
+  "dataHealth_sync_neverSynced": "Not synced yet",
+  "dataHealth_sync_rowSubtitle": "Synced: {when}",
+  "@dataHealth_sync_rowSubtitle": {"placeholders": {"when": {"type": "String"}}},
+  "dataHealth_sync_rowSubtitleDevices": "{count, plural, one{Synced: {when} · {count} device} other{Synced: {when} · {count} devices}}",
+  "@dataHealth_sync_rowSubtitleDevices": {"placeholders": {"when": {"type": "String"}, "count": {"type": "int"}}},
+  "dataHealth_libraries_failed": "{name}: sync failed",
+  "@dataHealth_libraries_failed": {"placeholders": {"name": {"type": "String"}}},
+  "dataHealth_libraries_failedMany": "{count, plural, one{{count} library failed to sync} other{{count} libraries failed to sync}}",
+  "@dataHealth_libraries_failedMany": {"placeholders": {"count": {"type": "int"}}},
+  "dataHealth_libraries_editsHeld": "{name}: your edits are on hold",
+  "@dataHealth_libraries_editsHeld": {"placeholders": {"name": {"type": "String"}}},
+  "dataHealth_media_finishSetup": "Photos: finish setting up this device",
+  "dataHealth_media_transfersPaused": "Photo transfers are paused",
+  "dataHealth_facts_dives": "{count, plural, one{{count} dive} other{{count} dives}}",
+  "@dataHealth_facts_dives": {"placeholders": {"count": {"type": "int"}}},
+  "dataHealth_facts_sites": "{count, plural, one{{count} site} other{{count} sites}}",
+  "@dataHealth_facts_sites": {"placeholders": {"count": {"type": "int"}}},
+  "dataHealth_facts_media": "{count, plural, one{{count} photo or video} other{{count} photos and videos}}",
+  "@dataHealth_facts_media": {"placeholders": {"count": {"type": "int"}}},
   "settings_decompression_aboutContent": "Gradient Factors (GF) control how conservative your decompression calculations are. GF Low affects deep stops, while GF High affects shallow stops.  Lower values = more conservative = longer deco stops Higher values = less conservative = shorter deco stops",
   "settings_decompression_aboutTitle": "About Gradient Factors",
   "settings_decompression_currentSettings": "Current Settings",
@@ -14877,7 +15155,6 @@
   "settings_section_appearance_title": "Appearance",
   "settings_section_data_subtitle": "Backup, restore & storage",
   "settings_section_data_title": "Data",
-  "settings_section_decompression_subtitle": "GF, data sources & narcosis",
   "settings_section_decompression_title": "Decompression",
   "settings_section_diverProfile_subtitle": "Active diver & profiles",
   "settings_section_diverProfile_title": "Diver Profile",
@@ -15672,6 +15949,30 @@
   "insights_gas_sacTrend_error": "Failed to load consumption trend",
   "insights_gas_sacTrend_subtitle": "Every dive in range",
   "insights_gas_sacTrend_title": "Gas consumption trend",
+  "insights_gas_tankConfig_title": "Tank configuration",
+  "insights_gas_tankConfig_subtitle": "Dives by how the tanks were set up",
+  "insights_gas_tankConfig_configurationHeading": "Configuration",
+  "insights_gas_tankConfig_extrasHeading": "Extras",
+  "insights_gas_tankConfig_rebreather": "Rebreather",
+  "insights_gas_tankConfig_sidemount": "Sidemount",
+  "insights_gas_tankConfig_twinBackmount": "Twin backmount",
+  "insights_gas_tankConfig_singleBackmount": "Single backmount",
+  "insights_gas_tankConfig_other": "Other",
+  "insights_gas_tankConfig_noTanks": "No tanks logged",
+  "insights_gas_tankConfig_stages": "Stage(s)",
+  "insights_gas_tankConfig_decoGas": "Deco gas",
+  "insights_gas_tankConfig_multiGas": "Multi-gas",
+  "insights_gas_tankConfig_countAndPercent": "{count} · {percent}",
+  "@insights_gas_tankConfig_countAndPercent": {
+    "description": "A bar's dive count and its share of all dives in scope, e.g. 131 · 62%",
+    "placeholders": {
+      "count": {"type": "int"},
+      "percent": {"type": "String"}
+    }
+  },
+  "insights_gas_tankConfig_note": "Twin sets logged as one cylinder are counted when the name says so (twin, double, D12, 2x12) or the cylinder is larger than any common single tank. Set Sidemount Left and Right on a dive's tanks for it to count as sidemount.",
+  "insights_gas_tankConfig_empty": "No dives to show",
+  "insights_gas_tankConfig_error": "Unable to load tank configuration",
   "insights_focus_title": "Dive focus",
   "insights_focus_intro": "See what a group of your dives has in common.",
   "insights_focus_error": "Failed to load dive focus",
@@ -17380,6 +17681,8 @@
   "transfer_export_completed": "Export completed",
   "transfer_export_csvSubtitle": "Spreadsheet format",
   "transfer_export_csvTitle": "CSV Export",
+  "transfer_export_documentsSubtitle": "All your documents as a password-protected ZIP",
+  "transfer_export_documentsTitle": "Documents",
   "transfer_export_excelSubtitle": "All data in one file (dives, sites, equipment, stats)",
   "transfer_export_excelTitle": "Excel Workbook",
   "transfer_export_failed": "Export failed: {error}",
@@ -21015,6 +21318,10 @@
   "@universalImport_label_replacedSourceData": {
     "description": "Label for the count of dives whose source data was replaced"
   },
+  "universalImport_label_timesCorrected": "Dive times corrected",
+  "@universalImport_label_timesCorrected": {
+    "description": "Label for the count of dives already in the log whose start times an Apple Watch re-import corrected"
+  },
   "universalImport_label_consolidated": "Consolidated",
   "@universalImport_label_consolidated": {
     "description": "Label for the count of consolidated dives in summary"
@@ -21643,6 +21950,9 @@
       }
     }
   },
+  "settings_mediaStorage_verify_deferred": "Nothing was deleted: deletes wait until this device has finished syncing.",
+  "settings_mediaStorage_verify_unregistered": "Nothing was deleted: reconnect the media store so this dive log knows which files are its own.",
+  "settings_mediaStorage_verify_uploads": "Nothing was deleted: deletes wait until uploads finish.",
   "settings_mediaStorage_backfill_action": "Upload existing library",
   "settings_mediaStorage_backfill_enqueued": "{count} uploads queued",
   "@settings_mediaStorage_backfill_enqueued": {
@@ -22116,10 +22426,9 @@
   },
   "settings_setup_dismiss": "Dismiss",
   "settings_photosMedia_title": "Photos & Media",
-  "settings_photosMedia_subtitle": "Sources, storage & accounts",
+  "settings_photosMedia_subtitle": "Sources & storage",
   "settings_photosMedia_sourcesHeader": "Where photos come from",
   "settings_photosMedia_storageHeader": "Where copies are kept",
-  "settings_photosMedia_accountsHeader": "Accounts",
   "settings_photosMedia_displayHeader": "Display",
   "settings_photosMedia_guidedSetup": "Guided setup",
   "settings_photosMedia_photoSources_title": "Photo library & sources",
@@ -22127,7 +22436,7 @@
   "settings_photosMedia_networkSources_title": "Network sources",
   "settings_photosMedia_networkSources_subtitle": "URLs and manifest feeds (advanced)",
   "settings_connectedAccounts_title": "Connected Accounts",
-  "settings_connectedAccounts_subtitle": "Cloud and service sign-ins",
+  "settings_connectedAccounts_subtitle": "Sign-ins used by sync, media storage and shared libraries",
   "settings_connectedAccounts_empty": "No accounts connected yet",
   "settings_connectedAccounts_status_signedIn": "Signed in",
   "settings_connectedAccounts_status_needsSignIn": "Needs sign-in",
@@ -22148,6 +22457,41 @@
   "settings_setupGuide_statusTodo": "Not set up",
   "settings_setupGuide_open": "Open",
   "settings_connectedAccounts_loadError": "Could not load accounts",
+  "settings_connectedAccounts_usage_label": "Used for: {uses}",
+  "@settings_connectedAccounts_usage_label": {
+    "description": "Connected account row: what the account is used for on this device. uses is a comma-separated list of usage names.",
+    "placeholders": {
+      "uses": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_connectedAccounts_usage_none": "Not used on this device",
+  "settings_connectedAccounts_usage_databaseSync": "Database sync",
+  "settings_connectedAccounts_usage_mediaStorage": "Media storage",
+  "settings_connectedAccounts_usage_sharedLibrary": "Shared site library: {name}",
+  "@settings_connectedAccounts_usage_sharedLibrary": {
+    "description": "Connected account usage: a shared site library by name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_connectedAccounts_usage_lightroom": "Lightroom",
+  "settings_connectedAccounts_signOutConfirmTitle": "Sign out on this device?",
+  "settings_connectedAccounts_signOutConfirmBody": "On this device, {account} is used for the features below. They stop working here until you sign in again.",
+  "@settings_connectedAccounts_signOutConfirmBody": {
+    "description": "Sign-out confirmation body; account is the account's label.",
+    "placeholders": {
+      "account": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_connectedAccounts_removeConfirmUsedHere": "On this device it is used for the features below, which stop working here:",
+  "settings_connectedAccounts_removeConfirmOtherDevices": "Other devices may also use this account.",
+  "settings_connectedAccounts_usage_unknown": "Could not check what this account is used for on this device. Anything that uses it here may stop working.",
   "media_unavailablePlaceholder_volumeOffline": "Volume not mounted",
   "media_unavailablePlaceholder_stillFetching": "Still loading. Tap to retry.",
   "media_unavailablePlaceholder_accessDenied": "No photo library access",
@@ -22415,6 +22759,54 @@
   "safetySettings_cnsOtuHeader": "Current dive load",
   "safetySettings_noFlyPreset_standard": "Standard (12/18/24 h)",
   "safetySettings_noFlyPreset_strict": "Strict (18/24/48 h)",
+  "safetyHub_reviewOn": "On, {enabled} of {total} rules, no-fly {noFly}",
+  "@safetyHub_reviewOn": {
+    "description": "Safety hub row subtitle: the safety review is on, with how many rules are enabled and the no-fly preset word",
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "noFly": {
+        "type": "String"
+      }
+    }
+  },
+  "safetyHub_reviewOff": "Off, no-fly {noFly}",
+  "@safetyHub_reviewOff": {
+    "description": "Safety hub row subtitle: the safety review is off; the no-fly preset still applies",
+    "placeholders": {
+      "noFly": {
+        "type": "String"
+      }
+    }
+  },
+  "safetyHub_noFlyStandard": "Standard",
+  "@safetyHub_noFlyStandard": {
+    "description": "Short name of the standard no-fly preset, used inside safetyHub_reviewOn/Off"
+  },
+  "safetyHub_noFlyStrict": "Strict",
+  "@safetyHub_noFlyStrict": {
+    "description": "Short name of the strict no-fly preset, used inside safetyHub_reviewOn/Off"
+  },
+  "safetyHub_conditionOn": "On, {enabled} of {total} rules",
+  "@safetyHub_conditionOn": {
+    "description": "Safety hub row subtitle: equipment condition checks are on, with how many rules are enabled",
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "safetyHub_off": "Off",
+  "@safetyHub_off": {
+    "description": "Safety hub row subtitle: the feature is switched off"
+  },
   "safetySettings_noFlyPreset_subtitle": "Guideline intervals after a single no-deco dive, repetitive dives, and deco dives",
   "flightWindow_closed": "No more diving before your flight",
   "flightWindow_conflict": "Your no-fly time extends past your flight departure",
@@ -22748,7 +23140,7 @@
   "planning_card_noFly_subtitle": "Guideline countdown from your last dives",
   "planning_card_cnsOtu_subtitle": "Live decay since your last dive",
   "settings_section_safety_title": "Safety",
-  "settings_section_safety_subtitle": "Review rules & flying after diving",
+  "settings_section_safety_subtitle": "Review rules, decompression & equipment",
   "settings_section_equipmentCondition_title": "Equipment condition",
   "settings_section_equipmentCondition_subtitle": "Exposure thresholds for service clocks",
   "equipmentConditionSettings_title": "Equipment condition",
@@ -23645,6 +24037,21 @@
   "@dataQuality_msg_tankInactive": {
     "placeholders": {
       "drop": {
+        "type": "String"
+      }
+    }
+  },
+  "dataQuality_detector_transmitter_role": "Transmitter role",
+  "dataQuality_msg_transmitterRoleBailout": "Tank {tankNumber} is marked {role} from its transmitter's name, but it lost {ocDrop} after the switch to open circuit and almost none on the loop, so it looks like the bailout. A bailout that was never breathed, or one breathed without a gas switch on the computer, cannot be detected this way.",
+  "@dataQuality_msg_transmitterRoleBailout": {
+    "placeholders": {
+      "tankNumber": {
+        "type": "int"
+      },
+      "role": {
+        "type": "String"
+      },
+      "ocDrop": {
         "type": "String"
       }
     }
@@ -26606,10 +27013,8 @@
   "common_action_add": "Add",
   "common_action_pin": "Pin",
   "common_action_remove": "Remove",
-  "equipment_documents_title": "Documents",
-  "equipment_documents_subtitle": "Invoices, receipts and warranty paperwork",
-  "equipment_documents_attachButton": "Attach",
-  "equipment_documents_empty": "No documents attached yet",
+  "equipment_documents_linkedTitle": "Linked files",
+  "equipment_documents_linkedSubtitle": "Too large, or a format Documents cannot hold",
   "equipment_documents_removeTitle": "Remove document?",
   "equipment_documents_removeContent": "It stops being attached to this item. Your original file is never touched.",
   "equipment_documents_removed": "Document removed",
@@ -27909,6 +28314,7 @@
   "lock_startFresh_confirm": "Set aside and start fresh",
   "lock_biometric_reason": "Unlock your dive log",
   "startup_migrating_progress": "Upgrading database... step {currentStep} of {totalSteps}",
+  "startup_compacting": "Optimizing storage...",
   "startup_error_title": "Submersion could not start",
   "startup_error_body": "Something went wrong before your dive log finished opening. Your data is still on disk and does not require a reinstall. Try restarting the app; if this persists, contact support.",
   "startup_engineUnavailable_title": "This build can't open a database",
@@ -29127,6 +29533,14 @@
   "media_servedFrom_embedded": "Stored in this logbook",
   "settings_media_provenanceBadges": "Show source badges on thumbnails",
   "settings_media_provenanceBadgesSubtitle": "A small glyph showing where each item is served from. Problem badges always show.",
+  "settings_photosMedia_cacheHeader": "Cache",
+  "settings_mediaCache_memory_title": "In-memory image cache",
+  "settings_mediaCache_memory_subtitle": "Decoded images kept in memory for the galleries and the full-screen viewer. Applies immediately, on this device only.",
+  "settings_mediaCache_disk_title": "Thumbnail disk cache",
+  "settings_mediaCache_disk_subtitle": "Thumbnails kept on this device. Originals and compressed copies are not counted.",
+  "settings_mediaCache_disk_empty": "Empty cache",
+  "settings_mediaCache_disk_emptied": "Thumbnail cache emptied",
+  "settings_mediaCache_disk_emptyFailed": "Could not empty the thumbnail cache",
   "media_status_transferFailed": "Upload failed",
   "media_status_transferring": "Uploading",
   "media_status_queued": "Waiting to upload",
@@ -29709,6 +30123,19 @@
   "settings_storageUsage_group_exports": "Exported Files",
   "settings_storageUsage_group_importedFiles": "Raw imported data",
   "settings_storageUsage_category_database": "Dive log database",
+  "settings_storageUsage_reclaimable": "{size} reclaimable",
+  "@settings_storageUsage_reclaimable": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_storageUsage_compact": "Compact",
+  "settings_storageUsage_compactTitle": "Compact the database?",
+  "settings_storageUsage_compactBody": "Runs the next time Submersion starts. A large log may take a minute and needs free space about the size of the database.",
+  "settings_storageUsage_compactScheduled": "Scheduled for next launch",
+  "settings_storageUsage_quitNow": "Quit now",
   "settings_storageUsage_category_localCache": "Local cache database",
   "settings_storageUsage_category_mediaCacheOriginals": "Original photos and videos",
   "settings_storageUsage_category_mediaCacheThumbs": "Thumbnails",
@@ -29723,6 +30150,38 @@
   "settings_storageUsage_category_temporary": "Temporary files",
   "settings_storageUsage_category_exports": "Exported files",
   "settings_storageUsage_category_importedFiles": "Imported logbook files",
+  "settings_storageUsage_totalSplit": "{device} on this device, {cloud} in the cloud",
+  "@settings_storageUsage_totalSplit": {"placeholders": {"device": {"type": "String"}, "cloud": {"type": "String"}}},
+  "settings_storageUsage_reclaimTitle": "About {size} can be reclaimed",
+  "@settings_storageUsage_reclaimTitle": {"placeholders": {"size": {"type": "String"}}},
+  "settings_storageUsage_reclaimNothing": "Nothing to reclaim right now",
+  "settings_storageUsage_reclaimLast": "Last reclaimed {size}, {when}",
+  "@settings_storageUsage_reclaimLast": {"placeholders": {"size": {"type": "String"}, "when": {"type": "String"}}},
+  "settings_storageUsage_reclaimWaiting": "{size} more will be reclaimable after the safety wait",
+  "@settings_storageUsage_reclaimWaiting": {"placeholders": {"size": {"type": "String"}}},
+  "settings_storageUsage_reclaimWaitingSync": "{size} more will be reclaimable once this device has finished syncing",
+  "@settings_storageUsage_reclaimWaitingSync": {"placeholders": {"size": {"type": "String"}}},
+  "settings_storageUsage_reclaimWaitingUnregistered": "{size} more will be reclaimable after you reconnect the media store",
+  "@settings_storageUsage_reclaimWaitingUnregistered": {"placeholders": {"size": {"type": "String"}}},
+  "settings_storageUsage_reclaimWaitingUploads": "{size} more will be reclaimable once uploads finish",
+  "@settings_storageUsage_reclaimWaitingUploads": {"placeholders": {"size": {"type": "String"}}},
+  "settings_storageUsage_reclaimAction": "Reclaim storage",
+  "settings_storageUsage_reclaimDone": "Reclaimed {size}",
+  "@settings_storageUsage_reclaimDone": {"placeholders": {"size": {"type": "String"}}},
+  "settings_storageUsage_reclaimDoneDeferred": "Reclaimed {size}. The cloud cleanup waits until this device has finished syncing.",
+  "@settings_storageUsage_reclaimDoneDeferred": {"placeholders": {"size": {"type": "String"}}},
+  "settings_storageUsage_reclaimDoneUnregistered": "Reclaimed {size}. Reconnect the media store to clean up the cloud.",
+  "@settings_storageUsage_reclaimDoneUnregistered": {"placeholders": {"size": {"type": "String"}}},
+  "settings_storageUsage_reclaimDoneUploads": "Reclaimed {size}. The cloud cleanup waits until uploads finish.",
+  "@settings_storageUsage_reclaimDoneUploads": {"placeholders": {"size": {"type": "String"}}},
+  "settings_storageUsage_group_cloud": "In the Cloud",
+  "settings_storageUsage_cloud_media": "Media store",
+  "settings_storageUsage_cloud_sync": "Database sync",
+  "settings_storageUsage_cloud_libraries": "Shared site libraries",
+  "settings_storageUsage_cloud_scanned": "Scanned {when}",
+  "@settings_storageUsage_cloud_scanned": {"placeholders": {"when": {"type": "String"}}},
+  "settings_storageUsage_cloud_notScanned": "Not scanned yet",
+  "settings_storageUsage_cloud_rescan": "Rescan",
   "profilePhoto_sheet_title": "Profile Photo",
   "profilePhoto_source_camera": "Take Photo",
   "common_camera_unavailable": "The camera could not be opened. Please allow camera access in Settings.",
@@ -29967,14 +30426,18 @@
   "transmitters_edit_title": "Edit transmitter",
   "transmitters_new_title": "New transmitter",
   "transmitters_field_label": "Label",
+  "transmitters_field_label_helper": "Becomes the cylinder's name on the dive once this transmitter is matched",
   "transmitters_field_serial": "Transmitter serial",
   "transmitters_field_computer": "Dive computer (when no serial is reported)",
   "transmitters_field_channel": "Channel",
   "transmitters_field_role": "Role",
   "transmitters_field_gear": "Cylinder from gear",
+  "transmitters_field_gear_subtitle": "The cylinder this transmitter reports pressure for",
   "transmitters_field_transmitterGear": "Transmitter from gear",
+  "transmitters_field_transmitterGear_subtitle": "Battery/service tracking, not matching",
   "transmitters_field_material": "Material",
   "transmitters_gear_none": "None",
+  "transmitters_hint_missingSize": "This cylinder has no size or pressure on file, so size will stay empty on the dive",
   "transmitters_validation_key": "Enter a transmitter serial, or pick a dive computer and channel",
   "transmitters_validation_positive": "Enter a value greater than zero",
   "transmitters_validation_duplicate": "Already assigned to {label}",
@@ -30024,6 +30487,40 @@
   "@dataQuality_msg_unknownTransmitter": {
     "placeholders": {
       "serial": { "type": "String" }
+    }
+  },
+  "dataQuality_repairLabel_useAsBailout": "Use as bailout",
+  "dataQuality_useAsBailout_title": "Make this tank the bailout?",
+  "dataQuality_useAsBailout_merge": "Removes the duplicate Bailout cylinder (switches move to Tank {tankNumber})",
+  "@dataQuality_useAsBailout_merge": {
+    "placeholders": {
+      "tankNumber": {
+        "type": "int"
+      }
+    }
+  },
+  "dataQuality_useAsBailout_register": "Also register this transmitter as {role}",
+  "@dataQuality_useAsBailout_register": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "dataQuality_useAsBailout_mixesKept": "{count, plural, =1{{count} other dive kept its gas mix. Check it.} other{{count} other dives kept their gas mix. Check them.}}",
+  "@dataQuality_useAsBailout_mixesKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dataQuality_useAsBailout_registered": "Transmitter registered as {role}. Undo changes this dive only.",
+  "@dataQuality_useAsBailout_registered": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
     }
   },
   "dataQuality_repairLabel_assignTransmitter": "Assign transmitter",

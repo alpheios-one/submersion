@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/certification_agencies/domain/certification_catalog.dart';
+import 'package:submersion/features/certifications/presentation/certification_title_l10n.dart';
+import 'package:submersion/features/documents/data/repositories/document_repository.dart';
 import 'package:submersion/features/documents/domain/entities/document.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
@@ -41,9 +45,62 @@ String documentOwnerKindLabel(AppLocalizations l10n, DocumentOwnerKind kind) =>
       DocumentOwnerKind.diveCenter => l10n.documents_owner_diveCenter,
     };
 
+IconData documentOwnerKindIcon(DocumentOwnerKind kind) => switch (kind) {
+  DocumentOwnerKind.personal => Icons.person_outline,
+  DocumentOwnerKind.dive => Icons.scuba_diving,
+  DocumentOwnerKind.site => Icons.place_outlined,
+  DocumentOwnerKind.trip => Icons.luggage_outlined,
+  DocumentOwnerKind.equipment => Icons.backpack_outlined,
+  DocumentOwnerKind.course => Icons.school_outlined,
+  DocumentOwnerKind.certification => Icons.card_membership_outlined,
+  DocumentOwnerKind.buddy => Icons.people_outline,
+  DocumentOwnerKind.diveCenter => Icons.storefront_outlined,
+};
+
+/// What a document is filed under on one line: the record's [label], then
+/// a dive's [date] in the diver's format (`#142 · Blue Hole · 12 Oct 2026`,
+/// #3391). Null when there is neither, for the caller's kind fallback.
+String? documentOwnerText(UnitFormatter units, String? label, DateTime? date) {
+  final parts = [
+    if (label?.trim() case final l? when l.isNotEmpty) l,
+    if (date != null) units.formatDate(date),
+  ];
+  return parts.isEmpty ? null : parts.join(' · ');
+}
+
+extension DocumentListEntryOwnerText on DocumentListEntry {
+  /// [ownerLabel] with a dive's date, per [documentOwnerText].
+  String? ownerText(UnitFormatter units) =>
+      documentOwnerText(units, ownerLabel, ownerDate);
+}
+
 /// The document's own title, or its type's name when it has none, so a
-/// default title follows the app language.
-String documentDisplayTitle(AppLocalizations l10n, Document document) {
+/// default title follows the app language. A certification card is titled
+/// by its certification ([ownerLabel], the certification's name), so a
+/// rename shows everywhere without a second write.
+String documentDisplayTitle(
+  AppLocalizations l10n,
+  Document document, {
+  String? ownerLabel,
+}) {
+  final label = ownerLabel?.trim() ?? '';
+  if (document.type == DocumentType.certificationCard && label.isNotEmpty) {
+    return label;
+  }
   final title = document.title.trim();
   return title.isEmpty ? documentTypeLabel(l10n, document.type) : title;
 }
+
+/// [entry] with a certification owner titled the way the Certifications
+/// screens title it: its custom name, else its certification. The stored
+/// name alone is empty for a certification with no custom title (#3366).
+DocumentListEntry withCertificationOwnerTitle(
+  DocumentListEntry entry,
+  AppLocalizations l10n, {
+  CertificationCatalog? catalog,
+}) => switch (entry.certification) {
+  final fields? => entry.withOwnerLabel(
+    certificationTitleFieldsL10n(fields, l10n, catalog: catalog),
+  ),
+  null => entry,
+};

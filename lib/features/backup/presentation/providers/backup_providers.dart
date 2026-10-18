@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:submersion/core/services/storage/gc/storage_gc_store.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
@@ -40,6 +41,10 @@ final backupPreferencesProvider = Provider<BackupPreferences>((ref) {
 
 /// Backup service with all dependencies injected
 final backupServiceProvider = Provider<BackupService>((ref) {
+  // Captured now, not read through ref inside the hook: a restore can run
+  // for minutes, and a rebuild of this provider meanwhile would leave the
+  // hook holding an unmounted Ref that throws, failing the restore.
+  final prefs = ref.watch(sharedPreferencesProvider);
   return BackupService(
     dbAdapter: DefaultBackupDatabaseAdapter(DatabaseService.instance),
     preferences: ref.watch(backupPreferencesProvider),
@@ -48,6 +53,7 @@ final backupServiceProvider = Provider<BackupService>((ref) {
     postRestoreSyncStore: PostRestoreSyncStore(
       ref.watch(sharedPreferencesProvider),
     ),
+    onRestoring: (at) => StorageGcStore.markRestored(prefs, at),
     encryptionKeyStore: ref.watch(encryptionKeyStoreProvider),
     syncPreferences: ref.watch(syncPreferencesProvider),
     backupEncryptionKeyStore: ref.watch(backupEncryptionKeyStoreProvider),
@@ -164,6 +170,25 @@ class BackupSettingsNotifier extends StateNotifier<BackupSettings> {
   /// Refresh state from SharedPreferences (e.g. after a backup updates lastBackupTime)
   void refresh() {
     state = _prefs.getSettings();
+  }
+
+  /// Like [refresh], but first re-reads what the WorkManager isolate may
+  /// have written since this isolate cached its preferences.
+  Future<void> reloadFromDisk() async {
+    await _prefs.reload();
+    if (!mounted) return;
+    refresh();
+  }
+
+  /// Records a failed scheduled backup for Settings > Data health.
+  Future<void> recordScheduledFailure(String message) async {
+    final at = DateTime.now();
+    await _prefs.setLastScheduledFailure(at, message);
+    if (!mounted) return;
+    state = state.copyWith(
+      lastScheduledFailureAt: at,
+      lastScheduledFailureMessage: message,
+    );
   }
 }
 
@@ -703,8 +728,12 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
       await _service.performBackup(isAutomatic: true);
       _ref.read(backupSettingsProvider.notifier).refresh();
       _ref.invalidate(backupHistoryProvider);
-    } catch (_) {
-      // Desktop automatic backup failure is silent — no notification system
+    } catch (e) {
+      // Desktop automatic backup failure has no notification system; it is
+      // recorded for Settings > Data health instead (#3394).
+      await _ref
+          .read(backupSettingsProvider.notifier)
+          .recordScheduledFailure(e.toString());
     }
   }
 

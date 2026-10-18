@@ -14455,6 +14455,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get cylinderConfigs_fieldMaterial => 'חומר';
 
   @override
+  String get cylinderConfigs_fieldGasMix => 'תערובת גז';
+
+  @override
   String get cylinderConfigs_sectionTitle => 'תצורות';
 
   @override
@@ -16438,13 +16441,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_icd_suggestionsTitle => 'כך שהכלל יתקיים';
 
   @override
-  String gasCalculators_icd_suggestionKeepA(String he) {
-    return 'השאר את הגז הנוכחי, קבע את ההליום של הגז שהוחלף אליו ל-$he%';
+  String gasCalculators_icd_suggestionSetHe(String he) {
+    return 'קבע את ההליום ל-$he%';
   }
 
   @override
-  String gasCalculators_icd_suggestionKeepB(String he) {
-    return 'השאר את הגז שהוחלף אליו, קבע את ההליום של הגז הנוכחי ל-$he%';
+  String gasCalculators_icd_suggestionSetO2(String o2) {
+    return 'קבע את החמצן ל-$o2%';
   }
 
   @override
@@ -18464,9 +18467,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get nav_courses => 'קורסים';
 
   @override
-  String get nav_coursesSubtitle => 'הכשרה וחינוך';
-
-  @override
   String get nav_diveCenters => 'מועדוני צלילה';
 
   @override
@@ -18896,6 +18896,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get nav_tracksSubtitle => 'מסלולי GPS ומסלולים תת-ימיים';
 
   @override
+  String get nav_training => 'הכשרה';
+
+  @override
+  String get nav_trainingSubtitle => 'הסמכות וקורסים';
+
+  @override
   String get nav_transfer => 'העברה';
 
   @override
@@ -19074,6 +19080,11 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
     return 'המדלל חורג מ-MOD מדלל ב-$depth (ppO₂ $value bar)';
+  }
+
+  @override
+  String plannerCanvas_issue_ceilingViolated(String ceiling) {
+    return 'הפרופיל חוצה את תקרת הדקומפרסיה של $ceiling ומדלג על עצירות נדרשות';
   }
 
   @override
@@ -20498,6 +20509,324 @@ class AppLocalizationsHe extends AppLocalizations {
       'תיקייה בתוך submersion-sites, בראש ה-bucket או השרת, למשל site-sync.';
 
   @override
+  String get sharedLibrary_connect_reservedFolder =>
+      'תיקיית ספרייה אינה יכולה להתחיל ב-sites, ‏members, ‏suggestions או backups.';
+
+  @override
+  String get sharedLibrary_connect_folderChars =>
+      'תיקיית ספרייה אינה יכולה להכיל *, ? או סימני דולר.';
+
+  @override
+  String get sharedLibrary_setup_title => 'איך להגדיר את האחסון';
+
+  @override
+  String sharedLibrary_setup_where(String folder) {
+    return 'הספרייה הזו נמצאת ב-$folder בראש ה-bucket או השרת, לצד submersion-sync ו-submersion-media.';
+  }
+
+  @override
+  String get sharedLibrary_setup_keys =>
+      'תנו לבעלים ולעורכים מפתחות שקוראים וכותבים בתיקיית הספרייה. תנו לכל השאר מפתחות שקוראים אותה וכותבים רק ב-members/ וב-suggestions/. האחסון, ולא האפליקציה, הוא שמונע ממפתח לכתוב.';
+
+  @override
+  String get sharedLibrary_setup_s3Full => 'מדיניות S3 לבעלים ולעורכים';
+
+  @override
+  String get sharedLibrary_setup_s3Reader => 'מדיניות S3 לקוראים';
+
+  @override
+  String get sharedLibrary_setup_webdav =>
+      'WebDAV: שתפו את התיקייה לקריאה בלבד עם הקוראים, ואת members/ ו-suggestions/ לכתיבה היכן שהשרת מאפשר זאת (למשל הרשאות שיתוף ב-Nextcloud).';
+
+  @override
+  String get sharedLibrary_setup_copy => 'העתקה';
+
+  @override
+  String get sharedLibrary_setup_copied => 'המדיניות הועתקה';
+
+  @override
+  String get sharedLibrary_recovery_title => 'שמרו את קוד השחזור הזה';
+
+  @override
+  String get sharedLibrary_recovery_body =>
+      'מי שיש לו את הקוד הזה יכול להפוך את עצמו לבעלים של הספרייה ולפתוח אותה אם היא מוצפנת. שמרו אותו במקום בטוח, בנפרד ממפתחות האחסון. הוא מוצג רק עכשיו.';
+
+  @override
+  String get sharedLibrary_recovery_stored => 'שמרתי אותו';
+
+  @override
+  String get sharedLibrary_roles_rejected =>
+      'קובץ התפקידים שונה על ידי מי שאינו בעלים. המכשיר הזה שומר את התפקידים האחרונים שבעלים חתם עליהם.';
+
+  @override
+  String get sharedLibrary_members_pending => 'ממתינים לאישור';
+
+  @override
+  String get sharedLibrary_members_approve => 'אישור';
+
+  @override
+  String get sharedLibrary_members_reject => 'דחייה';
+
+  @override
+  String sharedLibrary_members_fingerprint(String fingerprint) {
+    return 'מפתח $fingerprint';
+  }
+
+  @override
+  String get sharedLibrary_members_unsignedCard => 'הכרטיס לא נחתם על ידי החבר';
+
+  @override
+  String sharedLibrary_members_rejectTitle(String name) {
+    return 'לדחות את $name?';
+  }
+
+  @override
+  String get sharedLibrary_members_rejectBody =>
+      'הכרטיס מוסר ושום דבר שייכתב לא ייחשב. רק מפתחות אחסון חדשים ימנעו כתיבת קבצים לגמרי.';
+
+  @override
+  String get sharedLibrary_members_left => 'עזבו את הספרייה';
+
+  @override
+  String get sharedLibrary_members_removeRole => 'הסרת תפקיד';
+
+  @override
+  String get sharedLibrary_owner_onlyOne =>
+      'יש רק בעלים אחד. אם הגישה תאבד, רק קוד השחזור יוכל להחזיר אותה.';
+
+  @override
+  String get sharedLibrary_owner_addOwner => 'בחירת בעלים נוסף';
+
+  @override
+  String get sharedLibrary_owner_newCode => 'קוד שחזור חדש';
+
+  @override
+  String get sharedLibrary_owner_newCodeHelp =>
+      'מחליף את הקוד הישן, למשל אם ייתכן שדלף.';
+
+  @override
+  String get sharedLibrary_owner_recover => 'שחזור בעלות';
+
+  @override
+  String get sharedLibrary_owner_recoverHelp =>
+      'הפכו לבעלים באמצעות קוד השחזור של הספרייה.';
+
+  @override
+  String get sharedLibrary_owner_recoverPrompt => 'קוד שחזור';
+
+  @override
+  String get sharedLibrary_owner_wrongCode =>
+      'זה אינו קוד השחזור של הספרייה הזו.';
+
+  @override
+  String get sharedLibrary_owner_recovered => 'עכשיו אתם בעלים.';
+
+  @override
+  String get sharedLibrary_owner_reset => 'איפוס בעלות';
+
+  @override
+  String get sharedLibrary_owner_resetHelp =>
+      'רק אם לא נותרו בעלים וגם לא קוד שחזור. כל החברים חייבים לאשר זאת.';
+
+  @override
+  String get sharedLibrary_owner_resetConfirm =>
+      'להפוך לבעלים היחידים? המכשיר של כל חבר אחר יבקש ממנו לאשר זאת, ויפסיק לכתוב לספרייה עד שיאשר.';
+
+  @override
+  String sharedLibrary_owner_resetPrompt(
+    String library,
+    String name,
+    String fingerprint,
+  ) {
+    return 'הבעלות על $library אופסה על ידי $name (מפתח $fingerprint). עד שתאשרו, המכשיר הזה רק קורא את הספרייה.';
+  }
+
+  @override
+  String get sharedLibrary_owner_resetAccept => 'אישור';
+
+  @override
+  String get sharedLibrary_connect_untrusted =>
+      'התפקידים של הספרייה הזו אינם חתומים על ידי אחד מבעליה. בקשו מבעלים לבדוק זאת.';
+
+  @override
+  String get sharedLibrary_retired =>
+      'הספרייה הזו נוצרה בגרסת ניסיון של Submersion. צרו אותה מחדש.';
+
+  @override
+  String get sharedLibrary_encrypted_probe =>
+      'ספרייה מוצפנת. הזינו את משפט הסיסמה או את קוד השחזור.';
+
+  @override
+  String get sharedLibrary_encrypted_passphrase => 'משפט סיסמה או קוד שחזור';
+
+  @override
+  String get sharedLibrary_encrypted_unlock => 'שחרור נעילה';
+
+  @override
+  String get sharedLibrary_encrypted_wrong =>
+      'משפט הסיסמה הזה לא פותח את הספרייה.';
+
+  @override
+  String get sharedLibrary_backups_title => 'גיבויים';
+
+  @override
+  String get sharedLibrary_backups_subtitle => 'גיבוי הספרייה ושחזורה';
+
+  @override
+  String get sharedLibrary_backups_backUpNow => 'גיבוי עכשיו';
+
+  @override
+  String get sharedLibrary_backups_import => 'ייבוא גיבוי';
+
+  @override
+  String get sharedLibrary_backups_note => 'הערה (רשות)';
+
+  @override
+  String get sharedLibrary_backups_automatic => 'אוטומטי';
+
+  @override
+  String get sharedLibrary_backups_beforeRestore => 'לפני שחזור';
+
+  @override
+  String get sharedLibrary_backups_onDevice => 'במכשיר הזה';
+
+  @override
+  String get sharedLibrary_backups_inStorage => 'באחסון';
+
+  @override
+  String get sharedLibrary_backups_both => 'במכשיר הזה ובאחסון';
+
+  @override
+  String sharedLibrary_backups_summary(int sites, String size) {
+    return 'אתרים: $sites · $size';
+  }
+
+  @override
+  String get sharedLibrary_backups_pin => 'הצמדה';
+
+  @override
+  String get sharedLibrary_backups_unpin => 'ביטול הצמדה';
+
+  @override
+  String get sharedLibrary_backups_delete => 'מחיקה';
+
+  @override
+  String get sharedLibrary_backups_deleteConfirm => 'למחוק את הגיבוי הזה?';
+
+  @override
+  String get sharedLibrary_backups_deleteWhere => 'מאיפה למחוק את הגיבוי הזה?';
+
+  @override
+  String get sharedLibrary_backups_export => 'ייצוא';
+
+  @override
+  String get sharedLibrary_backups_restore => 'שחזור';
+
+  @override
+  String sharedLibrary_backups_restoreConfirm(String date) {
+    return 'לשחזר את הספרייה למצבה ב-$date? כל חבר יקבל גרסה זו בסנכרון הבא שלו. קודם נוצר גיבוי מוצמד של הספרייה במצבה הנוכחי.';
+  }
+
+  @override
+  String get sharedLibrary_backups_restoreDone => 'הספרייה שוחזרה';
+
+  @override
+  String get sharedLibrary_backups_oldKey =>
+      'הגיבוי הזה נחתם במשפט סיסמה קודם. הזינו את משפט הסיסמה ההוא או את קוד השחזור מאותה עת.';
+
+  @override
+  String get sharedLibrary_backups_empty =>
+      'אין עדיין גיבויים. מכשירי הבעלים יוצרים גיבוי בכל יום, ו״גיבוי עכשיו״ יוצר אחד מיד.';
+
+  @override
+  String get sharedLibrary_backups_importRefused =>
+      'הקובץ הזה אינו גיבוי של הספרייה הזו.';
+
+  @override
+  String get sharedLibrary_backups_ownersOnly => 'רק בעלים מנהלים גיבויים.';
+
+  @override
+  String get sharedLibrary_backups_done => 'הגיבוי נוצר';
+
+  @override
+  String sharedLibrary_library_myKey(String fingerprint) {
+    return 'המפתח שלכם $fingerprint';
+  }
+
+  @override
+  String sharedLibrary_suggest_held(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count הצעות ממתינות עד שתאשרו את הכותבים שלהן',
+      one: 'הצעה אחת ממתינה עד שתאשרו את הכותב שלה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedLibrary_restoreInto_action => 'שחזור מקובץ גיבוי';
+
+  @override
+  String get sharedLibrary_restoreInto_needsKey =>
+      'הגיבוי הזה מוצפן. הזינו את משפט הסיסמה או את קוד השחזור שלו.';
+
+  @override
+  String get sharedLibrary_restoreInto_refused =>
+      'הקובץ הזה אינו גיבוי ספרייה שנוצר על ידי בעלים.';
+
+  @override
+  String get sharedLibrary_restoreInto_oldStillThere =>
+      'הספרייה עדיין נמצאת גם בתיקייה הישנה. החברים שם ממשיכים להשתמש בעותק הזה עד שיתחברו לתיקייה הזו.';
+
+  @override
+  String sharedLibrary_encrypted_locked(String library) {
+    return 'הזינו את משפט הסיסמה של $library.';
+  }
+
+  @override
+  String sharedLibrary_encrypted_changed(String library) {
+    return 'משפט הסיסמה של $library השתנה. הזינו את החדש.';
+  }
+
+  @override
+  String get sharedLibrary_encryption_title => 'הצפנה';
+
+  @override
+  String get sharedLibrary_encryption_statusOn => 'מוצפנת במשפט סיסמה';
+
+  @override
+  String get sharedLibrary_encryption_statusOff =>
+      'לא מוצפנת: כל מי שיש לו גישה לאחסון יכול לקרוא אותה';
+
+  @override
+  String get sharedLibrary_encryption_on => 'הפעלת הצפנה';
+
+  @override
+  String get sharedLibrary_encryption_onHelp =>
+      'החברים מזינים את משפט הסיסמה פעם אחת לכל פרופיל. רק משפט הסיסמה או קוד השחזור פותחים את הספרייה. קוד שחזור חדש מחליף את הישן אצל כל הבעלים.';
+
+  @override
+  String get sharedLibrary_encryption_off => 'כיבוי הצפנה';
+
+  @override
+  String get sharedLibrary_encryption_offConfirm =>
+      'כל קובץ ייכתב מחדש כך שכל מי שיש לו גישה לאחסון יוכל לקרוא אותו. לכבות את ההצפנה?';
+
+  @override
+  String get sharedLibrary_encryption_change => 'שינוי משפט סיסמה';
+
+  @override
+  String get sharedLibrary_encryption_changeHelp =>
+      'יוצר מפתח חדש וקוד שחזור חדש. קוד שחזור חדש מחליף את הישן אצל כל הבעלים. שתפו את משפט הסיסמה החדש רק עם החברים שנשארים.';
+
+  @override
+  String get sharedLibrary_encryption_passphrase => 'משפט סיסמה';
+
+  @override
+  String get sharedLibrary_encryption_confirm => 'משפט הסיסמה שוב';
+
+  @override
   String get sharedLibrary_connect_probe_action => 'בדיקה';
 
   @override
@@ -20597,6 +20926,14 @@ class AppLocalizationsHe extends AppLocalizations {
       'אי אפשר להוריד בדרגה את הבעלים האחרון.';
 
   @override
+  String get sharedLibrary_members_keyChanged =>
+      'המפתח של החבר הזה השתנה. יש להשוות את המפתח החדש פנים אל פנים ואז לאשר אותו.';
+
+  @override
+  String get sharedLibrary_members_rolesOutOfDate =>
+      'התפקידים השתנו מאז שהמכשיר הזה סמך עליהם לאחרונה. יש לעזוב את הספרייה ולהצטרף אליה שוב כדי לקבל את השינוי, ואז לנסות שוב.';
+
+  @override
   String get sharedLibrary_picker_none =>
       'אין כאן ספריית אתרים משותפת שמאפשרת לך להוסיף אתרים.';
 
@@ -20626,6 +20963,33 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get sharedLibrary_site_addToLibrary => 'הוספה לספריית האתרים המשותפת';
+
+  @override
+  String sharedLibrary_add_confirm_title(String name, String library) {
+    return 'להוסיף את $name אל $library?';
+  }
+
+  @override
+  String sharedLibrary_add_confirm_titleMany(int count, String library) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'להוסיף $count אתרים אל $library?',
+      one: 'להוסיף $count אתר אל $library?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedLibrary_add_confirm_shared =>
+      'כל החברים יראו: שם, מיקום, עומקים, תיאור, סכנות, גישה, כניסה ויציאה, עגינה, חניה, סוגי אתר, תגיות, מינים ומאפיינים.';
+
+  @override
+  String get sharedLibrary_add_confirm_private =>
+      'נשאר שלך: ההערות והדירוג שלך. צלילות ותמונות אף פעם לא יוצאות מהספרייה האישית שלך.';
+
+  @override
+  String get sharedLibrary_add_confirm_action => 'הוספה';
 
   @override
   String get sharedLibrary_site_chooseLibrary => 'בחירת ספרייה';
@@ -20669,6 +21033,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get sharedLibrary_suggest_nothingChanged => 'שום דבר לא השתנה.';
+
+  @override
+  String get sharedLibrary_suggest_savedPrivate => 'ההערות והדירוג שלך נשמרו.';
 
   @override
   String sharedLibrary_suggest_pending(int count) {
@@ -20724,6 +21091,88 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get sharedLibrary_bulk_addToLibrary => 'הוספה לספריית האתרים המשותפת';
+
+  @override
+  String get sharedLibrary_about_title => 'אודות';
+
+  @override
+  String get sharedLibrary_about_edit_title => 'עריכת פרטי הספרייה';
+
+  @override
+  String get sharedLibrary_about_name_label => 'שם הספרייה';
+
+  @override
+  String get sharedLibrary_about_description_label => 'תיאור';
+
+  @override
+  String get sharedLibrary_about_description_help =>
+      'מה הספרייה הזו מכילה ולמי היא מיועדת. כל החברים רואים אותו.';
+
+  @override
+  String get sharedLibrary_about_nameRequired => 'הזינו שם';
+
+  @override
+  String get sharedLibrary_connection_title => 'החיבור במכשיר הזה';
+
+  @override
+  String get sharedLibrary_connection_s3 => 'חשבון S3';
+
+  @override
+  String sharedLibrary_connection_s3Bucket(String bucket) {
+    return 'חשבון S3, דלי $bucket';
+  }
+
+  @override
+  String get sharedLibrary_connection_webdav => 'חשבון WebDAV';
+
+  @override
+  String sharedLibrary_connection_webdavServer(String server) {
+    return 'חשבון WebDAV, $server';
+  }
+
+  @override
+  String get sharedLibrary_connection_accountMissing =>
+      'החשבון הזה כבר לא נמצא במכשיר הזה';
+
+  @override
+  String get sharedLibrary_connection_folder => 'תיקייה';
+
+  @override
+  String get sharedLibrary_connection_change => 'שינוי החיבור';
+
+  @override
+  String get sharedLibrary_connection_check => 'בדיקת המיקום';
+
+  @override
+  String sharedLibrary_connection_same(String name) {
+    return '$name נמצאה כאן. זו אותה ספרייה.';
+  }
+
+  @override
+  String get sharedLibrary_connection_save => 'שמירת החיבור';
+
+  @override
+  String get sharedLibrary_connection_olderCopy =>
+      'העותק הזה נראה ישן יותר מזה שסנכרנתם איתו עד עכשיו.';
+
+  @override
+  String get sharedLibrary_connection_saveAnyway => 'לשמור בכל זאת';
+
+  @override
+  String sharedLibrary_connection_different(String name) {
+    return 'התיקייה הזו מכילה ספרייה אחרת ($name). החיבור שלכם לא השתנה.';
+  }
+
+  @override
+  String get sharedLibrary_connection_differentUnnamed =>
+      'התיקייה הזו מכילה ספרייה אחרת. החיבור שלכם לא השתנה.';
+
+  @override
+  String get sharedLibrary_connection_none =>
+      'לא נמצאה ספרייה בתיקייה הזו. החיבור שלכם לא השתנה.';
+
+  @override
+  String get sharedLibrary_connection_saved => 'החיבור עודכן';
 
   @override
   String get settings_cloudSync_adopt_confirm => 'אימוץ הספרייה המשוחזרת';
@@ -22302,6 +22751,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_conflict_field_sharedLibraryLocation => 'מיקום הספרייה';
 
   @override
+  String get settings_conflict_field_sharedLibrarySigningKey => 'מפתח חתימה';
+
+  @override
+  String get settings_conflict_field_sharedLibraryKey => 'מפתח הספרייה';
+
+  @override
   String get settings_conflict_field_isTravelGas => 'גז מעבר';
 
   @override
@@ -23511,10 +23966,143 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get documents_export_action => 'ייצוא כל המסמכים';
+
+  @override
+  String get documents_export_title => 'ייצוא מסמכים';
+
+  @override
+  String documents_export_summary(int documents, int files) {
+    return 'מסמכים: $documents, קבצים: $files';
+  }
+
+  @override
+  String get documents_export_password => 'סיסמה';
+
+  @override
+  String get documents_export_confirmPassword => 'אישור סיסמה';
+
+  @override
+  String get documents_export_showPassword => 'הצגת הסיסמה';
+
+  @override
+  String get documents_export_hidePassword => 'הסתרת הסיסמה';
+
+  @override
+  String get documents_export_passwordTooShort => 'יש להשתמש ב-8 תווים לפחות';
+
+  @override
+  String get documents_export_passwordCharacters =>
+      'יש להשתמש רק באותיות A עד Z, ספרות, רווחים וסמלים נפוצים, כדי שקובץ ה-ZIP ייפתח בכל מחשב';
+
+  @override
+  String get documents_export_passwordMismatch => 'הסיסמאות אינן תואמות';
+
+  @override
+  String get documents_export_note =>
+      'לא ניתן לשחזר את הסיסמה הזו. קובץ ה-ZIP נפתח בלחיצה כפולה במחשב, לא בטלפון. ההגנה מונעת הצצה מזדמנת אך אינה הצפנה חזקה, ושמות הקבצים והתיקיות נשארים קריאים גם בלי הסיסמה.';
+
+  @override
+  String get documents_export_start => 'ייצוא';
+
+  @override
+  String get documents_export_cancel => 'ביטול';
+
+  @override
+  String documents_export_progress(int done, int total) {
+    return 'קובץ $done מתוך $total';
+  }
+
+  @override
+  String get documents_export_nothing => 'אין מסמכים לייצוא';
+
+  @override
+  String get documents_export_done => 'המסמכים יוצאו';
+
+  @override
+  String documents_export_failed(String error) {
+    return 'הייצוא נכשל: $error';
+  }
+
+  @override
+  String get documents_export_cancelled => 'הייצוא בוטל';
+
+  @override
+  String get documents_export_fileNamePrefix => 'מסמכי Submersion';
+
+  @override
+  String get documents_export_unknownRecord => 'לא ידוע';
+
+  @override
+  String get documents_export_front => 'חזית';
+
+  @override
+  String get documents_export_back => 'גב';
+
+  @override
+  String documents_export_page(int n) {
+    return 'עמוד $n';
+  }
+
+  @override
+  String get documents_export_manifest_title => 'כותרת';
+
+  @override
+  String get documents_export_manifest_type => 'סוג';
+
+  @override
+  String get documents_export_manifest_kind => 'מתויק תחת (סוג)';
+
+  @override
+  String get documents_export_manifest_filedUnder => 'מתויק תחת';
+
+  @override
+  String get documents_export_manifest_issuer => 'מנפיק';
+
+  @override
+  String get documents_export_manifest_reference => 'מספר אסמכתה';
+
+  @override
+  String get documents_export_manifest_issueDate => 'תאריך הנפקה';
+
+  @override
+  String get documents_export_manifest_expiryDate => 'תאריך תפוגה';
+
+  @override
+  String get documents_export_manifest_notes => 'הערות';
+
+  @override
+  String get documents_export_manifest_emergencyPhone => 'טלפון חירום';
+
+  @override
+  String get documents_export_manifest_phone => 'טלפון';
+
+  @override
+  String get documents_export_manifest_page => 'עמוד';
+
+  @override
+  String get documents_export_manifest_side => 'צד';
+
+  @override
+  String get documents_export_manifest_path => 'נתיב בקובץ ה-ZIP';
+
+  @override
   String get documents_filter_all => 'הכול';
 
   @override
   String get documents_detail_owner => 'מתויק תחת';
+
+  @override
+  String get documents_owner_pickerTitle => 'תיוק תחת';
+
+  @override
+  String get documents_owner_search => 'חיפוש';
+
+  @override
+  String get documents_owner_none => 'עדיין אין במה לתייק';
+
+  @override
+  String get documents_owner_locked => 'כרטיס נשאר עם ההסמכה שלו';
 
   @override
   String get documents_profileHub_documents => 'מסמכים';
@@ -24031,6 +24619,179 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String settings_data_syncTime_minutesAgo(Object count) {
     return 'לפני $count דקות';
+  }
+
+  @override
+  String get dataHealth_feature_backup => 'גיבוי';
+
+  @override
+  String get dataHealth_feature_sync => 'סנכרון';
+
+  @override
+  String get dataHealth_feature_libraries => 'ספריות';
+
+  @override
+  String get dataHealth_feature_media => 'מדיה';
+
+  @override
+  String get dataHealth_level_healthy => 'תקין';
+
+  @override
+  String get dataHealth_level_attention => 'דורש תשומת לב';
+
+  @override
+  String get dataHealth_level_failing => 'נכשל';
+
+  @override
+  String get dataHealth_level_notSetUp => 'לא הוגדר';
+
+  @override
+  String dataHealth_semantics(String feature, String status) {
+    return '$feature: $status';
+  }
+
+  @override
+  String get dataHealth_backup_autoOff => 'מומלץ: הפעל גיבויים אוטומטיים';
+
+  @override
+  String dataHealth_backup_failed(String when) {
+    return 'הגיבוי האחרון נכשל: $when';
+  }
+
+  @override
+  String dataHealth_backup_overdue(String when) {
+    return 'הגיבוי באיחור (האחרון: $when)';
+  }
+
+  @override
+  String get dataHealth_backup_never => 'עדיין אין גיבוי';
+
+  @override
+  String get dataHealth_backup_cloudCopyMissing => 'הגיבוי האחרון לא הגיע לענן';
+
+  @override
+  String get dataHealth_backup_noOffDeviceCopy => 'אין עותק מחוץ למכשיר הזה';
+
+  @override
+  String get dataHealth_sync_off => 'מומלץ: הפעל סנכרון ענן';
+
+  @override
+  String get dataHealth_sync_needsPassphrase =>
+      'הסנכרון מושהה: הזן את משפט הסיסמה';
+
+  @override
+  String get dataHealth_sync_awaitingAdoption =>
+      'הסנכרון מושהה: ספריית הענן הוחלפה';
+
+  @override
+  String get dataHealth_sync_signedOut => 'הסנכרון מושהה: התחבר מחדש';
+
+  @override
+  String dataHealth_sync_failed(String when) {
+    return 'הסנכרון האחרון נכשל: $when';
+  }
+
+  @override
+  String dataHealth_sync_offline(String when) {
+    return 'לא מקוון (סנכרון אחרון: $when)';
+  }
+
+  @override
+  String dataHealth_sync_conflicts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count התנגשויות סנכרון לפתרון',
+      one: '$count התנגשות סנכרון לפתרון',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataHealth_sync_peersHeld =>
+      'מכשיר אחר דורש תשומת לב לפני שיוכל לסנכרן';
+
+  @override
+  String get dataHealth_sync_autoOff => 'מומלץ: הפעל סנכרון אוטומטי';
+
+  @override
+  String get dataHealth_sync_neverSynced => 'עדיין לא סונכרן';
+
+  @override
+  String dataHealth_sync_rowSubtitle(String when) {
+    return 'סונכרן: $when';
+  }
+
+  @override
+  String dataHealth_sync_rowSubtitleDevices(String when, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'סונכרן: $when · $count מכשירים',
+      one: 'סונכרן: $when · $count מכשיר',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_failed(String name) {
+    return '$name: הסנכרון נכשל';
+  }
+
+  @override
+  String dataHealth_libraries_failedMany(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ספריות לא סונכרנו',
+      one: '$count ספרייה לא סונכרנה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_editsHeld(String name) {
+    return '$name: השינויים שלך מוחזקים';
+  }
+
+  @override
+  String get dataHealth_media_finishSetup =>
+      'תמונות: סיים להגדיר את המכשיר הזה';
+
+  @override
+  String get dataHealth_media_transfersPaused => 'העברות התמונות מושהות';
+
+  @override
+  String dataHealth_facts_dives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות',
+      one: '$count צלילה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_sites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count אתרים',
+      one: '$count אתר',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_media(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תמונות וסרטונים',
+      one: '$count תמונה או סרטון',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -25149,10 +25910,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_section_data_title => 'נתונים';
-
-  @override
-  String get settings_section_decompression_subtitle =>
-      'GF, מקורות נתונים ונרקוזה';
 
   @override
   String get settings_section_decompression_title => 'דקומפרסיה';
@@ -26315,6 +27072,61 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get insights_gas_sacTrend_title => 'מגמת צריכת גז';
+
+  @override
+  String get insights_gas_tankConfig_title => 'תצורת בלונים';
+
+  @override
+  String get insights_gas_tankConfig_subtitle =>
+      'צלילות לפי אופן נשיאת הבלונים';
+
+  @override
+  String get insights_gas_tankConfig_configurationHeading => 'תצורה';
+
+  @override
+  String get insights_gas_tankConfig_extrasHeading => 'תוספות';
+
+  @override
+  String get insights_gas_tankConfig_rebreather => 'ריברידר';
+
+  @override
+  String get insights_gas_tankConfig_sidemount => 'סיידמאונט';
+
+  @override
+  String get insights_gas_tankConfig_twinBackmount => 'בלונים תאומים על הגב';
+
+  @override
+  String get insights_gas_tankConfig_singleBackmount => 'בלון יחיד על הגב';
+
+  @override
+  String get insights_gas_tankConfig_other => 'אחר';
+
+  @override
+  String get insights_gas_tankConfig_noTanks => 'לא נרשמו בלונים';
+
+  @override
+  String get insights_gas_tankConfig_stages => 'סטייג\'ים';
+
+  @override
+  String get insights_gas_tankConfig_decoGas => 'גז דקו';
+
+  @override
+  String get insights_gas_tankConfig_multiGas => 'ריבוי גזים';
+
+  @override
+  String insights_gas_tankConfig_countAndPercent(int count, String percent) {
+    return '$count · $percent';
+  }
+
+  @override
+  String get insights_gas_tankConfig_note =>
+      'בלונים תאומים שנרשמו כבלון אחד נספרים כשהשם מציין זאת (twin, double, D12, 2x12) או כשהבלון גדול מכל בלון יחיד נפוץ. הגדר סיידמאונט שמאל וסיידמאונט ימין לבלוני הצלילה כדי שתיספר כסיידמאונט.';
+
+  @override
+  String get insights_gas_tankConfig_empty => 'אין צלילות להצגה';
+
+  @override
+  String get insights_gas_tankConfig_error => 'שגיאה בטעינת תצורת הבלונים';
 
   @override
   String get insights_focus_title => 'מיקוד צלילות';
@@ -28962,6 +29774,13 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get transfer_export_csvTitle => 'ייצוא CSV';
+
+  @override
+  String get transfer_export_documentsSubtitle =>
+      'כל המסמכים שלך בקובץ ZIP מוגן בסיסמה';
+
+  @override
+  String get transfer_export_documentsTitle => 'מסמכים';
 
   @override
   String get transfer_export_excelSubtitle =>
@@ -33690,6 +34509,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get universalImport_label_replacedSourceData => 'נתוני מקור הוחלפו';
 
   @override
+  String get universalImport_label_timesCorrected => 'זמני הצלילה תוקנו';
+
+  @override
   String get universalImport_label_consolidated => 'אוחדו';
 
   @override
@@ -34294,6 +35116,18 @@ class AppLocalizationsHe extends AppLocalizations {
     );
     return 'נבדקו $checked אובייקטים בענן ($_temp0, $_temp1, $_temp2): הוסרו $removed יתומים, $repaired תיקונים נוספו לתור, $aborted העלאות ישנות בוטלו';
   }
+
+  @override
+  String get settings_mediaStorage_verify_deferred =>
+      'דבר לא נמחק: המחיקות ימתינו עד שהמכשיר הזה יסיים לסנכרן.';
+
+  @override
+  String get settings_mediaStorage_verify_unregistered =>
+      'דבר לא נמחק: חבר מחדש את אחסון המדיה כדי שיומן הצלילות הזה ידע אילו קבצים שייכים לו.';
+
+  @override
+  String get settings_mediaStorage_verify_uploads =>
+      'דבר לא נמחק: המחיקות ימתינו עד שההעלאות יסתיימו.';
 
   @override
   String get settings_mediaStorage_backfill_action => 'העלה ספריה קיימת';
@@ -34915,16 +35749,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_photosMedia_title => 'תמונות ומדיה';
 
   @override
-  String get settings_photosMedia_subtitle => 'מקורות, אחסון וחשבונות';
+  String get settings_photosMedia_subtitle => 'מקורות ואחסון';
 
   @override
   String get settings_photosMedia_sourcesHeader => 'מאיפה מגיעות התמונות';
 
   @override
   String get settings_photosMedia_storageHeader => 'איפה נשמרים העותקים';
-
-  @override
-  String get settings_photosMedia_accountsHeader => 'חשבונות';
 
   @override
   String get settings_photosMedia_displayHeader => 'תצוגה';
@@ -34950,7 +35781,8 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_connectedAccounts_title => 'חשבונות מחוברים';
 
   @override
-  String get settings_connectedAccounts_subtitle => 'כניסות לענן ולשירותים';
+  String get settings_connectedAccounts_subtitle =>
+      'כניסות המשמשות לסנכרון, לאחסון מדיה ולספריות משותפות';
 
   @override
   String get settings_connectedAccounts_empty => 'אין עדיין חשבונות מחוברים';
@@ -35018,6 +35850,50 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_connectedAccounts_loadError => 'לא ניתן לטעון חשבונות';
+
+  @override
+  String settings_connectedAccounts_usage_label(String uses) {
+    return 'משמש עבור: $uses';
+  }
+
+  @override
+  String get settings_connectedAccounts_usage_none => 'לא בשימוש במכשיר זה';
+
+  @override
+  String get settings_connectedAccounts_usage_databaseSync =>
+      'סנכרון מסד נתונים';
+
+  @override
+  String get settings_connectedAccounts_usage_mediaStorage => 'אחסון מדיה';
+
+  @override
+  String settings_connectedAccounts_usage_sharedLibrary(String name) {
+    return 'ספריית אתרים משותפת: $name';
+  }
+
+  @override
+  String get settings_connectedAccounts_usage_lightroom => 'Lightroom';
+
+  @override
+  String get settings_connectedAccounts_signOutConfirmTitle =>
+      'להתנתק במכשיר זה?';
+
+  @override
+  String settings_connectedAccounts_signOutConfirmBody(String account) {
+    return 'במכשיר זה, $account משמש עבור התכונות שלהלן. הן יפסיקו לפעול כאן עד שתתחבר שוב.';
+  }
+
+  @override
+  String get settings_connectedAccounts_removeConfirmUsedHere =>
+      'במכשיר זה הוא משמש עבור התכונות שלהלן, שיפסיקו לפעול כאן:';
+
+  @override
+  String get settings_connectedAccounts_removeConfirmOtherDevices =>
+      'ייתכן שגם מכשירים אחרים משתמשים בחשבון זה.';
+
+  @override
+  String get settings_connectedAccounts_usage_unknown =>
+      'לא ניתן לבדוק למה משמש חשבון זה במכשיר זה. מה שמשתמש בו כאן עלול להפסיק לפעול.';
 
   @override
   String get media_unavailablePlaceholder_volumeOffline => 'הכונן אינו מחובר';
@@ -35829,6 +36705,30 @@ class AppLocalizationsHe extends AppLocalizations {
   String get safetySettings_noFlyPreset_strict => 'מחמיר (18/24/48 ש\')';
 
   @override
+  String safetyHub_reviewOn(int enabled, int total, String noFly) {
+    return 'פעיל, $enabled מתוך $total כללים, איסור טיסה $noFly';
+  }
+
+  @override
+  String safetyHub_reviewOff(String noFly) {
+    return 'כבוי, איסור טיסה $noFly';
+  }
+
+  @override
+  String get safetyHub_noFlyStandard => 'רגיל';
+
+  @override
+  String get safetyHub_noFlyStrict => 'מחמיר';
+
+  @override
+  String safetyHub_conditionOn(int enabled, int total) {
+    return 'פעיל, $enabled מתוך $total כללים';
+  }
+
+  @override
+  String get safetyHub_off => 'כבוי';
+
+  @override
   String get safetySettings_noFlyPreset_subtitle =>
       'מרווחים מנחים אחרי צלילה בודדת ללא דקו, צלילות חוזרות וצלילות דקומפרסיה';
 
@@ -36371,7 +37271,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_section_safety_title => 'בטיחות';
 
   @override
-  String get settings_section_safety_subtitle => 'כללי סקירה וטיסה אחרי צלילה';
+  String get settings_section_safety_subtitle => 'כללי סקירה, דקומפרסיה וציוד';
 
   @override
   String get settings_section_equipmentCondition_title => 'מצב הציוד';
@@ -37506,6 +38406,18 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String dataQuality_msg_tankInactive(String drop) {
     return 'בלון זה איבד $drop בעוד ציר הזמן של הגז מציין שהוא לא היה בשימוש';
+  }
+
+  @override
+  String get dataQuality_detector_transmitter_role => 'תפקיד המשדר';
+
+  @override
+  String dataQuality_msg_transmitterRoleBailout(
+    int tankNumber,
+    String role,
+    String ocDrop,
+  ) {
+    return 'בלון $tankNumber מסומן כ$role לפי שם המשדר, אבל הוא איבד $ocDrop אחרי המעבר למעגל פתוח וכמעט כלום בלולאה, כך שנראה שזה בלון החירום. בלון חירום שלא נשמו ממנו, או שנשמו ממנו בלי החלפת גז במחשב, אי אפשר לזהות כך.';
   }
 
   @override
@@ -44636,16 +45548,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get common_action_remove => 'הסר';
 
   @override
-  String get equipment_documents_title => 'מסמכים';
+  String get equipment_documents_linkedTitle => 'קבצים מקושרים';
 
   @override
-  String get equipment_documents_subtitle => 'חשבוניות, קבלות ומסמכי אחריות';
-
-  @override
-  String get equipment_documents_attachButton => 'צירוף';
-
-  @override
-  String get equipment_documents_empty => 'עדיין לא צורפו מסמכים';
+  String get equipment_documents_linkedSubtitle =>
+      'גדולים מדי, או בפורמט שמסמכים לא יכולים לשמור';
 
   @override
   String get equipment_documents_removeTitle => 'להסיר את המסמך?';
@@ -46587,6 +47494,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get startup_compacting => 'מייעל את האחסון...';
+
+  @override
   String get startup_error_title => 'Submersion לא הצליחה להיפתח';
 
   @override
@@ -48009,6 +48919,33 @@ class AppLocalizationsHe extends AppLocalizations {
       'סמל קטן שמראה מאיפה כל פריט מוגש. תגי בעיה מוצגים תמיד.';
 
   @override
+  String get settings_photosMedia_cacheHeader => 'מטמון';
+
+  @override
+  String get settings_mediaCache_memory_title => 'מטמון תמונות בזיכרון';
+
+  @override
+  String get settings_mediaCache_memory_subtitle =>
+      'תמונות מפוענחות שנשמרות בזיכרון עבור הגלריות והצגת מסך מלא. חל מיד, במכשיר זה בלבד.';
+
+  @override
+  String get settings_mediaCache_disk_title => 'מטמון תמונות ממוזערות בדיסק';
+
+  @override
+  String get settings_mediaCache_disk_subtitle =>
+      'תמונות ממוזערות שנשמרות במכשיר זה. קובצי מקור ועותקים דחוסים אינם נספרים.';
+
+  @override
+  String get settings_mediaCache_disk_empty => 'ריקון המטמון';
+
+  @override
+  String get settings_mediaCache_disk_emptied => 'מטמון התמונות הממוזערות רוקן';
+
+  @override
+  String get settings_mediaCache_disk_emptyFailed =>
+      'לא ניתן היה לרוקן את מטמון התמונות הממוזערות';
+
+  @override
   String get media_status_transferFailed => 'ההעלאה נכשלה';
 
   @override
@@ -48663,6 +49600,27 @@ class AppLocalizationsHe extends AppLocalizations {
       'מסד נתונים של יומן הצלילה';
 
   @override
+  String settings_storageUsage_reclaimable(String size) {
+    return '$size ניתנים לפינוי';
+  }
+
+  @override
+  String get settings_storageUsage_compact => 'דחיסה';
+
+  @override
+  String get settings_storageUsage_compactTitle => 'לדחוס את מסד הנתונים?';
+
+  @override
+  String get settings_storageUsage_compactBody =>
+      'יתבצע בהפעלה הבאה של Submersion. יומן גדול עשוי להימשך דקה ודורש שטח פנוי בערך בגודל מסד הנתונים.';
+
+  @override
+  String get settings_storageUsage_compactScheduled => 'מתוזמן להפעלה הבאה';
+
+  @override
+  String get settings_storageUsage_quitNow => 'יציאה עכשיו';
+
+  @override
   String get settings_storageUsage_category_localCache =>
       'מסד נתונים של מטמון מקומי';
 
@@ -48712,6 +49670,90 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_storageUsage_category_importedFiles =>
       'קובצי הייבוא המקוריים';
+
+  @override
+  String settings_storageUsage_totalSplit(String device, String cloud) {
+    return '$device במכשיר זה, $cloud בענן';
+  }
+
+  @override
+  String settings_storageUsage_reclaimTitle(String size) {
+    return 'ניתן לפנות כ-$size';
+  }
+
+  @override
+  String get settings_storageUsage_reclaimNothing => 'אין מה לפנות כרגע';
+
+  @override
+  String settings_storageUsage_reclaimLast(String size, String when) {
+    return 'פונו לאחרונה $size, $when';
+  }
+
+  @override
+  String settings_storageUsage_reclaimWaiting(String size) {
+    return 'עוד $size יהיו ניתנים לפינוי אחרי תקופת ההמתנה הבטיחותית';
+  }
+
+  @override
+  String settings_storageUsage_reclaimWaitingSync(String size) {
+    return 'עוד $size יהיו ניתנים לפינוי לאחר שהמכשיר הזה יסיים לסנכרן';
+  }
+
+  @override
+  String settings_storageUsage_reclaimWaitingUnregistered(String size) {
+    return 'עוד $size יהיו ניתנים לפינוי לאחר שתחבר מחדש את אחסון המדיה';
+  }
+
+  @override
+  String settings_storageUsage_reclaimWaitingUploads(String size) {
+    return 'עוד $size יהיו ניתנים לפינוי לאחר שההעלאות יסתיימו';
+  }
+
+  @override
+  String get settings_storageUsage_reclaimAction => 'פינוי אחסון';
+
+  @override
+  String settings_storageUsage_reclaimDone(String size) {
+    return 'פונו $size';
+  }
+
+  @override
+  String settings_storageUsage_reclaimDoneDeferred(String size) {
+    return 'פונו $size. הניקוי בענן ימתין עד שהמכשיר הזה יסיים לסנכרן.';
+  }
+
+  @override
+  String settings_storageUsage_reclaimDoneUnregistered(String size) {
+    return 'פונו $size. חבר מחדש את אחסון המדיה כדי לנקות את הענן.';
+  }
+
+  @override
+  String settings_storageUsage_reclaimDoneUploads(String size) {
+    return 'פונו $size. הניקוי בענן ימתין עד שההעלאות יסתיימו.';
+  }
+
+  @override
+  String get settings_storageUsage_group_cloud => 'בענן';
+
+  @override
+  String get settings_storageUsage_cloud_media => 'מאגר המדיה';
+
+  @override
+  String get settings_storageUsage_cloud_sync => 'סנכרון מסד הנתונים';
+
+  @override
+  String get settings_storageUsage_cloud_libraries => 'ספריות אתרים משותפות';
+
+  @override
+  String settings_storageUsage_cloud_scanned(String when) {
+    return 'נסרק $when';
+  }
+
+  @override
+  String get settings_storageUsage_cloud_notScanned => 'עדיין לא נסרק';
+
+  @override
+  String get settings_storageUsage_cloud_rescan => 'סריקה מחדש';
 
   @override
   String get profilePhoto_sheet_title => 'תמונת פרופיל';
@@ -49068,6 +50110,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get transmitters_field_label => 'תווית';
 
   @override
+  String get transmitters_field_label_helper =>
+      'הופך לשם המיכל בצלילה ברגע שהמשדר הזה משויך';
+
+  @override
   String get transmitters_field_serial => 'מספר סידורי של המשדר';
 
   @override
@@ -49084,13 +50130,25 @@ class AppLocalizationsHe extends AppLocalizations {
   String get transmitters_field_gear => 'מיכל מהציוד';
 
   @override
+  String get transmitters_field_gear_subtitle =>
+      'המיכל שעבורו משדר זה מדווח על הלחץ';
+
+  @override
   String get transmitters_field_transmitterGear => 'משדר מהציוד';
+
+  @override
+  String get transmitters_field_transmitterGear_subtitle =>
+      'מעקב סוללה/תחזוקה, לא משמש להתאמה';
 
   @override
   String get transmitters_field_material => 'חומר';
 
   @override
   String get transmitters_gear_none => 'ללא';
+
+  @override
+  String get transmitters_hint_missingSize =>
+      'למיכל זה אין גודל או לחץ רשומים, לכן הגודל יישאר ריק בצלילה';
 
   @override
   String get transmitters_validation_key =>
@@ -49185,6 +50243,39 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return 'משדר $serial אינו משויך למיכל';
+  }
+
+  @override
+  String get dataQuality_repairLabel_useAsBailout => 'שימוש כבלון חירום';
+
+  @override
+  String get dataQuality_useAsBailout_title =>
+      'להפוך את הבלון הזה לבלון החירום?';
+
+  @override
+  String dataQuality_useAsBailout_merge(int tankNumber) {
+    return 'מסיר את בלון החירום הכפול (החלפות הגז עוברות לבלון $tankNumber)';
+  }
+
+  @override
+  String dataQuality_useAsBailout_register(String role) {
+    return 'לרשום גם את המשדר הזה בתפקיד $role';
+  }
+
+  @override
+  String dataQuality_useAsBailout_mixesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות נוספות שמרו על תערובת הגז שלהן. כדאי לבדוק אותן.',
+      one: 'צלילה נוספת אחת שמרה על תערובת הגז שלה. כדאי לבדוק אותה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataQuality_useAsBailout_registered(String role) {
+    return 'המשדר נרשם בתפקיד $role. ביטול משנה רק את הצלילה הזו.';
   }
 
   @override

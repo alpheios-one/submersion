@@ -27,9 +27,14 @@ import 'package:submersion/features/query/presentation/widgets/query_filter_shee
 import 'package:submersion/features/courses/presentation/providers/course_list_count_provider.dart';
 import 'package:submersion/features/certification_agencies/presentation/providers/certification_catalog_context.dart';
 import 'package:submersion/features/certification_agencies/presentation/providers/certification_catalog_providers.dart';
+import 'package:submersion/shared/widgets/section_header_title.dart';
 
 class CourseListPage extends ConsumerStatefulWidget {
-  const CourseListPage({super.key});
+  const CourseListPage({super.key, this.headerTitle});
+
+  /// Replaces every layout's header title, as Training's tab switch does
+  /// (#3437).
+  final SectionHeaderTitle? headerTitle;
 
   @override
   ConsumerState<CourseListPage> createState() => _CourseListPageState();
@@ -63,11 +68,22 @@ class _CourseListPageState extends ConsumerState<CourseListPage>
     // optional detail pane.
     final viewMode = ref.watch(courseListViewModeProvider);
     if (viewMode == ListViewMode.table) {
+      final countLabel = courseListCountLabel(context, ref);
       return FocusTraversalGroup(
         child: TableModeLayout(
           sectionKey: 'courses',
           appBarTitle: context.l10n.nav_courses,
-          appBarSubtitle: courseListCountLabel(context, ref),
+          appBarSubtitle: countLabel,
+          appBarTitleWidget: widget.headerTitle?.build(
+            context,
+            SectionHeaderSlot.table,
+            countLabel,
+          ),
+          appBarToolbarHeight: widget.headerTitle?.appBarHeight(
+            context,
+            countLabel,
+          ),
+          phoneAppBarPin: widget.headerTitle?.pinAppBar,
           tableContent: CourseListContent(
             showAppBar: false,
             selectionController: tableSelection,
@@ -181,6 +197,7 @@ class _CourseListPageState extends ConsumerState<CourseListPage>
               onItemSelected: onItemSelected,
               selectedId: selectedId,
               showAppBar: false,
+              headerTitle: widget.headerTitle,
             ),
         detailBuilder: (context, courseId) => CourseDetailPage(
           courseId: courseId,
@@ -208,7 +225,11 @@ class _CourseListPageState extends ConsumerState<CourseListPage>
 
     // Mobile: Use list content with full scaffold
     return FocusTraversalGroup(
-      child: CourseListContent(showAppBar: true, floatingActionButton: fab),
+      child: CourseListContent(
+        showAppBar: true,
+        floatingActionButton: fab,
+        headerTitle: widget.headerTitle,
+      ),
     );
   }
 }

@@ -16,11 +16,12 @@ import 'package:submersion/core/services/shared_library/shared_library_models.da
 /// Creates the storage account a shared site library connects through,
 /// from the connect page (issue #2567).
 ///
-/// The account's folder is `submersion-sites`, which is also its identity:
-/// on a bucket or server that already holds `submersion-sync` and
-/// `submersion-media`, it is a third account, so a club's (perhaps
-/// read-only) keys never replace the sync or media keys. Its label names
-/// the folder too, as the sync account on the same server has the same
+/// The account's folder is the library's own, `submersion-sites/<folder>`,
+/// which is also its identity: beside `submersion-sync` and
+/// `submersion-media`, and beside every other library on the same server,
+/// it is an account of its own, so one library's (perhaps read-only) keys
+/// never replace another's, nor the sync or media keys. Its label names the
+/// folder too, as the sync account on the same server has the same
 /// `bucket @ host` label.
 class LibraryAccountSetup {
   LibraryAccountSetup({
@@ -35,22 +36,60 @@ class LibraryAccountSetup {
   final AccountCredentialsStore _credentials;
   final WebDavClientFactory _webdavClient;
 
-  static const _folderNote = ' (${SharedLibraryLayout.librariesDir})';
+  /// `submersion-sites/<folder>`, or `submersion-sites` for an empty one.
+  static String libraryFolder(String folder) {
+    final f = folder.trim().replaceAll(RegExp(r'^/+|/+$'), '').trim();
+    return f.isEmpty
+        ? SharedLibraryLayout.librariesDir
+        : '${SharedLibraryLayout.librariesDir}/$f';
+  }
 
-  Future<domain.ConnectedAccount> saveS3(S3Config server) async {
-    final config = server.copyWith(
-      prefix: '${SharedLibraryLayout.librariesDir}/',
-    );
+  /// The bucket the stored settings of the S3 account [accountId] name, or
+  /// null when it holds none.
+  Future<String?> s3Bucket(String accountId) async {
+    try {
+      final json = await _credentials.read(accountId);
+      if (json == null) return null;
+      final decoded = jsonDecode(json);
+      if (decoded is! Map<String, dynamic>) return null;
+      final bucket = S3Config.fromJson(decoded).bucket.trim();
+      return bucket.isEmpty ? null : bucket;
+    } on Object {
+      return null;
+    }
+  }
+
+  /// The server address the stored settings of the WebDAV account
+  /// [accountId] name, or null when they hold none (issue #3389).
+  Future<String?> webdavServer(String accountId) async {
+    try {
+      final json = await _credentials.read(accountId);
+      if (json == null) return null;
+      final decoded = jsonDecode(json);
+      if (decoded is! Map<String, dynamic>) return null;
+      final url = WebDavConfig.fromJson(decoded).serverUrl.trim();
+      return url.isEmpty ? null : url;
+    } on Object {
+      return null;
+    }
+  }
+
+  Future<domain.ConnectedAccount> saveS3(
+    S3Config server, {
+    required String folder,
+  }) async {
+    final where = libraryFolder(folder);
+    final config = server.copyWith(prefix: '$where/');
     final account = await _accounts.ensure(
       kind: AccountKind.s3,
       naturalKey: s3NaturalKey(config),
-      label: '${config.bucket} @ ${config.displayHost}$_folderNote',
+      label: '${config.bucket} @ ${config.displayHost} ($where)',
     );
     await _credentials.write(account.id, jsonEncode(config.toJson()));
     return account;
   }
 
-  /// Reaches the top folder of [server], read only, and returns it. A club
+  /// Reaches the top folder of [server], read only, and returns it. A library
   /// may hand out logins that cannot write, which the sync settings' write
   /// probe would refuse. A self-signed certificate surfaces as
   /// [WebDavUntrustedCertificateException], for the caller to offer trust.
@@ -74,12 +113,16 @@ class LibraryAccountSetup {
     return server;
   }
 
-  Future<domain.ConnectedAccount> saveWebDav(WebDavConfig server) async {
-    final config = server.copyWith(folder: SharedLibraryLayout.librariesDir);
+  Future<domain.ConnectedAccount> saveWebDav(
+    WebDavConfig server, {
+    required String folder,
+  }) async {
+    final where = libraryFolder(folder);
+    final config = server.copyWith(folder: where);
     final account = await _accounts.ensure(
       kind: AccountKind.webdav,
       naturalKey: webdavNaturalKey(config),
-      label: '${config.displayLabel}$_folderNote',
+      label: '${config.displayLabel} ($where)',
     );
     await _credentials.write(account.id, jsonEncode(config.toJson()));
     return account;

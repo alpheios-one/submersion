@@ -168,7 +168,15 @@ class SiteClassificationRepository {
     String siteId,
     List<String> typeIds, {
     bool notify = true,
+    String? actingDiverId,
   }) async {
+    // A library site [actingDiverId] may not edit (a reader's): never
+    // changed here, or the list would differ from the library's for good
+    // (issue #2567). The bridge applying a pulled list does not notify.
+    if (notify &&
+        !await _libraryStamper.mayEdit(siteId, actingDiverId: actingDiverId)) {
+      return;
+    }
     final changed = await _db.transaction(() async {
       final wanted = typeIds.toSet();
       final existing = await (_db.select(
@@ -195,9 +203,13 @@ class SiteClassificationRepository {
       return removed || added.isNotEmpty;
     });
     if (notify) {
-      // A club library clock only for a real change (issue #2567): a fresh
+      // A shared site library clock only for a real change (issue #2567): a fresh
       // clock on an unchanged list would beat another member's edit.
-      if (changed) await _libraryStamper.stamp(siteId, {'siteTypes'});
+      if (changed) {
+        await _libraryStamper.stamp(siteId, {
+          'siteTypes',
+        }, actingDiverId: actingDiverId);
+      }
       SyncEventBus.notifyLocalChange();
     }
   }
@@ -207,7 +219,15 @@ class SiteClassificationRepository {
     String siteId,
     List<String> typeIds, {
     bool notify = true,
+    String? actingDiverId,
   }) async {
+    // A library site [actingDiverId] may not edit (a reader's): never
+    // changed here, or the list would differ from the library's for good
+    // (issue #2567). The bridge applying a pulled list does not notify.
+    if (notify &&
+        !await _libraryStamper.mayEdit(siteId, actingDiverId: actingDiverId)) {
+      return;
+    }
     if (typeIds.isEmpty) return;
     final changed = await _db.transaction(() async {
       final existing = await (_db.select(
@@ -222,7 +242,11 @@ class SiteClassificationRepository {
       return added.isNotEmpty;
     });
     if (notify) {
-      if (changed) await _libraryStamper.stamp(siteId, {'siteTypes'});
+      if (changed) {
+        await _libraryStamper.stamp(siteId, {
+          'siteTypes',
+        }, actingDiverId: actingDiverId);
+      }
       SyncEventBus.notifyLocalChange();
     }
   }
@@ -232,7 +256,15 @@ class SiteClassificationRepository {
     String siteId,
     List<String> tagIds, {
     bool notify = true,
+    String? actingDiverId,
   }) async {
+    // A library site [actingDiverId] may not edit (a reader's): never
+    // changed here, or the list would differ from the library's for good
+    // (issue #2567). The bridge applying a pulled list does not notify.
+    if (notify &&
+        !await _libraryStamper.mayEdit(siteId, actingDiverId: actingDiverId)) {
+      return;
+    }
     final changed = await _db.transaction(() async {
       final wanted = tagIds.toSet();
       final existing = await (_db.select(
@@ -259,7 +291,11 @@ class SiteClassificationRepository {
       return removed || added.isNotEmpty;
     });
     if (notify) {
-      if (changed) await _libraryStamper.stamp(siteId, {'tags'});
+      if (changed) {
+        await _libraryStamper.stamp(siteId, {
+          'tags',
+        }, actingDiverId: actingDiverId);
+      }
       SyncEventBus.notifyLocalChange();
     }
   }
@@ -269,7 +305,15 @@ class SiteClassificationRepository {
     String siteId,
     List<String> tagIds, {
     bool notify = true,
+    String? actingDiverId,
   }) async {
+    // A library site [actingDiverId] may not edit (a reader's): never
+    // changed here, or the list would differ from the library's for good
+    // (issue #2567). The bridge applying a pulled list does not notify.
+    if (notify &&
+        !await _libraryStamper.mayEdit(siteId, actingDiverId: actingDiverId)) {
+      return;
+    }
     if (tagIds.isEmpty) return;
     final changed = await _db.transaction(() async {
       final existing = await (_db.select(
@@ -284,7 +328,11 @@ class SiteClassificationRepository {
       return added.isNotEmpty;
     });
     if (notify) {
-      if (changed) await _libraryStamper.stamp(siteId, {'tags'});
+      if (changed) {
+        await _libraryStamper.stamp(siteId, {
+          'tags',
+        }, actingDiverId: actingDiverId);
+      }
       SyncEventBus.notifyLocalChange();
     }
   }

@@ -111,6 +111,8 @@ class RecentSitesMapCard extends ConsumerWidget {
                             ),
                         ],
                       ),
+                      // No map style switcher: the map is locked, and the
+                      // full map the expand icon opens carries one.
                       const MapAttribution(),
                     ],
                   ),

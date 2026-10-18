@@ -14943,6 +14943,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cylinderConfigs_fieldMaterial => 'المادة';
 
   @override
+  String get cylinderConfigs_fieldGasMix => 'خليط الغاز';
+
+  @override
   String get cylinderConfigs_sectionTitle => 'الإعدادات';
 
   @override
@@ -17007,13 +17010,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_icd_suggestionsTitle => 'لتحقيق الامتثال';
 
   @override
-  String gasCalculators_icd_suggestionKeepA(String he) {
-    return 'احتفظ بالغاز الحالي، واضبط نسبة الهليوم في الغاز المنتقل إليه على $he%';
+  String gasCalculators_icd_suggestionSetHe(String he) {
+    return 'اضبط نسبة الهليوم على $he%';
   }
 
   @override
-  String gasCalculators_icd_suggestionKeepB(String he) {
-    return 'احتفظ بالغاز المنتقل إليه، واضبط نسبة الهليوم في الغاز الحالي على $he%';
+  String gasCalculators_icd_suggestionSetO2(String o2) {
+    return 'اضبط نسبة الأكسجين على $o2%';
   }
 
   @override
@@ -19142,9 +19145,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get nav_courses => 'الدورات';
 
   @override
-  String get nav_coursesSubtitle => 'التدريب والتعليم';
-
-  @override
   String get nav_diveCenters => 'مراكز الغوص';
 
   @override
@@ -19583,6 +19583,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get nav_tracksSubtitle => 'مسارات GPS والمسارات تحت الماء';
 
   @override
+  String get nav_training => 'التدريب';
+
+  @override
+  String get nav_trainingSubtitle => 'الشهادات والدورات';
+
+  @override
   String get nav_transfer => 'نقل البيانات';
 
   @override
@@ -19764,6 +19770,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
     return 'يتجاوز غاز التخفيف حد MOD الخاص به عند $depth (ppO₂ $value bar)';
+  }
+
+  @override
+  String plannerCanvas_issue_ceilingViolated(String ceiling) {
+    return 'المسار يتجاوز سقف تخفيف الضغط عند $ceiling ويتخطى توقفات إلزامية';
   }
 
   @override
@@ -21235,6 +21246,334 @@ class AppLocalizationsAr extends AppLocalizations {
       'مجلد داخل submersion-sites في أعلى الحاوية أو الخادم، مثل site-sync.';
 
   @override
+  String get sharedLibrary_connect_reservedFolder =>
+      'لا يمكن أن يبدأ مجلد المكتبة بـ sites أو members أو suggestions أو backups.';
+
+  @override
+  String get sharedLibrary_connect_folderChars =>
+      'لا يمكن أن يحتوي مجلد المكتبة على * أو ? أو علامات الدولار.';
+
+  @override
+  String get sharedLibrary_setup_title => 'كيفية إعداد التخزين';
+
+  @override
+  String sharedLibrary_setup_where(String folder) {
+    return 'توجد هذه المكتبة في $folder في أعلى الحاوية أو الخادم، بجانب submersion-sync وsubmersion-media.';
+  }
+
+  @override
+  String get sharedLibrary_setup_keys =>
+      'امنح المالكين والمحررين مفاتيح تقرأ مجلد المكتبة وتكتب فيه. وامنح الآخرين مفاتيح تقرؤه ولا تكتب إلا في members/ وsuggestions/. التخزين، لا التطبيق، هو ما يمنع المفتاح من الكتابة.';
+
+  @override
+  String get sharedLibrary_setup_s3Full => 'سياسة S3 للمالكين والمحررين';
+
+  @override
+  String get sharedLibrary_setup_s3Reader => 'سياسة S3 للقراء';
+
+  @override
+  String get sharedLibrary_setup_webdav =>
+      'WebDAV: شارك المجلد للقراءة فقط مع القراء، واجعل members/ وsuggestions/ قابلين للكتابة حيث يسمح خادمك بذلك (مثل أذونات المشاركة في Nextcloud).';
+
+  @override
+  String get sharedLibrary_setup_copy => 'نسخ';
+
+  @override
+  String get sharedLibrary_setup_copied => 'تم نسخ السياسة';
+
+  @override
+  String get sharedLibrary_recovery_title => 'احتفظ برمز الاسترداد هذا';
+
+  @override
+  String get sharedLibrary_recovery_body =>
+      'من يملك هذا الرمز يمكنه أن يجعل نفسه مالكًا للمكتبة، وأن يفتحها إن كانت مشفرة. احفظه في مكان آمن بعيدًا عن مفاتيح التخزين. لن يظهر إلا الآن.';
+
+  @override
+  String get sharedLibrary_recovery_stored => 'لقد حفظته';
+
+  @override
+  String get sharedLibrary_roles_rejected =>
+      'غيّر شخص ليس مالكًا ملف الأدوار. يحتفظ هذا الجهاز بآخر أدوار وقّعها مالك.';
+
+  @override
+  String get sharedLibrary_members_pending => 'بانتظار الموافقة';
+
+  @override
+  String get sharedLibrary_members_approve => 'موافقة';
+
+  @override
+  String get sharedLibrary_members_reject => 'رفض';
+
+  @override
+  String sharedLibrary_members_fingerprint(String fingerprint) {
+    return 'المفتاح $fingerprint';
+  }
+
+  @override
+  String get sharedLibrary_members_unsignedCard =>
+      'البطاقة غير موقعة من صاحبها';
+
+  @override
+  String sharedLibrary_members_rejectTitle(String name) {
+    return 'رفض $name؟';
+  }
+
+  @override
+  String get sharedLibrary_members_rejectBody =>
+      'تُزال بطاقته ولا يُعتدّ بأي شيء يكتبه. وحدها مفاتيح تخزين جديدة تمنعه من كتابة الملفات تمامًا.';
+
+  @override
+  String get sharedLibrary_members_left => 'غادروا المكتبة';
+
+  @override
+  String get sharedLibrary_members_removeRole => 'إزالة الدور';
+
+  @override
+  String get sharedLibrary_owner_onlyOne =>
+      'مالك واحد فقط. إن فقد الوصول، فلا يعيده إلا رمز الاسترداد.';
+
+  @override
+  String get sharedLibrary_owner_addOwner => 'اختر مالكًا آخر';
+
+  @override
+  String get sharedLibrary_owner_newCode => 'رمز استرداد جديد';
+
+  @override
+  String get sharedLibrary_owner_newCodeHelp =>
+      'يحل محل الرمز القديم، مثلًا إن كان قد تسرب.';
+
+  @override
+  String get sharedLibrary_owner_recover => 'استعادة الملكية';
+
+  @override
+  String get sharedLibrary_owner_recoverHelp =>
+      'كن مالكًا باستخدام رمز استرداد المكتبة.';
+
+  @override
+  String get sharedLibrary_owner_recoverPrompt => 'رمز الاسترداد';
+
+  @override
+  String get sharedLibrary_owner_wrongCode =>
+      'هذا ليس رمز استرداد هذه المكتبة.';
+
+  @override
+  String get sharedLibrary_owner_recovered => 'أصبحت مالكًا الآن.';
+
+  @override
+  String get sharedLibrary_owner_reset => 'إعادة تعيين الملكية';
+
+  @override
+  String get sharedLibrary_owner_resetHelp =>
+      'فقط إن لم يبقَ مالك ولا رمز استرداد. يجب أن يقبله كل الأعضاء.';
+
+  @override
+  String get sharedLibrary_owner_resetConfirm =>
+      'هل تجعل نفسك المالك الوحيد؟ سيطلب جهاز كل عضو آخر منه قبول ذلك، ويتوقف عن الكتابة في المكتبة حتى يقبل.';
+
+  @override
+  String sharedLibrary_owner_resetPrompt(
+    String library,
+    String name,
+    String fingerprint,
+  ) {
+    return 'أعاد $name تعيين ملكية $library (المفتاح $fingerprint). حتى تقبل، يكتفي هذا الجهاز بقراءة المكتبة.';
+  }
+
+  @override
+  String get sharedLibrary_owner_resetAccept => 'قبول';
+
+  @override
+  String get sharedLibrary_connect_untrusted =>
+      'أدوار هذه المكتبة غير موقعة من أحد مالكيها. اطلب من مالك التحقق منها.';
+
+  @override
+  String get sharedLibrary_retired =>
+      'أُنشئت هذه المكتبة بإصدار تجريبي من Submersion. أنشئها من جديد.';
+
+  @override
+  String get sharedLibrary_encrypted_probe =>
+      'مكتبة مشفرة. أدخل عبارة المرور أو رمز الاسترداد.';
+
+  @override
+  String get sharedLibrary_encrypted_passphrase =>
+      'عبارة المرور أو رمز الاسترداد';
+
+  @override
+  String get sharedLibrary_encrypted_unlock => 'فتح';
+
+  @override
+  String get sharedLibrary_encrypted_wrong =>
+      'عبارة المرور هذه لا تفتح هذه المكتبة.';
+
+  @override
+  String get sharedLibrary_backups_title => 'النسخ الاحتياطية';
+
+  @override
+  String get sharedLibrary_backups_subtitle =>
+      'انسخ المكتبة احتياطيًا واستعدها';
+
+  @override
+  String get sharedLibrary_backups_backUpNow => 'نسخ احتياطي الآن';
+
+  @override
+  String get sharedLibrary_backups_import => 'استيراد نسخة احتياطية';
+
+  @override
+  String get sharedLibrary_backups_note => 'ملاحظة (اختيارية)';
+
+  @override
+  String get sharedLibrary_backups_automatic => 'تلقائية';
+
+  @override
+  String get sharedLibrary_backups_beforeRestore => 'قبل الاستعادة';
+
+  @override
+  String get sharedLibrary_backups_onDevice => 'على هذا الجهاز';
+
+  @override
+  String get sharedLibrary_backups_inStorage => 'في التخزين';
+
+  @override
+  String get sharedLibrary_backups_both => 'على هذا الجهاز وفي التخزين';
+
+  @override
+  String sharedLibrary_backups_summary(int sites, String size) {
+    return 'المواقع: $sites · $size';
+  }
+
+  @override
+  String get sharedLibrary_backups_pin => 'تثبيت';
+
+  @override
+  String get sharedLibrary_backups_unpin => 'إلغاء التثبيت';
+
+  @override
+  String get sharedLibrary_backups_delete => 'حذف';
+
+  @override
+  String get sharedLibrary_backups_deleteConfirm =>
+      'هل تريد حذف هذه النسخة الاحتياطية؟';
+
+  @override
+  String get sharedLibrary_backups_deleteWhere =>
+      'من أين تريد حذف هذه النسخة الاحتياطية؟';
+
+  @override
+  String get sharedLibrary_backups_export => 'تصدير';
+
+  @override
+  String get sharedLibrary_backups_restore => 'استعادة';
+
+  @override
+  String sharedLibrary_backups_restoreConfirm(String date) {
+    return 'هل تريد إعادة المكتبة إلى حالتها في $date؟ يحصل كل عضو على هذه النسخة في مزامنته التالية. تُنشأ أولًا نسخة احتياطية مثبتة من المكتبة بحالتها الحالية.';
+  }
+
+  @override
+  String get sharedLibrary_backups_restoreDone => 'تمت استعادة المكتبة';
+
+  @override
+  String get sharedLibrary_backups_oldKey =>
+      'خُتمت هذه النسخة الاحتياطية بعبارة مرور سابقة. أدخل تلك العبارة أو رمز الاسترداد من ذلك الوقت.';
+
+  @override
+  String get sharedLibrary_backups_empty =>
+      'لا توجد نسخ احتياطية بعد. تنشئ أجهزة المالكين نسخة كل يوم، وينشئ زر نسخ احتياطي الآن نسخة فورًا.';
+
+  @override
+  String get sharedLibrary_backups_importRefused =>
+      'هذا الملف ليس نسخة احتياطية من هذه المكتبة.';
+
+  @override
+  String get sharedLibrary_backups_ownersOnly =>
+      'يدير المالكون وحدهم النسخ الاحتياطية.';
+
+  @override
+  String get sharedLibrary_backups_done => 'تم إنشاء النسخة الاحتياطية';
+
+  @override
+  String sharedLibrary_library_myKey(String fingerprint) {
+    return 'مفتاحك $fingerprint';
+  }
+
+  @override
+  String sharedLibrary_suggest_held(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count اقتراح ينتظر موافقتك على كتّابه',
+      many: '$count اقتراحًا ينتظر موافقتك على كتّابه',
+      few: '$count اقتراحات تنتظر موافقتك على كتّابها',
+      two: 'اقتراحان ينتظران موافقتك على كاتبيهما',
+      one: 'اقتراح واحد ينتظر موافقتك على كاتبه',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedLibrary_restoreInto_action =>
+      'الاستعادة من ملف نسخة احتياطية';
+
+  @override
+  String get sharedLibrary_restoreInto_needsKey =>
+      'هذه النسخة الاحتياطية مشفرة. أدخل عبارة المرور أو رمز الاسترداد الخاص بها.';
+
+  @override
+  String get sharedLibrary_restoreInto_refused =>
+      'هذا الملف ليس نسخة احتياطية لمكتبة أنشأها مالك.';
+
+  @override
+  String get sharedLibrary_restoreInto_oldStillThere =>
+      'لا تزال المكتبة في مجلدها القديم أيضًا. يواصل الأعضاء هناك استخدام تلك النسخة حتى يتصلوا بهذا المجلد.';
+
+  @override
+  String sharedLibrary_encrypted_locked(String library) {
+    return 'أدخل عبارة المرور لـ $library.';
+  }
+
+  @override
+  String sharedLibrary_encrypted_changed(String library) {
+    return 'تغيرت عبارة مرور $library. أدخل العبارة الجديدة.';
+  }
+
+  @override
+  String get sharedLibrary_encryption_title => 'التشفير';
+
+  @override
+  String get sharedLibrary_encryption_statusOn => 'مشفرة بعبارة مرور';
+
+  @override
+  String get sharedLibrary_encryption_statusOff =>
+      'غير مشفرة: يمكن لأي شخص لديه وصول إلى التخزين قراءتها';
+
+  @override
+  String get sharedLibrary_encryption_on => 'تشغيل التشفير';
+
+  @override
+  String get sharedLibrary_encryption_onHelp =>
+      'يدخل الأعضاء عبارة المرور مرة واحدة لكل ملف شخصي. وحدها عبارة المرور أو رمز الاسترداد تفتح المكتبة. يحل رمز الاسترداد الجديد محل القديم لدى جميع المالكين.';
+
+  @override
+  String get sharedLibrary_encryption_off => 'إيقاف التشفير';
+
+  @override
+  String get sharedLibrary_encryption_offConfirm =>
+      'ستُعاد كتابة كل الملفات بحيث يقرؤها أي شخص لديه وصول إلى التخزين. هل توقف التشفير؟';
+
+  @override
+  String get sharedLibrary_encryption_change => 'تغيير عبارة المرور';
+
+  @override
+  String get sharedLibrary_encryption_changeHelp =>
+      'ينشئ مفتاحًا جديدًا ورمز استرداد جديدًا. يحل رمز الاسترداد الجديد محل القديم لدى جميع المالكين. شارك عبارة المرور الجديدة مع الأعضاء الباقين فقط.';
+
+  @override
+  String get sharedLibrary_encryption_passphrase => 'عبارة المرور';
+
+  @override
+  String get sharedLibrary_encryption_confirm => 'عبارة المرور مرة أخرى';
+
+  @override
   String get sharedLibrary_connect_probe_action => 'تحقق';
 
   @override
@@ -21337,6 +21676,14 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا يمكن تخفيض رتبة المالك الأخير.';
 
   @override
+  String get sharedLibrary_members_keyChanged =>
+      'تغيّر مفتاح هذا العضو. قارن المفتاح الجديد شخصيًا ثم وافق عليه.';
+
+  @override
+  String get sharedLibrary_members_rolesOutOfDate =>
+      'تغيّرت الأدوار منذ آخر مرة وثق بها هذا الجهاز. غادر المكتبة وانضم إليها مرة أخرى لاعتماد التغيير، ثم حاول مجددًا.';
+
+  @override
   String get sharedLibrary_picker_none =>
       'لا توجد مكتبة مواقع مشتركة هنا تتيح لك إضافة مواقع.';
 
@@ -21367,6 +21714,36 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get sharedLibrary_site_addToLibrary =>
       'إضافة إلى مكتبة المواقع المشتركة';
+
+  @override
+  String sharedLibrary_add_confirm_title(String name, String library) {
+    return 'إضافة $name إلى $library؟';
+  }
+
+  @override
+  String sharedLibrary_add_confirm_titleMany(int count, String library) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'إضافة $count موقع إلى $library؟',
+      many: 'إضافة $count موقعًا إلى $library؟',
+      few: 'إضافة $count مواقع إلى $library؟',
+      two: 'إضافة موقعين إلى $library؟',
+      one: 'إضافة موقع واحد إلى $library؟',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedLibrary_add_confirm_shared =>
+      'سيرى كل الأعضاء: الاسم والموقع والأعماق والوصف والمخاطر والوصول والدخول والخروج والرسو ومواقف السيارات وأنواع المواقع والوسوم والأنواع البحرية والمعالم.';
+
+  @override
+  String get sharedLibrary_add_confirm_private =>
+      'يبقى لك: ملاحظاتك وتقييمك. لا تغادر الغطسات والصور مكتبتك الشخصية أبدًا.';
+
+  @override
+  String get sharedLibrary_add_confirm_action => 'إضافة';
 
   @override
   String get sharedLibrary_site_chooseLibrary => 'اختر مكتبة';
@@ -21410,6 +21787,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get sharedLibrary_suggest_nothingChanged => 'لم يتغير شيء.';
+
+  @override
+  String get sharedLibrary_suggest_savedPrivate => 'تم حفظ ملاحظاتك وتقييمك.';
 
   @override
   String sharedLibrary_suggest_pending(int count) {
@@ -21469,6 +21849,88 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get sharedLibrary_bulk_addToLibrary =>
       'إضافة إلى مكتبة المواقع المشتركة';
+
+  @override
+  String get sharedLibrary_about_title => 'حول';
+
+  @override
+  String get sharedLibrary_about_edit_title => 'تعديل تفاصيل المكتبة';
+
+  @override
+  String get sharedLibrary_about_name_label => 'اسم المكتبة';
+
+  @override
+  String get sharedLibrary_about_description_label => 'الوصف';
+
+  @override
+  String get sharedLibrary_about_description_help =>
+      'ما تحتويه هذه المكتبة ولمن هي. يراه جميع الأعضاء.';
+
+  @override
+  String get sharedLibrary_about_nameRequired => 'أدخل اسمًا';
+
+  @override
+  String get sharedLibrary_connection_title => 'الاتصال على هذا الجهاز';
+
+  @override
+  String get sharedLibrary_connection_s3 => 'حساب S3';
+
+  @override
+  String sharedLibrary_connection_s3Bucket(String bucket) {
+    return 'حساب S3، الحاوية $bucket';
+  }
+
+  @override
+  String get sharedLibrary_connection_webdav => 'حساب WebDAV';
+
+  @override
+  String sharedLibrary_connection_webdavServer(String server) {
+    return 'حساب WebDAV، $server';
+  }
+
+  @override
+  String get sharedLibrary_connection_accountMissing =>
+      'لم يعد هذا الحساب على هذا الجهاز';
+
+  @override
+  String get sharedLibrary_connection_folder => 'المجلد';
+
+  @override
+  String get sharedLibrary_connection_change => 'تغيير الاتصال';
+
+  @override
+  String get sharedLibrary_connection_check => 'التحقق من الموقع';
+
+  @override
+  String sharedLibrary_connection_same(String name) {
+    return 'تم العثور على $name هنا. إنها المكتبة نفسها.';
+  }
+
+  @override
+  String get sharedLibrary_connection_save => 'حفظ الاتصال';
+
+  @override
+  String get sharedLibrary_connection_olderCopy =>
+      'تبدو هذه النسخة أقدم من النسخة التي كنت تزامن معها.';
+
+  @override
+  String get sharedLibrary_connection_saveAnyway => 'حفظ على أي حال';
+
+  @override
+  String sharedLibrary_connection_different(String name) {
+    return 'يحتوي هذا المجلد على مكتبة أخرى ($name). لم يتغير اتصالك.';
+  }
+
+  @override
+  String get sharedLibrary_connection_differentUnnamed =>
+      'يحتوي هذا المجلد على مكتبة أخرى. لم يتغير اتصالك.';
+
+  @override
+  String get sharedLibrary_connection_none =>
+      'لم يتم العثور على مكتبة في هذا المجلد. لم يتغير اتصالك.';
+
+  @override
+  String get sharedLibrary_connection_saved => 'تم تحديث الاتصال';
 
   @override
   String get settings_cloudSync_adopt_confirm => 'اعتماد المكتبة المستعادة';
@@ -23087,6 +23549,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_conflict_field_sharedLibraryLocation => 'موقع المكتبة';
 
   @override
+  String get settings_conflict_field_sharedLibrarySigningKey => 'مفتاح التوقيع';
+
+  @override
+  String get settings_conflict_field_sharedLibraryKey => 'مفتاح المكتبة';
+
+  @override
   String get settings_conflict_field_isTravelGas => 'غاز العبور';
 
   @override
@@ -24316,10 +24784,143 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get documents_export_action => 'تصدير جميع المستندات';
+
+  @override
+  String get documents_export_title => 'تصدير المستندات';
+
+  @override
+  String documents_export_summary(int documents, int files) {
+    return 'المستندات: $documents، الملفات: $files';
+  }
+
+  @override
+  String get documents_export_password => 'كلمة المرور';
+
+  @override
+  String get documents_export_confirmPassword => 'تأكيد كلمة المرور';
+
+  @override
+  String get documents_export_showPassword => 'إظهار كلمة المرور';
+
+  @override
+  String get documents_export_hidePassword => 'إخفاء كلمة المرور';
+
+  @override
+  String get documents_export_passwordTooShort => 'استخدم 8 أحرف على الأقل';
+
+  @override
+  String get documents_export_passwordCharacters =>
+      'استخدم فقط الحروف اللاتينية من A إلى Z والأرقام والمسافات والرموز الشائعة، حتى يُفتح ملف ZIP على أي حاسوب';
+
+  @override
+  String get documents_export_passwordMismatch => 'كلمتا المرور غير متطابقتين';
+
+  @override
+  String get documents_export_note =>
+      'لا يمكن استعادة كلمة المرور هذه. يُفتح ملف ZIP بالنقر المزدوج على الحاسوب، وليس على الهاتف. تمنع الحماية التطفل العابر لكنها ليست تشفيرًا قويًا، وتبقى أسماء الملفات والمجلدات مقروءة دون كلمة المرور.';
+
+  @override
+  String get documents_export_start => 'تصدير';
+
+  @override
+  String get documents_export_cancel => 'إلغاء';
+
+  @override
+  String documents_export_progress(int done, int total) {
+    return 'الملف $done من $total';
+  }
+
+  @override
+  String get documents_export_nothing => 'لا توجد مستندات للتصدير';
+
+  @override
+  String get documents_export_done => 'تم تصدير المستندات';
+
+  @override
+  String documents_export_failed(String error) {
+    return 'فشل التصدير: $error';
+  }
+
+  @override
+  String get documents_export_cancelled => 'تم إلغاء التصدير';
+
+  @override
+  String get documents_export_fileNamePrefix => 'مستندات Submersion';
+
+  @override
+  String get documents_export_unknownRecord => 'غير معروف';
+
+  @override
+  String get documents_export_front => 'الوجه الأمامي';
+
+  @override
+  String get documents_export_back => 'الوجه الخلفي';
+
+  @override
+  String documents_export_page(int n) {
+    return 'الصفحة $n';
+  }
+
+  @override
+  String get documents_export_manifest_title => 'العنوان';
+
+  @override
+  String get documents_export_manifest_type => 'النوع';
+
+  @override
+  String get documents_export_manifest_kind => 'مصنف تحت (الفئة)';
+
+  @override
+  String get documents_export_manifest_filedUnder => 'مصنف تحت';
+
+  @override
+  String get documents_export_manifest_issuer => 'الجهة المصدرة';
+
+  @override
+  String get documents_export_manifest_reference => 'الرقم المرجعي';
+
+  @override
+  String get documents_export_manifest_issueDate => 'تاريخ الإصدار';
+
+  @override
+  String get documents_export_manifest_expiryDate => 'تاريخ الانتهاء';
+
+  @override
+  String get documents_export_manifest_notes => 'ملاحظات';
+
+  @override
+  String get documents_export_manifest_emergencyPhone => 'هاتف الطوارئ';
+
+  @override
+  String get documents_export_manifest_phone => 'الهاتف';
+
+  @override
+  String get documents_export_manifest_page => 'الصفحة';
+
+  @override
+  String get documents_export_manifest_side => 'الوجه';
+
+  @override
+  String get documents_export_manifest_path => 'المسار داخل ZIP';
+
+  @override
   String get documents_filter_all => 'الكل';
 
   @override
   String get documents_detail_owner => 'مُصنّف ضمن';
+
+  @override
+  String get documents_owner_pickerTitle => 'تصنيف ضمن';
+
+  @override
+  String get documents_owner_search => 'بحث';
+
+  @override
+  String get documents_owner_none => 'لا يوجد ما يُصنَّف ضمنه بعد';
+
+  @override
+  String get documents_owner_locked => 'تبقى البطاقة مع شهادتها';
 
   @override
   String get documents_profileHub_documents => 'المستندات';
@@ -24851,6 +25452,201 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String settings_data_syncTime_minutesAgo(Object count) {
     return 'منذ $countد';
+  }
+
+  @override
+  String get dataHealth_feature_backup => 'النسخ الاحتياطي';
+
+  @override
+  String get dataHealth_feature_sync => 'المزامنة';
+
+  @override
+  String get dataHealth_feature_libraries => 'المكتبات';
+
+  @override
+  String get dataHealth_feature_media => 'الوسائط';
+
+  @override
+  String get dataHealth_level_healthy => 'سليم';
+
+  @override
+  String get dataHealth_level_attention => 'يحتاج إلى انتباه';
+
+  @override
+  String get dataHealth_level_failing => 'متعطل';
+
+  @override
+  String get dataHealth_level_notSetUp => 'غير مُعد';
+
+  @override
+  String dataHealth_semantics(String feature, String status) {
+    return '$feature: $status';
+  }
+
+  @override
+  String get dataHealth_backup_autoOff =>
+      'موصى به: فعّل النسخ الاحتياطي التلقائي';
+
+  @override
+  String dataHealth_backup_failed(String when) {
+    return 'فشل آخر نسخ احتياطي: $when';
+  }
+
+  @override
+  String dataHealth_backup_overdue(String when) {
+    return 'النسخ الاحتياطي متأخر (آخر نسخة: $when)';
+  }
+
+  @override
+  String get dataHealth_backup_never => 'لا توجد نسخة احتياطية بعد';
+
+  @override
+  String get dataHealth_backup_cloudCopyMissing =>
+      'لم يصل آخر نسخ احتياطي إلى السحابة';
+
+  @override
+  String get dataHealth_backup_noOffDeviceCopy =>
+      'لا توجد نسخة خارج هذا الجهاز';
+
+  @override
+  String get dataHealth_sync_off => 'موصى به: فعّل المزامنة السحابية';
+
+  @override
+  String get dataHealth_sync_needsPassphrase =>
+      'المزامنة متوقفة مؤقتًا: أدخل عبارة المرور';
+
+  @override
+  String get dataHealth_sync_awaitingAdoption =>
+      'المزامنة متوقفة مؤقتًا: تم استبدال المكتبة السحابية';
+
+  @override
+  String get dataHealth_sync_signedOut =>
+      'المزامنة متوقفة مؤقتًا: سجّل الدخول مجددًا';
+
+  @override
+  String dataHealth_sync_failed(String when) {
+    return 'فشلت آخر مزامنة: $when';
+  }
+
+  @override
+  String dataHealth_sync_offline(String when) {
+    return 'غير متصل (آخر مزامنة: $when)';
+  }
+
+  @override
+  String dataHealth_sync_conflicts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count تعارض مزامنة بحاجة إلى حل',
+      many: '$count تعارضًا في المزامنة بحاجة إلى حل',
+      few: '$count تعارضات مزامنة بحاجة إلى حل',
+      two: 'تعارضا مزامنة بحاجة إلى حل',
+      one: '$count تعارض مزامنة بحاجة إلى حل',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataHealth_sync_peersHeld =>
+      'جهاز آخر يحتاج إلى انتباه قبل أن يتمكن من المزامنة';
+
+  @override
+  String get dataHealth_sync_autoOff => 'موصى به: فعّل المزامنة التلقائية';
+
+  @override
+  String get dataHealth_sync_neverSynced => 'لم تتم المزامنة بعد';
+
+  @override
+  String dataHealth_sync_rowSubtitle(String when) {
+    return 'تمت المزامنة: $when';
+  }
+
+  @override
+  String dataHealth_sync_rowSubtitleDevices(String when, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تمت المزامنة: $when · $count جهاز',
+      many: 'تمت المزامنة: $when · $count جهازًا',
+      few: 'تمت المزامنة: $when · $count أجهزة',
+      two: 'تمت المزامنة: $when · جهازان',
+      one: 'تمت المزامنة: $when · $count جهاز',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_failed(String name) {
+    return '$name: فشلت المزامنة';
+  }
+
+  @override
+  String dataHealth_libraries_failedMany(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تعذرت مزامنة $count مكتبة',
+      many: 'تعذرت مزامنة $count مكتبة',
+      few: 'تعذرت مزامنة $count مكتبات',
+      two: 'تعذرت مزامنة مكتبتين',
+      one: 'تعذرت مزامنة $count مكتبة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_editsHeld(String name) {
+    return '$name: تعديلاتك معلّقة';
+  }
+
+  @override
+  String get dataHealth_media_finishSetup => 'الصور: أكمل إعداد هذا الجهاز';
+
+  @override
+  String get dataHealth_media_transfersPaused =>
+      'عمليات نقل الصور متوقفة مؤقتًا';
+
+  @override
+  String dataHealth_facts_dives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
+      one: '$count غوصة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_sites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count موقع',
+      many: '$count موقعًا',
+      few: '$count مواقع',
+      two: 'موقعان',
+      one: '$count موقع',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_media(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صورة ومقطع فيديو',
+      many: '$count صورة ومقطع فيديو',
+      few: '$count صور ومقاطع فيديو',
+      two: 'صورتان أو مقطعا فيديو',
+      one: '$count صورة أو فيديو',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -25997,10 +26793,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_section_data_title => 'البيانات';
-
-  @override
-  String get settings_section_decompression_subtitle =>
-      'GF، مصادر البيانات والتخدير';
 
   @override
   String get settings_section_decompression_title => 'تخفيف الضغط';
@@ -27182,6 +27974,62 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get insights_gas_sacTrend_title => 'اتجاه استهلاك الغاز';
+
+  @override
+  String get insights_gas_tankConfig_title => 'تكوين الأسطوانات';
+
+  @override
+  String get insights_gas_tankConfig_subtitle =>
+      'الغوصات حسب طريقة حمل الأسطوانات';
+
+  @override
+  String get insights_gas_tankConfig_configurationHeading => 'التكوين';
+
+  @override
+  String get insights_gas_tankConfig_extrasHeading => 'إضافات';
+
+  @override
+  String get insights_gas_tankConfig_rebreather => 'جهاز إعادة تنفس';
+
+  @override
+  String get insights_gas_tankConfig_sidemount => 'تعليق جانبي';
+
+  @override
+  String get insights_gas_tankConfig_twinBackmount => 'أسطوانتان على الظهر';
+
+  @override
+  String get insights_gas_tankConfig_singleBackmount =>
+      'أسطوانة واحدة على الظهر';
+
+  @override
+  String get insights_gas_tankConfig_other => 'أخرى';
+
+  @override
+  String get insights_gas_tankConfig_noTanks => 'لا توجد أسطوانات مسجلة';
+
+  @override
+  String get insights_gas_tankConfig_stages => 'أسطوانات مرحلية';
+
+  @override
+  String get insights_gas_tankConfig_decoGas => 'غاز تخفيف الضغط';
+
+  @override
+  String get insights_gas_tankConfig_multiGas => 'غازات متعددة';
+
+  @override
+  String insights_gas_tankConfig_countAndPercent(int count, String percent) {
+    return '$count · $percent';
+  }
+
+  @override
+  String get insights_gas_tankConfig_note =>
+      'تُحتسب الأسطوانات المزدوجة المسجلة كأسطوانة واحدة عندما يدل الاسم على ذلك (twin، double، D12، 2x12) أو عندما تكون الأسطوانة أكبر من أي أسطوانة مفردة شائعة. عيّن تعليق جانبي أيسر وتعليق جانبي أيمن لأسطوانات الغوصة لتُحتسب كتعليق جانبي.';
+
+  @override
+  String get insights_gas_tankConfig_empty => 'لا توجد غوصات لعرضها';
+
+  @override
+  String get insights_gas_tankConfig_error => 'فشل تحميل تكوين الأسطوانات';
 
   @override
   String get insights_focus_title => 'تركيز الغطسات';
@@ -30031,6 +30879,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get transfer_export_csvTitle => 'تصدير CSV';
+
+  @override
+  String get transfer_export_documentsSubtitle =>
+      'جميع مستنداتك في ملف ZIP محمي بكلمة مرور';
+
+  @override
+  String get transfer_export_documentsTitle => 'المستندات';
 
   @override
   String get transfer_export_excelSubtitle =>
@@ -34985,6 +35840,9 @@ class AppLocalizationsAr extends AppLocalizations {
       'تم استبدال بيانات المصدر';
 
   @override
+  String get universalImport_label_timesCorrected => 'تم تصحيح أوقات الغطس';
+
+  @override
   String get universalImport_label_consolidated => 'مدمجة';
 
   @override
@@ -35659,6 +36517,18 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaStorage_verify_deferred =>
+      'لم يُحذف أي شيء: تنتظر عمليات الحذف حتى ينتهي هذا الجهاز من المزامنة.';
+
+  @override
+  String get settings_mediaStorage_verify_unregistered =>
+      'لم يُحذف أي شيء: أعد توصيل مخزن الوسائط ليعرف سجل الغوص هذا أي الملفات تخصه.';
+
+  @override
+  String get settings_mediaStorage_verify_uploads =>
+      'لم يُحذف أي شيء: تنتظر عمليات الحذف حتى تنتهي عمليات الرفع.';
+
+  @override
   String get settings_mediaStorage_backfill_action => 'رفع المكتبة الحالية';
 
   @override
@@ -36281,16 +37151,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_photosMedia_title => 'الصور والوسائط';
 
   @override
-  String get settings_photosMedia_subtitle => 'المصادر والتخزين والحسابات';
+  String get settings_photosMedia_subtitle => 'المصادر والتخزين';
 
   @override
   String get settings_photosMedia_sourcesHeader => 'من أين تأتي الصور';
 
   @override
   String get settings_photosMedia_storageHeader => 'أين تُحفظ النسخ';
-
-  @override
-  String get settings_photosMedia_accountsHeader => 'الحسابات';
 
   @override
   String get settings_photosMedia_displayHeader => 'العرض';
@@ -36317,7 +37184,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_connectedAccounts_subtitle =>
-      'تسجيلات الدخول للسحابة والخدمات';
+      'تسجيلات الدخول المستخدمة للمزامنة وتخزين الوسائط والمكتبات المشتركة';
 
   @override
   String get settings_connectedAccounts_empty => 'لا توجد حسابات متصلة بعد';
@@ -36386,6 +37253,51 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_connectedAccounts_loadError => 'تعذر تحميل الحسابات';
+
+  @override
+  String settings_connectedAccounts_usage_label(String uses) {
+    return 'يُستخدم لـ: $uses';
+  }
+
+  @override
+  String get settings_connectedAccounts_usage_none =>
+      'غير مستخدم على هذا الجهاز';
+
+  @override
+  String get settings_connectedAccounts_usage_databaseSync =>
+      'مزامنة قاعدة البيانات';
+
+  @override
+  String get settings_connectedAccounts_usage_mediaStorage => 'تخزين الوسائط';
+
+  @override
+  String settings_connectedAccounts_usage_sharedLibrary(String name) {
+    return 'مكتبة مواقع مشتركة: $name';
+  }
+
+  @override
+  String get settings_connectedAccounts_usage_lightroom => 'Lightroom';
+
+  @override
+  String get settings_connectedAccounts_signOutConfirmTitle =>
+      'تسجيل الخروج على هذا الجهاز؟';
+
+  @override
+  String settings_connectedAccounts_signOutConfirmBody(String account) {
+    return 'على هذا الجهاز، يُستخدم $account للميزات أدناه. ستتوقف عن العمل هنا حتى تسجّل الدخول مرة أخرى.';
+  }
+
+  @override
+  String get settings_connectedAccounts_removeConfirmUsedHere =>
+      'على هذا الجهاز يُستخدم للميزات أدناه، والتي ستتوقف عن العمل هنا:';
+
+  @override
+  String get settings_connectedAccounts_removeConfirmOtherDevices =>
+      'قد تستخدم أجهزة أخرى هذا الحساب أيضًا.';
+
+  @override
+  String get settings_connectedAccounts_usage_unknown =>
+      'تعذر التحقق مما يُستخدم له هذا الحساب على هذا الجهاز. قد يتوقف ما يستخدمه هنا عن العمل.';
 
   @override
   String get media_unavailablePlaceholder_volumeOffline =>
@@ -37199,6 +38111,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get safetySettings_noFlyPreset_strict => 'صارم (18/24/48 س)';
 
   @override
+  String safetyHub_reviewOn(int enabled, int total, String noFly) {
+    return 'مفعّل، $enabled من $total قاعدة، حظر الطيران $noFly';
+  }
+
+  @override
+  String safetyHub_reviewOff(String noFly) {
+    return 'متوقف، حظر الطيران $noFly';
+  }
+
+  @override
+  String get safetyHub_noFlyStandard => 'قياسي';
+
+  @override
+  String get safetyHub_noFlyStrict => 'صارم';
+
+  @override
+  String safetyHub_conditionOn(int enabled, int total) {
+    return 'مفعّل، $enabled من $total قاعدة';
+  }
+
+  @override
+  String get safetyHub_off => 'متوقف';
+
+  @override
   String get safetySettings_noFlyPreset_subtitle =>
       'فترات إرشادية بعد غطسة واحدة بلا توقفات، وغطسات متكررة، وغطسات بتخفيف الضغط';
 
@@ -37752,7 +38688,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_section_safety_subtitle =>
-      'قواعد المراجعة والطيران بعد الغوص';
+      'قواعد المراجعة وتخفيف الضغط والمعدات';
 
   @override
   String get settings_section_equipmentCondition_title => 'حالة المعدات';
@@ -38954,6 +39890,18 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String dataQuality_msg_tankInactive(String drop) {
     return 'فقدت هذه الأسطوانة $drop بينما يشير الخط الزمني للغاز إلى أنها لم تكن قيد الاستخدام';
+  }
+
+  @override
+  String get dataQuality_detector_transmitter_role => 'دور جهاز الإرسال';
+
+  @override
+  String dataQuality_msg_transmitterRoleBailout(
+    int tankNumber,
+    String role,
+    String ocDrop,
+  ) {
+    return 'الأسطوانة $tankNumber معلَّمة على أنها $role بناءً على اسم جهاز الإرسال، لكنها فقدت $ocDrop بعد التحويل إلى الدائرة المفتوحة ولم تفقد شيئًا تقريبًا على الدائرة المغلقة، لذا يبدو أنها أسطوانة غاز الطوارئ. لا يمكن بهذه الطريقة اكتشاف غاز طوارئ لم يُتنفَّس منه، أو استُخدم دون تبديل الغاز على الكمبيوتر.';
   }
 
   @override
@@ -46179,17 +47127,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get common_action_remove => 'إزالة';
 
   @override
-  String get equipment_documents_title => 'المستندات';
+  String get equipment_documents_linkedTitle => 'ملفات مرتبطة';
 
   @override
-  String get equipment_documents_subtitle =>
-      'الفواتير والإيصالات وأوراق الضمان';
-
-  @override
-  String get equipment_documents_attachButton => 'إرفاق';
-
-  @override
-  String get equipment_documents_empty => 'لا توجد مستندات مرفقة بعد';
+  String get equipment_documents_linkedSubtitle =>
+      'كبيرة جدًا، أو بتنسيق لا يمكن للمستندات حفظه';
 
   @override
   String get equipment_documents_removeTitle => 'إزالة المستند؟';
@@ -48220,6 +49162,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get startup_compacting => 'جارٍ تحسين التخزين...';
+
+  @override
   String get startup_error_title => 'تعذّر بدء تشغيل Submersion';
 
   @override
@@ -49671,6 +50616,35 @@ class AppLocalizationsAr extends AppLocalizations {
       'رمز صغير يوضح مصدر كل عنصر. تظهر شارات المشكلات دائما.';
 
   @override
+  String get settings_photosMedia_cacheHeader => 'التخزين المؤقت';
+
+  @override
+  String get settings_mediaCache_memory_title => 'ذاكرة الصور المؤقتة';
+
+  @override
+  String get settings_mediaCache_memory_subtitle =>
+      'الصور المفكوكة المحفوظة في الذاكرة للمعارض والعارض بملء الشاشة. يسري فورا وعلى هذا الجهاز فقط.';
+
+  @override
+  String get settings_mediaCache_disk_title =>
+      'التخزين المؤقت للصور المصغرة على القرص';
+
+  @override
+  String get settings_mediaCache_disk_subtitle =>
+      'الصور المصغرة المحفوظة على هذا الجهاز. لا تحتسب الملفات الأصلية والنسخ المضغوطة.';
+
+  @override
+  String get settings_mediaCache_disk_empty => 'إفراغ التخزين المؤقت';
+
+  @override
+  String get settings_mediaCache_disk_emptied =>
+      'تم إفراغ التخزين المؤقت للصور المصغرة';
+
+  @override
+  String get settings_mediaCache_disk_emptyFailed =>
+      'تعذر إفراغ التخزين المؤقت للصور المصغرة';
+
+  @override
   String get media_status_transferFailed => 'فشل الرفع';
 
   @override
@@ -50348,6 +51322,27 @@ class AppLocalizationsAr extends AppLocalizations {
       'قاعدة بيانات سجل الغوص';
 
   @override
+  String settings_storageUsage_reclaimable(String size) {
+    return '$size قابلة للاسترداد';
+  }
+
+  @override
+  String get settings_storageUsage_compact => 'ضغط';
+
+  @override
+  String get settings_storageUsage_compactTitle => 'ضغط قاعدة البيانات؟';
+
+  @override
+  String get settings_storageUsage_compactBody =>
+      'يتم التنفيذ عند التشغيل التالي لـ Submersion. قد يستغرق السجل الكبير دقيقة ويحتاج إلى مساحة خالية بحجم قاعدة البيانات تقريبًا.';
+
+  @override
+  String get settings_storageUsage_compactScheduled => 'مجدول للتشغيل التالي';
+
+  @override
+  String get settings_storageUsage_quitNow => 'إنهاء الآن';
+
+  @override
   String get settings_storageUsage_category_localCache =>
       'قاعدة بيانات التخزين المؤقت المحلي';
 
@@ -50396,6 +51391,91 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_storageUsage_category_importedFiles =>
       'ملفات الاستيراد الأصلية';
+
+  @override
+  String settings_storageUsage_totalSplit(String device, String cloud) {
+    return '$device على هذا الجهاز، $cloud في السحابة';
+  }
+
+  @override
+  String settings_storageUsage_reclaimTitle(String size) {
+    return 'يمكن استرداد نحو $size';
+  }
+
+  @override
+  String get settings_storageUsage_reclaimNothing =>
+      'لا يوجد ما يمكن استرداده الآن';
+
+  @override
+  String settings_storageUsage_reclaimLast(String size, String when) {
+    return 'آخر استرداد $size، $when';
+  }
+
+  @override
+  String settings_storageUsage_reclaimWaiting(String size) {
+    return 'سيصبح $size إضافية قابلة للاسترداد بعد فترة الانتظار الآمنة';
+  }
+
+  @override
+  String settings_storageUsage_reclaimWaitingSync(String size) {
+    return 'سيصبح $size إضافية قابلة للاسترداد بعد أن ينتهي هذا الجهاز من المزامنة';
+  }
+
+  @override
+  String settings_storageUsage_reclaimWaitingUnregistered(String size) {
+    return 'سيصبح $size إضافية قابلة للاسترداد بعد إعادة توصيل مخزن الوسائط';
+  }
+
+  @override
+  String settings_storageUsage_reclaimWaitingUploads(String size) {
+    return 'سيصبح $size إضافية قابلة للاسترداد بعد انتهاء عمليات الرفع';
+  }
+
+  @override
+  String get settings_storageUsage_reclaimAction => 'استرداد مساحة التخزين';
+
+  @override
+  String settings_storageUsage_reclaimDone(String size) {
+    return 'تم استرداد $size';
+  }
+
+  @override
+  String settings_storageUsage_reclaimDoneDeferred(String size) {
+    return 'تم استرداد $size. ينتظر تنظيف السحابة حتى ينتهي هذا الجهاز من المزامنة.';
+  }
+
+  @override
+  String settings_storageUsage_reclaimDoneUnregistered(String size) {
+    return 'تم استرداد $size. أعد توصيل مخزن الوسائط لتنظيف السحابة.';
+  }
+
+  @override
+  String settings_storageUsage_reclaimDoneUploads(String size) {
+    return 'تم استرداد $size. ينتظر تنظيف السحابة حتى تنتهي عمليات الرفع.';
+  }
+
+  @override
+  String get settings_storageUsage_group_cloud => 'في السحابة';
+
+  @override
+  String get settings_storageUsage_cloud_media => 'مخزن الوسائط';
+
+  @override
+  String get settings_storageUsage_cloud_sync => 'مزامنة قاعدة البيانات';
+
+  @override
+  String get settings_storageUsage_cloud_libraries => 'مكتبات المواقع المشتركة';
+
+  @override
+  String settings_storageUsage_cloud_scanned(String when) {
+    return 'تم الفحص $when';
+  }
+
+  @override
+  String get settings_storageUsage_cloud_notScanned => 'لم يتم الفحص بعد';
+
+  @override
+  String get settings_storageUsage_cloud_rescan => 'إعادة الفحص';
 
   @override
   String get profilePhoto_sheet_title => 'صورة الملف الشخصي';
@@ -50776,6 +51856,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get transmitters_field_label => 'التسمية';
 
   @override
+  String get transmitters_field_label_helper =>
+      'يصبح اسم الأسطوانة في الغطسة بمجرد مطابقة جهاز الإرسال هذا';
+
+  @override
   String get transmitters_field_serial => 'الرقم التسلسلي لجهاز الإرسال';
 
   @override
@@ -50792,13 +51876,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get transmitters_field_gear => 'أسطوانة من المعدات';
 
   @override
+  String get transmitters_field_gear_subtitle =>
+      'الأسطوانة التي يبلغ جهاز الإرسال هذا عن ضغطها';
+
+  @override
   String get transmitters_field_transmitterGear => 'جهاز إرسال من المعدات';
+
+  @override
+  String get transmitters_field_transmitterGear_subtitle =>
+      'تتبع البطارية/الصيانة، لا يُستخدم للمطابقة';
 
   @override
   String get transmitters_field_material => 'المادة';
 
   @override
   String get transmitters_gear_none => 'لا شيء';
+
+  @override
+  String get transmitters_hint_missingSize =>
+      'لا يوجد حجم أو ضغط مسجل لهذه الأسطوانة، لذا سيبقى الحجم فارغًا في الغطسة';
 
   @override
   String get transmitters_validation_key =>
@@ -50897,6 +51993,42 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return 'جهاز الإرسال $serial غير معيّن لأسطوانة';
+  }
+
+  @override
+  String get dataQuality_repairLabel_useAsBailout => 'استخدام كغاز طوارئ';
+
+  @override
+  String get dataQuality_useAsBailout_title => 'جعل هذه الأسطوانة غاز الطوارئ؟';
+
+  @override
+  String dataQuality_useAsBailout_merge(int tankNumber) {
+    return 'يزيل أسطوانة غاز الطوارئ المكررة (تنتقل تبديلات الغاز إلى الأسطوانة $tankNumber)';
+  }
+
+  @override
+  String dataQuality_useAsBailout_register(String role) {
+    return 'تسجيل جهاز الإرسال هذا أيضًا بدور $role';
+  }
+
+  @override
+  String dataQuality_useAsBailout_mixesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'احتفظت $count غطسة أخرى بمزيج الغاز الخاص بها. يُرجى التحقق منها.',
+      many: 'احتفظت $count غطسة أخرى بمزيج الغاز الخاص بها. يُرجى التحقق منها.',
+      few: 'احتفظت $count غطسات أخرى بمزيج الغاز الخاص بها. يُرجى التحقق منها.',
+      two: 'احتفظت غطستان أخريان بمزيج الغاز الخاص بهما. يُرجى التحقق منهما.',
+      one: 'احتفظت غطسة أخرى واحدة بمزيج الغاز الخاص بها. يُرجى التحقق منها.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataQuality_useAsBailout_registered(String role) {
+    return 'تم تسجيل جهاز الإرسال بدور $role. التراجع يغيّر هذه الغطسة فقط.';
   }
 
   @override

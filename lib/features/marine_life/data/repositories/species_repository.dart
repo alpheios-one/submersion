@@ -802,14 +802,21 @@ class SpeciesRepository {
   }
 
   /// Add expected species to a site
-  /// [stampLibrary] false is for the club library bridge, which applies a
+  /// [stampLibrary] false is for the shared site library bridge, which applies a
   /// pulled list whose clocks it writes itself (issue #2567).
   Future<domain.SiteSpeciesEntry> addExpectedSpecies({
     required String siteId,
     required String speciesId,
     String notes = '',
     bool stampLibrary = true,
+    String? actingDiverId,
   }) async {
+    // A library site [actingDiverId] may not edit (issue #2567); the bridge
+    // applying a pulled list does not stamp.
+    if (stampLibrary &&
+        !await _libraryStamper.mayEdit(siteId, actingDiverId: actingDiverId)) {
+      throw StateError('site $siteId is not this profile to edit');
+    }
     final id = _uuid.v4();
     final now = DateTime.now().millisecondsSinceEpoch;
 
@@ -830,7 +837,11 @@ class SpeciesRepository {
       recordId: id,
       localUpdatedAt: now,
     );
-    if (stampLibrary) await _libraryStamper.stamp(siteId, {'species'});
+    if (stampLibrary) {
+      await _libraryStamper.stamp(siteId, {
+        'species',
+      }, actingDiverId: actingDiverId);
+    }
     SyncEventBus.notifyLocalChange();
 
     final species = await getSpeciesById(speciesId);
@@ -851,7 +862,12 @@ class SpeciesRepository {
     String siteId,
     String speciesId, {
     bool stampLibrary = true,
+    String? actingDiverId,
   }) async {
+    if (stampLibrary &&
+        !await _libraryStamper.mayEdit(siteId, actingDiverId: actingDiverId)) {
+      return;
+    }
     final existing = await _db
         .customSelect(
           'SELECT id FROM site_species WHERE site_id = ? AND species_id = ?',
@@ -869,10 +885,19 @@ class SpeciesRepository {
         entityType: 'siteSpecies',
         recordId: id,
       );
-      if (stampLibrary) await _libraryStamper.stamp(siteId, {'species'});
+      if (stampLibrary) {
+        await _libraryStamper.stamp(siteId, {
+          'species',
+        }, actingDiverId: actingDiverId);
+      }
       SyncEventBus.notifyLocalChange();
     }
   }
+
+  /// Whether the profile [actingDiverId] may change [siteId]'s lists: a
+  /// shared library site only as its role there allows (issue #2567).
+  Future<bool> mayEditSite(String siteId, {String? actingDiverId}) =>
+      _libraryStamper.mayEdit(siteId, actingDiverId: actingDiverId);
 
   /// Remove all expected species from a site
   Future<void> removeAllExpectedSpeciesForSite(String siteId) async {

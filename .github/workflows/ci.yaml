@@ -112,6 +112,7 @@ jobs:
             [ -n "$f" ] || continue
             case "$f" in
               .github/flutter-version.txt) code=true ;;   # SDK bump affects all
+              .github/actions/setup-flutter/*) code=true ;; # SDK setup for every job
               .github/*) ;;                                # other CI/meta: inert
               *.md|docs/*|LICENSE*|.gitignore|.gitattributes|.editorconfig|codecov.yml|hooks/*) ;;
               *.png|*.jpg|*.jpeg|*.gif|*.svg|*.webp|*.ico) ;;
@@ -121,11 +122,12 @@ jobs:
             # package (Swift and its Dart channel), the secure-storage and
             # database-security code whose keychain fallback only macOS takes,
             # the two tests, the macOS runner project they are built into, and
-            # the Flutter SDK. An edit to the job in this file is not listed:
-            # use [full-ci] for that. The test files here must match the run
-            # loop in integration-test-macos.
+            # the Flutter SDK and the action that installs it. An edit to the
+            # job in this file is not listed: use [full-ci] for that. The test
+            # files here must match the run loop in integration-test-macos.
             case "$f" in
-              .github/flutter-version.txt|macos/*|packages/submersion_transcoder/*) macos_native=true ;;
+              .github/flutter-version.txt|.github/actions/setup-flutter/*) macos_native=true ;;
+              macos/*|packages/submersion_transcoder/*) macos_native=true ;;
               lib/core/services/secure_storage/*|lib/core/services/security/*) macos_native=true ;;
               integration_test/darwin_transcode_test.dart|integration_test/db_security_test.dart) macos_native=true ;;
             esac
@@ -182,7 +184,7 @@ jobs:
         id: flutter-ver
         run: echo "version=$(cat ${{ env.FLUTTER_VERSION_FILE }})" >> "$GITHUB_OUTPUT"
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/setup-flutter
         id: setup-flutter
         with:
           flutter-version: ${{ steps.flutter-ver.outputs.version }}
@@ -276,7 +278,7 @@ jobs:
         id: flutter-ver
         run: echo "version=$(cat ${{ env.FLUTTER_VERSION_FILE }})" >> "$GITHUB_OUTPUT"
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/setup-flutter
         id: setup-flutter
         with:
           flutter-version: ${{ steps.flutter-ver.outputs.version }}
@@ -378,7 +380,7 @@ jobs:
         id: flutter-ver
         run: echo "version=$(cat ${{ env.FLUTTER_VERSION_FILE }})" >> "$GITHUB_OUTPUT"
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/setup-flutter
         id: setup-flutter
         with:
           flutter-version: ${{ steps.flutter-ver.outputs.version }}
@@ -490,7 +492,7 @@ jobs:
         id: flutter-ver
         run: echo "version=$(cat ${{ env.FLUTTER_VERSION_FILE }})" >> "$GITHUB_OUTPUT"
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/setup-flutter
         id: setup-flutter
         with:
           flutter-version: ${{ steps.flutter-ver.outputs.version }}
@@ -595,6 +597,12 @@ jobs:
         # script-tests itself went ungated from 2026-06-24 to 2026-09-03.
         run: python3 scripts/check_ci_success_gate.py
 
+      - name: Check Flutter setup is retried
+        # Fails if a workflow calls subosito/flutter-action directly instead of
+        # ./.github/actions/setup-flutter, or if that action stops retrying. One
+        # stalled SDK download turned main red in run 36852093336 (#2765).
+        run: python3 scripts/check_flutter_setup_retried.py
+
       - name: Check JNI local-reference hygiene (source)
         # Source-level guard: no build artifact needed (unlike the APK/mapping
         # guards), so it runs here. Fails if a libdivecomputer JNI callback
@@ -615,10 +623,16 @@ jobs:
         # docs-only pull requests too.
         run: python3 scripts/check_docs_links.py
 
+      - name: Check Gemfiles are parseable by Dependabot
+        # Fails on an eval_gemfile call Dependabot cannot parse (a variable
+        # path, as `fastlane add_plugin` writes). That made every bundler
+        # version and security update fail, monthly and silently (#2766).
+        run: python3 scripts/check_dependabot_gemfiles.py
+
       - name: Run Python guard tests with coverage
         run: |
           mkdir -p coverage
-          guards='scripts/check_proguard_serial_keep.py,scripts/check_apk_signing_cert.py,scripts/check_native_libs_present.py,scripts/check_bundled_native_assets.py,scripts/check_jni_local_refs.py,scripts/check_dc_process_isolation.py,scripts/check_ci_success_gate.py,scripts/check_pr_issue_link.py,scripts/fix_macho_symbol_order.py,scripts/release/sanitize_apple_store_notes.py,scripts/bundle_tests.py,scripts/filter_trivial_coverage.py,scripts/beta_failure_alert.py,scripts/release/play_beta_cooldown.py,scripts/report_inherited_failures.py,scripts/export_support_matrix_catalog.py,scripts/check_no_skipped_tests.py,scripts/check_docs_links.py'
+          guards='scripts/check_proguard_serial_keep.py,scripts/check_apk_signing_cert.py,scripts/check_native_libs_present.py,scripts/check_bundled_native_assets.py,scripts/check_jni_local_refs.py,scripts/check_dc_process_isolation.py,scripts/check_ci_success_gate.py,scripts/check_flutter_setup_retried.py,scripts/check_pr_issue_link.py,scripts/fix_macho_symbol_order.py,scripts/release/sanitize_apple_store_notes.py,scripts/bundle_tests.py,scripts/filter_trivial_coverage.py,scripts/beta_failure_alert.py,scripts/release/play_beta_cooldown.py,scripts/report_inherited_failures.py,scripts/export_support_matrix_catalog.py,scripts/check_no_skipped_tests.py,scripts/check_docs_links.py,scripts/check_dependabot_gemfiles.py,scripts/dependabot_failure_alert.py'
           python3 -m coverage run --include="$guards" \
             scripts/check_proguard_serial_keep_test.py
           python3 -m coverage run --append --include="$guards" \
@@ -633,6 +647,8 @@ jobs:
             scripts/check_dc_process_isolation_test.py
           python3 -m coverage run --append --include="$guards" \
             scripts/check_ci_success_gate_test.py
+          python3 -m coverage run --append --include="$guards" \
+            scripts/check_flutter_setup_retried_test.py
           python3 -m coverage run --append --include="$guards" \
             scripts/check_pr_issue_link_test.py
           python3 -m coverage run --append --include="$guards" \
@@ -655,6 +671,10 @@ jobs:
             scripts/check_no_skipped_tests_test.py
           python3 -m coverage run --append --include="$guards" \
             scripts/check_docs_links_test.py
+          python3 -m coverage run --append --include="$guards" \
+            scripts/check_dependabot_gemfiles_test.py
+          python3 -m coverage run --append --include="$guards" \
+            scripts/dependabot_failure_alert_test.py
           python3 -m coverage report -m --include="$guards"
           python3 -m coverage xml --include="$guards" \
             -o coverage/scripts.xml
@@ -822,7 +842,7 @@ jobs:
         id: flutter-ver
         run: echo "version=$(cat ${{ env.FLUTTER_VERSION_FILE }})" >> "$GITHUB_OUTPUT"
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/setup-flutter
         id: setup-flutter
         with:
           flutter-version: ${{ steps.flutter-ver.outputs.version }}
@@ -954,7 +974,7 @@ jobs:
         with:
           xcode-version: 'latest-stable'
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/setup-flutter
         id: setup-flutter
         with:
           flutter-version: ${{ steps.flutter-ver.outputs.version }}
@@ -1036,7 +1056,7 @@ jobs:
         with:
           xcode-version: 'latest-stable'
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/setup-flutter
         id: setup-flutter
         with:
           flutter-version: ${{ steps.flutter-ver.outputs.version }}
@@ -1113,7 +1133,7 @@ jobs:
         with:
           xcode-version: 'latest-stable'
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/setup-flutter
         id: setup-flutter
         with:
           flutter-version: ${{ steps.flutter-ver.outputs.version }}
@@ -1240,7 +1260,7 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/setup-flutter
         id: setup-flutter
         with:
           flutter-version: ${{ steps.flutter-ver.outputs.version }}
@@ -1357,7 +1377,7 @@ jobs:
         id: flutter-ver
         run: echo "version=$(cat ${{ env.FLUTTER_VERSION_FILE }})" >> "$GITHUB_OUTPUT"
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/setup-flutter
         id: setup-flutter
         with:
           flutter-version: ${{ steps.flutter-ver.outputs.version }}
@@ -1453,26 +1473,41 @@ jobs:
       - name: Verify the packages install in clean containers
         run: |
           set -euo pipefail
-          # Images come from ECR Public's mirror of the Docker Official
-          # Images (same digests as Docker Hub), not from Docker Hub itself.
+          # Images come from mirrors of the Docker Official Images (the same
+          # images Docker Hub serves), tried in order until one answers.
           # Docker Hub limits anonymous pulls per IP, GitHub-hosted runners
           # share IPs, and the limit failed this step before any package was
-          # tested (issue #3139). The repository has no Docker Hub token, and
-          # fork PRs could not read one anyway. ECR Public's own anonymous
-          # limit is per second, which the retry below absorbs.
-          MIRROR=public.ecr.aws/docker/library
+          # tested (issue #3139). The repository has no registry token, and
+          # fork PRs could not read one anyway. ECR Public, tried first, has
+          # a per-second limit that the retry absorbs, but also a cap on the
+          # data an anonymous client pulls, which no retry recovers from
+          # (issue #3424). mirror.gcr.io, Google's cache of Docker Hub, comes
+          # next, and Docker Hub itself last.
+          REGISTRIES=(
+            public.ecr.aws/docker/library
+            mirror.gcr.io/library
+            docker.io/library
+          )
           UBUNTU_TAG="ubuntu:$(. /etc/os-release && echo "$VERSION_ID")"
           echo "runner is $UBUNTU_TAG"
-          # Retries with backoff (10s, 20s, 40s) so a transient registry
-          # error does not fail the step.
+          # Sets PULLED to the first registry's reference that pulls. Each
+          # registry gets three tries with backoff (10s, 20s) so a transient
+          # error does not skip it.
           pull() {
-            local attempt
-            for attempt in 1 2 3 4; do
-              docker pull --quiet "$1" && return 0
-              if [ "$attempt" -lt 4 ]; then
-                echo "pull of $1 failed (attempt $attempt), retrying in $((10 << (attempt - 1)))s"
-                sleep $((10 << (attempt - 1)))
-              fi
+            local registry attempt
+            PULLED=
+            for registry in "${REGISTRIES[@]}"; do
+              for attempt in 1 2 3; do
+                if docker pull --quiet "$registry/$1"; then
+                  PULLED="$registry/$1"
+                  return 0
+                fi
+                if [ "$attempt" -lt 3 ]; then
+                  echo "pull of $registry/$1 failed (attempt $attempt), retrying in $((10 << (attempt - 1)))s"
+                  sleep $((10 << (attempt - 1)))
+                fi
+              done
+              echo "giving up on $registry for $1"
             done
             return 1
           }
@@ -1482,17 +1517,17 @@ jobs:
           # pull failure is reported as such rather than as a broken package,
           # and `--pull=never` keeps `docker run` from pulling a second time.
           failed=()
-          for image in "$MIRROR/$UBUNTU_TAG" "$MIRROR/fedora:latest"; do
+          for image in "$UBUNTU_TAG" fedora:latest; do
             echo "=== $image ==="
             if ! pull "$image"; then
-              failed+=("$image (could not pull)")
+              failed+=("$image (no registry could serve it)")
               continue
             fi
             if ! docker run --rm --pull=never \
               -v "$PWD/packages:/p" \
               -v "$PWD/scripts/release/verify_linux_package.sh:/verify.sh:ro" \
-              "$image" bash /verify.sh; then
-              failed+=("$image")
+              "$PULLED" bash /verify.sh; then
+              failed+=("$PULLED")
             fi
           done
           if [ "${#failed[@]}" -gt 0 ]; then
@@ -1528,7 +1563,7 @@ jobs:
         shell: bash
         run: echo "version=$(cat ${{ env.FLUTTER_VERSION_FILE }})" >> "$GITHUB_OUTPUT"
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/setup-flutter
         id: setup-flutter
         with:
           flutter-version: ${{ steps.flutter-ver.outputs.version }}

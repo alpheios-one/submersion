@@ -32,6 +32,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/dive_log/presentation/navigation/open_dive_list.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
+import 'package:submersion/features/trips/presentation/navigation/open_trip_list.dart';
 import 'package:collection/collection.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_attribute_catalog.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_colors.dart';
@@ -272,14 +273,10 @@ class _EquipmentDetailContent extends ConsumerWidget {
             const SizedBox(height: 24),
             UnitConfigurationsCard(equipmentId: equipmentId),
           ],
-          const SizedBox(height: 24),
+          // Brings its own top gap: it hides itself once every linked file
+          // has moved into Documents.
           EquipmentDocumentsSection(
             equipmentId: equipmentId,
-            onAttachPressed: () => DocumentOpenHelper.pickAndAttach(
-              context: context,
-              ref: ref,
-              equipmentId: equipmentId,
-            ),
             onOpenDocument: (item) =>
                 DocumentOpenHelper.open(context, ref, item),
           ),
@@ -653,9 +650,11 @@ class _EquipmentDetailContent extends ConsumerWidget {
                 child: InkWell(
                   onTap: count > 0
                       ? () {
-                          ref.read(tripFilterProvider.notifier).state =
-                              TripFilterState(equipmentId: equipmentId);
-                          context.go('/trips');
+                          openTripList(
+                            context,
+                            ref,
+                            TripFilterState(equipmentId: equipmentId),
+                          );
                         }
                       : null,
                   borderRadius: BorderRadius.circular(8),

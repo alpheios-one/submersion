@@ -37,16 +37,16 @@ void main() {
   setUp(() async {
     await setUpTestDatabase();
     cloud = FakeCloudStorageProvider();
-    t = SharedLibraryTransport(cloud, prefix: 'club');
+    t = SharedLibraryTransport(cloud, prefix: 'site-sync');
     await _diver('reader');
     await _diver('owner');
     final store = SharedLibraryStore();
     await store.upsertLibrary(
       const SharedLibrary(
         id: 'L',
-        name: 'Club',
+        name: 'Reef Survey',
         connectedAccountId: 'acc',
-        prefix: 'club',
+        prefix: 'site-sync',
         roles: SharedLibraryRoles(owners: {'o'}),
       ),
     );
@@ -57,7 +57,7 @@ void main() {
         libraryId: 'L',
         memberId: 'r',
         displayName: 'Ray',
-        libraryName: 'Club',
+        libraryName: 'Reef Survey',
         backendKind: 's3',
       ),
     );
@@ -68,7 +68,7 @@ void main() {
         libraryId: 'L',
         memberId: 'o',
         displayName: 'Olga',
-        libraryName: 'Club',
+        libraryName: 'Reef Survey',
         backendKind: 's3',
       ),
     );
@@ -91,11 +91,15 @@ void main() {
     () async {
       final site = (await SiteRepository().getSiteById('s'))!;
       final s = await service.propose(
-        proposed: site.copyWith(hazards: 'new', notes: 'n'),
+        proposed: site.copyWith(
+          hazards: 'new',
+          parkingInfo: 'n',
+          notes: 'mine',
+        ),
         diverId: 'reader',
         note: 'please',
       );
-      expect(s!.fields, {'hazards': 'new', 'notes': 'n'});
+      expect(s!.fields, {'hazards': 'new', 'parkingInfo': 'n'});
       expect(s.direction, SharedSiteSuggestion.outgoing);
       expect(s.status, SharedSiteSuggestion.pending);
       expect(s.memberId, 'r');
@@ -125,57 +129,82 @@ void main() {
   test('withdraw removes a pending outgoing suggestion', () async {
     final site = (await SiteRepository().getSiteById('s'))!;
     final s = await service.propose(
-      proposed: site.copyWith(notes: 'x'),
+      proposed: site.copyWith(parkingInfo: 'x'),
       diverId: 'reader',
     );
     await service.withdraw(s!.id);
     expect(await SharedLibraryStore().suggestions('L'), isEmpty);
   });
 
-  test(
-    'accept applies with the suggester as editor and removes the file',
-    () async {
-      await t.writeSuggestion(
-        'g1',
-        _incoming('g1', {'hazards': 'new'}).toJson(),
-      );
-      await SharedLibraryStore().putSuggestion(
-        _incoming('g1', {'hazards': 'new'}),
-      );
-      final diff = await service.diff(
-        (await SharedLibraryStore().suggestions('L')).single,
-      );
-      expect(diff['hazards'], ('old', 'new'));
-      await service.accept('g1', diverId: 'owner');
-      expect((await SiteRepository().getSiteById('s'))!.hazards, 'new');
-      final state = (await SharedLibraryStore().getSiteState('s'))!;
-      expect(state.clocks['hazards']!.memberId, 'r');
-      expect(state.lastEditorMemberId, 'r');
-      expect(state.dirty, isTrue);
-      expect(await t.listSuggestions(), isEmpty);
-      expect(await SharedLibraryStore().suggestions('L'), isEmpty);
-    },
-  );
+  test("accept never touches the owner's private notes or rating", () async {
+    final site = (await SiteRepository().getSiteById('s'))!;
+    await SiteRepository().updateSite(
+      site.copyWith(notes: 'mine', rating: 4),
+      actingDiverId: 'owner',
+    );
+    // From an older or altered build: private fields in the suggestion.
+    final s = _incoming('g9', {
+      'hazards': 'new',
+      'notes': 'theirs',
+      'rating': 1,
+    });
+    await t.writeSuggestion('g9', s.toJson());
+    await SharedLibraryStore().putSuggestion(s);
+    await service.accept('g9', diverId: 'owner');
+    final after = (await SiteRepository().getSiteById('s'))!;
+    expect(after.hazards, 'new');
+    expect(after.notes, 'mine');
+    expect(after.rating, 4);
+    final state = (await SharedLibraryStore().getSiteState('s'))!;
+    expect(state.clocks.keys, isNot(contains('notes')));
+  });
+
+  test('accept applies as the accepting owner and removes the file', () async {
+    await t.writeSuggestion('g1', _incoming('g1', {'hazards': 'new'}).toJson());
+    await SharedLibraryStore().putSuggestion(
+      _incoming('g1', {'hazards': 'new'}),
+    );
+    final diff = await service.diff(
+      (await SharedLibraryStore().suggestions('L')).single,
+    );
+    expect(diff['hazards'], ('old', 'new'));
+    await service.accept('g1', diverId: 'owner');
+    expect((await SiteRepository().getSiteById('s'))!.hazards, 'new');
+    final state = (await SharedLibraryStore().getSiteState('s'))!;
+    // Signed by the owner who accepted: only a key on this device can
+    // sign, and the suggester's is not.
+    expect(state.clocks['hazards']!.memberId, 'o');
+    expect(state.lastEditorMemberId, 'o');
+    expect(state.dirty, isTrue);
+    expect(await t.listSuggestions(), isEmpty);
+    expect(await SharedLibraryStore().suggestions('L'), isEmpty);
+  });
 
   test(
     'dismiss drops the file and the row; a vanished file is tolerated',
     () async {
-      await SharedLibraryStore().putSuggestion(_incoming('g2', {'notes': 'x'}));
+      await SharedLibraryStore().putSuggestion(
+        _incoming('g2', {'parkingInfo': 'x'}),
+      );
       await service.dismiss('g2', diverId: 'owner');
       expect(await SharedLibraryStore().suggestions('L'), isEmpty);
-      expect((await SiteRepository().getSiteById('s'))!.notes, '');
+      expect((await SiteRepository().getSiteById('s'))!.parkingInfo, isNull);
     },
   );
 
   test('a reader may neither accept nor dismiss', () async {
-    await SharedLibraryStore().putSuggestion(_incoming('g4', {'notes': 'x'}));
+    await SharedLibraryStore().putSuggestion(
+      _incoming('g4', {'parkingInfo': 'x'}),
+    );
     expect(() => service.accept('g4', diverId: 'reader'), throwsStateError);
     expect(() => service.dismiss('g4', diverId: 'reader'), throwsStateError);
     expect(await SharedLibraryStore().suggestions('L'), hasLength(1));
   });
 
   test('accept of a suggestion whose site is gone only dismisses', () async {
-    await SharedLibraryStore().putSuggestion(_incoming('g3', {'notes': 'x'}));
+    await SharedLibraryStore().putSuggestion(
+      _incoming('g3', {'parkingInfo': 'x'}),
+    );
     await SiteRepository().deleteSite('s');
     await service.accept('g3', diverId: 'owner');
     expect(await SharedLibraryStore().suggestions('L'), isEmpty);
@@ -183,7 +212,11 @@ void main() {
 
   test('an accept whose remote delete fails is not re-imported, and the '
       'next sync finishes the delete', () async {
-    await t.writeManifest({'id': 'L', 'name': 'Club', 'formatVersion': 1});
+    await t.writeManifest({
+      'id': 'L',
+      'name': 'Reef Survey',
+      'formatVersion': 2,
+    });
     await t.writeRoles(const SharedLibraryRoles(owners: {'o'}));
     await t.writeSuggestion('g9', _incoming('g9', {'hazards': 'new'}).toJson());
     await SharedLibraryStore().putSuggestion(

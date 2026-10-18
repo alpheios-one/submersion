@@ -411,14 +411,14 @@ void main() {
     () async {
       // Read-only credentials: the server refuses MKCOL with 403 even for a
       // collection that is there.
-      server.seedCollection('/dav/club');
+      server.seedCollection('/dav/site-sync');
       final readOnly = WebDavClient(
         _config(),
         httpClient: _RefuseMkcol(server.client),
         backoff: (_) => Duration.zero,
       );
       addTearDown(readOnly.close);
-      await readOnly.ensureCollection('club');
+      await readOnly.ensureCollection('site-sync');
       await expectLater(
         readOnly.ensureCollection('missing'),
         throwsA(

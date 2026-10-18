@@ -21,6 +21,7 @@ import 'package:submersion/core/services/sync/device_local_fields.dart';
 import 'package:submersion/core/services/sync/legacy_wire_keys.dart';
 import 'package:submersion/core/services/sync/sync_fact_groups.dart';
 import 'package:submersion/core/services/sync/sync_record_overlay.dart';
+import 'package:submersion/core/services/sync/view_config_merge.dart';
 import 'package:submersion/core/services/sync/changeset_log/sync_temp_dir.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
@@ -373,8 +374,12 @@ class SyncData {
   final List<Map<String, dynamic>> equipmentLocationMoves;
   final List<Map<String, dynamic>> diveComputerConnections;
 
-  /// Club-library memberships per profile (v289, issue #2567).
+  /// Shared site library memberships per profile (v289, issue #2567).
   final List<Map<String, dynamic>> sharedLibraryMemberships;
+
+  /// A profile's private notes on shared site library sites (v289, issue
+  /// #2567).
+  final List<Map<String, dynamic>> librarySiteNotes;
   final List<Map<String, dynamic>> mediaSpecies;
   final List<Map<String, dynamic>> siteFeatures;
   final List<Map<String, dynamic>> csvPresets;
@@ -495,6 +500,7 @@ class SyncData {
     this.equipmentLocationMoves = const [],
     this.diveComputerConnections = const [],
     this.sharedLibraryMemberships = const [],
+    this.librarySiteNotes = const [],
     this.mediaSpecies = const [],
     this.siteFeatures = const [],
     this.csvPresets = const [],
@@ -614,6 +620,7 @@ class SyncData {
     'equipmentLocationMoves': equipmentLocationMoves,
     'diveComputerConnections': diveComputerConnections,
     'sharedLibraryMemberships': sharedLibraryMemberships,
+    'librarySiteNotes': librarySiteNotes,
     'mediaSpecies': mediaSpecies,
     'siteFeatures': siteFeatures,
     'csvPresets': csvPresets,
@@ -748,6 +755,7 @@ class SyncData {
       equipmentLocationMoves: _parseList(json['equipmentLocationMoves']),
       diveComputerConnections: _parseList(json['diveComputerConnections']),
       sharedLibraryMemberships: _parseList(json['sharedLibraryMemberships']),
+      librarySiteNotes: _parseList(json['librarySiteNotes']),
       mediaSpecies: _parseList(json['mediaSpecies']),
       siteFeatures: _parseList(json['siteFeatures']),
       csvPresets: _parseList(json['csvPresets']),
@@ -1344,6 +1352,12 @@ class SyncDataSerializer {
     (
       key: 'sharedLibraryMemberships',
       table: _db.sharedLibraryMemberships,
+      blob: false,
+      full: null,
+    ),
+    (
+      key: 'librarySiteNotes',
+      table: _db.librarySiteNotes,
       blob: false,
       full: null,
     ),
@@ -2674,6 +2688,10 @@ class SyncDataSerializer {
         'sharedLibraryMemberships',
         () => _exportSharedLibraryMemberships(hlcSince),
       ),
+      librarySiteNotes: await _safeExport(
+        'librarySiteNotes',
+        () => _exportLibrarySiteNotes(hlcSince),
+      ),
       siteTypes: await _safeExport(
         'siteTypes',
         () => _exportSiteTypes(hlcSince),
@@ -3356,6 +3374,11 @@ class SyncDataSerializer {
           _db.sharedLibraryMemberships,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
+      case 'librarySiteNotes':
+        final row = await (_db.select(
+          _db.librarySiteNotes,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
       case 'transmitters':
         final row = await (_db.select(
           _db.transmitters,
@@ -3825,6 +3848,11 @@ class SyncDataSerializer {
       case 'sharedLibraryMemberships':
         final rows = await (_db.select(
           _db.sharedLibraryMemberships,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
+      case 'librarySiteNotes':
+        final rows = await (_db.select(
+          _db.librarySiteNotes,
         )..where((t) => t.id.isIn(idList))).get();
         return {for (final r in rows) r.id: r.toJson()};
       case 'transmitters':
@@ -5192,6 +5220,15 @@ class SyncDataSerializer {
               ).toCompanion(false),
             );
         return;
+      case 'librarySiteNotes':
+        await _db
+            .into(_db.librarySiteNotes)
+            .insertOnConflictUpdate(
+              LibrarySiteNoteRow.fromJson(
+                _withTimestampDefaults(data),
+              ).toCompanion(false),
+            );
+        return;
       case 'transmitters':
         await _db
             .into(_db.transmitters)
@@ -5372,13 +5409,11 @@ class SyncDataSerializer {
             );
         return;
       case 'viewConfigs':
-        await _db
-            .into(_db.viewConfigs)
-            .insertOnConflictUpdate(
-              ViewConfig.fromJson(
-                _withTimestampDefaults(data),
-              ).toCompanion(false),
-            );
+        await applyViewConfigRecord(
+          _db,
+          ViewConfig.fromJson(_withTimestampDefaults(data)),
+          syncRepository: _syncRepository,
+        );
         return;
       case 'fieldPresets':
         await _db
@@ -6656,6 +6691,20 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'librarySiteNotes':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.librarySiteNotes,
+            records
+                .map(
+                  (r) => LibrarySiteNoteRow.fromJson(
+                    _withTimestampDefaults(r),
+                  ).toCompanion(false),
+                )
+                .toList(),
+          ),
+        );
+        return;
       case 'transmitters':
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
@@ -6916,18 +6965,16 @@ class SyncDataSerializer {
         );
         return;
       case 'viewConfigs':
-        await _db.batch(
-          (b) => b.insertAllOnConflictUpdate(
-            _db.viewConfigs,
-            records
-                .map(
-                  (r) => ViewConfig.fromJson(
-                    _withTimestampDefaults(r),
-                  ).toCompanion(false),
-                )
-                .toList(),
-          ),
-        );
+        // One at a time rather than one batch: a peer's row may need merging
+        // with a rival this device holds for the same view (issue #3343).
+        // A diver has a handful of these rows, so the batch saved nothing.
+        for (final r in records) {
+          await applyViewConfigRecord(
+            _db,
+            ViewConfig.fromJson(_withTimestampDefaults(r)),
+            syncRepository: _syncRepository,
+          );
+        }
         return;
       case 'fieldPresets':
         await _db.batch(
@@ -7196,6 +7243,8 @@ class SyncDataSerializer {
           _db.sharedLibraryMemberships,
           _db.sharedLibraryMemberships.id,
         );
+      case 'librarySiteNotes':
+        return plain(_db.librarySiteNotes, _db.librarySiteNotes.id);
       case 'transmitters':
         return plain(_db.transmitters, _db.transmitters.id);
       case 'cylinderFills':
@@ -7658,6 +7707,8 @@ class SyncDataSerializer {
         return _db.diveComputerConnections;
       case 'sharedLibraryMemberships':
         return _db.sharedLibraryMemberships;
+      case 'librarySiteNotes':
+        return _db.librarySiteNotes;
       case 'transmitters':
         return _db.transmitters;
       case 'cylinderFills':
@@ -8251,6 +8302,11 @@ class SyncDataSerializer {
           _db.sharedLibraryMemberships,
         )..where((t) => t.id.equals(recordId))).go();
         return;
+      case 'librarySiteNotes':
+        await (_db.delete(
+          _db.librarySiteNotes,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
       case 'transmitters':
         await (_db.delete(
           _db.transmitters,
@@ -8539,7 +8595,7 @@ class SyncDataSerializer {
   }
 
   /// Child entities of `dive_sites` whose rows follow the site out of the
-  /// personal sync when the site belongs to a club library (issue #2567).
+  /// personal sync when the site belongs to a shared site library (issue #2567).
   /// `siteHides` is not one: a hide is the profile's own preference and
   /// syncs to its other devices; the parent gate drops it on a device that
   /// holds no copy of the site.
@@ -8550,7 +8606,7 @@ class SyncDataSerializer {
     'siteFeatures',
   };
 
-  /// Ids of sites that belong to a club library (issue #2567): outside the
+  /// Ids of sites that belong to a shared site library (issue #2567): outside the
   /// personal sync in both directions.
   Future<Set<String>> librarySiteIds() async {
     final memo = _librarySiteIdsMemo;
@@ -9533,11 +9589,24 @@ class SyncDataSerializer {
         .toList();
   }
 
-  /// Club-library memberships (v289, issue #2567), incremental by hlc.
+  /// Shared site library memberships (v289, issue #2567), incremental by hlc.
   Future<List<Map<String, dynamic>>> _exportSharedLibraryMemberships(
     String? hlcSince,
   ) async {
     final query = _db.select(_db.sharedLibraryMemberships);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
+  /// Private notes on shared site library sites (v289, issue #2567),
+  /// incremental by hlc.
+  Future<List<Map<String, dynamic>>> _exportLibrarySiteNotes(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.librarySiteNotes);
     if (hlcSince != null) {
       query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
     }

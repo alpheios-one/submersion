@@ -50,7 +50,7 @@ void main() {
         'hazards': 'current',
         'entryMethod': 'shore',
         'siteTypes': ['Reef'],
-        'tags': ['Club'],
+        'tags': ['Reef Survey'],
         'species': [
           {'name': 'Grouper', 'scientificName': 'Epinephelus'},
         ],
@@ -89,7 +89,7 @@ void main() {
       (await SiteClassificationRepository().getTagsForSite(
         's1',
       )).map((t) => t.name),
-      ['Club'],
+      ['Reef Survey'],
     );
     final features = await SiteFeatureRepository().getFeaturesForSite('s1');
     expect(features.single.id, 'f1');
@@ -212,5 +212,33 @@ void main() {
         .customSelect("SELECT 1 FROM sync_records WHERE id = 'diveSites_s5'")
         .get();
     expect(pending, isEmpty);
+  });
+
+  test('a library site keeps its own notes and rating', () async {
+    await SiteRepository().createSite(
+      const DiveSite(
+        id: 'p1',
+        name: 'A',
+        notes: 'mine',
+        rating: 4,
+        sharedLibraryId: 'L',
+      ),
+    );
+    final doc = await bridge.build(
+      'p1',
+      const SharedSiteState(siteId: 'p1', libraryId: 'L'),
+    );
+    expect(doc.fields.containsKey('notes'), isFalse);
+    expect(doc.fields.containsKey('rating'), isFalse);
+    await bridge.apply(
+      doc.copyWith(fields: {...doc.fields, 'name': 'B'}),
+      libraryId: 'L',
+      vocabularyDiverId: 'd1',
+      fields: {'name'},
+    );
+    final site = (await SiteRepository().getSiteById('p1'))!;
+    expect(site.name, 'B');
+    expect(site.notes, 'mine');
+    expect(site.rating, 4);
   });
 }

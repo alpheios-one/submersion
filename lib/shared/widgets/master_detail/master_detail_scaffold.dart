@@ -8,6 +8,7 @@ import 'package:submersion/core/router/section_navigation.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
 import 'package:submersion/shared/widgets/master_detail/master_detail_form_scope.dart';
+import 'package:submersion/shared/widgets/master_detail/master_detail_route_scope.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 
 /// Width of the master (list) pane in a split view.
@@ -201,16 +202,35 @@ class _MasterDetailScaffoldState extends ConsumerState<MasterDetailScaffold> {
   /// when a new detail is built. See [DetailScrollRetainer].
   double _detailScrollOffset = 0;
 
-  /// Get the currently selected item ID from URL query params
-  String? get _selectedId {
-    final state = GoRouterState.of(context);
-    return state.uri.queryParameters[widget.queryParamKey];
+  /// The query this scaffold last read at its own address, under a
+  /// [MasterDetailRouteScope]; see [_query].
+  Map<String, String> _scopedQuery = const {};
+
+  /// The URL's query parameters, or under a [MasterDetailRouteScope] whose
+  /// path is not the current one, the ones last read at that path. A hidden
+  /// tab then keeps its own selection rather than reading the other tab's.
+  Map<String, String> get _query {
+    final uri = GoRouterState.of(context).uri;
+    final scopePath = MasterDetailRouteScope.pathOf(context);
+    if (scopePath == null) return uri.queryParameters;
+    if (uri.path == scopePath) _scopedQuery = uri.queryParameters;
+    return _scopedQuery;
   }
+
+  /// The list address this scaffold's URL changes go to: its
+  /// [MasterDetailRouteScope]'s path, or the current one. Under a scope, a
+  /// save that lands after the diver switched tabs returns to its own tab
+  /// instead of writing its id into the other tab's address.
+  String get _ownPath =>
+      MasterDetailRouteScope.pathOf(context) ??
+      GoRouterState.of(context).uri.path;
+
+  /// Get the currently selected item ID from URL query params
+  String? get _selectedId => _query[widget.queryParamKey];
 
   /// Get the current mode from URL query params
   DetailPaneMode get _mode {
-    final state = GoRouterState.of(context);
-    final modeParam = state.uri.queryParameters['mode'];
+    final modeParam = _query['mode'];
     switch (modeParam) {
       case 'edit':
         return DetailPaneMode.edit;
@@ -222,10 +242,7 @@ class _MasterDetailScaffoldState extends ConsumerState<MasterDetailScaffold> {
   }
 
   /// Check if map view is active from URL query params
-  bool get _isMapView {
-    final state = GoRouterState.of(context);
-    return state.uri.queryParameters['view'] == 'map';
-  }
+  bool get _isMapView => _query['view'] == 'map';
 
   /// Navigate to view mode for an item
   ///
@@ -233,8 +250,7 @@ class _MasterDetailScaffoldState extends ConsumerState<MasterDetailScaffold> {
   /// (a site's dives, say) replaces its own URL and keeps the page it was
   /// opened from, where go() would erase it and the back arrow (#3292).
   void _onItemSelected(String? itemId) {
-    final state = GoRouterState.of(context);
-    final currentPath = state.uri.path;
+    final currentPath = _ownPath;
 
     if (ResponsiveBreakpoints.isMasterDetail(context)) {
       // Desktop: Update URL with query param, preserving map view state
@@ -278,8 +294,7 @@ class _MasterDetailScaffoldState extends ConsumerState<MasterDetailScaffold> {
 
   /// Navigate to create mode
   void _onCreate() {
-    final state = GoRouterState.of(context);
-    final currentPath = state.uri.path;
+    final currentPath = _ownPath;
 
     if (ResponsiveBreakpoints.isMasterDetail(context) &&
         widget.createBuilder != null) {
@@ -293,16 +308,14 @@ class _MasterDetailScaffoldState extends ConsumerState<MasterDetailScaffold> {
 
   /// Handle save from edit/create mode - go back to view mode
   void _onSaved(String savedId) {
-    final state = GoRouterState.of(context);
-    final currentPath = state.uri.path;
+    final currentPath = _ownPath;
     final key = widget.queryParamKey;
     context.goInPlace('$currentPath?$key=$savedId');
   }
 
   /// Handle cancel from edit/create mode - go back to previous state
   void _onCancel() {
-    final state = GoRouterState.of(context);
-    final currentPath = state.uri.path;
+    final currentPath = _ownPath;
     final selectedId = _selectedId;
 
     if (selectedId != null) {

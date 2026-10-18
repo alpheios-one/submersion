@@ -4,7 +4,12 @@ import 'package:submersion/core/services/accounts/account_kind.dart';
 import 'package:submersion/core/services/accounts/account_provider_adapter.dart';
 import 'package:submersion/core/services/accounts/connected_account.dart';
 import 'package:submersion/core/providers/account_providers.dart';
+import 'package:submersion/core/services/shared_library/backup/library_backup_record.dart';
+import 'package:submersion/core/services/shared_library/backup/library_backup_service.dart';
+import 'package:submersion/core/services/shared_library/backup/library_restore_service.dart';
 import 'package:submersion/core/services/shared_library/library_account_setup.dart';
+import 'package:submersion/core/services/shared_library/library_edit_stamper.dart';
+import 'package:submersion/core/services/shared_library/library_encryption_service.dart';
 import 'package:submersion/core/services/shared_library/shared_library_models.dart';
 import 'package:submersion/core/services/shared_library/shared_library_membership_service.dart';
 import 'package:submersion/core/services/shared_library/shared_library_service.dart';
@@ -13,9 +18,10 @@ import 'package:submersion/core/services/shared_library/shared_library_transport
 import 'package:submersion/core/services/shared_library/shared_site_publisher.dart';
 import 'package:submersion/core/services/shared_library/site_detacher.dart';
 import 'package:submersion/core/services/shared_library/suggestion_service.dart';
+import 'package:submersion/features/backup/data/services/backup_service.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 
-/// The device-local store for club libraries (issue #2567).
+/// The device-local store for shared site libraries (issue #2567).
 final sharedLibraryStoreProvider = Provider<SharedLibraryStore>(
   (ref) => SharedLibraryStore(),
 );
@@ -80,11 +86,27 @@ final libraryRoleProvider = FutureProvider.family<SharedLibraryRole, String>((
     if (l.id == libraryId) {
       return effectiveRole(
         listed: l.roles.roleOf(membership.memberId),
-        readOnlyDetected: l.readOnlyDetected,
+        // Writes held by roles this device refused count as read-only;
+        // a reset waiting for an answer is asked for on the library page.
+        readOnlyDetected: l.readOnlyDetected || l.rolesRejected,
       );
     }
   }
   return SharedLibraryRole.reader;
+});
+
+/// Whether the active profile may change [siteId]: always a personal site;
+/// a shared library site as its role there allows. What a surface offers
+/// to edit follows it, so a reader is never shown an edit that does
+/// nothing.
+final siteEditableProvider = FutureProvider.family<bool, String>((
+  ref,
+  siteId,
+) async {
+  final diverId = await ref.watch(validatedCurrentDiverIdProvider.future);
+  // Roles and read-only state change with each library sync.
+  await ref.watch(sharedLibrariesProvider.future);
+  return LibraryEditStamper().mayEdit(siteId, actingDiverId: diverId);
 });
 
 /// Member id to display name for [libraryId], from the member cache.
@@ -117,7 +139,7 @@ final _siteStateTickProvider = StreamProvider<void>((ref) async* {
   yield* ref.watch(sharedLibraryStoreProvider).watchSiteStates();
 });
 
-/// Connected accounts that can back a club library.
+/// Connected accounts that can back a shared site library.
 final eligibleLibraryAccountsProvider = FutureProvider<List<ConnectedAccount>>((
   ref,
 ) async {
@@ -162,7 +184,12 @@ final sharedLibraryTransportFactoryProvider =
             'The account for ${library.name} is no longer on this device',
           );
         }
-        return byAccount(account: account, prefix: library.prefix);
+        final t = await byAccount(account: account, prefix: library.prefix);
+        return t
+          ..cipher = await ref
+              .read(sharedLibraryStoreProvider)
+              .libraryCipherFor(library.id)
+          ..encrypting = library.encrypted;
       };
     });
 
@@ -204,6 +231,41 @@ final libraryAccountSetupProvider = Provider<LibraryAccountSetup>(
   ),
 );
 
+// no-tick: a service object; it rewrites the library at action time.
+final libraryEncryptionServiceProvider = Provider<LibraryEncryptionService>(
+  (ref) => LibraryEncryptionService(
+    store: ref.watch(sharedLibraryStoreProvider),
+    memberships: ref.watch(sharedLibraryMembershipServiceProvider),
+  ),
+);
+
+// no-tick: a service object; it writes backups at action time.
+final libraryBackupServiceProvider = Provider<LibraryBackupService>(
+  (ref) => LibraryBackupService(
+    store: ref.watch(sharedLibraryStoreProvider),
+    memberships: ref.watch(sharedLibraryMembershipServiceProvider),
+    backupsDirectory: BackupService.defaultBackupsDirectoryPath,
+  ),
+);
+
+// no-tick: a service object; it restores at action time.
+final libraryRestoreServiceProvider = Provider<LibraryRestoreService>(
+  (ref) => LibraryRestoreService(
+    store: ref.watch(sharedLibraryStoreProvider),
+    memberships: ref.watch(sharedLibraryMembershipServiceProvider),
+    backups: ref.watch(libraryBackupServiceProvider),
+  ),
+);
+
+/// The backups of [libraryId] on this device and in storage, newest first.
+/// The backups page refreshes it after each action.
+// no-tick: read when the page opens and re-read after each action on it.
+final libraryBackupsProvider = FutureProvider.autoDispose
+    .family<List<LibraryBackupRecord>, String>(
+      (ref, libraryId) =>
+          ref.watch(libraryBackupServiceProvider).list(libraryId: libraryId),
+    );
+
 final sharedSitePublisherProvider = Provider<SharedSitePublisher>(
   (ref) => SharedSitePublisher(store: ref.watch(sharedLibraryStoreProvider)),
 );
@@ -237,6 +299,22 @@ final pendingIncomingSuggestionCountProvider =
       );
       return list.length;
     });
+
+/// Suggestions in [libraryId] held until an owner approves their authors.
+final heldIncomingSuggestionCountProvider = FutureProvider.family<int, String>((
+  ref,
+  libraryId,
+) async {
+  ref.watch(_suggestionTickProvider);
+  final held = await ref
+      .watch(sharedLibraryStoreProvider)
+      .suggestions(
+        libraryId,
+        direction: SharedSiteSuggestion.incoming,
+        status: SharedSiteSuggestion.held,
+      );
+  return held.length;
+});
 
 /// Field name to (stored value, proposed value) for the review sheet.
 // no-tick: a one-shot diff computed when the sheet opens; auto-disposed with

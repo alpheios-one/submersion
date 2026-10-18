@@ -1,21 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/data/visibility/shared_item_policy.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/shared_library/crypto/library_signer.dart';
 import 'package:submersion/core/services/shared_library/shared_library_models.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/features/settings/presentation/widgets/settings_pane_navigator.dart';
 import 'package:submersion/features/shared_library/presentation/providers/shared_library_providers.dart';
 import 'package:submersion/features/shared_library/presentation/providers/shared_library_sync_notifier.dart';
+import 'package:submersion/features/shared_library/presentation/widgets/add_to_library_confirmation.dart';
+import 'package:submersion/features/shared_library/presentation/widgets/library_about_section.dart';
+import 'package:submersion/features/shared_library/presentation/widgets/library_connection_section.dart';
+import 'package:submersion/features/shared_library/presentation/widgets/library_encryption_section.dart';
 import 'package:submersion/features/shared_library/presentation/widgets/library_error_text.dart';
+import 'package:submersion/features/shared_library/presentation/widgets/library_ownership_section.dart';
 import 'package:submersion/features/shared_library/presentation/widgets/library_role_chip.dart';
 import 'package:submersion/features/weight_presets/presentation/widgets/name_prompt_dialog.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/shared_items/shared_item_dialogs.dart';
 
-/// One connected club library (issue #2567): status, display name, role,
-/// members, suggestions, adding personal sites, leaving.
+/// One connected shared site library (issue #2567): status, what it is for
+/// (issue #3389), display name, role, members, suggestions, adding personal
+/// sites, its connection on this device, leaving.
 class SharedLibraryPage extends ConsumerWidget {
   const SharedLibraryPage({super.key, required this.libraryId});
 
@@ -37,18 +44,18 @@ class SharedLibraryPage extends ConsumerWidget {
             : Center(child: Text(l10n.sharedLibrary_list_empty)),
       );
     }
+    // .value keeps the last role and membership through a reload (every
+    // write to the library row reloads them): blanking them would drop the
+    // owner tiles for a frame and rebuild the sections below away.
     final role =
-        ref.watch(libraryRoleProvider(libraryId)).valueOrNull ??
+        ref.watch(libraryRoleProvider(libraryId)).value ??
         SharedLibraryRole.reader;
-    final membership = ref
-        .watch(currentMembershipProvider(libraryId))
-        .valueOrNull;
+    final membership = ref.watch(currentMembershipProvider(libraryId)).value;
     final names = ref.watch(libraryMemberNamesProvider(libraryId)).valueOrNull;
     final pending =
-        ref
-            .watch(pendingIncomingSuggestionCountProvider(libraryId))
-            .valueOrNull ??
-        0;
+        ref.watch(pendingIncomingSuggestionCountProvider(libraryId)).value ?? 0;
+    final held =
+        ref.watch(heldIncomingSuggestionCountProvider(libraryId)).value ?? 0;
     final syncState = ref.watch(sharedLibrarySyncProvider);
     final syncing =
         syncState.syncing && syncState.syncingLibraryId == libraryId;
@@ -57,10 +64,18 @@ class SharedLibraryPage extends ConsumerWidget {
       appBar: AppBar(title: Text(library.name)),
       body: ListView(
         children: [
+          PendingResetBanner(library: library, names: names ?? const {}),
+          LockedLibraryBanner(library: library, membership: membership),
           if (library.readOnlyDetected)
             _Banner(
               icon: Icons.lock_outline,
               text: l10n.sharedLibrary_library_readOnlyBanner,
+            ),
+          if (library.rolesRejected)
+            _Banner(
+              icon: Icons.gpp_maybe_outlined,
+              text: l10n.sharedLibrary_roles_rejected,
+              isError: true,
             ),
           if (library.lastError != null)
             _Banner(
@@ -96,6 +111,12 @@ class SharedLibraryPage extends ConsumerWidget {
             ),
           ),
           const Divider(height: 1),
+          LibraryAboutSection(
+            key: const ValueKey('about'),
+            library: library,
+            role: role,
+            membership: membership,
+          ),
           ListTile(
             leading: const Icon(Icons.badge_outlined),
             title: Text(l10n.sharedLibrary_library_rename_label),
@@ -104,6 +125,13 @@ class SharedLibraryPage extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(membership?.displayName ?? ''),
+                // What an owner compares before approving this member.
+                if (membership?.signingKey case final key?)
+                  Text(
+                    l10n.sharedLibrary_library_myKey(
+                      LibrarySigner.fingerprint(key.publicKey),
+                    ),
+                  ),
                 LibraryRoleChip(role: role),
               ],
             ),
@@ -119,18 +147,22 @@ class SharedLibraryPage extends ConsumerWidget {
                 ? null
                 : Text(l10n.sharedLibrary_library_memberCount(names.length)),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () =>
-                context.push('/settings/club-libraries/$libraryId/members'),
+            onTap: () => context.pushSettingsPage(
+              '/settings/shared-libraries/$libraryId/members',
+            ),
           ),
           if (canManageLibrary(role))
             ListTile(
               leading: const Icon(Icons.rate_review_outlined),
               title: Text(l10n.sharedLibrary_library_suggestions),
+              subtitle: held > 0
+                  ? Text(l10n.sharedLibrary_suggest_held(held))
+                  : null,
               trailing: pending > 0
                   ? Badge.count(count: pending)
                   : const Icon(Icons.chevron_right),
-              onTap: () => context.push(
-                '/settings/club-libraries/$libraryId/suggestions',
+              onTap: () => context.pushSettingsPage(
+                '/settings/shared-libraries/$libraryId/suggestions',
               ),
             ),
           if (canEditLibrarySite(role))
@@ -140,6 +172,34 @@ class SharedLibraryPage extends ConsumerWidget {
               trailing: const Icon(Icons.chevron_right),
               onTap: () => _addMySites(context, ref, library!),
             ),
+          if (role == SharedLibraryRole.owner)
+            ListTile(
+              leading: const Icon(Icons.inventory_2_outlined),
+              title: Text(l10n.sharedLibrary_backups_title),
+              subtitle: Text(l10n.sharedLibrary_backups_subtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.pushSettingsPage(
+                '/settings/shared-libraries/$libraryId/backups',
+              ),
+            ),
+          const Divider(height: 1),
+          LibraryConnectionSection(
+            key: const ValueKey('connection'),
+            library: library,
+          ),
+          const Divider(height: 1),
+          LibraryOwnershipSection(
+            key: const ValueKey('ownership'),
+            library: library,
+            role: role,
+            membership: membership,
+          ),
+          LibraryEncryptionSection(
+            key: const ValueKey('encryption'),
+            library: library,
+            role: role,
+            membership: membership,
+          ),
           const Divider(height: 1),
           ListTile(
             leading: Icon(
@@ -254,7 +314,16 @@ class SharedLibraryPage extends ConsumerWidget {
         ),
       ),
     );
-    if (confirmed != true || chosen.isEmpty) return;
+    if (confirmed != true || chosen.isEmpty || !context.mounted) return;
+    final agreed = await confirmAddToLibrary(
+      context,
+      libraryName: library.name,
+      siteCount: chosen.length,
+      siteName: chosen.length == 1
+          ? personal.firstWhere((s) => s.id == chosen.single).name
+          : null,
+    );
+    if (!agreed) return;
     final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
     if (diverId == null) return;
     final publisher = ref.read(sharedSitePublisherProvider);
@@ -325,7 +394,7 @@ class SharedLibraryPage extends ConsumerWidget {
     }
     ref.invalidate(currentMembershipsProvider);
     ref.invalidate(sitesProvider);
-    if (context.mounted) context.pop();
+    if (context.mounted) Navigator.of(context).pop();
   }
 }
 

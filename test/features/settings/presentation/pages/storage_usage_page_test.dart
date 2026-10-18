@@ -3,14 +3,22 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:submersion/core/database/compaction/database_compaction_prefs.dart';
+import 'package:submersion/core/database/compaction/database_space.dart';
+import 'package:submersion/core/services/storage/gc/cloud_usage_measure.dart';
 import 'package:submersion/core/services/storage/storage_category.dart';
 import 'package:submersion/features/backup/data/services/backup_attribution.dart';
 import 'package:submersion/features/backup/data/services/orphaned_backup_scan.dart';
 import 'package:submersion/features/backup/presentation/providers/unrecognized_backup_providers.dart';
 import 'package:submersion/features/settings/presentation/widgets/unrecognized_backups_notice.dart';
 import 'package:submersion/features/settings/presentation/pages/storage_usage_page.dart';
+import 'package:submersion/features/settings/presentation/providers/database_reclaim_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/storage_gc_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/storage_usage_providers.dart';
+import 'package:submersion/features/settings/presentation/widgets/database_reclaim_row.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 void main() {
@@ -31,6 +39,8 @@ void main() {
   Widget harness({
     required Map<String, Future<int?> Function()> sizes,
     Future<List<UnrecognizedBackup>?> Function()? unrecognized,
+    StorageGcView? cloudView,
+    List<Override> extra = const [],
   }) {
     return ProviderScope(
       overrides: [
@@ -43,6 +53,14 @@ void main() {
         unrecognizedBackupsProvider.overrideWith(
           (ref) => unrecognized?.call() ?? Future.value(const []),
         ),
+        // The storage cleanup reads SharedPreferences and the cloud; these
+        // tests are about the device rows, so it reports nothing scanned.
+        storageGcStateProvider.overrideWith(
+          (ref) =>
+              Stream.value(cloudView ?? const StorageGcView(running: false)),
+        ),
+        deviceReclaimableBytesProvider.overrideWith((ref) async => 0),
+        ...extra,
       ],
       child: const MaterialApp(
         // Pinned: the assertions match English strings.
@@ -73,6 +91,41 @@ void main() {
 
     expect(expected, 15);
     expect(find.byType(StorageUsageRow), findsNWidgets(expected));
+  });
+
+  testWidgets('the database row shows its reclaimable space', (tester) async {
+    useTallSurface(tester);
+    SharedPreferences.setMockInitialValues({});
+    final prefs = DatabaseCompactionPrefs(
+      await SharedPreferences.getInstance(),
+    );
+    await tester.pumpWidget(
+      harness(
+        sizes: {},
+        extra: [
+          databaseSpaceProvider.overrideWith(
+            (ref) async => const DatabaseSpace(
+              pageSize: 4096,
+              pageCount: 100000,
+              freePages: 10000,
+            ),
+          ),
+          databaseCompactionPrefsProvider.overrideWith((ref) async => prefs),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DatabaseReclaimRow), findsOneWidget);
+    final database = tester.getRect(find.byType(StorageUsageRow).first);
+    final reclaim = tester.getRect(
+      find.byKey(const ValueKey('database-reclaim-row')),
+    );
+    expect(reclaim.top, greaterThanOrEqualTo(database.bottom - 1));
+    expect(
+      reclaim.top,
+      lessThan(tester.getRect(find.byType(StorageUsageRow).at(1)).top),
+    );
   });
 
   testWidgets('shows the raw imported data group and its row', (tester) async {
@@ -308,5 +361,50 @@ void main() {
 
       expect(find.textContaining('not in your backup history'), findsNothing);
     });
+  });
+
+  testWidgets('header splits device and cloud totals', (tester) async {
+    useTallSurface(tester);
+    await tester.pumpWidget(
+      harness(
+        sizes: {StorageCategoryId.database: () => Future<int?>.value(1024)},
+        cloudView: StorageGcView(
+          running: false,
+          cloudUsage: CloudUsage(
+            scannedAt: DateTime(2026, 10, 17),
+            mediaBytes: 2048,
+            syncBytes: 1024,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('4.0 KB'), findsOneWidget);
+    expect(
+      find.text('1.0 KB on this device, 3.0 KB in the cloud'),
+      findsOneWidget,
+    );
+    expect(find.text('In the Cloud'), findsOneWidget);
+  });
+
+  testWidgets('a partial cloud scan marks the total partial', (tester) async {
+    useTallSurface(tester);
+    await tester.pumpWidget(
+      harness(
+        sizes: {},
+        cloudView: StorageGcView(
+          running: false,
+          cloudUsage: CloudUsage(
+            scannedAt: DateTime(2026, 10, 17),
+            librariesBytes: 10,
+            partial: true,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Total so far'), findsOneWidget);
   });
 }

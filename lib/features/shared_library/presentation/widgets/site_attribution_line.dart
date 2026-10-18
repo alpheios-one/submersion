@@ -19,7 +19,7 @@ String memberDisplayName(Map<String, String> names, String memberId) {
   return memberId.length > 8 ? memberId.substring(0, 8) : memberId;
 }
 
-/// `Last edited by [name], [date]` for a club library site (issue #2567);
+/// `Last edited by [name], [date]` for a shared site library site (issue #2567);
 /// nothing for a personal site or one with no clocks yet.
 class SiteAttributionLine extends ConsumerWidget {
   const SiteAttributionLine({super.key, required this.site});
@@ -38,10 +38,7 @@ class SiteAttributionLine extends ConsumerWidget {
     final names =
         ref.watch(libraryMemberNamesProvider(libraryId)).value ??
         const <String, String>{};
-    final when = DateTime.fromMillisecondsSinceEpoch(
-      newest.hlc.physicalTime,
-      isUtc: true,
-    );
+    final when = newest.editedAt;
     return Text(
       context.l10n.sharedLibrary_site_lastEdited(
         memberDisplayName(names, newest.memberId),

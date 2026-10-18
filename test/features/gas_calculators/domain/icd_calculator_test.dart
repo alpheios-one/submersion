@@ -98,10 +98,16 @@ void main() {
       final suggestions = computeIcdFixSuggestions(
         _icdInputs(o2A: 18, heA: 45, o2B: 32, heB: 0),
       );
-      expect(suggestions.heBKeepingGasA, closeTo(31, 0.001));
+      expect(suggestions.heBKeepingGasA.value, closeTo(31, 0.001));
+      expect(suggestions.heBKeepingGasA.resolves, isTrue);
 
       final applied = computeIcd(
-        _icdInputs(o2A: 18, heA: 45, o2B: 32, heB: suggestions.heBKeepingGasA),
+        _icdInputs(
+          o2A: 18,
+          heA: 45,
+          o2B: 32,
+          heB: suggestions.heBKeepingGasA.value,
+        ),
       );
       expect(applied.n2IncreasePercent, closeTo(0, 0.001));
       expect(applied.severity, IcdSeverity.ok);
@@ -113,22 +119,131 @@ void main() {
       final suggestions = computeIcdFixSuggestions(
         _icdInputs(o2A: 18, heA: 45, o2B: 32, heB: 0),
       );
-      expect(suggestions.heAKeepingGasB, closeTo(14, 0.001));
+      expect(suggestions.heAKeepingGasB.value, closeTo(14, 0.001));
+      expect(suggestions.heAKeepingGasB.resolves, isTrue);
 
       final applied = computeIcd(
-        _icdInputs(o2A: 18, heA: suggestions.heAKeepingGasB, o2B: 32, heB: 0),
+        _icdInputs(
+          o2A: 18,
+          heA: suggestions.heAKeepingGasB.value,
+          o2B: 32,
+          heB: 0,
+        ),
       );
       expect(applied.n2IncreasePercent, closeTo(0, 0.001));
       expect(applied.severity, IcdSeverity.ok);
     });
 
-    test('suggestions are clamped to a valid He% range', () {
+    test('He suggestions are clamped to a valid He% range', () {
       // Gas A (10/0, N2 90) to Gas B (90/0, N2 10): equalizing N2 on Gas B
       // would need He of 0 + 10 - 90 = -80, not a valid mix, so clamp to 0.
+      // Clamping He to 0 always leaves no helium to counterdiffuse against
+      // on that side, so the rule no longer applies at all -- the clamped
+      // suggestion still resolves, just not by matching N2 exactly.
       final suggestions = computeIcdFixSuggestions(
         _icdInputs(o2A: 10, heA: 0, o2B: 90, heB: 0),
       );
-      expect(suggestions.heBKeepingGasA, 0);
+      expect(suggestions.heBKeepingGasA.value, 0);
+      expect(suggestions.heBKeepingGasA.resolves, isTrue);
+    });
+
+    test('keeping Gas B: suggests the O2% on Gas A that equalizes N2', () {
+      // Matches an independently computed reference spreadsheet for the
+      // same Tx 25/50 (Gas A) -> Tx 50/20 (Gas B) pair ("BO für Deko, He
+      // führend"): O2(A) = O2(B) + He(B) - He(A) = 50 + 20 - 50 = 20.
+      final suggestions = computeIcdFixSuggestions(
+        _icdInputs(o2A: 25, heA: 50, o2B: 50, heB: 20),
+      );
+      expect(suggestions.o2AKeepingGasB.value, closeTo(20, 0.001));
+
+      final applied = computeIcd(
+        _icdInputs(
+          o2A: suggestions.o2AKeepingGasB.value,
+          heA: 50,
+          o2B: 50,
+          heB: 20,
+        ),
+      );
+      expect(applied.n2IncreasePercent, closeTo(0, 0.001));
+    });
+
+    test('keeping Gas A: suggests the O2% on Gas B that equalizes N2', () {
+      // Same reference pair ("Deko für BO, He führend"):
+      // O2(B) = O2(A) + He(A) - He(B) = 25 + 50 - 20 = 55.
+      final suggestions = computeIcdFixSuggestions(
+        _icdInputs(o2A: 25, heA: 50, o2B: 50, heB: 20),
+      );
+      expect(suggestions.o2BKeepingGasA.value, closeTo(55, 0.001));
+
+      final applied = computeIcd(
+        _icdInputs(
+          o2A: 25,
+          heA: 50,
+          o2B: suggestions.o2BKeepingGasA.value,
+          heB: 20,
+        ),
+      );
+      expect(applied.n2IncreasePercent, closeTo(0, 0.001));
+    });
+
+    test('o2AKeepingGasB can be clamped without resolving the violation', () {
+      // Gas A (5/90, N2 5) to Gas B (5/80, N2 15): He falls 90 -> 80
+      // (decrease 10), N2 rises 5 -> 15 (increase 10), far above the
+      // allowed 10/5 = 2 -- a violation. Equalizing N2 on Gas A would
+      // need O2 = 5 + 80 - 90 = -5, clamped to 0. Unlike a clamped He
+      // suggestion, this does not touch He, so the rule still applies:
+      // Gas A's N2 only falls to 10, still 5 above Gas B's 15 minus the
+      // allowed 2 -- the clamped suggestion does not actually resolve it.
+      final suggestions = computeIcdFixSuggestions(
+        _icdInputs(o2A: 5, heA: 90, o2B: 5, heB: 80),
+      );
+      expect(suggestions.o2AKeepingGasB.value, 0);
+      expect(suggestions.o2AKeepingGasB.resolves, isFalse);
+    });
+
+    test('o2BKeepingGasA always resolves, even at the clamp', () {
+      // Gas A (5/10, N2 85) to Gas B (0/20, N2 80): not a real violation
+      // (He actually rises here, chosen purely to force the clamp) --
+      // He(B) 20 exceeds O2(A)+He(A) 15, so the raw O2(B) = 5+10-20 = -5
+      // clamps to 0. That clamp always coincides with He(B) > He(A), so
+      // heDecrease (He(A) - He(B)) is forced negative, which disables the
+      // rule itself -- the same mechanism that makes a clamped He
+      // suggestion always resolve. A real violation (heDecrease > 0)
+      // never reaches this clamp in the first place: see
+      // o2AKeepingGasB's doc comment for the asymmetric counterpart.
+      final suggestions = computeIcdFixSuggestions(
+        _icdInputs(o2A: 5, heA: 10, o2B: 0, heB: 20),
+      );
+      expect(suggestions.o2BKeepingGasA.value, 0);
+      expect(suggestions.o2BKeepingGasA.resolves, isTrue);
+    });
+
+    test('a suggestion that only reaches caution still counts as resolved', () {
+      // Gas A (5/6, N2 89) to Gas B (5/0, N2 95): He falls 6 -> 0
+      // (decrease 6), N2 rises 89 -> 95 (increase 6), far above the
+      // allowed 6/5 = 1.2 -- a violation. Equalizing N2 on Gas A via O2
+      // would need O2 = 5 + 0 - 6 = -1, clamped to 0: N2(A) falls only to
+      // 94, leaving a 1% increase against Gas B's 95 -- above the allowed
+      // 1.2 threshold's caution band (0.96) but not above 1.2 itself, so
+      // the result reads as a caution, not a violation. The widget itself
+      // treats a caution as already compliant, so this must count as
+      // resolved too, not just an exact match down to ok (Copilot review
+      // on PR #3372).
+      final suggestions = computeIcdFixSuggestions(
+        _icdInputs(o2A: 5, heA: 6, o2B: 5, heB: 0),
+      );
+      expect(suggestions.o2AKeepingGasB.value, 0);
+      expect(suggestions.o2AKeepingGasB.resolves, isTrue);
+
+      final applied = computeIcd(
+        _icdInputs(
+          o2A: suggestions.o2AKeepingGasB.value,
+          heA: 6,
+          o2B: 5,
+          heB: 0,
+        ),
+      );
+      expect(applied.severity, IcdSeverity.caution);
     });
   });
 }

@@ -6,6 +6,8 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 
 import 'package:flutter/foundation.dart' show visibleForTesting;
+import 'package:drift/drift.dart' show Variable;
+
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart'
     show AppDatabase, SyncRecord, DeletionLogData;
@@ -15,6 +17,7 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/child_column_clears.dart';
 import 'package:submersion/core/services/sync/device_local_fields.dart';
 import 'package:submersion/core/services/sync/peer_device_name_store.dart';
+import 'package:submersion/core/services/sync/peer_sync_snapshot.dart';
 import 'package:submersion/core/services/sync/sync_fact_groups.dart';
 import 'package:submersion/core/services/sync/media_resolution_hints.dart';
 import 'package:submersion/core/services/sync/conflict_reference.dart';
@@ -47,6 +50,8 @@ import 'package:submersion/core/services/sync/crypto/sync_encryption_service.dar
 import 'package:submersion/core/services/sync/crypto/sync_envelope.dart';
 import 'package:submersion/core/services/sync/library_moved.dart';
 import 'package:submersion/core/services/sync/sync_clock.dart';
+import 'package:submersion/core/services/shared_library/library_site_notes.dart';
+import 'package:submersion/core/services/shared_library/shared_library_store.dart';
 import 'package:submersion/core/services/sync/sync_data_serializer.dart';
 import 'package:submersion/core/services/sync/sync_record_overlay.dart';
 import 'package:submersion/core/services/sync/tag_fill_copy_merge.dart';
@@ -261,6 +266,7 @@ class SyncService {
   /// labels such as "From Eric's MacBook" need no cloud read. Optional:
   /// the legacy tests build the service without one.
   final PeerDeviceNameStore? _peerNames;
+  final PeerSyncSnapshotStore? _peerSnapshots;
 
   /// Told which media rows a merge gave something new to be found by, so
   /// their cached "not found here" searches retry at once (spec 6.2).
@@ -331,6 +337,7 @@ class SyncService {
     SyncEncryptionService? encryptionService,
     AppLocalizations Function()? localizations,
     PeerDeviceNameStore? peerNames,
+    PeerSyncSnapshotStore? peerSnapshots,
     Future<void> Function(MediaResolutionHints hints)? onMediaResolutionHints,
   }) : _syncRepository = syncRepository,
        _eventScopeApplier = EventScopeTombstoneApplier(
@@ -342,6 +349,7 @@ class SyncService {
        _epochStore = epochStore,
        _encryptionService = encryptionService,
        _peerNames = peerNames,
+       _peerSnapshots = peerSnapshots,
        _onMediaResolutionHints = onMediaResolutionHints,
        _localizations = localizations ?? _englishLocalizations;
 
@@ -564,6 +572,12 @@ class SyncService {
         0.0,
         _l10n.settings_cloudSync_progress_preparing,
       );
+      // Until this sync reaches its clean end, the storage cleanup must not
+      // trust the previous snapshot: an authentication failure, an adoption
+      // halt or a failure below leaves this device behind its peers (storage
+      // GC design, safety). A reset that cannot be written fails this sync
+      // rather than leave a stale caught-up snapshot behind it.
+      await _peerSnapshots?.markNotCaughtUp();
       if (!await provider.isAuthenticated()) {
         return SyncResult(
           status: SyncResultStatus.authError,
@@ -647,6 +661,9 @@ class SyncService {
       var recordsSynced = 0;
       var conflictsFound = 0;
       var recordsFailed = 0;
+      // The snapshot's time: before the pull, not after the publish (see
+      // PeerSyncSnapshot.takenAt).
+      final pullStartedAt = DateTime.now();
       final pullResult = await _changesetReader.pull(
         provider: provider,
         selfDeviceId: deviceId,
@@ -723,6 +740,36 @@ class SyncService {
         );
       } catch (e) {
         _log.warning('Device retirement sweep failed (non-fatal): $e');
+      }
+
+      // What the storage cleanup needs from this pull once the manifests are
+      // gone: whether every live peer applied cleanly to its head, and when
+      // each last published. It describes the pull, so it is written once the
+      // pull and the retirement sweep are done: a publish or cleanup failure
+      // later in this sync does not change which peer rows this device holds,
+      // and tying the two together deadlocked a full cloud (every publish
+      // fails, so the cleanup that frees space never ran). Best-effort: a
+      // failed write leaves the not-caught-up mark this sync set at its
+      // start, the cautious state.
+      try {
+        await _peerSnapshots?.write(
+          buildPeerSyncSnapshot(
+            now: pullStartedAt,
+            providerId: provider.providerId,
+            selfDeviceId: deviceId,
+            peerManifests: pullResult.peerManifests,
+            fencedPeerIds: fencedPeerIds,
+            readFailedPeerIds: pullResult.readFailedPeerDeviceIds,
+            newerSchemaPeerIds: pullResult.newerSchemaPeerDeviceIds,
+            incompletePeerIds: pullResult.incompletePeerDeviceIds,
+            unpublishedPeerIds: pullResult.unpublishedPeerDeviceIds,
+            skippedPeerIds: pullResult.skippedPeerDeviceIds,
+            recordsFailed: recordsFailed,
+            manifestListedAt: pullResult.peerManifestListedAt,
+          ),
+        );
+      } catch (e) {
+        _log.warning('Peer sync snapshot write failed (non-fatal): $e');
       }
 
       // ---- Upload: publish our delta ----
@@ -1538,10 +1585,16 @@ class SyncService {
             records: data.diveComputerConnections,
             hasUpdatedAt: true,
           ),
-          // v289: a profile's club-library memberships (issue #2567).
+          // v289: a profile's shared site library memberships (issue #2567).
           (
             type: 'sharedLibraryMemberships',
             records: data.sharedLibraryMemberships,
+            hasUpdatedAt: true,
+          ),
+          // v289: a profile's private notes on library sites (issue #2567).
+          (
+            type: 'librarySiteNotes',
+            records: data.librarySiteNotes,
             hasUpdatedAt: true,
           ),
           (
@@ -2666,6 +2719,7 @@ class SyncService {
     'diveComputers': true,
     'diveComputerConnections': true,
     'sharedLibraryMemberships': true,
+    'librarySiteNotes': true,
     'transmitters': true,
     'cylinderFills': true,
     'connectionMaps': true,
@@ -2805,9 +2859,9 @@ class SyncService {
     },
   };
 
-  /// A device that has not connected a club library holds no copy of its
+  /// A device that has not connected a shared site library holds no copy of its
   /// sites, so the FK repair clears its rows' links to one, and its next
-  /// edit of such a row sends that null back (issue #2567). Where the club
+  /// edit of such a row sends that null back (issue #2567). Where the library
   /// site exists, the null is the peer's blindness, not an unlink: keep the
   /// local link. The rest of the row merges as usual.
   Future<List<Map<String, dynamic>>> _keepLibrarySiteLinks(
@@ -2839,6 +2893,117 @@ class SyncService {
         else
           r,
     ];
+  }
+
+  static const _signingKeyFields = ['signingPublicKey', 'signingPrivateKey'];
+  static const _libraryKeyFields = ['libraryKeyId', 'libraryKey'];
+
+  /// The key id the library's manifest names on this device, lowercased,
+  /// or null when this device has not connected the library.
+  Future<String?> _currentLibraryKeyId(Object? libraryId) async {
+    if (libraryId is! String) return null;
+    final row = await DatabaseService.instance.database
+        .customSelect(
+          'SELECT key_id FROM shared_libraries WHERE id = ?',
+          variables: [Variable.withString(libraryId)],
+        )
+        .getSingleOrNull();
+    return row?.read<String?>('key_id')?.toLowerCase();
+  }
+
+  /// A profile's keys on its shared site library memberships (issue #2567)
+  /// are never lost to a row written before they reached that device: an
+  /// incoming row without them keeps the local ones, and a local row
+  /// without them adopts the incoming ones whichever row wins.
+  Future<List<Map<String, dynamic>>> _keepLibraryMembershipKeys(
+    String entityType,
+    List<Map<String, dynamic>> records,
+  ) async {
+    if (entityType != 'sharedLibraryMemberships' || records.isEmpty) {
+      return records;
+    }
+    final ids = [
+      for (final r in records)
+        if (r['id'] is String) r['id'] as String,
+    ];
+    final local = await _serializer.fetchRecords(entityType, ids);
+    final db = DatabaseService.instance.database;
+    final kept = <Map<String, dynamic>>[];
+    for (final r in records) {
+      final mine = local[r['id']];
+      if (mine == null) {
+        kept.add(r);
+        continue;
+      }
+      final merged = {...r};
+      for (final fields in [_signingKeyFields, _libraryKeyFields]) {
+        final incomingHas = fields.every((f) => r[f] != null);
+        final localHas = fields.every((f) => mine[f] != null);
+        if (incomingHas &&
+            localHas &&
+            identical(fields, _libraryKeyFields) &&
+            r['libraryKeyId'] != mine['libraryKeyId']) {
+          // Two keys: the library's current one stays, whichever row wins.
+          final current = await _currentLibraryKeyId(r['libraryId']);
+          if (current == null) continue;
+          if (current == (mine['libraryKeyId'] as String).toLowerCase()) {
+            for (final f in fields) {
+              merged[f] = mine[f];
+            }
+            // The other device may hold the library's next key, from a
+            // change this device has not synced yet: kept aside for the
+            // library sync to take up once the manifest names it.
+            await db.customUpdate(
+              'UPDATE shared_libraries SET spare_key_id = ?, spare_key = ? '
+              'WHERE id = ?',
+              variables: [
+                Variable.withString(r['libraryKeyId'] as String),
+                Variable.withString(r['libraryKey'] as String),
+                Variable.withString(r['libraryId'] as String),
+              ],
+              updates: {db.sharedLibraries},
+            );
+          } else if (current == (r['libraryKeyId'] as String).toLowerCase()) {
+            await db.customUpdate(
+              'UPDATE shared_library_memberships SET library_key_id = ?, '
+              'library_key = ? WHERE id = ?',
+              variables: [
+                Variable.withString(r['libraryKeyId'] as String),
+                Variable.withString(r['libraryKey'] as String),
+                Variable.withString(r['id'] as String),
+              ],
+              updates: {db.sharedLibraryMemberships},
+            );
+          }
+        } else if (!incomingHas && localHas) {
+          for (final f in fields) {
+            merged[f] = mine[f];
+          }
+        } else if (incomingHas && !localHas) {
+          // Adopted in place, without a pending stamp: the key came from
+          // the peer, so there is nothing new to send back.
+          final signing = identical(fields, _signingKeyFields);
+          await db.customUpdate(
+            signing
+                ? 'UPDATE shared_library_memberships SET signing_public_key = ?, '
+                      'signing_private_key = ? WHERE diver_id = ? AND '
+                      'signing_private_key IS NULL'
+                : 'UPDATE shared_library_memberships SET library_key_id = ?, '
+                      'library_key = ? WHERE id = ? AND library_key IS NULL',
+            variables: [
+              Variable.withString(r[fields[0]] as String),
+              Variable.withString(r[fields[1]] as String),
+              Variable.withString(
+                signing ? mine['diverId'] as String : r['id'] as String,
+              ),
+            ],
+            updates: {db.sharedLibraryMemberships},
+          );
+        }
+      }
+      kept.add(merged);
+    }
+    return kept;
   }
 
   @visibleForTesting
@@ -2873,6 +3038,9 @@ class SyncService {
     'sharedLibraryMemberships': [
       (field: 'diverId', parent: 'divers', nullable: false),
     ],
+    // v289: private notes belong to their profile (issue #2567). The site
+    // is no parent: library sites never cross the personal sync.
+    'librarySiteNotes': [(field: 'diverId', parent: 'divers', nullable: false)],
     // Both gear FKs are nullable: the registry entry outlives a deleted
     // cylinder or computer (set null), so a missing parent must not drop it.
     'transmitters': [
@@ -3207,7 +3375,7 @@ class SyncService {
     if (records.isEmpty) {
       return const _MergeResult(recordsApplied: 0, conflictsFound: 0);
     }
-    // A row of a club-library site never arrives through the personal sync
+    // A row of a shared site library site never arrives through the personal sync
     // (issue #2567): a peer's stale personal copy must not overwrite it.
     if (entityType == 'diveSites' ||
         SyncDataSerializer.librarySiteChildEntities.contains(entityType)) {
@@ -3224,6 +3392,7 @@ class SyncService {
       }
     }
     records = await _keepLibrarySiteLinks(entityType, records);
+    records = await _keepLibraryMembershipKeys(entityType, records);
 
     var applied = 0;
     var conflicts = 0;
@@ -3712,6 +3881,12 @@ class SyncService {
           '${hints.retry.length + hints.remap.length} media rows: $e',
         );
       }
+    }
+
+    // A profile's private notes on shared site library sites (issue #2567)
+    // reach the library site rows, which personal sync never carries.
+    if (entityType == SharedLibraryStore.siteNotesEntity && applied > 0) {
+      await applyLibrarySiteNotes(DatabaseService.instance.database);
     }
 
     return _MergeResult(

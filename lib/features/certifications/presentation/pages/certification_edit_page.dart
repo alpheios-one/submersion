@@ -26,6 +26,8 @@ import 'package:submersion/features/certification_agencies/presentation/provider
 import 'package:submersion/features/certification_agencies/presentation/widgets/certification_agency_dropdown.dart';
 import 'package:submersion/features/certification_agencies/presentation/widgets/certification_level_dialog.dart';
 import 'package:submersion/features/certifications/presentation/widgets/certification_level_dropdown_items.dart';
+import 'package:submersion/shared/widgets/label_with_control.dart';
+import 'package:submersion/shared/widgets/tab_visibility.dart';
 
 class CertificationEditPage extends ConsumerStatefulWidget {
   final String? certificationId;
@@ -912,7 +914,9 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
     // Embedded mode: no Scaffold wrapper
     if (widget.embedded) {
       return PopScope(
-        canPop: !_hasChanges,
+        // In a Training tab the diver has switched away from, Back leaves
+        // rather than asking about a form that is not on screen (#3437).
+        canPop: !_hasChanges || !TabVisibility.isVisible(context),
         onPopInvokedWithResult: (didPop, result) async {
           if (!didPop && _hasChanges) {
             final shouldDiscard = await _showDiscardDialog();
@@ -972,41 +976,49 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
           bottom: BorderSide(color: colorScheme.outlineVariant, width: 1),
         ),
       ),
-      child: Row(
-        children: [
-          Icon(
-            isEditing ? Icons.edit : Icons.add_card,
-            color: colorScheme.primary,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              isEditing
-                  ? context.l10n.certifications_edit_appBar_edit
-                  : context.l10n.certifications_edit_appBar_add,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+      child: LabelWithControl(
+        label: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isEditing ? Icons.edit : Icons.add_card,
+              color: colorScheme.primary,
+            ),
+            const SizedBox(width: 12),
+            Flexible(
+              child: Text(
+                isEditing
+                    ? context.l10n.certifications_edit_appBar_edit
+                    : context.l10n.certifications_edit_appBar_add,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-          if (_isSaving)
-            const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          else ...[
-            TextButton(
-              onPressed: _handleCancel,
-              child: Text(context.l10n.certifications_edit_button_cancel),
-            ),
-            const SizedBox(width: 8),
-            FilledButton(
-              onPressed: _saveCertification,
-              child: Text(context.l10n.certifications_edit_button_save),
-            ),
           ],
-        ],
+        ),
+        control: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_isSaving)
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            else ...[
+              TextButton(
+                onPressed: _handleCancel,
+                child: Text(context.l10n.certifications_edit_button_cancel),
+              ),
+              const SizedBox(width: 8),
+              FilledButton(
+                onPressed: _saveCertification,
+                child: Text(context.l10n.certifications_edit_button_save),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

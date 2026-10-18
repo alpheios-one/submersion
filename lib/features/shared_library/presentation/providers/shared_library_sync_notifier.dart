@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/services/shared_library/backup/library_backup_service.dart';
+import 'package:submersion/core/services/shared_library/shared_library_models.dart';
 import 'package:submersion/core/services/shared_library/shared_library_service.dart';
 import 'package:submersion/core/services/shared_library/shared_library_store.dart';
 import 'package:submersion/core/services/sync/sync_coordinator.dart';
@@ -36,7 +38,7 @@ class SharedLibrarySyncState {
   );
 }
 
-/// Runs club library syncs (issue #2567): on launch and resume under the
+/// Runs shared site library syncs (issue #2567): on launch and resume under the
 /// personal auto-sync preferences, after a debounce when a library site or
 /// suggestion changes locally, and on Sync now. Every run goes through
 /// [SyncCoordinator], so it never overlaps the personal sync.
@@ -115,6 +117,7 @@ class SharedLibrarySyncNotifier extends StateNotifier<SharedLibrarySyncState> {
     final store = _store;
     final service = _service;
     final membershipService = _ref.read(sharedLibraryMembershipServiceProvider);
+    final backups = _ref.read(libraryBackupServiceProvider);
     final diverId = await _ref.read(validatedCurrentDiverIdProvider.future);
     if (diverId == null || !mounted) return;
     // A library the profile left on another device: its rows go here too.
@@ -142,6 +145,7 @@ class SharedLibrarySyncNotifier extends StateNotifier<SharedLibrarySyncState> {
             '${result.error}',
           );
         }
+        if (result.isHealthy) await _autoBackUp(store, backups, m);
         if (!mounted) return;
         state = state.copyWith(lastResults: Map.unmodifiable(results));
       }
@@ -150,6 +154,28 @@ class SharedLibrarySyncNotifier extends StateNotifier<SharedLibrarySyncState> {
       if (mounted) {
         state = state.copyWith(syncing: false, clearSyncingLibraryId: true);
       }
+    }
+  }
+
+  /// An owner's device keeps the daily library backup (issue #2567). A
+  /// failure is logged, never a sync error.
+  Future<void> _autoBackUp(
+    SharedLibraryStore store,
+    LibraryBackupService backups,
+    SharedLibraryMembership m,
+  ) async {
+    final library = await store.getLibrary(m.libraryId);
+    // A device holding writes (a sync that only read) backs nothing up:
+    // it would sign the index and prune storage all the same.
+    if (library == null ||
+        library.writesHeld ||
+        library.roles.roleOf(m.memberId) != SharedLibraryRole.owner) {
+      return;
+    }
+    try {
+      await backups.backUpIfDue(libraryId: m.libraryId, diverId: m.diverId);
+    } catch (e) {
+      _log.warning('Automatic backup of ${m.libraryId} failed: $e');
     }
   }
 

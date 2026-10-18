@@ -28,9 +28,14 @@ import 'package:submersion/features/certifications/presentation/widgets/certific
 import 'package:submersion/features/certifications/presentation/providers/certification_list_count_provider.dart';
 import 'package:submersion/features/certification_agencies/presentation/providers/certification_catalog_context.dart';
 import 'package:submersion/features/certification_agencies/presentation/providers/certification_catalog_providers.dart';
+import 'package:submersion/shared/widgets/section_header_title.dart';
 
 class CertificationListPage extends ConsumerStatefulWidget {
-  const CertificationListPage({super.key});
+  const CertificationListPage({super.key, this.headerTitle});
+
+  /// Replaces every layout's header title, as Training's tab switch does
+  /// (#3437).
+  final SectionHeaderTitle? headerTitle;
 
   @override
   ConsumerState<CertificationListPage> createState() =>
@@ -65,11 +70,22 @@ class _CertificationListPageState extends ConsumerState<CertificationListPage>
     // optional detail pane.
     final viewMode = ref.watch(certificationListViewModeProvider);
     if (viewMode == ListViewMode.table) {
+      final countLabel = certificationListCountLabel(context, ref);
       return FocusTraversalGroup(
         child: TableModeLayout(
           sectionKey: 'certifications',
           appBarTitle: context.l10n.nav_certifications,
-          appBarSubtitle: certificationListCountLabel(context, ref),
+          appBarSubtitle: countLabel,
+          appBarTitleWidget: widget.headerTitle?.build(
+            context,
+            SectionHeaderSlot.table,
+            countLabel,
+          ),
+          appBarToolbarHeight: widget.headerTitle?.appBarHeight(
+            context,
+            countLabel,
+          ),
+          phoneAppBarPin: widget.headerTitle?.pinAppBar,
           tableContent: CertificationListContent(
             showAppBar: false,
             selectionController: tableSelection,
@@ -191,6 +207,7 @@ class _CertificationListPageState extends ConsumerState<CertificationListPage>
               onItemSelected: onItemSelected,
               selectedId: selectedId,
               showAppBar: false,
+              headerTitle: widget.headerTitle,
             ),
         detailBuilder: (context, certificationId) => CertificationDetailPage(
           certificationId: certificationId,
@@ -221,6 +238,7 @@ class _CertificationListPageState extends ConsumerState<CertificationListPage>
     return FocusTraversalGroup(
       child: CertificationListContent(
         showAppBar: true,
+        headerTitle: widget.headerTitle,
         floatingActionButton: fab,
       ),
     );

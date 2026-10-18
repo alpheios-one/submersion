@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/shared_library/crypto/library_cipher.dart';
 import 'package:submersion/core/services/shared_library/shared_library_models.dart';
 import 'package:submersion/core/services/shared_library/shared_library_store.dart';
 import 'package:submersion/core/services/sync/hlc.dart';
@@ -26,13 +27,87 @@ void main() {
 
   tearDown(tearDownTestDatabase);
 
+  test('two first calls for a signing key agree on one', () async {
+    await store.upsertMembership(
+      const SharedLibraryMembership(
+        id: 'ms',
+        diverId: 'd1',
+        libraryId: 'L',
+        memberId: 'm1',
+        displayName: 'Ann',
+        libraryName: 'Reef Survey',
+        backendKind: 's3',
+      ),
+    );
+    final both = await Future.wait([
+      store.ensureSigningKey('d1'),
+      store.ensureSigningKey('d1'),
+    ]);
+    final stored = (await store.signingKeyForDiver('d1'))!;
+    expect(both[0].publicKey, stored.publicKey);
+    expect(both[1].publicKey, stored.publicKey);
+  });
+
+  test(
+    "the library's current key wins over another profile's stale one",
+    () async {
+      await DiverRepository().createDiver(
+        Diver(
+          id: 'd2',
+          name: 'Bo',
+          createdAt: DateTime(2026),
+          updatedAt: DateTime(2026),
+        ),
+      );
+      final stale = await LibraryCipher.generate();
+      final current = await LibraryCipher.generate();
+      await store.upsertLibrary(
+        SharedLibrary(
+          id: 'L',
+          name: 'Reef Survey',
+          connectedAccountId: 'acc',
+          prefix: 'site-sync',
+          encrypted: true,
+          keyId: current.keyId,
+        ),
+      );
+      for (final (id, diver) in [('ms1', 'd1'), ('ms2', 'd2')]) {
+        await store.upsertMembership(
+          SharedLibraryMembership(
+            id: id,
+            diverId: diver,
+            libraryId: 'L',
+            memberId: 'm-$diver',
+            displayName: diver,
+            libraryName: 'Reef Survey',
+            backendKind: 's3',
+          ),
+        );
+      }
+      // The first profile still holds the key from before a passphrase change.
+      await store.setLibraryKey(
+        diverId: 'd1',
+        libraryId: 'L',
+        keyId: stale.keyId,
+        key: await stale.exportKey(),
+      );
+      await store.setLibraryKey(
+        diverId: 'd2',
+        libraryId: 'L',
+        keyId: current.keyId,
+        key: await current.exportKey(),
+      );
+      expect((await store.libraryCipherFor('L'))!.keyId, current.keyId);
+    },
+  );
+
   test('library round trip, status update and cascade delete', () async {
     await store.upsertLibrary(
       const SharedLibrary(
         id: 'L',
-        name: 'Club',
+        name: 'Reef Survey',
         connectedAccountId: 'acc',
-        prefix: 'club/',
+        prefix: 'site-sync/',
       ),
     );
     await store.replaceMembers('L', [
@@ -49,7 +124,7 @@ void main() {
     );
     final lib = (await store.getLibrary('L'))!;
     expect(lib.lastError, 'boom');
-    expect(lib.prefix, 'club/');
+    expect(lib.prefix, 'site-sync/');
     expect(lib.roles.roleOf('m1'), SharedLibraryRole.owner);
     expect(await store.memberNames('L'), {'m1': 'Ann'});
     await store.setLibraryStatus('L', clearError: true, readOnlyDetected: true);
@@ -62,6 +137,28 @@ void main() {
     expect(await store.getLibrary('L'), isNull);
   });
 
+  test(
+    'upsertLibrary and setLibraryStatus round-trip the description',
+    () async {
+      await store.upsertLibrary(
+        const SharedLibrary(
+          id: 'L',
+          name: 'Reef Survey',
+          connectedAccountId: 'acc',
+          prefix: 'site-sync',
+          description: 'Group sites',
+        ),
+      );
+      expect((await store.getLibrary('L'))!.description, 'Group sites');
+      await store.setLibraryStatus('L', description: 'New');
+      expect((await store.getLibrary('L'))!.description, 'New');
+      await store.setLibraryStatus('L', lastError: 'x');
+      expect((await store.getLibrary('L'))!.description, 'New');
+      await store.setLibraryStatus('L', clearDescription: true);
+      expect((await store.getLibrary('L'))!.description, isNull);
+    },
+  );
+
   test('memberIdForDiver is stable across libraries', () async {
     final first = await store.memberIdForDiver('d1');
     await store.upsertMembership(
@@ -71,7 +168,7 @@ void main() {
         libraryId: 'L',
         memberId: first,
         displayName: 'Ann',
-        libraryName: 'Club',
+        libraryName: 'Reef Survey',
         backendKind: 's3',
       ),
     );
@@ -93,7 +190,7 @@ void main() {
         libraryId: 'L',
         memberId: 'm',
         displayName: 'Ann',
-        libraryName: 'Club',
+        libraryName: 'Reef Survey',
         backendKind: 's3',
       ),
     );
@@ -160,7 +257,7 @@ void main() {
     await store.upsertLibrary(
       const SharedLibrary(
         id: 'L',
-        name: 'Club',
+        name: 'Reef Survey',
         connectedAccountId: 'a',
         prefix: 'p',
       ),
@@ -201,7 +298,7 @@ void main() {
         libraryId: 'L',
         memberId: 'm',
         displayName: 'Ann',
-        libraryName: 'Club',
+        libraryName: 'Reef Survey',
         backendKind: 's3',
       ),
     );
@@ -211,5 +308,71 @@ void main() {
         )
         .get();
     expect(rows.single.read<String?>('hlc'), isNotNull);
+  });
+
+  SharedLibraryMembership membershipOf(String id, String libraryId) =>
+      SharedLibraryMembership(
+        id: id,
+        diverId: 'd1',
+        libraryId: libraryId,
+        memberId: 'm1',
+        displayName: 'Ann',
+        libraryName: 'Library $libraryId',
+        backendKind: 's3',
+      );
+
+  test('a profile has one signing key across its memberships', () async {
+    final store = SharedLibraryStore();
+    await store.upsertMembership(membershipOf('ms-a', 'A'));
+    final key = await store.ensureSigningKey('d1');
+    await store.upsertMembership(membershipOf('ms-b', 'B'));
+    expect((await store.signingKeyForDiver('d1'))!.publicKey, key.publicKey);
+    final b = await store.membership(diverId: 'd1', libraryId: 'B');
+    expect(b!.signingKey!.publicKey, key.publicKey);
+    expect((await store.ensureSigningKey('d1')).publicKey, key.publicKey);
+  });
+
+  test('a keyless write never erases a key', () async {
+    final store = SharedLibraryStore();
+    await store.upsertMembership(membershipOf('ms-a', 'A'));
+    final key = await store.ensureSigningKey('d1');
+    await store.setLibraryKey(
+      diverId: 'd1',
+      libraryId: 'A',
+      keyId: 'k1',
+      key: 'secret',
+    );
+    await store.upsertMembership(membershipOf('ms-a', 'A'));
+    final a = (await store.membership(diverId: 'd1', libraryId: 'A'))!;
+    expect(a.signingKey!.privateKey, key.privateKey);
+    expect(a.libraryKeyId, 'k1');
+    expect(a.libraryKey, 'secret');
+    await store.setLibraryKey(diverId: 'd1', libraryId: 'A');
+    final cleared = (await store.membership(diverId: 'd1', libraryId: 'A'))!;
+    expect(cleared.libraryKey, isNull);
+    expect(cleared.signingKey, isNotNull);
+  });
+
+  test('member cards keep their key and verification', () async {
+    await store.upsertLibrary(
+      const SharedLibrary(
+        id: 'L',
+        name: 'Reef Survey',
+        connectedAccountId: 'a',
+        prefix: 'p',
+      ),
+    );
+    await store.replaceMembers('L', [
+      SharedLibraryMember(
+        memberId: 'm1',
+        displayName: 'Ann',
+        joinedAt: DateTime.utc(2026),
+        publicKey: 'pk',
+        cardVerified: true,
+      ),
+    ]);
+    final m = (await store.getMembers('L')).single;
+    expect(m.publicKey, 'pk');
+    expect(m.cardVerified, isTrue);
   });
 }

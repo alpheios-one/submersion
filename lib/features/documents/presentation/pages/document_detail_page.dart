@@ -1,35 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
-import 'package:submersion/features/documents/domain/document_expiry.dart';
+import 'package:submersion/features/certification_agencies/presentation/providers/certification_catalog_providers.dart';
 import 'package:submersion/features/documents/domain/entities/document.dart';
 import 'package:submersion/features/documents/presentation/document_l10n.dart';
 import 'package:submersion/features/documents/presentation/providers/document_providers.dart';
-import 'package:submersion/features/documents/presentation/widgets/document_expiry_badge.dart';
+import 'package:submersion/features/documents/presentation/widgets/document_details_panel.dart';
 import 'package:submersion/features/documents/presentation/widgets/document_page_viewer.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
-
-/// The route of the record a document is filed under; null for personal.
-String? documentOwnerRoute(DocumentOwner owner) {
-  final id = owner.id;
-  if (id == null) return null;
-  return switch (owner.kind) {
-    DocumentOwnerKind.personal => null,
-    DocumentOwnerKind.dive => '/dives/$id',
-    DocumentOwnerKind.site => '/sites/$id',
-    DocumentOwnerKind.trip => '/trips/$id',
-    DocumentOwnerKind.equipment => '/equipment/$id',
-    DocumentOwnerKind.course => '/courses/$id',
-    DocumentOwnerKind.certification => '/certifications/$id',
-    DocumentOwnerKind.buddy => '/buddies/$id',
-    DocumentOwnerKind.diveCenter => '/dive-centers/$id',
-  };
-}
 
 /// One document: its pages, its details and what it is filed under.
 class DocumentDetailPage extends ConsumerStatefulWidget {
@@ -51,6 +33,10 @@ class DocumentDetailPage extends ConsumerStatefulWidget {
 }
 
 class _DocumentDetailPageState extends ConsumerState<DocumentDetailPage> {
+  /// Wide enough for a readable page beside the details column.
+  static const double _sideBySideWidth = 840;
+  static const double _sideColumnWidth = 360;
+
   bool _redirected = false;
 
   @override
@@ -70,6 +56,7 @@ class _DocumentDetailPageState extends ConsumerState<DocumentDetailPage> {
     }
     final entry = ref.watch(documentEntryProvider(widget.documentId));
     final pages = ref.watch(documentPagesProvider(widget.documentId));
+    final units = UnitFormatter(ref.watch(settingsProvider));
     return entry.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -79,54 +66,119 @@ class _DocumentDetailPageState extends ConsumerState<DocumentDetailPage> {
         appBar: AppBar(automaticallyImplyLeading: !widget.embedded),
         body: Center(child: Text(l10n.documents_error_load('$e'))),
       ),
-      data: (entry) {
-        if (entry == null) {
+      data: (stored) {
+        if (stored == null) {
           return Scaffold(
             appBar: AppBar(automaticallyImplyLeading: !widget.embedded),
             body: Center(child: Text(l10n.documents_empty)),
           );
         }
+        final entry = withCertificationOwnerTitle(
+          stored,
+          l10n,
+          catalog: ref.watch(certificationCatalogSyncProvider),
+        );
         final doc = entry.document;
+        final owner = entry.ownerText(units);
         return Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: !widget.embedded,
-            title: Text(documentDisplayTitle(l10n, doc)),
+            title: Text(
+              documentDisplayTitle(l10n, doc, ownerLabel: entry.ownerLabel),
+            ),
             actions: [
               IconButton(
                 tooltip: l10n.common_action_edit,
                 icon: const Icon(Icons.edit_outlined),
                 onPressed: () => _edit(doc.id),
               ),
-              IconButton(
-                tooltip: l10n.common_action_delete,
-                icon: const Icon(Icons.delete_outline),
-                onPressed: () => _delete(doc),
+              // Delete waits behind the overflow menu, as on the other
+              // detail pages, not one tap away beside Edit (#3384).
+              PopupMenuButton<String>(
+                onSelected: (value) {
+                  if (value == 'delete') _delete(doc);
+                },
+                itemBuilder: (context) {
+                  final error = Theme.of(context).colorScheme.error;
+                  return [
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete, color: error),
+                          const SizedBox(width: 8),
+                          Text(
+                            l10n.common_action_delete,
+                            style: TextStyle(color: error),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ];
+                },
               ),
             ],
           ),
-          body: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              SizedBox(
-                height: 320,
-                child: pages.when(
-                  data: (list) => list.isEmpty
-                      ? Center(
-                          child: Icon(
-                            documentTypeIcon(doc.type),
-                            size: 64,
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                        )
-                      : DocumentPageViewer(pages: list),
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Center(child: Text('$e')),
-                ),
-              ),
-              const SizedBox(height: 16),
-              _DetailsCard(document: doc, ownerLabel: entry.ownerLabel),
-            ],
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              // Nothing to show but the details (an insurance kept as its
+              // numbers alone): show them, not an empty viewer over a
+              // folded panel.
+              if (pages.value?.isEmpty ?? false) {
+                return ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    // A readable line length on a wide window.
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 640),
+                        child: DocumentDetailsCard(
+                          document: doc,
+                          ownerLabel: owner,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+              final viewer = pages.when(
+                data: (list) => DocumentPageViewer(pages: list),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(child: Text('$e')),
+              );
+              if (constraints.maxWidth >= _sideBySideWidth) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: viewer),
+                    SizedBox(
+                      width: _sideColumnWidth,
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(16),
+                        child: DocumentDetailsCard(
+                          document: doc,
+                          ownerLabel: owner,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+              // The pages own every vertical drag here: inside a scrolling
+              // list a PDF could neither fill the screen nor scroll.
+              return Column(
+                children: [
+                  Expanded(child: viewer),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: constraints.maxHeight / 2,
+                    ),
+                    child: DocumentDetailsPanel(entry: entry),
+                  ),
+                ],
+              );
+            },
           ),
         );
       },
@@ -185,139 +237,5 @@ class _DocumentDetailPageState extends ConsumerState<DocumentDetailPage> {
     } else {
       context.go('/documents');
     }
-  }
-}
-
-class _DetailsCard extends ConsumerWidget {
-  final Document document;
-  final String? ownerLabel;
-
-  const _DetailsCard({required this.document, required this.ownerLabel});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = context.l10n;
-    final units = UnitFormatter(ref.watch(settingsProvider));
-    final doc = document;
-    final insurance = doc.type == DocumentType.insurance;
-    final ownerRoute = documentOwnerRoute(doc.owner);
-    final status = documentExpiryStatus(doc, DateTime.now());
-    String? text(String? v) => (v == null || v.trim().isEmpty) ? null : v;
-    return Card(
-      child: Column(
-        children: [
-          _Row(
-            icon: documentTypeIcon(doc.type),
-            label: l10n.documents_field_type,
-            value: documentTypeLabel(l10n, doc.type),
-          ),
-          if (text(doc.issuer) case final issuer?)
-            _Row(
-              icon: Icons.apartment_outlined,
-              label: insurance
-                  ? l10n.documents_field_issuerInsurance
-                  : l10n.documents_field_issuer,
-              value: issuer,
-            ),
-          if (text(doc.referenceNumber) case final number?)
-            _Row(
-              icon: Icons.tag,
-              label: insurance
-                  ? l10n.documents_field_referenceNumberInsurance
-                  : l10n.documents_field_referenceNumber,
-              value: number,
-            ),
-          if (doc.issueDate case final issued?)
-            _Row(
-              icon: Icons.event_outlined,
-              label: l10n.documents_field_issueDate,
-              value: units.formatDate(issued),
-            ),
-          if (doc.expiryDate case final expiry?)
-            _Row(
-              icon: Icons.event_busy_outlined,
-              label: l10n.documents_field_expiryDate,
-              value: units.formatDate(expiry),
-              trailing: DocumentExpiryBadge(status: status),
-            ),
-          if (insurance && text(doc.emergencyPhone) != null)
-            _Row(
-              icon: Icons.emergency_outlined,
-              label: l10n.documents_field_emergencyPhone,
-              value: doc.emergencyPhone!,
-              onTap: () => _call(doc.emergencyPhone!),
-            ),
-          if (insurance && text(doc.phone) != null)
-            _Row(
-              icon: Icons.phone_outlined,
-              label: l10n.documents_field_phone,
-              value: doc.phone!,
-              onTap: () => _call(doc.phone!),
-            ),
-          if (insurance && doc.isPrimary)
-            _Row(
-              icon: Icons.star_outline,
-              label: l10n.documents_field_isPrimary,
-              value: l10n.documents_field_isPrimary_subtitle,
-            ),
-          _Row(
-            icon: Icons.folder_outlined,
-            label: l10n.documents_detail_owner,
-            value: ownerLabel ?? documentOwnerKindLabel(l10n, doc.owner.kind),
-            onTap: ownerRoute == null ? null : () => context.push(ownerRoute),
-          ),
-          if (text(doc.notes) case final notes?)
-            _Row(
-              icon: Icons.notes_outlined,
-              label: l10n.documents_field_notes,
-              value: notes,
-            ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _call(String number) async {
-    final uri = Uri(scheme: 'tel', path: number.replaceAll(' ', ''));
-    if (await canLaunchUrl(uri)) await launchUrl(uri);
-  }
-}
-
-class _Row extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final VoidCallback? onTap;
-  final Widget? trailing;
-
-  const _Row({
-    required this.icon,
-    required this.label,
-    required this.value,
-    this.onTap,
-    this.trailing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(
-        label,
-        style: theme.textTheme.labelMedium?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
-      ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(value, style: theme.textTheme.bodyLarge),
-          if (trailing case final badge?) ...[const SizedBox(height: 4), badge],
-        ],
-      ),
-      onTap: onTap,
-    );
   }
 }

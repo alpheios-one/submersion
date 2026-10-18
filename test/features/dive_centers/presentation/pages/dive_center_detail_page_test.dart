@@ -8,6 +8,7 @@ import 'package:submersion/features/dive_centers/domain/entities/dive_center.dar
 import 'package:submersion/features/dive_centers/presentation/pages/dive_center_detail_page.dart';
 import 'package:submersion/features/dive_centers/presentation/providers/dive_center_providers.dart';
 import 'package:submersion/features/maps/presentation/widgets/locked_map_scroll_passthrough.dart';
+import 'package:submersion/features/maps/presentation/widgets/map_style_button.dart';
 import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -316,12 +317,71 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(seconds: 1));
 
+      // The locked preview carries no map style switcher (issue #3473).
+      expect(find.byType(MapStyleButton), findsNothing);
+
       await tester.tap(find.byIcon(Icons.fullscreen));
       await tester.pump();
       await tester.pump(const Duration(seconds: 1));
 
-      // The full-screen route adds its own FlutterMap (now two in the tree).
+      // The full-screen route adds its own FlutterMap (now two in the tree),
+      // and the switcher with it.
       expect(find.byType(FlutterMap), findsWidgets);
+      expect(find.byType(MapStyleButton), findsOneWidget);
     });
+
+    testWidgets(
+      'switching style on the full-screen map swaps its tiles (#3386)',
+      (tester) async {
+        tester.view.devicePixelRatio = 1.0;
+        tester.view.physicalSize = const Size(600, 900);
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        final overrides = await getBaseOverrides();
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              ...overrides,
+              diveCenterByIdProvider(
+                locatedCenter.id,
+              ).overrideWith((ref) async => locatedCenter),
+              diveCenterDiveCountProvider(
+                locatedCenter.id,
+              ).overrideWith((ref) async => 0),
+            ].cast(),
+            child: MaterialApp(
+              locale: const Locale('en'),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: DiveCenterDetailPage(centerId: locatedCenter.id),
+            ),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
+
+        await tester.tap(find.byIcon(Icons.fullscreen));
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
+
+        // The pushed route's map is built from the detail page's ref, so its
+        // tile layer must rebuild on its own when the style changes there.
+        await tester.tap(find.byType(MapStyleButton));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
+        await tester.tap(find.text('Satellite'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
+
+        final fullscreenTiles = tester.widget<TileLayer>(
+          find.byType(TileLayer).last,
+        );
+        expect(fullscreenTiles.urlTemplate, contains('arcgisonline'));
+      },
+    );
   });
 }

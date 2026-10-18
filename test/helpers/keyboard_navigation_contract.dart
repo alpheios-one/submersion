@@ -7,8 +7,8 @@ import 'package:submersion/shared/widgets/master_detail/keyboard_list_navigator.
 
 /// Makes focus highlighting behave as it does on desktop, where it starts in
 /// the traditional mode and a mouse click leaves it there, for the rest of
-/// the test. Widget tests otherwise run as a touch platform, which never
-/// draws a list's focus ring.
+/// the test. Widget tests otherwise run as a touch platform, which hides
+/// focus decorations a desktop would draw.
 void useDesktopFocusHighlighting() {
   final focusManager = FocusManager.instance;
   final strategy = focusManager.highlightStrategy;

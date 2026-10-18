@@ -26,6 +26,8 @@ final planEngineConfigProvider = Provider<PlanEngineConfig>((ref) {
     ppO2Working: ref.watch(ppO2MaxWorkingProvider),
     ppO2Deco: ref.watch(ppO2MaxDecoProvider),
     ccrDiluentModPpO2: ref.watch(ccrDiluentModPpO2Provider),
+    ccrSetpointLow: ref.watch(ccrSetpointLowProvider),
+    ccrSetpointHigh: ref.watch(ccrSetpointHighProvider),
     cnsWarningThreshold: ref.watch(cnsWarningThresholdProvider),
     o2Narcotic: ref.watch(settingsProvider.select((s) => s.o2Narcotic)),
     endLimitMeters: ref.watch(settingsProvider.select((s) => s.endLimit)),
@@ -419,7 +421,10 @@ PlanCanvasSeries buildCanvasSeries({
 final planBailoutProvider = Provider<BailoutOutcome?>((ref) {
   final state = ref.watch(divePlanNotifierProvider);
   final solver = BailoutSolver(config: ref.watch(planEngineConfigProvider));
-  return solver.solve(divePlanFromState(state));
+  return solver.solve(
+    divePlanFromState(state),
+    startState: startStateForPlan(state),
+  );
 });
 
 /// Deviation (deeper/longer/both) outcomes for the current plan.
@@ -434,7 +439,10 @@ final planDeviationsProvider = Provider<List<DeviationOutcome>>((ref) {
   final service = ContingencyService(
     config: ref.watch(planEngineConfigProvider),
   );
-  return service.deviations(divePlanFromState(state));
+  return service.deviations(
+    divePlanFromState(state),
+    startState: startStateForPlan(state),
+  );
 });
 
 /// Lost-gas outcomes for the current OC plan.
@@ -444,7 +452,10 @@ final planLostGasProvider = Provider<List<LostGasOutcome>>((ref) {
   final service = ContingencyService(
     config: ref.watch(planEngineConfigProvider),
   );
-  return service.lostGas(divePlanFromState(state));
+  return service.lostGas(
+    divePlanFromState(state),
+    startState: startStateForPlan(state),
+  );
 });
 
 /// Which per-contingency mini tables (keyed by deviation key or tank id) are
@@ -461,7 +472,10 @@ final planRangeTableProvider = Provider<RangeTable?>((ref) {
   final service = RangeTableService(
     config: ref.watch(planEngineConfigProvider),
   );
-  final table = service.compute(divePlanFromState(state));
+  final table = service.compute(
+    divePlanFromState(state),
+    startState: startStateForPlan(state),
+  );
   return table.isEmpty ? null : table;
 });
 
@@ -502,9 +516,14 @@ final selectedContingencyProvider =
         config: ref.watch(planEngineConfigProvider),
       );
       final plan = divePlanFromState(state);
+      final startState = startStateForPlan(state);
 
       if (deviationKey != null) {
-        final deviation = service.deviationFor(plan, deviationKey);
+        final deviation = service.deviationFor(
+          plan,
+          deviationKey,
+          startState: startState,
+        );
         if (deviation == null) return null;
         return (
           plan: deviation.plan,
@@ -512,7 +531,11 @@ final selectedContingencyProvider =
           lostTank: null,
         );
       }
-      final lost = service.lostGasFor(plan, lostGasTankId!);
+      final lost = service.lostGasFor(
+        plan,
+        lostGasTankId!,
+        startState: startState,
+      );
       if (lost == null) return null;
       return (plan: lost.plan, outcome: lost.outcome, lostTank: lost.tank);
     });

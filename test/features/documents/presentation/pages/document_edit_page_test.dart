@@ -41,6 +41,7 @@ void main() {
     DocumentOwner owner = const DocumentOwner.personal(),
     DocumentPageCapture? capture,
     VoidCallback? onCancel,
+    DocumentOwner? pickedOwner,
   }) async {
     t.view.physicalSize = const Size(900, 1600);
     t.view.devicePixelRatio = 1;
@@ -62,6 +63,7 @@ void main() {
           onSaved: (_) {},
           onCancel: onCancel ?? () {},
           capture: capture,
+          pickOwner: (_, _) async => pickedOwner,
         ),
       ),
     );
@@ -274,5 +276,152 @@ void main() {
     final after = (await DocumentRepository().getById(saved.id))!;
     expect(after.title, 'Boat trip');
     expect(after.owner, const DocumentOwner(DocumentOwnerKind.trip, 't1'));
+  });
+
+  testWidgets('a dive owner shows its number, site and date (#3391)', (
+    t,
+  ) async {
+    final db = DatabaseService.instance.database;
+    await db.customStatement(
+      'INSERT INTO dive_sites (id, diver_id, name, created_at, updated_at) '
+      "VALUES ('s1', 'd1', 'Blue Hole', 0, 0)",
+    );
+    final when = DateTime.utc(2026, 10, 12, 9).millisecondsSinceEpoch;
+    await db.customStatement(
+      'INSERT INTO dives (id, diver_id, dive_number, dive_date_time, site_id, '
+      "created_at, updated_at) VALUES ('v1', 'd1', 142, $when, 's1', 0, 0)",
+    );
+    await pumpEditor(
+      t,
+      owner: const DocumentOwner(DocumentOwnerKind.dive, 'v1'),
+    );
+    final field = find.byKey(const ValueKey('document-owner-field'));
+    expect(
+      find.descendant(
+        of: field,
+        matching: find.textContaining(RegExp(r'^#142 · Blue Hole · .*2026')),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  group('Filed under', () {
+    Future<void> addTrip() => DatabaseService.instance.database.customStatement(
+      'INSERT INTO trips (id, diver_id, name, start_date, end_date, '
+      "created_at, updated_at) VALUES ('t1', 'd1', 'Bonaire', 0, 0, 0, 0)",
+    );
+
+    Future<Document> saveDoc(DocumentType type, DocumentOwner owner) =>
+        DocumentRepository().save(
+          Document(
+            id: '',
+            diverId: 'd1',
+            owner: owner,
+            type: type,
+            title: 'Boat',
+            createdAt: DateTime(2026),
+            updatedAt: DateTime(2026),
+          ),
+          const [],
+        );
+
+    testWidgets('a personal document can be filed under a trip', (t) async {
+      await addTrip();
+      final doc = await saveDoc(
+        DocumentType.booking,
+        const DocumentOwner.personal(),
+      );
+      await pumpEditor(
+        t,
+        documentId: doc.id,
+        pickedOwner: const DocumentOwner(DocumentOwnerKind.trip, 't1'),
+      );
+      expect(find.text('Personal'), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('document-owner-field')));
+      await t.pumpAndSettle();
+      expect(
+        t.getSemantics(find.byKey(const ValueKey('document-owner-field'))),
+        isSemantics(
+          isButton: true,
+          isEnabled: true,
+          label: 'Filed under\nBonaire',
+        ),
+      );
+      // The record's name, with its kind as the icon.
+      expect(find.text('Bonaire'), findsOneWidget);
+      expect(find.textContaining('Trips'), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('document-owner-field')),
+          matching: find.byIcon(Icons.luggage_outlined),
+        ),
+        findsOneWidget,
+      );
+      await t.tap(find.text('Save'));
+      await t.pumpAndSettle();
+      final after = (await DocumentRepository().getById(doc.id))!;
+      expect(after.owner, const DocumentOwner(DocumentOwnerKind.trip, 't1'));
+    });
+
+    testWidgets('moving to Personal clears the old owner column', (t) async {
+      await addTrip();
+      final doc = await saveDoc(
+        DocumentType.booking,
+        const DocumentOwner(DocumentOwnerKind.trip, 't1'),
+      );
+      await pumpEditor(
+        t,
+        documentId: doc.id,
+        pickedOwner: const DocumentOwner.personal(),
+      );
+      await t.tap(find.byKey(const ValueKey('document-owner-field')));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Save'));
+      await t.pumpAndSettle();
+      final db = DatabaseService.instance.database;
+      final row = await (db.select(
+        db.documents,
+      )..where((d) => d.id.equals(doc.id))).getSingle();
+      expect(row.tripId, isNull);
+    });
+
+    testWidgets('a new document starts where it was opened from', (t) async {
+      await addTrip();
+      await pumpEditor(
+        t,
+        owner: const DocumentOwner(DocumentOwnerKind.trip, 't1'),
+      );
+      expect(find.textContaining('Bonaire'), findsOneWidget);
+    });
+
+    testWidgets('a card document cannot be moved', (t) async {
+      await DatabaseService.instance.database.customStatement(
+        'INSERT INTO certifications (id, diver_id, name, agency, created_at, '
+        "updated_at) VALUES ('c1', 'd1', 'Nitrox', 'tdi', 0, 0)",
+      );
+      final doc = await saveDoc(
+        DocumentType.certificationCard,
+        const DocumentOwner(DocumentOwnerKind.certification, 'c1'),
+      );
+      await pumpEditor(
+        t,
+        documentId: doc.id,
+        pickedOwner: const DocumentOwner.personal(),
+      );
+      expect(find.text('A card stays with its certification'), findsOneWidget);
+      expect(
+        t.getSemantics(find.byKey(const ValueKey('document-owner-field'))),
+        isSemantics(isButton: true, isEnabled: false),
+      );
+      await t.tap(find.byKey(const ValueKey('document-owner-field')));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Save'));
+      await t.pumpAndSettle();
+      final after = (await DocumentRepository().getById(doc.id))!;
+      expect(
+        after.owner,
+        const DocumentOwner(DocumentOwnerKind.certification, 'c1'),
+      );
+    });
   });
 }

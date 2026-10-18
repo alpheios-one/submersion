@@ -31,6 +31,7 @@ import 'package:submersion/features/equipment/presentation/pages/equipment_edit_
 import 'package:submersion/features/equipment/presentation/pages/equipment_set_detail_page.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_list_count_provider.dart';
+import 'package:submersion/shared/widgets/section_title_toggle.dart';
 import 'package:submersion/shared/widgets/title_with_subtitle.dart';
 
 class EquipmentListPage extends ConsumerStatefulWidget {
@@ -53,6 +54,7 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _shownTabIndex = _tabController.index;
     _tabController.addListener(_onTabChanged);
   }
 
@@ -64,8 +66,15 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
     super.dispose();
   }
 
+  /// The section the page last built for; see [_onTabChanged].
+  late int _shownTabIndex;
+
   void _onTabChanged() {
-    if (_tabController.indexIsChanging) return;
+    // A tapped name notifies twice: as the index changes, with the underline
+    // about to slide, and again when it lands. Act on the first, so the section
+    // shows at once rather than after the slide (issue #3461).
+    if (_tabController.index == _shownTabIndex) return;
+    _shownTabIndex = _tabController.index;
     setState(() {});
     // Skip URL clearing for programmatic tab switches (e.g., auto-switching
     // to Equipment tab when EquipmentDetailPage's desktop redirect fires)
@@ -199,7 +208,7 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
         return Scaffold(
           appBar: AppBar(
             // The title is the section switcher: "Equipment" and "Sets" sit
-            // where the title would, the one showing in a pill. 8 here plus
+            // where the title would, the one showing underlined. 8 here plus
             // the switcher's own 8px label padding puts the text at the 16px
             // every other app bar title sits at.
             titleSpacing: _phoneTitleSpacing,
@@ -210,6 +219,7 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
                 child: EquipmentSectionToggle(
                   controller: _tabController,
                   tabHeight: EquipmentSectionToggle.compactTabHeight,
+                  onAppBar: true,
                 ),
               ),
               subtitle: _isEquipmentTab && !selection.isActive
@@ -255,10 +265,6 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
   /// Horizontal space either side of the phone title; see [_phoneRowFits].
   static const double _phoneTitleSpacing = 8;
 
-  /// The text scale [AppBar] caps its title at (its private
-  /// `_kMaxTitleTextScaleFactor`), which the switcher and count both sit in.
-  static const double _appBarTitleMaxTextScale = 1.34;
-
   /// The standard toolbar height, or taller when a large text size needs
   /// more room for the switcher and the entry count under it.
   ///
@@ -272,7 +278,7 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
   double _phoneToolbarHeight(BuildContext context, TextStyle titleStyle) {
     final scaler = MediaQuery.textScalerOf(
       context,
-    ).clamp(maxScaleFactor: _appBarTitleMaxTextScale);
+    ).clamp(maxScaleFactor: SectionTitleToggle.appBarTitleMaxTextScale);
     final switcher = EquipmentSectionToggle.heightFor(
       EquipmentSectionToggle.fittedTabHeight(
         context,
@@ -294,13 +300,8 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
     );
   }
 
-  /// The phone title at 18px: a step under the usual 22px app bar title,
-  /// which is what lets the switcher share its row with the actions in most
-  /// locales.
   TextStyle _phoneTitleStyle(BuildContext context) =>
-      (Theme.of(context).textTheme.titleMedium ?? const TextStyle()).copyWith(
-        fontSize: 18,
-      );
+      SectionTitleToggle.toolbarTitleStyle(context);
 
   /// Whether the switcher and [actionCount] actions fit the app bar's one row.
   ///
