@@ -14075,6 +14075,48 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cylinderConfigs_fromPreset => '从预设填入';
 
   @override
+  String get tankMod_label => 'MOD';
+
+  @override
+  String tankMod_default(String ppO2, String limit) {
+    return '默认值，ppO2 $ppO2（$limit）';
+  }
+
+  @override
+  String get tankMod_limitBottom => '底部限值';
+
+  @override
+  String get tankMod_limitDeco => '减压限值';
+
+  @override
+  String tankMod_overridden(String depth) {
+    return '由你设置 · 默认 $depth';
+  }
+
+  @override
+  String tankMod_ppO2At(String ppO2, String depth) {
+    return '$depth 处 ppO2 $ppO2';
+  }
+
+  @override
+  String tankMod_exceeds(
+    String ppO2,
+    String depth,
+    String limit,
+    String limitPpO2,
+  ) {
+    return '$depth 处 ppO2 $ppO2，超过$limit $limitPpO2';
+  }
+
+  @override
+  String get tankMod_reset => '重置';
+
+  @override
+  String tankMod_chip(String depth) {
+    return 'MOD $depth';
+  }
+
+  @override
   String get cylinderConfigs_applyAction => '应用配置';
 
   @override
