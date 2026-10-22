@@ -18,6 +18,7 @@ void main() {
     TankMaterial? material,
     double? startPressure,
     String? label,
+    double? mod,
   }) => CylinderConfigItem(
     id: id,
     configId: 'c1',
@@ -30,6 +31,7 @@ void main() {
     tankMaterial: material,
     defaultStartPressureBar: startPressure,
     label: label,
+    decoSwitchDepth: mod,
     createdAt: now,
     updatedAt: now,
   );
@@ -43,6 +45,9 @@ void main() {
     double? startPressure,
     String? name,
     int order = 0,
+    double o2 = 21,
+    double he = 0,
+    double? mod,
   }) => ExistingTank(
     id: id,
     tankRole: role,
@@ -52,6 +57,9 @@ void main() {
     startPressureBar: startPressure,
     tankName: name,
     tankOrder: order,
+    o2Percent: o2,
+    hePercent: he,
+    decoSwitchDepth: mod,
   );
 
   test('an empty dive gets every cylinder inserted, in sort order', () {
@@ -352,6 +360,105 @@ void main() {
 
       expect(plan.overwrites, isEmpty);
       expect(plan.ops, isEmpty);
+    });
+  });
+
+  // A MOD set by hand belongs to the mix it was set for (issue #3567): a
+  // claimed tank keeps its own gas, so the MOD carries only where the mixes
+  // match.
+  group('a MOD set by hand (issue #3567)', () {
+    test('is filled onto a tank with none when the mixes match', () {
+      final plan = applier.plan(
+        existing: [tank(id: 't1', role: TankRole.deco, o2: 50)],
+        items: [cfg(id: 'a', role: TankRole.deco, o2: 50, mod: 18)],
+      );
+
+      final fill = plan.ops.single as FillTank;
+      expect(fill.decoSwitchDepth, 18);
+      expect(plan.overwrites, isEmpty);
+    });
+
+    test('is not filled when the tank holds a different mix', () {
+      final plan = applier.plan(
+        existing: [tank(id: 't1', role: TankRole.deco, o2: 32)],
+        items: [cfg(id: 'a', role: TankRole.deco, o2: 50, mod: 18)],
+      );
+
+      expect(plan.ops, isEmpty);
+      expect(plan.overwrites, isEmpty);
+    });
+
+    test('a different one is listed as an overwrite when the mixes match', () {
+      final plan = applier.plan(
+        existing: [tank(id: 't1', role: TankRole.deco, o2: 50, mod: 21)],
+        items: [cfg(id: 'a', role: TankRole.deco, o2: 50, mod: 18)],
+      );
+
+      final change = plan.overwrites.single.decoSwitchDepth;
+      expect(change?.from, 21);
+      expect(change?.to, 18);
+      expect(plan.overwrites.single.changesCylinder, isFalse);
+      expect(plan.ops, isEmpty);
+    });
+
+    test('a different one is not offered when the mixes differ', () {
+      final plan = applier.plan(
+        existing: [tank(id: 't1', role: TankRole.deco, o2: 32, mod: 30)],
+        items: [cfg(id: 'a', role: TankRole.deco, o2: 50, mod: 18)],
+      );
+
+      expect(plan.overwrites, isEmpty);
+    });
+
+    test('an equal one, or none in the configuration, is no change', () {
+      final plan = applier.plan(
+        existing: [
+          tank(id: 't1', role: TankRole.deco, o2: 50, mod: 18),
+          tank(id: 't2', role: TankRole.stage, o2: 32, mod: 30, order: 1),
+        ],
+        items: [
+          cfg(id: 'a', role: TankRole.deco, o2: 50, mod: 18),
+          cfg(id: 'b', role: TankRole.stage, o2: 32, order: 1),
+        ],
+      );
+
+      expect(plan.ops, isEmpty);
+      expect(plan.overwrites, isEmpty);
+    });
+
+    test('goes with the mix to a re-roled tank whose defaulted gas the '
+        'configuration replaces', () {
+      // A bailout the dive computer read as the oxygen supply (issue #3307),
+      // carrying the importer's 100% default.
+      final plan = applier.plan(
+        existing: const [
+          ExistingTank(
+            id: 't1',
+            tankRole: TankRole.oxygenSupply,
+            o2Percent: 100,
+          ),
+          ExistingTank(id: 't2', tankRole: TankRole.diluent, tankOrder: 1),
+          ExistingTank(
+            id: 't3',
+            tankRole: TankRole.oxygenSupply,
+            roleSource: TankRoleSource.transmitterName,
+            tankOrder: 2,
+            o2Percent: 100,
+          ),
+        ],
+        items: [
+          cfg(id: 'o2', role: TankRole.oxygenSupply, o2: 100),
+          cfg(id: 'dil', role: TankRole.diluent, order: 1),
+          cfg(id: 'bo', role: TankRole.bailout, order: 2, o2: 50, mod: 21),
+        ],
+      );
+
+      final change = plan.overwrites.single;
+      expect(change.tankId, 't3');
+      expect(change.gas?.to, (o2: 50.0, he: 0.0));
+      final fill = plan.ops.whereType<FillTank>().single;
+      expect(fill.tankId, 't3');
+      expect(fill.decoSwitchDepth, 21);
     });
   });
 }

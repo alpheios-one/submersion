@@ -20,6 +20,9 @@ class ExistingTank {
   /// Where [tankRole] came from when no person chose it (issue #2595).
   final TankRoleSource? roleSource;
 
+  /// The MOD set by hand for the tank's mix, if any (issue #3567).
+  final double? decoSwitchDepth;
+
   const ExistingTank({
     required this.id,
     required this.tankRole,
@@ -32,6 +35,7 @@ class ExistingTank {
     this.tankOrder = 0,
     this.o2Percent = 21,
     this.hePercent = 0,
+    this.decoSwitchDepth,
   });
 
   /// The dive computer read the role off the transmitter's name, so it is a
@@ -72,6 +76,10 @@ class FillTank extends CylinderConfigOp {
   final double? startPressureBar;
   final String? tankName;
 
+  /// The configuration's MOD set by hand (issue #3567), only for a tank
+  /// whose mix is the one it was set for.
+  final double? decoSwitchDepth;
+
   /// The configuration confirms a role the dive computer read off the
   /// transmitter's name, so it stops being a guess (issue #3307). Clears a
   /// marker, never a role, so it needs no consent.
@@ -84,6 +92,7 @@ class FillTank extends CylinderConfigOp {
     this.tankMaterial,
     this.startPressureBar,
     this.tankName,
+    this.decoSwitchDepth,
     this.clearRoleSource = false,
   });
 
@@ -93,6 +102,7 @@ class FillTank extends CylinderConfigOp {
       tankMaterial == null &&
       startPressureBar == null &&
       tankName == null &&
+      decoSwitchDepth == null &&
       !clearRoleSource;
 }
 
@@ -136,6 +146,10 @@ class OverwriteTank extends CylinderConfigOp {
   final SpecChange<TankMaterial>? tankMaterial;
   final SpecChange<String>? tankName;
 
+  /// A MOD set by hand that differs (issue #3567), only for a tank whose
+  /// mix is the one it was set for, or becomes it through [gas].
+  final SpecChange<double>? decoSwitchDepth;
+
   const OverwriteTank({
     required this.tankId,
     required this.tankRole,
@@ -145,6 +159,7 @@ class OverwriteTank extends CylinderConfigOp {
     this.workingPressureBar,
     this.tankMaterial,
     this.tankName,
+    this.decoSwitchDepth,
   });
 
   bool get isEmpty =>
@@ -153,7 +168,8 @@ class OverwriteTank extends CylinderConfigOp {
       volumeL == null &&
       workingPressureBar == null &&
       tankMaterial == null &&
-      tankName == null;
+      tankName == null &&
+      decoSwitchDepth == null;
 
   /// Whether the cylinder itself changes, not just its label. A tank preset
   /// name no longer describes a cylinder whose size or material changed.
@@ -194,6 +210,7 @@ class CylinderConfigApplier {
   // cylinder to the value it already holds.
   static const _volumeToleranceL = 0.01;
   static const _pressureToleranceBar = 0.5;
+  static const _depthToleranceM = 0.1;
 
   /// A change only when both sides hold a value: a null on the dive is a
   /// fill, and a null in the configuration has nothing to offer.
@@ -369,6 +386,16 @@ class CylinderConfigApplier {
 
       kept++;
       final roleChanges = match.tankRole != item.tankRole;
+      final gasChange = roleChanges ? _gasDiffers(match, item) : null;
+      // A MOD is set for one mix (issue #3567). The tank keeps its own gas,
+      // so the configuration's MOD carries only when the mixes match, or
+      // when the configuration's mix replaces the tank's along with it.
+      final sameMix =
+          gasChange != null ||
+          _sameGas(
+            (o2: match.o2Percent, he: match.hePercent),
+            (o2: item.o2Percent, he: item.hePercent),
+          );
 
       final fill = FillTank(
         tankId: match.id,
@@ -381,6 +408,9 @@ class CylinderConfigApplier {
             ? item.defaultStartPressureBar
             : null,
         tankName: match.tankName == null ? item.label : null,
+        decoSwitchDepth: sameMix && match.decoSwitchDepth == null
+            ? item.decoSwitchDepth
+            : null,
         // A size that fits confirms a name-derived role; a match on role
         // alone is the same guess counted twice.
         clearRoleSource:
@@ -395,7 +425,7 @@ class CylinderConfigApplier {
         tankId: match.id,
         tankRole: match.tankRole,
         role: roleChanges ? SpecChange(match.tankRole, item.tankRole) : null,
-        gas: roleChanges ? _gasDiffers(match, item) : null,
+        gas: gasChange,
         volumeL: _differs(match.volumeL, item.volumeL, _volumeToleranceL),
         workingPressureBar: _differs(
           match.workingPressureBar,
@@ -414,6 +444,13 @@ class CylinderConfigApplier {
                 label.isNotEmpty &&
                 match.tankName!.trim() != label
             ? SpecChange(match.tankName!, label)
+            : null,
+        decoSwitchDepth: sameMix
+            ? _differs(
+                match.decoSwitchDepth,
+                item.decoSwitchDepth,
+                _depthToleranceM,
+              )
             : null,
       );
       if (!overwrite.isEmpty) overwrites.add(overwrite);

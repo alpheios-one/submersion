@@ -30,6 +30,7 @@ class DiveTankConfigAdapter {
     tankOrder: tank.order,
     o2Percent: tank.gasMix.o2,
     hePercent: tank.gasMix.he,
+    decoSwitchDepth: tank.decoSwitchDepth,
   );
 
   DiveTank _fromItem(CylinderConfigItem item, int order, String id) => DiveTank(
@@ -123,6 +124,7 @@ class DiveTankConfigAdapter {
             material: op.tankMaterial,
             startPressure: op.startPressureBar,
             name: op.tankName,
+            decoSwitchDepth: op.decoSwitchDepth,
             clearRoleSource: op.clearRoleSource,
           );
         case InsertTank():
@@ -137,6 +139,7 @@ class DiveTankConfigAdapter {
             workingPressure: op.workingPressureBar?.to,
             material: op.tankMaterial?.to,
             name: op.tankName?.to,
+            decoSwitchDepth: op.decoSwitchDepth?.to,
             role: op.role?.to,
             gasMix: switch (op.gas?.to) {
               final gas? => GasMix(o2: gas.o2, he: gas.he),
