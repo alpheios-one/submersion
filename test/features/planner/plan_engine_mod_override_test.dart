@@ -19,6 +19,7 @@ domain.DivePlan _plan({
   double? ean40Mod,
   bool ean40Travel = false,
   double? ppO2Deco,
+  double ean40Start = 207,
 }) => domain.DivePlan(
   id: 'plan-mod',
   name: 'MOD override',
@@ -30,7 +31,7 @@ domain.DivePlan _plan({
     DiveTank(
       id: 'ean40',
       volume: 11.1,
-      startPressure: 207,
+      startPressure: ean40Start,
       gasMix: _ean40,
       isTravelGas: ean40Travel,
       decoSwitchDepth: ean40Mod,
@@ -116,6 +117,23 @@ void main() {
     expect(critical.first.value, closeTo(1.72, 1e-9));
     expect(critical.first.atDepth, 33);
     expect(critical.first.threshold, 1.6);
+  });
+
+  test('a reported override takes its place in severity order', () {
+    // A short-filled EAN40 adds a gas issue of lower severity; the critical
+    // MOD issue must still come ahead of it.
+    final outcome = engine.compute(_plan(ean40Mod: 33, ean40Start: 70));
+    final severities = outcome.issues.map((i) => i.severity).toList();
+    expect(severities, contains(PlanIssueSeverity.critical));
+    expect(
+      severities.any((s) => s != PlanIssueSeverity.critical),
+      isTrue,
+      reason: 'needs a lower-severity issue to order against',
+    );
+    expect(
+      severities,
+      [...severities]..sort((a, b) => b.index.compareTo(a.index)),
+    );
   });
 
   test('an override within the limit raises nothing', () {

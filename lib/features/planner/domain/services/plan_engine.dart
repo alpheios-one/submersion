@@ -1440,8 +1440,8 @@ class PlanEngine {
       );
     }
 
-    issues.sort((a, b) => b.severity.index.compareTo(a.severity.index));
     issues.addAll(_modOverrideIssues(plan.tanks));
+    issues.sort((a, b) => b.severity.index.compareTo(a.severity.index));
     return issues;
   }
 
