@@ -11,6 +11,7 @@ import 'package:submersion/features/cylinder_configs/domain/entities/cylinder_co
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tank_preset_dropdown.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tank_role_option.dart';
+import 'package:submersion/features/planner/domain/services/tank_mod.dart';
 import 'package:submersion/features/planner/presentation/widgets/tank_mod_field.dart';
 import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -81,6 +82,13 @@ class _CylinderConfigItemEditorState extends State<CylinderConfigItemEditor> {
   /// The preset last picked this session, so the dropdown shows it. A saved
   /// cylinder records its size, not the preset it came from.
   String? _presetName;
+
+  /// MODs set by hand that a role change put aside this session, keyed by
+  /// whether the limit they were set against is the deco one (issue #3567).
+  /// A role on the other limit takes its default; changing back restores
+  /// the MOD, so a slip of the dropdown loses nothing. What is saved is
+  /// only the MOD in effect, so this goes with the page.
+  final Map<bool, double> _setAsideMods = {};
 
   @override
   void initState() {
@@ -207,6 +215,26 @@ class _CylinderConfigItemEditorState extends State<CylinderConfigItemEditor> {
       );
       _workingPressure.text = _pressureText(preset.workingPressureBar);
       if (!keepLabel) _label.text = preset.displayName;
+    });
+  }
+
+  // ---------------------------------------------------------------- role
+
+  void _onRole(TankRole role) {
+    final item = _item;
+    final fromDeco = usesDecoLimit(item.tankRole, _gas);
+    final toDeco = usesDecoLimit(role, _gas);
+    if (fromDeco == toDeco) {
+      _emit(item.copyWith(tankRole: role));
+      return;
+    }
+    if (item.decoSwitchDepth case final mod?) _setAsideMods[fromDeco] = mod;
+    _emit(switch (_setAsideMods.remove(toDeco)) {
+      final restored? => item.copyWith(
+        tankRole: role,
+        decoSwitchDepth: restored,
+      ),
+      null => item.copyWith(tankRole: role, clearDecoSwitchDepth: true),
     });
   }
 
@@ -358,7 +386,7 @@ class _CylinderConfigItemEditorState extends State<CylinderConfigItemEditor> {
                         ),
                     ],
                     onChanged: (role) {
-                      if (role != null) _emit(item.copyWith(tankRole: role));
+                      if (role != null) _onRole(role);
                     },
                   ),
                 ),

@@ -478,4 +478,35 @@ void main() {
     final saved = await repo.getConfigById(id);
     expect(saved!.items.single.decoSwitchDepth, 18);
   });
+
+  testWidgets('a MOD set aside by a role change is gone once saved', (
+    tester,
+  ) async {
+    final id = await repo.createConfig(diverId: 'd1', name: 'Deco');
+    await repo.saveItems(id, [
+      CylinderConfigItem(
+        id: 'i1',
+        configId: id,
+        tankRole: TankRole.deco,
+        o2Percent: 50,
+        decoSwitchDepth: 15,
+        createdAt: now,
+        updatedAt: now,
+      ),
+    ]);
+
+    await tester.pumpWidget(host(configId: id));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Deco').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Stage').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    final saved = await repo.getConfigById(id);
+    expect(saved!.items.single.tankRole, TankRole.stage);
+    expect(saved.items.single.decoSwitchDepth, isNull);
+  });
 }

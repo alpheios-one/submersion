@@ -249,6 +249,102 @@ void main() {
       expect(current.tankRole, TankRole.bailout);
     });
 
+    // A MOD set by hand is measured against its role's ppO2 limit (issue
+    // #3567). A role on the other limit sets it aside for that role's
+    // default; going back restores it, so a slip of the dropdown costs
+    // nothing.
+    group('a MOD set by hand across a role change', () {
+      Future<void> pickRole(WidgetTester tester, String from, String to) async {
+        await tester.tap(find.text(from));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(to).last);
+        await tester.pumpAndSettle();
+      }
+
+      testWidgets('gives way to the default on a role with the other limit', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          host(item: seed(role: TankRole.deco, o2: 50, mod: 15)),
+        );
+        await tester.pumpAndSettle();
+
+        await pickRole(tester, 'Deco', 'Stage');
+
+        expect(current.tankRole, TankRole.stage);
+        expect(current.decoSwitchDepth, isNull);
+        // EAN50 at the 1.4 bottom limit.
+        expect(textOf(tester, 'MOD'), '18');
+      });
+
+      testWidgets('comes back when the role is changed back', (tester) async {
+        await tester.pumpWidget(
+          host(item: seed(role: TankRole.deco, o2: 50, mod: 15)),
+        );
+        await tester.pumpAndSettle();
+
+        await pickRole(tester, 'Deco', 'Stage');
+        await pickRole(tester, 'Stage', 'Deco');
+
+        expect(current.tankRole, TankRole.deco);
+        expect(current.decoSwitchDepth, 15);
+        expect(textOf(tester, 'MOD'), '15');
+      });
+
+      testWidgets('comes back for any role on its limit', (tester) async {
+        await tester.pumpWidget(
+          host(item: seed(role: TankRole.deco, o2: 50, mod: 15)),
+        );
+        await tester.pumpAndSettle();
+
+        await pickRole(tester, 'Deco', 'Stage');
+        await pickRole(tester, 'Stage', 'O₂ Supply');
+
+        expect(current.tankRole, TankRole.oxygenSupply);
+        expect(current.decoSwitchDepth, 15);
+      });
+
+      testWidgets('one set on the other limit is kept for that limit', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          host(item: seed(role: TankRole.deco, o2: 50, mod: 15)),
+        );
+        await tester.pumpAndSettle();
+
+        await pickRole(tester, 'Deco', 'Stage');
+        await tester.enterText(field('MOD'), '12');
+        await tester.pumpAndSettle();
+        await pickRole(tester, 'Stage', 'Deco');
+        expect(current.decoSwitchDepth, 15);
+
+        await pickRole(tester, 'Deco', 'Stage');
+        expect(current.decoSwitchDepth, 12);
+      });
+
+      testWidgets('stays on a role with the same limit', (tester) async {
+        await tester.pumpWidget(
+          host(item: seed(role: TankRole.backGas, o2: 32, mod: 30)),
+        );
+        await tester.pumpAndSettle();
+
+        await pickRole(tester, 'Back Gas', 'Stage');
+
+        expect(current.tankRole, TankRole.stage);
+        expect(current.decoSwitchDepth, 30);
+      });
+
+      testWidgets('leaves a cylinder on its default alone', (tester) async {
+        await tester.pumpWidget(host(item: seed(role: TankRole.deco, o2: 50)));
+        await tester.pumpAndSettle();
+
+        await pickRole(tester, 'Deco', 'Stage');
+        await pickRole(tester, 'Stage', 'Deco');
+
+        expect(current.decoSwitchDepth, isNull);
+      });
+    });
+
     testWidgets('the role field and every role option carry the role glyph', (
       tester,
     ) async {
