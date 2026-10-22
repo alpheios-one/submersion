@@ -4146,7 +4146,7 @@
   "tankMod_label": "MOD",
   "tankMod_default": "Alapértelmezés ppO2 {ppO2} mellett ({limit})",
   "tankMod_limitBottom": "fenékidő-határ",
-  "tankMod_limitDeco": "deko határ",
+  "tankMod_limitDeco": "dekó határ",
   "tankMod_overridden": "Általad megadva · alapértelmezés {depth}",
   "tankMod_ppO2At": "ppO2 {ppO2} itt: {depth}",
   "tankMod_exceeds": "ppO2 {ppO2} itt: {depth}, a(z) {limit} ({limitPpO2}) felett",

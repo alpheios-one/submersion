@@ -14692,7 +14692,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tankMod_limitBottom => 'fenékidő-határ';
 
   @override
-  String get tankMod_limitDeco => 'deko határ';
+  String get tankMod_limitDeco => 'dekó határ';
 
   @override
   String tankMod_overridden(String depth) {
