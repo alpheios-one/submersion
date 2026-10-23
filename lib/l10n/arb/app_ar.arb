@@ -6512,7 +6512,6 @@
   "settings_conflict_field_dayNumber": "رقم اليوم",
   "settings_conflict_field_dayType": "نوع اليوم",
   "settings_conflict_field_decoStopIncrement": "المسافة بين محطات تخفيف الضغط",
-  "settings_conflict_field_decoSwitchDepth": "عمق التبديل إلى غاز تخفيف الضغط",
   "settings_conflict_field_deepDiveThresholdM": "حد الغوص العميق",
   "settings_conflict_field_defaultCategory": "الفئة الافتراضية",
   "settings_conflict_field_defaultCeilingSource": "مصدر بيانات السقف",

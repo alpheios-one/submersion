@@ -22648,10 +22648,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Dekómegállók távolsága';
 
   @override
-  String get settings_conflict_field_decoSwitchDepth =>
-      'Dekógázra váltás mélysége';
-
-  @override
   String get settings_conflict_field_deepDiveThresholdM =>
       'Mélymerülési küszöb';
 

@@ -6643,7 +6643,6 @@
   "settings_conflict_field_dayNumber": "Tagnummer",
   "settings_conflict_field_dayType": "Tagestyp",
   "settings_conflict_field_decoStopIncrement": "Abstand der Dekostopps",
-  "settings_conflict_field_decoSwitchDepth": "Tiefe des Deko-Gaswechsels",
   "settings_conflict_field_deepDiveThresholdM": "Schwelle für Tieftauchgänge",
   "settings_conflict_field_defaultCategory": "Standardkategorie",
   "settings_conflict_field_defaultCeilingSource": "Datenquelle für die Ceiling",

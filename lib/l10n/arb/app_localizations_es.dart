@@ -22735,10 +22735,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Intervalo entre paradas de descompresión';
 
   @override
-  String get settings_conflict_field_decoSwitchDepth =>
-      'Profundidad de cambio a gas de descompresión';
-
-  @override
   String get settings_conflict_field_deepDiveThresholdM =>
       'Umbral de inmersión profunda';
 

@@ -22695,10 +22695,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Abstand der Dekostopps';
 
   @override
-  String get settings_conflict_field_decoSwitchDepth =>
-      'Tiefe des Deko-Gaswechsels';
-
-  @override
   String get settings_conflict_field_deepDiveThresholdM =>
       'Schwelle für Tieftauchgänge';
 

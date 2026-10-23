@@ -6512,7 +6512,6 @@
   "settings_conflict_field_dayNumber": "Número do dia",
   "settings_conflict_field_dayType": "Tipo de dia",
   "settings_conflict_field_decoStopIncrement": "Intervalo entre paradas de descompressão",
-  "settings_conflict_field_decoSwitchDepth": "Profundidade de troca para gás de descompressão",
   "settings_conflict_field_deepDiveThresholdM": "Limite de mergulho profundo",
   "settings_conflict_field_defaultCategory": "Categoria padrão",
   "settings_conflict_field_defaultCeilingSource": "Fonte de dados do teto",

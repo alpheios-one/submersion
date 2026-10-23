@@ -22206,9 +22206,6 @@ class AppLocalizationsHe extends AppLocalizations {
       'מרווח בין עצירות דקו';
 
   @override
-  String get settings_conflict_field_decoSwitchDepth => 'עומק המעבר לגז דקו';
-
-  @override
   String get settings_conflict_field_deepDiveThresholdM => 'סף צלילה עמוקה';
 
   @override

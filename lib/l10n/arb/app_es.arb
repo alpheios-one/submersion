@@ -6512,7 +6512,6 @@
   "settings_conflict_field_dayNumber": "Número de día",
   "settings_conflict_field_dayType": "Tipo de día",
   "settings_conflict_field_decoStopIncrement": "Intervalo entre paradas de descompresión",
-  "settings_conflict_field_decoSwitchDepth": "Profundidad de cambio a gas de descompresión",
   "settings_conflict_field_deepDiveThresholdM": "Umbral de inmersión profunda",
   "settings_conflict_field_defaultCategory": "Categoría predeterminada",
   "settings_conflict_field_defaultCeilingSource": "Fuente de datos del techo",

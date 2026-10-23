@@ -22734,10 +22734,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Intervallo delle soste deco';
 
   @override
-  String get settings_conflict_field_decoSwitchDepth =>
-      'Profondità di cambio al gas deco';
-
-  @override
   String get settings_conflict_field_deepDiveThresholdM =>
       'Soglia di immersione profonda';
 

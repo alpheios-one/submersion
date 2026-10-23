@@ -6512,7 +6512,6 @@
   "settings_conflict_field_dayNumber": "Dagnummer",
   "settings_conflict_field_dayType": "Soort dag",
   "settings_conflict_field_decoStopIncrement": "Afstand tussen decostops",
-  "settings_conflict_field_decoSwitchDepth": "Diepte voor de wissel naar decogas",
   "settings_conflict_field_deepDiveThresholdM": "Drempel voor diepe duiken",
   "settings_conflict_field_defaultCategory": "Standaardcategorie",
   "settings_conflict_field_defaultCeilingSource": "Gegevensbron voor het plafond",

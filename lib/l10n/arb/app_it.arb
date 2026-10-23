@@ -6412,7 +6412,6 @@
   "settings_conflict_field_dayNumber": "Numero del giorno",
   "settings_conflict_field_dayType": "Tipo di giorno",
   "settings_conflict_field_decoStopIncrement": "Intervallo delle soste deco",
-  "settings_conflict_field_decoSwitchDepth": "Profondità di cambio al gas deco",
   "settings_conflict_field_deepDiveThresholdM": "Soglia di immersione profonda",
   "settings_conflict_field_defaultCategory": "Categoria predefinita",
   "settings_conflict_field_defaultCeilingSource": "Fonte dei dati del ceiling",

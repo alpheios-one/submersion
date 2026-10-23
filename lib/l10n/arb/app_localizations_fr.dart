@@ -22794,10 +22794,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Intervalle des paliers de déco';
 
   @override
-  String get settings_conflict_field_decoSwitchDepth =>
-      'Profondeur de changement de gaz de déco';
-
-  @override
   String get settings_conflict_field_deepDiveThresholdM =>
       'Seuil de plongée profonde';
 

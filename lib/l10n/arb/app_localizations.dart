@@ -36215,12 +36215,6 @@ abstract class AppLocalizations {
   /// **'Deco stop increment'**
   String get settings_conflict_field_decoStopIncrement;
 
-  /// No description provided for @settings_conflict_field_decoSwitchDepth.
-  ///
-  /// In en, this message translates to:
-  /// **'Deco gas switch depth'**
-  String get settings_conflict_field_decoSwitchDepth;
-
   /// No description provided for @settings_conflict_field_deepDiveThresholdM.
   ///
   /// In en, this message translates to:

@@ -6664,7 +6664,6 @@
   "settings_conflict_field_dayNumber": "第几天",
   "settings_conflict_field_dayType": "日程类型",
   "settings_conflict_field_decoStopIncrement": "减压停留间隔",
-  "settings_conflict_field_decoSwitchDepth": "切换减压气深度",
   "settings_conflict_field_deepDiveThresholdM": "深潜阈值",
   "settings_conflict_field_defaultCategory": "默认类别",
   "settings_conflict_field_defaultCeilingSource": "天花板数据来源",

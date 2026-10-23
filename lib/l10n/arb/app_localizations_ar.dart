@@ -23000,10 +23000,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'المسافة بين محطات تخفيف الضغط';
 
   @override
-  String get settings_conflict_field_decoSwitchDepth =>
-      'عمق التبديل إلى غاز تخفيف الضغط';
-
-  @override
   String get settings_conflict_field_deepDiveThresholdM => 'حد الغوص العميق';
 
   @override

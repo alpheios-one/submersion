@@ -21567,9 +21567,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_conflict_field_decoStopIncrement => '减压停留间隔';
 
   @override
-  String get settings_conflict_field_decoSwitchDepth => '切换减压气深度';
-
-  @override
   String get settings_conflict_field_deepDiveThresholdM => '深潜阈值';
 
   @override

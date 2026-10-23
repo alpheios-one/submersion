@@ -6412,7 +6412,6 @@
   "settings_conflict_field_dayNumber": "Nap sorszáma",
   "settings_conflict_field_dayType": "Nap típusa",
   "settings_conflict_field_decoStopIncrement": "Dekómegállók távolsága",
-  "settings_conflict_field_decoSwitchDepth": "Dekógázra váltás mélysége",
   "settings_conflict_field_deepDiveThresholdM": "Mélymerülési küszöb",
   "settings_conflict_field_defaultCategory": "Alapértelmezett kategória",
   "settings_conflict_field_defaultCeilingSource": "Plafon adatforrása",

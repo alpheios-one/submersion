@@ -6412,7 +6412,6 @@
   "settings_conflict_field_dayNumber": "Numéro du jour",
   "settings_conflict_field_dayType": "Type de jour",
   "settings_conflict_field_decoStopIncrement": "Intervalle des paliers de déco",
-  "settings_conflict_field_decoSwitchDepth": "Profondeur de changement de gaz de déco",
   "settings_conflict_field_deepDiveThresholdM": "Seuil de plongée profonde",
   "settings_conflict_field_defaultCategory": "Catégorie par défaut",
   "settings_conflict_field_defaultCeilingSource": "Source des données de plafond",

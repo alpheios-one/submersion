@@ -22587,10 +22587,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Afstand tussen decostops';
 
   @override
-  String get settings_conflict_field_decoSwitchDepth =>
-      'Diepte voor de wissel naar decogas';
-
-  @override
   String get settings_conflict_field_deepDiveThresholdM =>
       'Drempel voor diepe duiken';
 

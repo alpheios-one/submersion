@@ -13720,7 +13720,6 @@
   "settings_conflict_field_dayNumber": "Day number",
   "settings_conflict_field_dayType": "Day type",
   "settings_conflict_field_decoStopIncrement": "Deco stop increment",
-  "settings_conflict_field_decoSwitchDepth": "Deco gas switch depth",
   "settings_conflict_field_deepDiveThresholdM": "Deep dive threshold",
   "settings_conflict_field_defaultCategory": "Default category",
   "settings_conflict_field_defaultCeilingSource": "Ceiling data source",

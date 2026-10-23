@@ -22384,9 +22384,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_conflict_field_decoStopIncrement => 'Deco stop increment';
 
   @override
-  String get settings_conflict_field_decoSwitchDepth => 'Deco gas switch depth';
-
-  @override
   String get settings_conflict_field_deepDiveThresholdM =>
       'Deep dive threshold';
 

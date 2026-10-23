@@ -6516,7 +6516,6 @@
   "settings_conflict_field_dayNumber": "מספר היום",
   "settings_conflict_field_dayType": "סוג היום",
   "settings_conflict_field_decoStopIncrement": "מרווח בין עצירות דקו",
-  "settings_conflict_field_decoSwitchDepth": "עומק המעבר לגז דקו",
   "settings_conflict_field_deepDiveThresholdM": "סף צלילה עמוקה",
   "settings_conflict_field_defaultCategory": "קטגוריית ברירת מחדל",
   "settings_conflict_field_defaultCeilingSource": "מקור נתוני התקרה",
