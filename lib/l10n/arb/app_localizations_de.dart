@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -4364,8 +4365,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           'Alle $count Einträge aus dieser Checkliste löschen? Vorlagen sind nicht betroffen.',
-      one:
-          'Den einzigen Eintrag aus dieser Checkliste löschen? Vorlagen sind nicht betroffen.',
+      one: 'Den einzigen Eintrag aus dieser Checkliste löschen? Vorlagen sind nicht betroffen.',
     );
     return '$_temp0';
   }
@@ -11506,8 +11506,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           '$count Tauchplätze mit Koordinaten haben kein Land, keine Region, keinen Ort oder kein Gewässer.',
-      one:
-          '1 Tauchplatz mit Koordinaten hat kein Land, keine Region, keinen Ort oder kein Gewässer.',
+      one: '1 Tauchplatz mit Koordinaten hat kein Land, keine Region, keinen Ort oder kein Gewässer.',
     );
     String _temp1 = intl.Intl.pluralLogic(
       minutes,
@@ -14729,6 +14728,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tankMod_limitDeco => 'Deko-Limit';
+
+  @override
+  String get tankMod_limitDiluent => 'Dil MOD';
 
   @override
   String tankMod_overridden(String depth) {
@@ -18144,8 +18146,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           '$count davon haben eine Bildunterschrift oder Favoritenmarkierung in Submersion, diese Details gehen verloren.',
-      one:
-          'Eines davon hat eine Bildunterschrift oder Favoritenmarkierung in Submersion, diese Details gehen verloren.',
+      one: 'Eines davon hat eine Bildunterschrift oder Favoritenmarkierung in Submersion, diese Details gehen verloren.',
     );
     return '$_temp0';
   }
@@ -21867,8 +21868,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           'Die Cloud-Bibliothek wird gelöscht und durch die $diveCount Tauchgänge dieses Geräts ersetzt.',
-      one:
-          'Die Cloud-Bibliothek wird gelöscht und durch den 1 Tauchgang dieses Geräts ersetzt.',
+      one: 'Die Cloud-Bibliothek wird gelöscht und durch den 1 Tauchgang dieses Geräts ersetzt.',
     );
     return '$_temp0';
   }
@@ -21880,10 +21880,8 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           '$peerCount andere Geräte werden zur Übernahme aufgefordert; bis dahin werden ihre Änderungen nicht zusammengeführt.',
-      one:
-          '1 anderes Gerät wird zur Übernahme aufgefordert; bis dahin werden seine Änderungen nicht zusammengeführt.',
-      zero:
-          'Es synchronisiert noch kein anderes Gerät, es gibt also nichts zu übernehmen.',
+      one: '1 anderes Gerät wird zur Übernahme aufgefordert; bis dahin werden seine Änderungen nicht zusammengeführt.',
+      zero: 'Es synchronisiert noch kein anderes Gerät, es gibt also nichts zu übernehmen.',
     );
     return '$_temp0';
   }
@@ -30008,8 +30006,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           'Dieser Tag ist an $count Tauchgängen. Wenn „Für Tauchgänge verwenden“ ausgeschaltet wird, wird er von diesen Tauchgängen entfernt.',
-      one:
-          'Dieser Tag ist an 1 Tauchgang. Wenn „Für Tauchgänge verwenden“ ausgeschaltet wird, wird er von diesem Tauchgang entfernt.',
+      one: 'Dieser Tag ist an 1 Tauchgang. Wenn „Für Tauchgänge verwenden“ ausgeschaltet wird, wird er von diesem Tauchgang entfernt.',
     );
     return '$_temp0';
   }
@@ -30021,8 +30018,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           'Dieser Tag ist an $count Ausrüstungsteilen. Wenn „Für Ausrüstung verwenden“ ausgeschaltet wird, wird er von diesen Ausrüstungsteilen entfernt.',
-      one:
-          'Dieser Tag ist an 1 Ausrüstungsteil. Wenn „Für Ausrüstung verwenden“ ausgeschaltet wird, wird er von diesem Ausrüstungsteil entfernt.',
+      one: 'Dieser Tag ist an 1 Ausrüstungsteil. Wenn „Für Ausrüstung verwenden“ ausgeschaltet wird, wird er von diesem Ausrüstungsteil entfernt.',
     );
     return '$_temp0';
   }
@@ -30034,8 +30030,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           'Dieser Tag ist an $count Tauchplätzen. Wenn „Für Tauchplätze verwenden“ ausgeschaltet wird, wird er von diesen Tauchplätzen entfernt.',
-      one:
-          'Dieser Tag ist an 1 Tauchplatz. Wenn „Für Tauchplätze verwenden“ ausgeschaltet wird, wird er von diesem Tauchplatz entfernt.',
+      one: 'Dieser Tag ist an 1 Tauchplatz. Wenn „Für Tauchplätze verwenden“ ausgeschaltet wird, wird er von diesem Tauchplatz entfernt.',
     );
     return '$_temp0';
   }
@@ -32870,8 +32865,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           '$count Werte konnten nicht umgewandelt werden und wurden leer gelassen. Wenn ein Feld falsch aussieht, prüfen Sie die Spaltenzuordnung und importieren Sie erneut.',
-      one:
-          '1 Wert konnte nicht umgewandelt werden und wurde leer gelassen. Wenn ein Feld falsch aussieht, prüfen Sie die Spaltenzuordnung und importieren Sie erneut.',
+      one: '1 Wert konnte nicht umgewandelt werden und wurde leer gelassen. Wenn ein Feld falsch aussieht, prüfen Sie die Spaltenzuordnung und importieren Sie erneut.',
     );
     return '$_temp0';
   }
@@ -33124,8 +33118,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           'Es wurde nichts importiert: Die Datumsangaben in $count Zeilen konnten nicht gelesen werden.',
-      one:
-          'Es wurde nichts importiert: Das Datum in 1 Zeile konnte nicht gelesen werden.',
+      one: 'Es wurde nichts importiert: Das Datum in 1 Zeile konnte nicht gelesen werden.',
     );
     return '$_temp0';
   }
@@ -39749,8 +39742,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           'Der Drucksensor lieferte $count-mal Fehlwerte (Aussetzer oder Ausreisser)',
-      one:
-          'Der Drucksensor lieferte einmal Fehlwerte (Aussetzer oder Ausreisser)',
+      one: 'Der Drucksensor lieferte einmal Fehlwerte (Aussetzer oder Ausreisser)',
     );
     return '$_temp0';
   }
@@ -46756,8 +46748,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           'Keines der $count Elemente konnte geprüft werden. Ihre Quellen sind derzeit nicht erreichbar.',
-      one:
-          'Das Element konnte nicht geprüft werden. Seine Quelle ist derzeit nicht erreichbar.',
+      one: 'Das Element konnte nicht geprüft werden. Seine Quelle ist derzeit nicht erreichbar.',
     );
     return '$_temp0';
   }
@@ -49673,8 +49664,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           'KML-Datei erfolgreich exportiert ($count Tauchplätze ohne Koordinaten übersprungen)',
-      one:
-          'KML-Datei erfolgreich exportiert (1 Tauchplatz ohne Koordinaten übersprungen)',
+      one: 'KML-Datei erfolgreich exportiert (1 Tauchplatz ohne Koordinaten übersprungen)',
       zero: 'KML-Datei erfolgreich exportiert',
     );
     return '$_temp0';
@@ -49691,8 +49681,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           'KML-Datei erfolgreich gespeichert ($count Tauchplätze ohne Koordinaten übersprungen)',
-      one:
-          'KML-Datei erfolgreich gespeichert (1 Tauchplatz ohne Koordinaten übersprungen)',
+      one: 'KML-Datei erfolgreich gespeichert (1 Tauchplatz ohne Koordinaten übersprungen)',
       zero: 'KML-Datei erfolgreich gespeichert',
     );
     return '$_temp0';
@@ -51840,8 +51829,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           '$count Sicherungsdateien werden endgültig gelöscht. Dies kann nicht rückgängig gemacht werden.',
-      one:
-          '1 Sicherungsdatei wird endgültig gelöscht. Dies kann nicht rückgängig gemacht werden.',
+      one: '1 Sicherungsdatei wird endgültig gelöscht. Dies kann nicht rückgängig gemacht werden.',
     );
     return '$_temp0';
   }
@@ -54738,8 +54726,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           '$count Fotos liegen nur in den bisherigen Kopien und lassen sich nach dem Wechsel auf diesem Gerät nicht mehr öffnen.',
-      one:
-          '1 Foto liegt nur in den bisherigen Kopien und lässt sich nach dem Wechsel auf diesem Gerät nicht mehr öffnen.',
+      one: '1 Foto liegt nur in den bisherigen Kopien und lässt sich nach dem Wechsel auf diesem Gerät nicht mehr öffnen.',
     );
     return '$_temp0';
   }

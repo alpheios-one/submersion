@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -14442,6 +14443,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get tankMod_limitDeco => 'מגבלת דקו';
 
   @override
+  String get tankMod_limitDiluent => 'Dil MOD';
+
+  @override
   String tankMod_overridden(String depth) {
     return 'הוגדר על ידך · ברירת מחדל $depth';
   }
@@ -17766,8 +17770,7 @@ class AppLocalizationsHe extends AppLocalizations {
       locale: localeName,
       other:
           'ל-$count מהם יש כיתוב או סימון מועדף השמורים ב-Submersion, והפרטים האלה יאבדו.',
-      one:
-          'לאחד מהם יש כיתוב או סימון מועדף השמורים ב-Submersion, והפרטים האלה יאבדו.',
+      one: 'לאחד מהם יש כיתוב או סימון מועדף השמורים ב-Submersion, והפרטים האלה יאבדו.',
     );
     return '$_temp0';
   }
@@ -29316,8 +29319,7 @@ class AppLocalizationsHe extends AppLocalizations {
       locale: localeName,
       other:
           'התגית הזו מופיעה ב-$count צלילות. כיבוי \"שימוש לצלילות\" יסיר אותה מצלילות אלה.',
-      one:
-          'התגית הזו מופיעה בצלילה אחת. כיבוי \"שימוש לצלילות\" יסיר אותה מצלילה זו.',
+      one: 'התגית הזו מופיעה בצלילה אחת. כיבוי \"שימוש לצלילות\" יסיר אותה מצלילה זו.',
     );
     return '$_temp0';
   }
@@ -29329,8 +29331,7 @@ class AppLocalizationsHe extends AppLocalizations {
       locale: localeName,
       other:
           'התגית הזו מופיעה ב-$count פריטי ציוד. כיבוי \"שימוש לציוד\" יסיר אותה מפריטים אלה.',
-      one:
-          'התגית הזו מופיעה בפריט ציוד אחד. כיבוי \"שימוש לציוד\" יסיר אותה מפריט זה.',
+      one: 'התגית הזו מופיעה בפריט ציוד אחד. כיבוי \"שימוש לציוד\" יסיר אותה מפריט זה.',
     );
     return '$_temp0';
   }
@@ -29342,8 +29343,7 @@ class AppLocalizationsHe extends AppLocalizations {
       locale: localeName,
       other:
           'התגית הזו מופיעה ב-$count אתרים. כיבוי \"שימוש לאתרים\" יסיר אותה מאתרים אלה.',
-      one:
-          'התגית הזו מופיעה באתר אחד. כיבוי \"שימוש לאתרים\" יסיר אותה מאתר זה.',
+      one: 'התגית הזו מופיעה באתר אחד. כיבוי \"שימוש לאתרים\" יסיר אותה מאתר זה.',
     );
     return '$_temp0';
   }
@@ -32133,8 +32133,7 @@ class AppLocalizationsHe extends AppLocalizations {
       locale: localeName,
       other:
           '$count ערכים לא הומרו ונשארו ריקים. אם שדה נראה שגוי, יש לבדוק את מיפוי העמודות ולייבא שוב.',
-      one:
-          'ערך אחד לא הומר ונשאר ריק. אם שדה נראה שגוי, יש לבדוק את מיפוי העמודות ולייבא שוב.',
+      one: 'ערך אחד לא הומר ונשאר ריק. אם שדה נראה שגוי, יש לבדוק את מיפוי העמודות ולייבא שוב.',
     );
     return '$_temp0';
   }
@@ -32165,8 +32164,7 @@ class AppLocalizationsHe extends AppLocalizations {
       locale: localeName,
       other:
           'לא ניתן היה לייבא $count תמונות השמורות בקובץ היומן (תמונות ציוד, מפות אתרים וכדומה). שמרו את הקובץ המקורי כדי לא לאבד אותן.',
-      one:
-          'לא ניתן היה לייבא תמונה אחת השמורה בקובץ היומן (תמונת ציוד, מפת אתר וכדומה). שמרו את הקובץ המקורי כדי לא לאבד אותה.',
+      one: 'לא ניתן היה לייבא תמונה אחת השמורה בקובץ היומן (תמונת ציוד, מפת אתר וכדומה). שמרו את הקובץ המקורי כדי לא לאבד אותה.',
     );
     return '$_temp0';
   }
@@ -53718,8 +53716,7 @@ class AppLocalizationsHe extends AppLocalizations {
       locale: localeName,
       other:
           '$count תמונות שמורות רק בעותקים הנוכחיים ולא ייפתחו במכשיר הזה אחרי השינוי.',
-      one:
-          'תמונה אחת שמורה רק בעותקים הנוכחיים ולא תיפתח במכשיר הזה אחרי השינוי.',
+      one: 'תמונה אחת שמורה רק בעותקים הנוכחיים ולא תיפתח במכשיר הזה אחרי השינוי.',
     );
     return '$_temp0';
   }

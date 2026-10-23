@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -4344,8 +4345,7 @@ class AppLocalizationsHu extends AppLocalizations {
       locale: localeName,
       other:
           'Törli mind a(z) $count elemet az ellenőrzőlistáról? A sablonokat ez nem érinti.',
-      one:
-          'Törli az ellenőrzőlista egyetlen elemét? A sablonokat ez nem érinti.',
+      one: 'Törli az ellenőrzőlista egyetlen elemét? A sablonokat ez nem érinti.',
     );
     return '$_temp0';
   }
@@ -11487,8 +11487,7 @@ class AppLocalizationsHu extends AppLocalizations {
       locale: localeName,
       other:
           '$count koordinátával rendelkező merülőhelynek üres az országa, régiója, települése vagy víztestje.',
-      one:
-          '1 koordinátával rendelkező merülőhelynek üres az országa, régiója, települése vagy víztestje.',
+      one: '1 koordinátával rendelkező merülőhelynek üres az országa, régiója, települése vagy víztestje.',
     );
     return '$_temp0 A Submersion mindegyiket lekérdezi az OpenStreetMapról, és csak az üres mezőket tölti ki. Ez körülbelül $minutes percet vesz igénybe.';
   }
@@ -14693,6 +14692,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get tankMod_limitDeco => 'dekó határ';
+
+  @override
+  String get tankMod_limitDiluent => 'Dil MOD';
 
   @override
   String tankMod_overridden(String depth) {
@@ -18103,8 +18105,7 @@ class AppLocalizationsHu extends AppLocalizations {
       locale: localeName,
       other:
           'Közülük $count elemhez felirat vagy kedvenc jelölés tartozik a Submersionben, és ezek a részletek elvesznek.',
-      one:
-          'Egyikükhöz felirat vagy kedvenc jelölés tartozik a Submersionben, és ezek a részletek elvesznek.',
+      one: 'Egyikükhöz felirat vagy kedvenc jelölés tartozik a Submersionben, és ezek a részletek elvesznek.',
     );
     return '$_temp0';
   }
@@ -21829,8 +21830,7 @@ class AppLocalizationsHu extends AppLocalizations {
       locale: localeName,
       other:
           '$peerCount másik eszköz kap felkérést az átvételre; addig a változásaik nem egyesülnek.',
-      one:
-          '1 másik eszköz kap felkérést az átvételre; addig a változásai nem egyesülnek.',
+      one: '1 másik eszköz kap felkérést az átvételre; addig a változásai nem egyesülnek.',
       zero:
           'Még egyetlen másik eszköz sem szinkronizál, így nincs mit átvenni.',
     );
@@ -29912,8 +29912,7 @@ class AppLocalizationsHu extends AppLocalizations {
       locale: localeName,
       other:
           'Ez a címke $count merülésen szerepel. A „Merülésekhez” kikapcsolása eltávolítja ezekről a merülésekről.',
-      one:
-          'Ez a címke 1 merülésen szerepel. A „Merülésekhez” kikapcsolása eltávolítja erről a merülésről.',
+      one: 'Ez a címke 1 merülésen szerepel. A „Merülésekhez” kikapcsolása eltávolítja erről a merülésről.',
     );
     return '$_temp0';
   }
@@ -29925,8 +29924,7 @@ class AppLocalizationsHu extends AppLocalizations {
       locale: localeName,
       other:
           'Ez a címke $count felszerelésen szerepel. A „Felszereléshez” kikapcsolása eltávolítja ezekről a felszerelésekről.',
-      one:
-          'Ez a címke 1 felszerelésen szerepel. A „Felszereléshez” kikapcsolása eltávolítja erről a felszerelésről.',
+      one: 'Ez a címke 1 felszerelésen szerepel. A „Felszereléshez” kikapcsolása eltávolítja erről a felszerelésről.',
     );
     return '$_temp0';
   }
@@ -29938,8 +29936,7 @@ class AppLocalizationsHu extends AppLocalizations {
       locale: localeName,
       other:
           'Ez a címke $count merülőhelyen szerepel. A „Merülőhelyekhez” kikapcsolása eltávolítja ezekről a merülőhelyekről.',
-      one:
-          'Ez a címke 1 merülőhelyen szerepel. A „Merülőhelyekhez” kikapcsolása eltávolítja erről a merülőhelyről.',
+      one: 'Ez a címke 1 merülőhelyen szerepel. A „Merülőhelyekhez” kikapcsolása eltávolítja erről a merülőhelyről.',
     );
     return '$_temp0';
   }
@@ -32759,8 +32756,7 @@ class AppLocalizationsHu extends AppLocalizations {
       locale: localeName,
       other:
           '$count értéket nem sikerült átalakítani, ezért üresen maradtak. Ha egy mező hibásnak tűnik, ellenőrizd az oszlopok hozzárendelését, és importáld újra.',
-      one:
-          '1 értéket nem sikerült átalakítani, ezért üresen maradt. Ha egy mező hibásnak tűnik, ellenőrizd az oszlopok hozzárendelését, és importáld újra.',
+      one: '1 értéket nem sikerült átalakítani, ezért üresen maradt. Ha egy mező hibásnak tűnik, ellenőrizd az oszlopok hozzárendelését, és importáld újra.',
     );
     return '$_temp0';
   }
@@ -46593,8 +46589,7 @@ class AppLocalizationsHu extends AppLocalizations {
       locale: localeName,
       other:
           'A(z) $count elem egyikét sem sikerült ellenőrizni. A forrásaik jelenleg nem érhetők el.',
-      one:
-          'Az elemet nem sikerült ellenőrizni. A forrása jelenleg nem érhető el.',
+      one: 'Az elemet nem sikerült ellenőrizni. A forrása jelenleg nem érhető el.',
     );
     return '$_temp0';
   }
@@ -49506,8 +49501,7 @@ class AppLocalizationsHu extends AppLocalizations {
       locale: localeName,
       other:
           'A KML-fájl exportálása sikerült ($count koordináták nélküli merülőhely kihagyva)',
-      one:
-          'A KML-fájl exportálása sikerült (1 koordináták nélküli merülőhely kihagyva)',
+      one: 'A KML-fájl exportálása sikerült (1 koordináták nélküli merülőhely kihagyva)',
       zero: 'A KML-fájl exportálása sikerült',
     );
     return '$_temp0';
@@ -49523,8 +49517,7 @@ class AppLocalizationsHu extends AppLocalizations {
       locale: localeName,
       other:
           'A KML-fájl mentése sikerült ($count koordináták nélküli merülőhely kihagyva)',
-      one:
-          'A KML-fájl mentése sikerült (1 koordináták nélküli merülőhely kihagyva)',
+      one: 'A KML-fájl mentése sikerült (1 koordináták nélküli merülőhely kihagyva)',
       zero: 'A KML-fájl mentése sikerült',
     );
     return '$_temp0';
@@ -51665,8 +51658,7 @@ class AppLocalizationsHu extends AppLocalizations {
       locale: localeName,
       other:
           '$count biztonsági mentési fájl véglegesen törlődik. A művelet nem vonható vissza.',
-      one:
-          '1 biztonsági mentési fájl véglegesen törlődik. A művelet nem vonható vissza.',
+      one: '1 biztonsági mentési fájl véglegesen törlődik. A művelet nem vonható vissza.',
     );
     return '$_temp0';
   }
@@ -54539,8 +54531,7 @@ class AppLocalizationsHu extends AppLocalizations {
       locale: localeName,
       other:
           '$count fotó csak a jelenlegi másolatokban van meg, és a váltás után nem nyitható meg ezen az eszközön.',
-      one:
-          '1 fotó csak a jelenlegi másolatokban van meg, és a váltás után nem nyitható meg ezen az eszközön.',
+      one: '1 fotó csak a jelenlegi másolatokban van meg, és a váltás után nem nyitható meg ezen az eszközön.',
     );
     return '$_temp0';
   }

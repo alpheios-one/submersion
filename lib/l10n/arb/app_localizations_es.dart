@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -533,8 +534,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           'Se conservaron $skipped elementos compartidos: solo sus propietarios pueden eliminarlos',
-      one:
-          'Se conservó 1 elemento compartido: solo su propietario puede eliminarlo',
+      one: 'Se conservó 1 elemento compartido: solo su propietario puede eliminarlo',
     );
     return '$_temp0. $_temp1';
   }
@@ -4363,8 +4363,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           '¿Eliminar los $count elementos de esta lista? Las plantillas no se ven afectadas.',
-      one:
-          '¿Eliminar el único elemento de esta lista? Las plantillas no se ven afectadas.',
+      one: '¿Eliminar el único elemento de esta lista? Las plantillas no se ven afectadas.',
     );
     return '$_temp0';
   }
@@ -11506,8 +11505,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           '$count puntos de buceo con coordenadas no tienen país, región, localidad o masa de agua.',
-      one:
-          '1 punto de buceo con coordenadas no tiene país, región, localidad o masa de agua.',
+      one: '1 punto de buceo con coordenadas no tiene país, región, localidad o masa de agua.',
     );
     String _temp1 = intl.Intl.pluralLogic(
       minutes,
@@ -14732,6 +14730,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tankMod_limitDeco => 'límite de descompresión';
+
+  @override
+  String get tankMod_limitDiluent => 'Dil MOD';
 
   @override
   String tankMod_overridden(String depth) {
@@ -18157,8 +18158,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           '$count de ellos tienen un pie de foto o marca de favorito guardados en Submersion, y esos detalles se pierden.',
-      one:
-          'Uno de ellos tiene un pie de foto o marca de favorito guardados en Submersion, y esos detalles se pierden.',
+      one: 'Uno de ellos tiene un pie de foto o marca de favorito guardados en Submersion, y esos detalles se pierden.',
     );
     return '$_temp0';
   }
@@ -21896,8 +21896,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           'La biblioteca en la nube se borra y se reemplaza por las $diveCount inmersiones de este dispositivo.',
-      one:
-          'La biblioteca en la nube se borra y se reemplaza por la 1 inmersión de este dispositivo.',
+      one: 'La biblioteca en la nube se borra y se reemplaza por la 1 inmersión de este dispositivo.',
     );
     return '$_temp0';
   }
@@ -21909,10 +21908,8 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           'Se pedirá a $peerCount dispositivos más que la adopten; hasta entonces, sus cambios no se combinan.',
-      one:
-          'Se pedirá a 1 dispositivo más que la adopte; hasta entonces, sus cambios no se combinan.',
-      zero:
-          'Todavía no se sincroniza ningún otro dispositivo, así que no hay nada que adoptar.',
+      one: 'Se pedirá a 1 dispositivo más que la adopte; hasta entonces, sus cambios no se combinan.',
+      zero: 'Todavía no se sincroniza ningún otro dispositivo, así que no hay nada que adoptar.',
     );
     return '$_temp0';
   }
@@ -30099,8 +30096,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           'Esta etiqueta está en $count inmersiones. Desactivar «Usar en inmersiones» la quita de esas inmersiones.',
-      one:
-          'Esta etiqueta está en 1 inmersión. Desactivar «Usar en inmersiones» la quita de esa inmersión.',
+      one: 'Esta etiqueta está en 1 inmersión. Desactivar «Usar en inmersiones» la quita de esa inmersión.',
     );
     return '$_temp0';
   }
@@ -30112,8 +30108,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           'Esta etiqueta está en $count equipos. Desactivar «Usar en equipos» la quita de esos equipos.',
-      one:
-          'Esta etiqueta está en 1 equipo. Desactivar «Usar en equipos» la quita de ese equipo.',
+      one: 'Esta etiqueta está en 1 equipo. Desactivar «Usar en equipos» la quita de ese equipo.',
     );
     return '$_temp0';
   }
@@ -30125,8 +30120,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           'Esta etiqueta está en $count puntos. Desactivar «Usar en puntos» la quita de esos puntos.',
-      one:
-          'Esta etiqueta está en 1 punto. Desactivar «Usar en puntos» la quita de ese punto.',
+      one: 'Esta etiqueta está en 1 punto. Desactivar «Usar en puntos» la quita de ese punto.',
     );
     return '$_temp0';
   }
@@ -32965,8 +32959,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           '$count valores no se pudieron convertir y quedaron en blanco. Si un campo parece incorrecto, revisa la asignación de columnas y vuelve a importar.',
-      one:
-          '1 valor no se pudo convertir y quedó en blanco. Si un campo parece incorrecto, revisa la asignación de columnas y vuelve a importar.',
+      one: '1 valor no se pudo convertir y quedó en blanco. Si un campo parece incorrecto, revisa la asignación de columnas y vuelve a importar.',
     );
     return '$_temp0';
   }
@@ -39856,8 +39849,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           'El sensor de presión registró lecturas erróneas $count veces (pérdidas o picos)',
-      one:
-          'El sensor de presión registró una lectura errónea una vez (pérdida o pico)',
+      one: 'El sensor de presión registró una lectura errónea una vez (pérdida o pico)',
     );
     return '$_temp0';
   }
@@ -46887,8 +46879,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           'No se pudo comprobar ninguno de los $count elementos. Sus orígenes no están accesibles ahora mismo.',
-      one:
-          'No se pudo comprobar el elemento. Su origen no está accesible ahora mismo.',
+      one: 'No se pudo comprobar el elemento. Su origen no está accesible ahora mismo.',
     );
     return '$_temp0';
   }
@@ -49834,8 +49825,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           'Archivo KML exportado correctamente ($count puntos de buceo sin coordenadas omitidos)',
-      one:
-          'Archivo KML exportado correctamente (1 punto de buceo sin coordenadas omitido)',
+      one: 'Archivo KML exportado correctamente (1 punto de buceo sin coordenadas omitido)',
       zero: 'Archivo KML exportado correctamente',
     );
     return '$_temp0';
@@ -49852,8 +49842,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           'Archivo KML guardado correctamente ($count puntos de buceo sin coordenadas omitidos)',
-      one:
-          'Archivo KML guardado correctamente (1 punto de buceo sin coordenadas omitido)',
+      one: 'Archivo KML guardado correctamente (1 punto de buceo sin coordenadas omitido)',
       zero: 'Archivo KML guardado correctamente',
     );
     return '$_temp0';
@@ -52003,8 +51992,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           'Se eliminarán permanentemente $count archivos de copia de seguridad. Esta acción no se puede deshacer.',
-      one:
-          'Se eliminará permanentemente 1 archivo de copia de seguridad. Esta acción no se puede deshacer.',
+      one: 'Se eliminará permanentemente 1 archivo de copia de seguridad. Esta acción no se puede deshacer.',
     );
     return '$_temp0';
   }
@@ -54897,8 +54885,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           '$count fotos solo están en las copias actuales y no se abrirán en este dispositivo después del cambio.',
-      one:
-          '1 foto solo está en las copias actuales y no se abrirá en este dispositivo después del cambio.',
+      one: '1 foto solo está en las copias actuales y no se abrirá en este dispositivo después del cambio.',
     );
     return '$_temp0';
   }

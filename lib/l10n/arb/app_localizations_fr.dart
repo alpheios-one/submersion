@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -4374,8 +4375,7 @@ class AppLocalizationsFr extends AppLocalizations {
       locale: localeName,
       other:
           'Supprimer les $count éléments de cette check-list ? Les modèles ne sont pas affectés.',
-      one:
-          'Supprimer le seul élément de cette check-list ? Les modèles ne sont pas affectés.',
+      one: 'Supprimer le seul élément de cette check-list ? Les modèles ne sont pas affectés.',
     );
     return '$_temp0';
   }
@@ -14778,6 +14778,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tankMod_limitDeco => 'limite de déco';
 
   @override
+  String get tankMod_limitDiluent => 'Dil MOD';
+
+  @override
   String tankMod_overridden(String depth) {
     return 'Définie par vous · par défaut $depth';
   }
@@ -18220,8 +18223,7 @@ class AppLocalizationsFr extends AppLocalizations {
       locale: localeName,
       other:
           '$count d\'entre eux possèdent une légende ou un favori enregistré dans Submersion, et ces détails sont perdus.',
-      one:
-          'L\'un d\'eux possède une légende ou un favori enregistré dans Submersion, et ces détails sont perdus.',
+      one: 'L\'un d\'eux possède une légende ou un favori enregistré dans Submersion, et ces détails sont perdus.',
     );
     return '$_temp0';
   }
@@ -21969,8 +21971,7 @@ class AppLocalizationsFr extends AppLocalizations {
           '$peerCount autres appareils devront l\'adopter ; d\'ici là, leurs modifications ne sont pas fusionnées.',
       one:
           '$peerCount autre appareil devra l\'adopter ; d\'ici là, ses modifications ne sont pas fusionnées.',
-      zero:
-          'Aucun autre appareil ne se synchronise encore, il n\'y a donc rien à adopter.',
+      zero: 'Aucun autre appareil ne se synchronise encore, il n\'y a donc rien à adopter.',
     );
     return '$_temp0';
   }
@@ -39935,8 +39936,7 @@ class AppLocalizationsFr extends AppLocalizations {
       locale: localeName,
       other:
           'Le capteur de pression a enregistré des valeurs erronées $count fois (pertes ou pics)',
-      one:
-          'Le capteur de pression a enregistré une valeur erronée une fois (perte ou pic)',
+      one: 'Le capteur de pression a enregistré une valeur erronée une fois (perte ou pic)',
     );
     return '$_temp0';
   }
@@ -46962,8 +46962,7 @@ class AppLocalizationsFr extends AppLocalizations {
       locale: localeName,
       other:
           'Impossible de vérifier les $count éléments. Leurs sources sont actuellement inaccessibles.',
-      one:
-          'Impossible de vérifier cet élément. Sa source est actuellement inaccessible.',
+      one: 'Impossible de vérifier cet élément. Sa source est actuellement inaccessible.',
     );
     return '$_temp0';
   }

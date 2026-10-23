@@ -260,12 +260,13 @@ class PlanTankList extends ConsumerWidget {
 /// The ppO2 limits each tank's default MOD is worked out at (issue #3567):
 /// the plan's own, falling back to the diver's settings, as the plan engine
 /// resolves them.
-({double bottom, double deco}) _modLimits(
+({double bottom, double deco, double diluent}) _modLimits(
   DivePlanState state,
   UnitFormatter units,
 ) => (
   bottom: state.ppO2Bottom ?? units.settings.ppO2MaxWorking,
   deco: state.ppO2Deco ?? units.settings.ppO2MaxDeco,
+  diluent: units.settings.ccrDiluentModPpO2,
 );
 
 /// The role [TankRoleResolver] would give a cylinder, as the dialog has it
@@ -401,7 +402,7 @@ class _TankEditDialog extends StatefulWidget {
   final UnitFormatter units;
 
   /// The ppO2 limits the tank's default MOD is worked out at (#3567).
-  final ({double bottom, double deco}) modLimits;
+  final ({double bottom, double deco, double diluent}) modLimits;
 
   /// The plan's breathing mode. Only a loop plan can carry bailout gas, so
   /// the diluent flag is offered there and nowhere else.
@@ -612,6 +613,7 @@ class _TankEditDialogState extends State<_TankEditDialog> {
                   overrideMeters: _modOverride,
                   bottomPpO2: widget.modLimits.bottom,
                   decoPpO2: widget.modLimits.deco,
+                  diluentPpO2: widget.modLimits.diluent,
                   units: widget.units,
                   onChanged: (meters) => setState(() => _modOverride = meters),
                 ),

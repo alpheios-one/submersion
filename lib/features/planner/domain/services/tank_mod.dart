@@ -23,13 +23,20 @@ const double _airO2Percent = 21;
 ///
 /// The deco limit for a deco gas and the CCR oxygen supply, and for a
 /// bailout richer than air. The bottom limit for everything else: back gas,
-/// stages, sidemount, pony, diluent, and air or leaner bailout.
+/// stages, sidemount, pony, and air or leaner bailout. A diluent uses its own
+/// CCR Dil MOD limit, [diluentPpO2], when the caller has one to hand; a
+/// caller where a diluent role is meaningless (bailout, the OC calculator)
+/// can leave it out and falls back to [bottomPpO2], as before.
 double modPpO2For(
   TankRole role,
   GasMix gas, {
   required double bottomPpO2,
   required double decoPpO2,
-}) => usesDecoLimit(role, gas) ? decoPpO2 : bottomPpO2;
+  double? diluentPpO2,
+}) => switch (role) {
+  TankRole.diluent => diluentPpO2 ?? bottomPpO2,
+  _ => usesDecoLimit(role, gas) ? decoPpO2 : bottomPpO2,
+};
 
 /// Whether [role] with [gas] is held to the deco limit rather than the
 /// bottom one. See [modPpO2For].
@@ -52,9 +59,16 @@ double defaultModMeters(
   GasMix gas, {
   required double bottomPpO2,
   required double decoPpO2,
+  double? diluentPpO2,
 }) => maxOperatingDepthMeters(
   gas.o2 / 100.0,
-  maxPpO2: modPpO2For(role, gas, bottomPpO2: bottomPpO2, decoPpO2: decoPpO2),
+  maxPpO2: modPpO2For(
+    role,
+    gas,
+    bottomPpO2: bottomPpO2,
+    decoPpO2: decoPpO2,
+    diluentPpO2: diluentPpO2,
+  ),
 );
 
 /// [tank]'s MOD: the one set by hand when there is one, otherwise its
@@ -64,6 +78,7 @@ double effectiveModMeters(
   DiveTank tank, {
   required double bottomPpO2,
   required double decoPpO2,
+  double? diluentPpO2,
 }) =>
     tank.decoSwitchDepth ??
     defaultModMeters(
@@ -71,6 +86,7 @@ double effectiveModMeters(
       tank.gasMix,
       bottomPpO2: bottomPpO2,
       decoPpO2: decoPpO2,
+      diluentPpO2: diluentPpO2,
     );
 
 /// ppO2 of [gas] at [depthMeters], on the same flat 10 m per bar model the
@@ -84,6 +100,7 @@ double ppO2AtDepth(GasMix gas, double depthMeters) =>
   DiveTank tank, {
   required double bottomPpO2,
   required double decoPpO2,
+  double? diluentPpO2,
 }) {
   final override = tank.decoSwitchDepth;
   if (override == null) return null;
@@ -93,6 +110,7 @@ double ppO2AtDepth(GasMix gas, double depthMeters) =>
     tank.gasMix,
     bottomPpO2: bottomPpO2,
     decoPpO2: decoPpO2,
+    diluentPpO2: diluentPpO2,
   );
   // A hair of slack: an override typed at exactly the default MOD lands on
   // the limit, give or take float noise, and is not "above" it.
@@ -105,6 +123,7 @@ List<AvailableGas> ascentGasesFor(
   Iterable<DiveTank> tanks, {
   required double bottomPpO2,
   required double decoPpO2,
+  double? diluentPpO2,
 }) => [
   for (final tank in tanks)
     AvailableGas(
@@ -114,6 +133,7 @@ List<AvailableGas> ascentGasesFor(
         tank,
         bottomPpO2: bottomPpO2,
         decoPpO2: decoPpO2,
+        diluentPpO2: diluentPpO2,
       ),
     ),
 ];

@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -14087,6 +14088,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get tankMod_limitDeco => '减压限值';
+
+  @override
+  String get tankMod_limitDiluent => 'Dil MOD';
 
   @override
   String tankMod_overridden(String depth) {

@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -4299,8 +4300,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           'Delete all $count items from this checklist? Templates are not affected.',
-      one:
-          'Delete the only item from this checklist? Templates are not affected.',
+      one: 'Delete the only item from this checklist? Templates are not affected.',
     );
     return '$_temp0';
   }
@@ -11332,8 +11332,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           '$count sites with coordinates have an empty country, region, town or body of water.',
-      one:
-          '1 site with coordinates has an empty country, region, town or body of water.',
+      one: '1 site with coordinates has an empty country, region, town or body of water.',
     );
     String _temp1 = intl.Intl.pluralLogic(
       minutes,
@@ -14526,6 +14525,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tankMod_limitDeco => 'deco limit';
+
+  @override
+  String get tankMod_limitDiluent => 'Dil MOD';
 
   @override
   String tankMod_overridden(String depth) {
@@ -17895,8 +17897,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           '$count of these have a caption or favorite saved in Submersion, and those details are lost.',
-      one:
-          '1 of these has a caption or favorite saved in Submersion, and those details are lost.',
+      one: '1 of these has a caption or favorite saved in Submersion, and those details are lost.',
     );
     return '$_temp0';
   }
@@ -21568,8 +21569,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           'The cloud library is erased and replaced with this device\'s $diveCount dives.',
-      one:
-          'The cloud library is erased and replaced with this device\'s 1 dive.',
+      one: 'The cloud library is erased and replaced with this device\'s 1 dive.',
     );
     return '$_temp0';
   }
@@ -21581,8 +21581,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           '$peerCount other devices will be asked to adopt it; until they do, their changes are not merged.',
-      one:
-          '1 other device will be asked to adopt it; until it does, its changes are not merged.',
+      one: '1 other device will be asked to adopt it; until it does, its changes are not merged.',
       zero: 'No other device is syncing yet, so there is nothing to adopt it.',
     );
     return '$_temp0';
@@ -29563,8 +29562,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           'This tag is on $count dives. Turning off \"Use for dives\" removes it from those dives.',
-      one:
-          'This tag is on 1 dive. Turning off \"Use for dives\" removes it from that dive.',
+      one: 'This tag is on 1 dive. Turning off \"Use for dives\" removes it from that dive.',
     );
     return '$_temp0';
   }
@@ -29576,8 +29574,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           'This tag is on $count equipment items. Turning off \"Use for equipment\" removes it from those items.',
-      one:
-          'This tag is on 1 equipment item. Turning off \"Use for equipment\" removes it from that item.',
+      one: 'This tag is on 1 equipment item. Turning off \"Use for equipment\" removes it from that item.',
     );
     return '$_temp0';
   }
@@ -29589,8 +29586,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           'This tag is on $count sites. Turning off \"Use for sites\" removes it from those sites.',
-      one:
-          'This tag is on 1 site. Turning off \"Use for sites\" removes it from that site.',
+      one: 'This tag is on 1 site. Turning off \"Use for sites\" removes it from that site.',
     );
     return '$_temp0';
   }
@@ -32392,8 +32388,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           '$count values could not be converted and were left blank. If a field looks wrong, check its column mapping and import again.',
-      one:
-          '1 value could not be converted and was left blank. If a field looks wrong, check its column mapping and import again.',
+      one: '1 value could not be converted and was left blank. If a field looks wrong, check its column mapping and import again.',
     );
     return '$_temp0';
   }
@@ -53993,8 +53988,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           '$count photos are kept only in the current copies and will not open on this device after the change.',
-      one:
-          '1 photo is kept only in the current copies and will not open on this device after the change.',
+      one: '1 photo is kept only in the current copies and will not open on this device after the change.',
     );
     return '$_temp0';
   }

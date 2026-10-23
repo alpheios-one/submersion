@@ -23921,6 +23921,12 @@ abstract class AppLocalizations {
   /// **'deco limit'**
   String get tankMod_limitDeco;
 
+  /// Name of the CCR diluent ppO2 limit, used inside other MOD strings. Matches the "Dil MOD" term on the Settings page.
+  ///
+  /// In en, this message translates to:
+  /// **'Dil MOD'**
+  String get tankMod_limitDiluent;
+
   /// Under the MOD field when the diver typed a depth: says so and gives the default it replaces.
   ///
   /// In en, this message translates to:

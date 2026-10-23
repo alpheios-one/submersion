@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -14735,6 +14736,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tankMod_limitDeco => 'limite de descompressão';
 
   @override
+  String get tankMod_limitDiluent => 'Dil MOD';
+
+  @override
   String tankMod_overridden(String depth) {
     return 'Definida por você · padrão $depth';
   }
@@ -18164,8 +18168,7 @@ class AppLocalizationsPt extends AppLocalizations {
       locale: localeName,
       other:
           '$count deles têm legenda ou favorito guardados no Submersion, e esses detalhes perdem-se.',
-      one:
-          'Um deles tem uma legenda ou favorito guardados no Submersion, e esses detalhes perdem-se.',
+      one: 'Um deles tem uma legenda ou favorito guardados no Submersion, e esses detalhes perdem-se.',
     );
     return '$_temp0';
   }
@@ -21906,8 +21909,7 @@ class AppLocalizationsPt extends AppLocalizations {
           'Será pedido a $peerCount outros dispositivos que a adotem; até lá, as suas alterações não são combinadas.',
       one:
           'Será pedido a $peerCount outro dispositivo que a adote; até lá, as suas alterações não são combinadas.',
-      zero:
-          'Nenhum outro dispositivo sincroniza ainda, portanto não há nada para adotar.',
+      zero: 'Nenhum outro dispositivo sincroniza ainda, portanto não há nada para adotar.',
     );
     return '$_temp0';
   }
@@ -39809,8 +39811,7 @@ class AppLocalizationsPt extends AppLocalizations {
       locale: localeName,
       other:
           'O sensor de pressão registou leituras erradas $count vezes (falhas ou picos)',
-      one:
-          'O sensor de pressão registou uma leitura errada uma vez (falha ou pico)',
+      one: 'O sensor de pressão registou uma leitura errada uma vez (falha ou pico)',
     );
     return '$_temp0';
   }
@@ -46849,8 +46850,7 @@ class AppLocalizationsPt extends AppLocalizations {
       locale: localeName,
       other:
           'Não foi possível verificar nenhum dos $count itens. As origens deles não estão acessíveis no momento.',
-      one:
-          'Não foi possível verificar o item. A origem dele não está acessível no momento.',
+      one: 'Não foi possível verificar o item. A origem dele não está acessível no momento.',
     );
     return '$_temp0';
   }

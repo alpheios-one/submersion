@@ -34,6 +34,7 @@ void main() {
     TankRole role = TankRole.deco,
     double? override,
     UnitFormatter units = metric,
+    double diluentPpO2 = 1.6,
   }) {
     reported = override;
     reports = 0;
@@ -48,6 +49,7 @@ void main() {
             overrideMeters: reported,
             bottomPpO2: 1.4,
             decoPpO2: 1.6,
+            diluentPpO2: diluentPpO2,
             units: units,
             onChanged: (value) => setState(() {
               reported = value;
@@ -82,6 +84,18 @@ void main() {
 
     expect(fieldText(tester), '25');
     expect(find.text('Default at ppO2 1.4 (bottom limit)'), findsOneWidget);
+  });
+
+  testWidgets('a diluent uses the CCR Dil MOD limit, not the bottom limit', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      host(gas: ean40, role: TankRole.diluent, diluentPpO2: 1.6),
+    );
+    await tester.pumpAndSettle();
+
+    expect(fieldText(tester), '30');
+    expect(find.text('Default at ppO2 1.6 (Dil MOD)'), findsOneWidget);
   });
 
   testWidgets('typing a depth sets the override', (tester) async {

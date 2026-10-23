@@ -68,6 +68,26 @@ void main() {
         );
       }
     });
+
+    test('a diluent uses its own CCR Dil MOD limit when given one', () {
+      expect(
+        modPpO2For(
+          TankRole.diluent,
+          ean40,
+          bottomPpO2: bottom,
+          decoPpO2: deco,
+          diluentPpO2: 1.6,
+        ),
+        1.6,
+      );
+    });
+
+    test('a diluent falls back to the bottom limit with no Dil MOD', () {
+      expect(
+        modPpO2For(TankRole.diluent, ean40, bottomPpO2: bottom, decoPpO2: deco),
+        bottom,
+      );
+    });
   });
 
   group('default MOD', () {
@@ -116,6 +136,19 @@ void main() {
           decoPpO2: deco,
         ),
         0,
+      );
+    });
+
+    test('EAN40 as a diluent follows the CCR Dil MOD limit', () {
+      expect(
+        defaultModMeters(
+          TankRole.diluent,
+          ean40,
+          bottomPpO2: bottom,
+          decoPpO2: deco,
+          diluentPpO2: 1.6,
+        ),
+        closeTo(30, 1e-9),
       );
     });
   });
@@ -197,6 +230,17 @@ void main() {
         isNull,
       );
     });
+
+    test('a diluent override is checked against the Dil MOD limit', () {
+      final check = modOverrideCheck(
+        tank(ean40, role: TankRole.diluent, override: 25),
+        bottomPpO2: bottom,
+        decoPpO2: deco,
+        diluentPpO2: 1.6,
+      );
+      expect(check!.exceedsLimit, isFalse);
+      expect(check.limitPpO2, 1.6);
+    });
   });
 
   group('ascent gases', () {
@@ -216,6 +260,16 @@ void main() {
       expect(gases[2].maxPpO2Mod, closeTo(22, 1e-9));
       expect(gases[2].fN2, closeTo(0.5, 1e-9));
       expect(gases[0].fHe, closeTo(0.45, 1e-9));
+    });
+
+    test('a diluent tank carries the Dil MOD limit when given one', () {
+      final gases = ascentGasesFor(
+        [tank(ean40, role: TankRole.diluent)],
+        bottomPpO2: bottom,
+        decoPpO2: deco,
+        diluentPpO2: 1.6,
+      );
+      expect(gases.single.maxPpO2Mod, closeTo(30, 1e-9));
     });
   });
 }

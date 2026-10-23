@@ -498,6 +498,7 @@ class _CylinderConfigItemEditorState extends State<CylinderConfigItemEditor> {
                     overrideMeters: item.decoSwitchDepth,
                     bottomPpO2: settings.ppO2MaxWorking,
                     decoPpO2: settings.ppO2MaxDeco,
+                    diluentPpO2: settings.ccrDiluentModPpO2,
                     units: _units,
                     onChanged: (meters) => _emit(
                       meters == null
@@ -515,6 +516,7 @@ class _CylinderConfigItemEditorState extends State<CylinderConfigItemEditor> {
               overrideMeters: item.decoSwitchDepth,
               bottomPpO2: settings.ppO2MaxWorking,
               decoPpO2: settings.ppO2MaxDeco,
+              diluentPpO2: settings.ccrDiluentModPpO2,
               units: _units,
               onReset: () => _emit(item.copyWith(clearDecoSwitchDepth: true)),
             ),

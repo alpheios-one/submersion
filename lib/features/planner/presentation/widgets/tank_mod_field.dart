@@ -29,6 +29,7 @@ class TankModField extends StatefulWidget {
     required this.overrideMeters,
     required this.bottomPpO2,
     required this.decoPpO2,
+    required this.diluentPpO2,
     required this.units,
     required this.onChanged,
     this.showDetails = true,
@@ -43,6 +44,10 @@ class TankModField extends StatefulWidget {
   final double? overrideMeters;
   final double bottomPpO2;
   final double decoPpO2;
+
+  /// The CCR "Dil MOD" limit a diluent cylinder's default follows, from the
+  /// diver's "ppO2 limits CCR" Settings. Unused for every other role.
+  final double diluentPpO2;
   final UnitFormatter units;
 
   /// The new override in metres, or null when it was cleared.
@@ -109,7 +114,7 @@ class _TankModFieldState extends State<TankModField> {
     if (override != null) {
       return formatRoundedForInput(widget.units.convertDepth(override), 1);
     }
-    return '${shownDefaultMod(widget.gas, widget.role, widget.bottomPpO2, widget.decoPpO2, widget.units)}';
+    return '${shownDefaultMod(widget.gas, widget.role, widget.bottomPpO2, widget.decoPpO2, widget.diluentPpO2, widget.units)}';
   }
 
   void _onText(String text) {
@@ -141,6 +146,7 @@ class _TankModFieldState extends State<TankModField> {
       override,
       widget.bottomPpO2,
       widget.decoPpO2,
+      widget.diluentPpO2,
     );
 
     final field = TextField(
@@ -186,6 +192,7 @@ class _TankModFieldState extends State<TankModField> {
           overrideMeters: override,
           bottomPpO2: widget.bottomPpO2,
           decoPpO2: widget.decoPpO2,
+          diluentPpO2: widget.diluentPpO2,
           units: widget.units,
           onReset: _reset,
         ),
@@ -207,6 +214,7 @@ class TankModDetails extends StatelessWidget {
     required this.overrideMeters,
     required this.bottomPpO2,
     required this.decoPpO2,
+    required this.diluentPpO2,
     required this.units,
     required this.onReset,
   });
@@ -216,6 +224,10 @@ class TankModDetails extends StatelessWidget {
   final double? overrideMeters;
   final double bottomPpO2;
   final double decoPpO2;
+
+  /// The CCR "Dil MOD" limit a diluent cylinder's default follows, from the
+  /// diver's "ppO2 limits CCR" Settings. Unused for every other role.
+  final double diluentPpO2;
   final UnitFormatter units;
 
   /// Clears the MOD set by hand.
@@ -227,9 +239,11 @@ class TankModDetails extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final override = overrideMeters;
-    final limitName = usesDecoLimit(role, gas)
-        ? l10n.tankMod_limitDeco
-        : l10n.tankMod_limitBottom;
+    final limitName = switch (role) {
+      TankRole.diluent => l10n.tankMod_limitDiluent,
+      _ when usesDecoLimit(role, gas) => l10n.tankMod_limitDeco,
+      _ => l10n.tankMod_limitBottom,
+    };
     final small = theme.textTheme.bodySmall?.copyWith(
       color: scheme.onSurfaceVariant,
     );
@@ -240,6 +254,7 @@ class TankModDetails extends StatelessWidget {
         gas,
         bottomPpO2: bottomPpO2,
         decoPpO2: decoPpO2,
+        diluentPpO2: diluentPpO2,
       );
       return Text(
         l10n.tankMod_default(formatFixedForDisplay(limit, 1), limitName),
@@ -251,12 +266,14 @@ class TankModDetails extends StatelessWidget {
       DiveTank(id: '', gasMix: gas, role: role, decoSwitchDepth: override),
       bottomPpO2: bottomPpO2,
       decoPpO2: decoPpO2,
+      diluentPpO2: diluentPpO2,
     )!;
     final defaultMeters = defaultModMeters(
       role,
       gas,
       bottomPpO2: bottomPpO2,
       decoPpO2: decoPpO2,
+      diluentPpO2: diluentPpO2,
     );
     final depth = units.formatDepth(override, decimals: 0);
     final ppO2 = formatFixedForDisplay(check.ppO2, 2);
@@ -315,6 +332,7 @@ int shownDefaultMod(
   TankRole role,
   double bottomPpO2,
   double decoPpO2,
+  double diluentPpO2,
   UnitFormatter units,
 ) {
   final meters = defaultModMeters(
@@ -322,6 +340,7 @@ int shownDefaultMod(
     gas,
     bottomPpO2: bottomPpO2,
     decoPpO2: decoPpO2,
+    diluentPpO2: diluentPpO2,
   );
   return (units.convertDepth(meters) + 1e-6).floor();
 }
@@ -332,12 +351,14 @@ bool _exceeds(
   double? override,
   double bottomPpO2,
   double decoPpO2,
+  double diluentPpO2,
 ) {
   if (override == null) return false;
   return modOverrideCheck(
         DiveTank(id: '', gasMix: gas, role: role, decoSwitchDepth: override),
         bottomPpO2: bottomPpO2,
         decoPpO2: decoPpO2,
+        diluentPpO2: diluentPpO2,
       )?.exceedsLimit ??
       false;
 }

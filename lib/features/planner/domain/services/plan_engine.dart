@@ -1496,6 +1496,7 @@ class PlanEngine {
         tanks,
         bottomPpO2: config.ppO2Working,
         decoPpO2: config.ppO2Deco,
+        diluentPpO2: config.ccrDiluentModPpO2,
       ),
     );
   }
@@ -1509,6 +1510,7 @@ class PlanEngine {
             tank,
             bottomPpO2: config.ppO2Working,
             decoPpO2: config.ppO2Deco,
+            diluentPpO2: config.ccrDiluentModPpO2,
           )
           case (:final ppO2, :final limitPpO2, exceedsLimit: true))
         PlanIssue(
