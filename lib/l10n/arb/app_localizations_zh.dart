@@ -14089,7 +14089,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tankMod_limitDeco => '减压限值';
 
   @override
-  String get tankMod_limitDiluent => 'Dil MOD';
+  String get tankMod_limitDiluent => '稀释气 MOD';
 
   @override
   String tankMod_overridden(String depth) {

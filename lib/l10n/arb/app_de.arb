@@ -4293,6 +4293,7 @@
   "tankMod_default": "Standard bei ppO2 {ppO2} ({limit})",
   "tankMod_limitBottom": "Grundlimit",
   "tankMod_limitDeco": "Deko-Limit",
+  "tankMod_limitDiluent": "Dil-MOD",
   "tankMod_overridden": "Von dir gesetzt · Standard {depth}",
   "tankMod_ppO2At": "ppO2 {ppO2} auf {depth}",
   "tankMod_exceeds": "ppO2 {ppO2} auf {depth}, über dem {limit} {limitPpO2}",

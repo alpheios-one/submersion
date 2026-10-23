@@ -4247,6 +4247,7 @@
   "tankMod_default": "Padrão com ppO2 {ppO2} ({limit})",
   "tankMod_limitBottom": "limite de fundo",
   "tankMod_limitDeco": "limite de descompressão",
+  "tankMod_limitDiluent": "MOD Dil",
   "tankMod_overridden": "Definida por você · padrão {depth}",
   "tankMod_ppO2At": "ppO2 {ppO2} a {depth}",
   "tankMod_exceeds": "ppO2 {ppO2} a {depth}, acima do {limit} {limitPpO2}",

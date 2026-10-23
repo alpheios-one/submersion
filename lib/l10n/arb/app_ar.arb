@@ -4247,6 +4247,7 @@
   "tankMod_default": "الافتراضي عند ppO2 {ppO2} ({limit})",
   "tankMod_limitBottom": "حد القاع",
   "tankMod_limitDeco": "حد تخفيف الضغط",
+  "tankMod_limitDiluent": "MOD غاز التخفيف",
   "tankMod_overridden": "حددته أنت · الافتراضي {depth}",
   "tankMod_ppO2At": "ppO2 {ppO2} عند {depth}",
   "tankMod_exceeds": "ppO2 {ppO2} عند {depth}، أعلى من {limit} {limitPpO2}",

@@ -4147,6 +4147,7 @@
   "tankMod_default": "ברירת מחדל ב-ppO2 {ppO2} ({limit})",
   "tankMod_limitBottom": "מגבלת קרקעית",
   "tankMod_limitDeco": "מגבלת דקו",
+  "tankMod_limitDiluent": "MOD מדלל",
   "tankMod_overridden": "הוגדר על ידך · ברירת מחדל {depth}",
   "tankMod_ppO2At": "ppO2 {ppO2} ב-{depth}",
   "tankMod_exceeds": "ppO2 {ppO2} ב-{depth}, מעל {limit} {limitPpO2}",

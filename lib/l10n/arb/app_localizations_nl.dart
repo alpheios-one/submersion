@@ -14642,7 +14642,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tankMod_limitDeco => 'decolimiet';
 
   @override
-  String get tankMod_limitDiluent => 'Dil MOD';
+  String get tankMod_limitDiluent => 'Dil-MOD';
 
   @override
   String tankMod_overridden(String depth) {

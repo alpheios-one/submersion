@@ -14442,7 +14442,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get tankMod_limitDeco => 'מגבלת דקו';
 
   @override
-  String get tankMod_limitDiluent => 'Dil MOD';
+  String get tankMod_limitDiluent => 'MOD מדלל';
 
   @override
   String tankMod_overridden(String depth) {

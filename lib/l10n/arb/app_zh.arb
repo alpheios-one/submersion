@@ -4374,6 +4374,7 @@
   "tankMod_default": "默认值，ppO2 {ppO2}（{limit}）",
   "tankMod_limitBottom": "底部限值",
   "tankMod_limitDeco": "减压限值",
+  "tankMod_limitDiluent": "稀释气 MOD",
   "tankMod_overridden": "由你设置 · 默认 {depth}",
   "tankMod_ppO2At": "{depth} 处 ppO2 {ppO2}",
   "tankMod_exceeds": "{depth} 处 ppO2 {ppO2}，超过{limit} {limitPpO2}",
