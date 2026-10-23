@@ -1,6 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -535,7 +534,8 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           '$skipped elementi condivisi sono stati mantenuti: solo i proprietari possono eliminarli',
-      one: '1 elemento condiviso è stato mantenuto: solo il proprietario può eliminarlo',
+      one:
+          '1 elemento condiviso è stato mantenuto: solo il proprietario può eliminarlo',
     );
     return '$_temp0. $_temp1';
   }
@@ -4361,7 +4361,8 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           'Eliminare tutti i $count elementi da questa checklist? I modelli non vengono modificati.',
-      one: 'Eliminare l\'unico elemento da questa checklist? I modelli non vengono modificati.',
+      one:
+          'Eliminare l\'unico elemento da questa checklist? I modelli non vengono modificati.',
     );
     return '$_temp0';
   }
@@ -11510,7 +11511,8 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           '$count siti con coordinate non hanno paese, regione, città o specchio d\'acqua.',
-      one: '1 sito con coordinate non ha paese, regione, città o specchio d\'acqua.',
+      one:
+          '1 sito con coordinate non ha paese, regione, città o specchio d\'acqua.',
     );
     String _temp1 = intl.Intl.pluralLogic(
       minutes,
@@ -18170,7 +18172,8 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           '$count di questi hanno una didascalia o un preferito salvati in Submersion, e quei dettagli vanno persi.',
-      one: 'Uno di questi ha una didascalia o un preferito salvati in Submersion, e quei dettagli vanno persi.',
+      one:
+          'Uno di questi ha una didascalia o un preferito salvati in Submersion, e quei dettagli vanno persi.',
     );
     return '$_temp0';
   }
@@ -21890,7 +21893,8 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           'La libreria cloud viene cancellata e sostituita con le $diveCount immersioni di questo dispositivo.',
-      one: 'La libreria cloud viene cancellata e sostituita con la 1 immersione di questo dispositivo.',
+      one:
+          'La libreria cloud viene cancellata e sostituita con la 1 immersione di questo dispositivo.',
     );
     return '$_temp0';
   }
@@ -21902,8 +21906,10 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           'A $peerCount altri dispositivi verrà chiesto di adottarla; fino ad allora le loro modifiche non vengono unite.',
-      one: 'A 1 altro dispositivo verrà chiesto di adottarla; fino ad allora le sue modifiche non vengono unite.',
-      zero: 'Nessun altro dispositivo si sincronizza ancora, quindi non c\'è nulla da adottare.',
+      one:
+          'A 1 altro dispositivo verrà chiesto di adottarla; fino ad allora le sue modifiche non vengono unite.',
+      zero:
+          'Nessun altro dispositivo si sincronizza ancora, quindi non c\'è nulla da adottare.',
     );
     return '$_temp0';
   }
@@ -30080,7 +30086,8 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           'Questo tag è su $count immersioni. Disattivando \"Usa per le immersioni\" verrà rimosso da quelle immersioni.',
-      one: 'Questo tag è su 1 immersione. Disattivando \"Usa per le immersioni\" verrà rimosso da quell\'immersione.',
+      one:
+          'Questo tag è su 1 immersione. Disattivando \"Usa per le immersioni\" verrà rimosso da quell\'immersione.',
     );
     return '$_temp0';
   }
@@ -30092,7 +30099,8 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           'Questo tag è su $count attrezzature. Disattivando \"Usa per l\'attrezzatura\" verrà rimosso da quelle attrezzature.',
-      one: 'Questo tag è su 1 attrezzatura. Disattivando \"Usa per l\'attrezzatura\" verrà rimosso da quell\'attrezzatura.',
+      one:
+          'Questo tag è su 1 attrezzatura. Disattivando \"Usa per l\'attrezzatura\" verrà rimosso da quell\'attrezzatura.',
     );
     return '$_temp0';
   }
@@ -30104,7 +30112,8 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           'Questo tag è su $count siti. Disattivando \"Usa per i siti\" verrà rimosso da quei siti.',
-      one: 'Questo tag è su 1 sito. Disattivando \"Usa per i siti\" verrà rimosso da quel sito.',
+      one:
+          'Questo tag è su 1 sito. Disattivando \"Usa per i siti\" verrà rimosso da quel sito.',
     );
     return '$_temp0';
   }
@@ -32938,7 +32947,8 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           '$count valori non sono stati convertiti e sono stati lasciati vuoti. Se un campo sembra sbagliato, controlla l\'associazione delle colonne e importa di nuovo.',
-      one: '1 valore non è stato convertito ed è stato lasciato vuoto. Se un campo sembra sbagliato, controlla l\'associazione delle colonne e importa di nuovo.',
+      one:
+          '1 valore non è stato convertito ed è stato lasciato vuoto. Se un campo sembra sbagliato, controlla l\'associazione delle colonne e importa di nuovo.',
     );
     return '$_temp0';
   }
@@ -33191,7 +33201,8 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           'Non è stato importato nulla: non è stato possibile leggere le date di $count righe.',
-      one: 'Non è stato importato nulla: non è stato possibile leggere la data di 1 riga.',
+      one:
+          'Non è stato importato nulla: non è stato possibile leggere la data di 1 riga.',
     );
     return '$_temp0';
   }
@@ -39822,7 +39833,8 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           'Il sensore di pressione ha registrato letture errate $count volte (interruzioni o picchi)',
-      one: 'Il sensore di pressione ha registrato una lettura errata una volta (interruzione o picco)',
+      one:
+          'Il sensore di pressione ha registrato una lettura errata una volta (interruzione o picco)',
     );
     return '$_temp0';
   }
@@ -46855,7 +46867,8 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           'Impossibile controllare nessuno dei $count elementi. Le loro origini non sono raggiungibili al momento.',
-      one: 'Impossibile controllare l’elemento. La sua origine non è raggiungibile al momento.',
+      one:
+          'Impossibile controllare l’elemento. La sua origine non è raggiungibile al momento.',
     );
     return '$_temp0';
   }
@@ -51942,7 +51955,8 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           '$count file di backup saranno eliminati definitivamente. L\'operazione non può essere annullata.',
-      one: '1 file di backup sarà eliminato definitivamente. L\'operazione non può essere annullata.',
+      one:
+          '1 file di backup sarà eliminato definitivamente. L\'operazione non può essere annullata.',
     );
     return '$_temp0';
   }
@@ -54842,7 +54856,8 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           '$count foto sono conservate solo nelle copie attuali e non si apriranno su questo dispositivo dopo il cambio.',
-      one: '1 foto è conservata solo nelle copie attuali e non si aprirà su questo dispositivo dopo il cambio.',
+      one:
+          '1 foto è conservata solo nelle copie attuali e non si aprirà su questo dispositivo dopo il cambio.',
     );
     return '$_temp0';
   }

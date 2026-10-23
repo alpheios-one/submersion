@@ -1,6 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -4340,7 +4339,8 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           'Alle $count items uit deze checklist verwijderen? Sjablonen blijven ongewijzigd.',
-      one: 'Het enige item uit deze checklist verwijderen? Sjablonen blijven ongewijzigd.',
+      one:
+          'Het enige item uit deze checklist verwijderen? Sjablonen blijven ongewijzigd.',
     );
     return '$_temp0';
   }
@@ -18051,7 +18051,8 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           '$count daarvan hebben een bijschrift of favoriet opgeslagen in Submersion, en die details gaan verloren.',
-      one: 'Eén daarvan heeft een bijschrift of favoriet opgeslagen in Submersion, en die details gaan verloren.',
+      one:
+          'Eén daarvan heeft een bijschrift of favoriet opgeslagen in Submersion, en die details gaan verloren.',
     );
     return '$_temp0';
   }
@@ -21759,7 +21760,8 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           'De cloudbibliotheek wordt gewist en vervangen door de $diveCount duiken van dit apparaat.',
-      one: 'De cloudbibliotheek wordt gewist en vervangen door de 1 duik van dit apparaat.',
+      one:
+          'De cloudbibliotheek wordt gewist en vervangen door de 1 duik van dit apparaat.',
     );
     return '$_temp0';
   }
@@ -21771,8 +21773,10 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           '$peerCount andere apparaten worden gevraagd deze over te nemen; tot die tijd worden hun wijzigingen niet samengevoegd.',
-      one: '1 ander apparaat wordt gevraagd deze over te nemen; tot die tijd worden de wijzigingen niet samengevoegd.',
-      zero: 'Er synchroniseert nog geen ander apparaat, dus er is niets over te nemen.',
+      one:
+          '1 ander apparaat wordt gevraagd deze over te nemen; tot die tijd worden de wijzigingen niet samengevoegd.',
+      zero:
+          'Er synchroniseert nog geen ander apparaat, dus er is niets over te nemen.',
     );
     return '$_temp0';
   }
@@ -29867,7 +29871,8 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           'Deze tag staat op $count duiken. Als je \"Gebruiken voor duiken\" uitzet, wordt hij van die duiken verwijderd.',
-      one: 'Deze tag staat op 1 duik. Als je \"Gebruiken voor duiken\" uitzet, wordt hij van die duik verwijderd.',
+      one:
+          'Deze tag staat op 1 duik. Als je \"Gebruiken voor duiken\" uitzet, wordt hij van die duik verwijderd.',
     );
     return '$_temp0';
   }
@@ -29879,7 +29884,8 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           'Deze tag staat op $count uitrustingsstukken. Als je \"Gebruiken voor uitrusting\" uitzet, wordt hij van die uitrustingsstukken verwijderd.',
-      one: 'Deze tag staat op 1 uitrustingsstuk. Als je \"Gebruiken voor uitrusting\" uitzet, wordt hij van dat uitrustingsstuk verwijderd.',
+      one:
+          'Deze tag staat op 1 uitrustingsstuk. Als je \"Gebruiken voor uitrusting\" uitzet, wordt hij van dat uitrustingsstuk verwijderd.',
     );
     return '$_temp0';
   }
@@ -29891,7 +29897,8 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           'Deze tag staat op $count duikstekken. Als je \"Gebruiken voor duikstekken\" uitzet, wordt hij van die duikstekken verwijderd.',
-      one: 'Deze tag staat op 1 duikstek. Als je \"Gebruiken voor duikstekken\" uitzet, wordt hij van die duikstek verwijderd.',
+      one:
+          'Deze tag staat op 1 duikstek. Als je \"Gebruiken voor duikstekken\" uitzet, wordt hij van die duikstek verwijderd.',
     );
     return '$_temp0';
   }
@@ -32711,7 +32718,8 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           '$count waarden konden niet worden omgezet en zijn leeg gelaten. Als een veld er verkeerd uitziet, controleer dan de kolomtoewijzing en importeer opnieuw.',
-      one: '1 waarde kon niet worden omgezet en is leeg gelaten. Als een veld er verkeerd uitziet, controleer dan de kolomtoewijzing en importeer opnieuw.',
+      one:
+          '1 waarde kon niet worden omgezet en is leeg gelaten. Als een veld er verkeerd uitziet, controleer dan de kolomtoewijzing en importeer opnieuw.',
     );
     return '$_temp0';
   }
@@ -32964,7 +32972,8 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           'Er is niets geïmporteerd: de datums in $count rijen konden niet worden gelezen.',
-      one: 'Er is niets geïmporteerd: de datum in 1 rij kon niet worden gelezen.',
+      one:
+          'Er is niets geïmporteerd: de datum in 1 rij kon niet worden gelezen.',
     );
     return '$_temp0';
   }
@@ -46548,7 +46557,8 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           'Geen van de $count items kon worden gecontroleerd. Hun bronnen zijn momenteel niet bereikbaar.',
-      one: 'Het item kon niet worden gecontroleerd. De bron is momenteel niet bereikbaar.',
+      one:
+          'Het item kon niet worden gecontroleerd. De bron is momenteel niet bereikbaar.',
     );
     return '$_temp0';
   }
@@ -49467,7 +49477,8 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           'KML-bestand succesvol geëxporteerd ($count duikstekken zonder coördinaten overgeslagen)',
-      one: 'KML-bestand succesvol geëxporteerd (1 duikstek zonder coördinaten overgeslagen)',
+      one:
+          'KML-bestand succesvol geëxporteerd (1 duikstek zonder coördinaten overgeslagen)',
       zero: 'KML-bestand succesvol geëxporteerd',
     );
     return '$_temp0';
@@ -49484,7 +49495,8 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           'KML-bestand succesvol opgeslagen ($count duikstekken zonder coördinaten overgeslagen)',
-      one: 'KML-bestand succesvol opgeslagen (1 duikstek zonder coördinaten overgeslagen)',
+      one:
+          'KML-bestand succesvol opgeslagen (1 duikstek zonder coördinaten overgeslagen)',
       zero: 'KML-bestand succesvol opgeslagen',
     );
     return '$_temp0';
@@ -51614,7 +51626,8 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           '$count back-upbestanden worden permanent verwijderd. Dit kan niet ongedaan worden gemaakt.',
-      one: '1 back-upbestand wordt permanent verwijderd. Dit kan niet ongedaan worden gemaakt.',
+      one:
+          '1 back-upbestand wordt permanent verwijderd. Dit kan niet ongedaan worden gemaakt.',
     );
     return '$_temp0';
   }
@@ -54509,7 +54522,8 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           '$count foto\'s staan alleen in de huidige kopieën en openen na de wijziging niet meer op dit apparaat.',
-      one: '1 foto staat alleen in de huidige kopieën en opent na de wijziging niet meer op dit apparaat.',
+      one:
+          '1 foto staat alleen in de huidige kopieën en opent na de wijziging niet meer op dit apparaat.',
     );
     return '$_temp0';
   }
