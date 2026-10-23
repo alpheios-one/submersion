@@ -93,12 +93,6 @@ class ApplyConfigurationConfirmDialog extends StatelessWidget {
         ),
       if (change.tankName case final name?)
         line(l10n.cylinderConfigs_label, name.from, name.to),
-      if (change.decoSwitchDepth case final mod?)
-        line(
-          l10n.tankMod_label,
-          units.formatDepth(mod.from, decimals: 0),
-          units.formatDepth(mod.to, decimals: 0),
-        ),
     ];
   }
 

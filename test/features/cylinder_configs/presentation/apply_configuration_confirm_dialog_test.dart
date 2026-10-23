@@ -149,33 +149,4 @@ void main() {
       expect(find.byType(AlertDialog), findsNothing);
     });
   }
-
-  testWidgets("a MOD change shows in the diver's depth unit", (tester) async {
-    await show(
-      tester,
-      overwrites: const [
-        OverwriteTank(
-          tankId: 't2',
-          tankRole: TankRole.bailout,
-          decoSwitchDepth: SpecChange(21, 18),
-        ),
-      ],
-    );
-    expect(find.text('MOD: 21m → 18m'), findsOneWidget);
-  });
-
-  testWidgets('a MOD change in feet for an imperial diver', (tester) async {
-    await show(
-      tester,
-      overwrites: const [
-        OverwriteTank(
-          tankId: 't2',
-          tankRole: TankRole.bailout,
-          decoSwitchDepth: SpecChange(21, 18),
-        ),
-      ],
-      units: const UnitFormatter(AppSettings(depthUnit: DepthUnit.feet)),
-    );
-    expect(find.text('MOD: 69ft → 59ft'), findsOneWidget);
-  });
 }

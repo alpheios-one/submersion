@@ -21,7 +21,6 @@ void main() {
     TankMaterial? material,
     double? startPressure,
     String? label,
-    double? mod,
   }) => CylinderConfigItem(
     id: id,
     configId: 'c1',
@@ -34,7 +33,6 @@ void main() {
     tankMaterial: material,
     defaultStartPressureBar: startPressure,
     label: label,
-    decoSwitchDepth: mod,
     createdAt: now,
     updatedAt: now,
   );
@@ -353,55 +351,6 @@ void main() {
       expect(result.changed, isTrue);
       expect(result.tanks.single.role, TankRole.oxygenSupply);
       expect(result.tanks.single.roleSource, isNull);
-    });
-  });
-
-  // A MOD set by hand belongs to the mix it was set for (issue #3567).
-  group('a MOD set by hand', () {
-    const deco = DiveTank(
-      id: 't1',
-      role: TankRole.deco,
-      gasMix: GasMix(o2: 50),
-    );
-
-    test('reaches a matched tank with none, and the same mix', () {
-      final result = adapter.apply(
-        tanks: [deco],
-        items: [cfg(id: 'a', role: TankRole.deco, o2: 50, mod: 18)],
-        newId: newId,
-      );
-
-      expect(result.tanks.single.decoSwitchDepth, 18);
-      expect(result.changed, isTrue);
-    });
-
-    test('stays off a matched tank holding a different mix', () {
-      final result = adapter.apply(
-        tanks: [deco],
-        items: [cfg(id: 'a', role: TankRole.deco, o2: 80, mod: 12)],
-        newId: newId,
-      );
-
-      expect(result.tanks.single.decoSwitchDepth, isNull);
-      expect(result.changed, isFalse);
-    });
-
-    test('replaces a different one only once the overwrite is accepted', () {
-      final tanks = [deco.copyWith(decoSwitchDepth: 21)];
-      final items = [cfg(id: 'a', role: TankRole.deco, o2: 50, mod: 18)];
-
-      final asked = adapter.apply(tanks: tanks, items: items, newId: newId);
-      expect(asked.overwrites.single.decoSwitchDepth?.to, 18);
-      expect(asked.tanks.single.decoSwitchDepth, 21);
-
-      final accepted = adapter.apply(
-        tanks: tanks,
-        items: items,
-        newId: newId,
-        overwrite: true,
-      );
-      expect(accepted.tanks.single.decoSwitchDepth, 18);
-      expect(accepted.updated, 1);
     });
   });
 }
