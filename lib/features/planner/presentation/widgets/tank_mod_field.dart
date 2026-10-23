@@ -239,10 +239,10 @@ class TankModDetails extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final override = overrideMeters;
-    final limitName = switch (role) {
-      TankRole.diluent => l10n.tankMod_limitDiluent,
-      _ when usesDecoLimit(role, gas) => l10n.tankMod_limitDeco,
-      _ => l10n.tankMod_limitBottom,
+    final limitName = switch (modLimitClassFor(role, gas)) {
+      ModLimitClass.deco => l10n.tankMod_limitDeco,
+      ModLimitClass.bottom => l10n.tankMod_limitBottom,
+      ModLimitClass.diluent => l10n.tankMod_limitDiluent,
     };
     final small = theme.textTheme.bodySmall?.copyWith(
       color: scheme.onSurfaceVariant,
