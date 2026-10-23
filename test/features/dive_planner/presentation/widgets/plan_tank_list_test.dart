@@ -1005,6 +1005,56 @@ void main() {
       );
     });
 
+    testWidgets(
+      "a diluent chip's MOD override is checked against its Dil MOD limit, "
+      'not the bottom limit (issue #3567)',
+      (tester) async {
+        await tester.pumpWidget(
+          testApp(
+            locale: const Locale('en'),
+            overrides: [
+              settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+            ],
+            child: const SingleChildScrollView(child: PlanTankList()),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(PlanTankList)),
+        );
+        container
+            .read(divePlanNotifierProvider.notifier)
+            .updateMode(PlanMode.ccr);
+        await tester.pumpAndSettle();
+        container
+            .read(divePlanNotifierProvider.notifier)
+            .addTank(
+              const DiveTank(
+                id: 'dil',
+                name: 'EAN40 dil',
+                volume: 11.1,
+                startPressure: 200,
+                gasMix: GasMix(o2: 40),
+                role: TankRole.diluent,
+                // ppO2 1.52: above the 1.4 bottom limit, within the 1.6
+                // Dil MOD limit settings gives a diluent (#TestSettingsNotifier
+                // default).
+                decoSwitchDepth: 28,
+                order: 2,
+              ),
+            );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.descendant(
+            of: find.widgetWithText(InputChip, 'EAN40 dil'),
+            matching: find.byIcon(Icons.warning_amber_rounded),
+          ),
+          findsNothing,
+        );
+      },
+    );
+
     testWidgets('the CCR oxygen slot has no MOD to set', (tester) async {
       final container = await pump(tester);
       container

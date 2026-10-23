@@ -180,6 +180,7 @@ class PlanTankList extends ConsumerWidget {
           tank.copyWith(role: role),
           bottomPpO2: limits.bottom,
           decoPpO2: limits.deco,
+          diluentPpO2: limits.diluent,
         );
         return _TankChip(
           tank: tank,
