@@ -47,6 +47,7 @@ final planCalculatorServiceProvider = Provider<PlanCalculatorService>((ref) {
   final gfHigh = ref.watch(gfHighProvider);
   final ppO2MaxWorking = ref.watch(ppO2MaxWorkingProvider);
   final ppO2MaxDeco = ref.watch(ppO2MaxDecoProvider);
+  final ccrDiluentModPpO2 = ref.watch(ccrDiluentModPpO2Provider);
   final cnsWarningThreshold = ref.watch(cnsWarningThresholdProvider);
 
   return PlanCalculatorService(
@@ -54,6 +55,7 @@ final planCalculatorServiceProvider = Provider<PlanCalculatorService>((ref) {
     gfHigh: gfHigh,
     ppO2Warning: ppO2MaxWorking,
     ppO2Critical: ppO2MaxDeco,
+    ccrDiluentModPpO2: ccrDiluentModPpO2,
     cnsWarningThreshold: cnsWarningThreshold,
     cnsMethod: ref.watch(cnsCalculationMethodProvider),
     gasModel: ref.watch(gasModelProvider),

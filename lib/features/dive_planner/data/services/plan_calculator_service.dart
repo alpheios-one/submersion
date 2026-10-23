@@ -38,6 +38,11 @@ class PlanCalculatorService {
   /// ppO2 critical threshold (typically 1.6 bar).
   final double ppO2Critical;
 
+  /// CCR Dil MOD limit: the ppO2 a diluent may reach on a flush, from the
+  /// diver's "ppO2 limits CCR" Settings (issue #3567). A diluent's ascent
+  /// gas MOD follows this rather than [ppO2Warning].
+  final double ccrDiluentModPpO2;
+
   /// CNS warning threshold percentage (typically 80).
   final int cnsWarningThreshold;
 
@@ -61,6 +66,7 @@ class PlanCalculatorService {
     this.gfHigh = 70,
     this.ppO2Warning = 1.4,
     this.ppO2Critical = 1.6,
+    this.ccrDiluentModPpO2 = 1.6,
     this.cnsWarningThreshold = 80,
     this.defaultAscentRate = 9.0,
     this.defaultDescentRate = 18.0,
@@ -80,6 +86,7 @@ class PlanCalculatorService {
       gfHigh: gfHigh,
       ppO2Warning: ppO2Warning,
       ppO2Critical: ppO2Critical,
+      ccrDiluentModPpO2: ccrDiluentModPpO2,
       cnsWarningThreshold: cnsWarningThreshold,
       defaultAscentRate: defaultAscentRate,
       defaultDescentRate: defaultDescentRate,
@@ -463,6 +470,7 @@ class PlanCalculatorService {
       tanks,
       bottomPpO2: bottomPpO2,
       decoPpO2: decoPpO2,
+      diluentPpO2: ccrDiluentModPpO2,
     );
     final AscentGasPlan? ascentGas = ascentGases.isEmpty
         ? null
