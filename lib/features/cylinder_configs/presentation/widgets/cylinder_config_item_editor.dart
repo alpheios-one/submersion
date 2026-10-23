@@ -84,12 +84,11 @@ class _CylinderConfigItemEditorState extends State<CylinderConfigItemEditor> {
   String? _presetName;
 
   /// MODs set by hand that a role change put aside this session, keyed by
-  /// the ppO2 limit they were set against (issue #3567): the deco, bottom,
-  /// or CCR Dil MOD one. A role on a different limit takes its default;
-  /// changing back restores the MOD, so a slip of the dropdown loses
-  /// nothing. What is saved is only the MOD in effect, so this goes with
-  /// the page.
-  final Map<double, double> _setAsideMods = {};
+  /// which limit they were set against (issue #3567). A role on a different
+  /// limit takes its default; changing back restores the MOD, so a slip of
+  /// the dropdown loses nothing. What is saved is only the MOD in effect, so
+  /// this goes with the page.
+  final Map<ModLimitClass, double> _setAsideMods = {};
 
   @override
   void initState() {
@@ -223,22 +222,14 @@ class _CylinderConfigItemEditorState extends State<CylinderConfigItemEditor> {
 
   void _onRole(TankRole role) {
     final item = _item;
-    final settings = _units.settings;
-    double limitFor(TankRole role) => modPpO2For(
-      role,
-      _gas,
-      bottomPpO2: settings.ppO2MaxWorking,
-      decoPpO2: settings.ppO2MaxDeco,
-      diluentPpO2: settings.ccrDiluentModPpO2,
-    );
-    final fromLimit = limitFor(item.tankRole);
-    final toLimit = limitFor(role);
-    if (fromLimit == toLimit) {
+    final fromClass = modLimitClassFor(item.tankRole, _gas);
+    final toClass = modLimitClassFor(role, _gas);
+    if (fromClass == toClass) {
       _emit(item.copyWith(tankRole: role));
       return;
     }
-    if (item.decoSwitchDepth case final mod?) _setAsideMods[fromLimit] = mod;
-    _emit(switch (_setAsideMods.remove(toLimit)) {
+    if (item.decoSwitchDepth case final mod?) _setAsideMods[fromClass] = mod;
+    _emit(switch (_setAsideMods.remove(toClass)) {
       final restored? => item.copyWith(
         tankRole: role,
         decoSwitchDepth: restored,

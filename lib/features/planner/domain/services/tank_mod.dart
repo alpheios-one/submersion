@@ -19,6 +19,19 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 /// leaner is bottom bailout.
 const double _airO2Percent = 21;
 
+/// Which ppO2 limit a cylinder's default MOD follows (issue #3567): not the
+/// limit's value, which two of these can coincidentally share, but which one
+/// it is. A caller that needs to tell "the same limit" from "a different
+/// one" (the cylinder editor's set-aside cache) keys on this, not on
+/// [modPpO2For]'s result.
+enum ModLimitClass { deco, bottom, diluent }
+
+/// Which limit [role] with [gas] follows. See [ModLimitClass].
+ModLimitClass modLimitClassFor(TankRole role, GasMix gas) => switch (role) {
+  TankRole.diluent => ModLimitClass.diluent,
+  _ => usesDecoLimit(role, gas) ? ModLimitClass.deco : ModLimitClass.bottom,
+};
+
 /// The ppO2 limit [role] calls for with [gas] in the cylinder.
 ///
 /// The deco limit for a deco gas and the CCR oxygen supply, and for a
