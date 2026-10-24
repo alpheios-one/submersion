@@ -19,6 +19,7 @@ import 'package:submersion/features/settings/data/repositories/app_settings_repo
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/shared/widgets/main_scaffold.dart';
+import 'package:submersion/shared/widgets/master_detail/list_memory_scope.dart';
 import 'package:submersion/shared/widgets/nav/nav_order_provider.dart';
 import 'package:submersion/shared/widgets/shell_chrome_scope.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
@@ -221,14 +222,23 @@ class _FakeRepo implements AppSettingsRepository {
   @override
   Future<void> setRawSetting(String key, String value) async {}
 
-  /// Always-hide-labels setting (#1424), defaulting to today's behavior.
-  bool alwaysHideLabels = false;
+  /// Always-hide-labels settings (#1424), split by surface (#3222),
+  /// defaulting to today's behavior.
+  bool alwaysHideLabelsPhone = false;
+  bool alwaysHideLabelsDesktop = false;
 
   @override
-  Future<bool> getNavAlwaysHideLabels() async => alwaysHideLabels;
+  Future<bool> getNavAlwaysHideLabelsPhone() async => alwaysHideLabelsPhone;
   @override
-  Future<void> setNavAlwaysHideLabels(bool value) async {
-    alwaysHideLabels = value;
+  Future<void> setNavAlwaysHideLabelsPhone(bool value) async {
+    alwaysHideLabelsPhone = value;
+  }
+
+  @override
+  Future<bool> getNavAlwaysHideLabelsDesktop() async => alwaysHideLabelsDesktop;
+  @override
+  Future<void> setNavAlwaysHideLabelsDesktop(bool value) async {
+    alwaysHideLabelsDesktop = value;
   }
 
   @override
@@ -244,6 +254,15 @@ class _FakeRepo implements AppSettingsRepository {
 
 void main() {
   group('MainScaffold', () {
+    // The lists' memory follows records opened and diver switches anywhere
+    // in the shell (#3301).
+    testWidgets('keeps the lists\' memory for the whole shell', (tester) async {
+      await tester.pumpWidget(await _buildTestApp());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ListMemoryScope), findsOneWidget);
+    });
+
     testWidgets('desktop layout shows NavigationRail', (tester) async {
       tester.view.physicalSize = const Size(1400, 900);
       tester.view.devicePixelRatio = 1.0;
@@ -558,7 +577,7 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.reset);
 
-        final repo = _FakeRepo()..alwaysHideLabels = true;
+        final repo = _FakeRepo()..alwaysHideLabelsPhone = true;
         await tester.pumpWidget(await buildHarness(repo: repo));
         await tester.pumpAndSettle();
 
@@ -591,13 +610,50 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.reset);
 
-        final repo = _FakeRepo()..alwaysHideLabels = true;
+        final repo = _FakeRepo()..alwaysHideLabelsDesktop = true;
         await tester.pumpWidget(await buildHarness(repo: repo));
         await tester.pumpAndSettle();
 
         final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
         expect(rail.extended, isFalse);
       });
+
+      testWidgets(
+        'a phone-only setting does not collapse the desktop rail (#3222)',
+        (tester) async {
+          tester.view.physicalSize = const Size(1400, 900);
+          tester.view.devicePixelRatio = 1.0;
+          addTearDown(tester.view.reset);
+
+          final repo = _FakeRepo()..alwaysHideLabelsPhone = true;
+          await tester.pumpWidget(await buildHarness(repo: repo));
+          await tester.pumpAndSettle();
+
+          final rail = tester.widget<NavigationRail>(
+            find.byType(NavigationRail),
+          );
+          expect(rail.extended, isTrue);
+        },
+      );
+
+      testWidgets(
+        'a desktop-only setting does not hide the phone bar labels (#3222)',
+        (tester) async {
+          tester.view.physicalSize = const Size(400, 800);
+          tester.view.devicePixelRatio = 1.0;
+          addTearDown(tester.view.reset);
+
+          final repo = _FakeRepo()..alwaysHideLabelsDesktop = true;
+          await tester.pumpWidget(await buildHarness(repo: repo));
+          await tester.pumpAndSettle();
+
+          final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
+          expect(
+            bar.labelBehavior,
+            NavigationDestinationLabelBehavior.alwaysShow,
+          );
+        },
+      );
 
       testWidgets(
         'the manual collapse arrow still overrides the setting for the session',
@@ -679,7 +735,7 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.reset);
 
-        final repo = _FakeRepo()..alwaysHideLabels = true;
+        final repo = _FakeRepo()..alwaysHideLabelsDesktop = true;
         await tester.pumpWidget(await buildHarness(repo: repo));
         await tester.pumpAndSettle();
 
@@ -728,7 +784,7 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.reset);
 
-        final repo = _FakeRepo()..alwaysHideLabels = true;
+        final repo = _FakeRepo()..alwaysHideLabelsDesktop = true;
         await tester.pumpWidget(
           await buildHarness(repo: repo, locale: const Locale('ar')),
         );
@@ -799,7 +855,7 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.reset);
 
-        final repo = _FakeRepo()..alwaysHideLabels = true;
+        final repo = _FakeRepo()..alwaysHideLabelsPhone = true;
         await tester.pumpWidget(await buildHarness(repo: repo));
         await tester.pumpAndSettle();
 

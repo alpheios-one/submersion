@@ -41,7 +41,7 @@ passphrase.
 Encryption is set up on one device and then adopted by the others.
 
 1. Set up sync first. Encryption is in
-   **Settings > Data > Database Cloud Sync**, under **End-to-end encryption**, and needs a cloud provider already
+   **Settings > Data > Sync between devices > Advanced > Encryption**, and needs a cloud provider already
    chosen ("Select a cloud provider first" until then). Do this on the device
    that holds your library.
 2. Tap **Enable encryption**.
@@ -92,7 +92,7 @@ anything:
    your existing data and connect cloud sync; the setup says "This library is
    encrypted" and asks for the passphrase there.)
 2. Otherwise, run a sync. Sync pauses because this device has no key yet, and
-   the Cloud Sync page shows that a passphrase is needed, with an
+   the Sync between devices page shows that a passphrase is needed, with an
    **Enter passphrase** button.
 3. Enter your passphrase or your recovery code in
    **Enter your encryption passphrase**. Submersion unlocks the library, downloads it, and syncs
@@ -127,14 +127,14 @@ even before sync is set up there.
 > [!NOTE]
 > A device that has not been unlocked yet (one still waiting for the
 > passphrase) never uploads an unencrypted backup. It keeps its backups on the
-> device only, and **Backup now** says so, until you enter the passphrase
+> device only, and **Back up now** says so, until you enter the passphrase
 > there. To have a locked device upload backups anyway, turn on
 > **Encrypt backups** there, which encrypts them with its own password.
 
 Backups saved to a local folder or shared from the device are not covered by
 this passphrase. To protect those too, turn on **Encrypt backups** in
-**Backup & Restore**, which uses a password of its own; see
-[Backup encryption](backup-and-restore.md#backup-encryption).
+**Backups**, which uses a password of its own; see
+[Password protection](backup-and-restore.md#password-protection).
 
 ## Turning Off Encryption
 

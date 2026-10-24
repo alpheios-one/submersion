@@ -463,6 +463,207 @@ void main() {
     },
   );
 
+  testWidgets(
+    'offers to copy the serial onto a freshly picked transmitter gear item '
+    'with no serial (#3367)',
+    (tester) async {
+      await DatabaseService.instance.database.customStatement(
+        "INSERT INTO equipment (id, diver_id, name, type, created_at, "
+        "updated_at) VALUES ('tx', 'diver-1', 'Perdix Tx', 'transmitter', 1, "
+        "1)",
+      );
+      await _pumpPage(
+        tester,
+        _buildPage(diverIdNotifier, prefs, initialSerial: '555'),
+      );
+
+      await tester.tap(find.text('Transmitter from gear'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Perdix Tx'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const Key('transmitter_label')), 'M');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Copy the serial to "Perdix Tx"?'), findsOneWidget);
+      await tester.tap(find.text('Copy'));
+      await tester.pumpAndSettle();
+
+      final db = DatabaseService.instance.database;
+      final row = await (db.select(
+        db.equipment,
+      )..where((t) => t.id.equals('tx'))).getSingle();
+      expect(row.serialNumber, '555');
+    },
+  );
+
+  testWidgets('declining the serial-copy offer still saves the entry (#3367)', (
+    tester,
+  ) async {
+    await DatabaseService.instance.database.customStatement(
+      "INSERT INTO equipment (id, diver_id, name, type, created_at, "
+      "updated_at) VALUES ('tx', 'diver-1', 'Perdix Tx', 'transmitter', 1, "
+      "1)",
+    );
+    await _pumpPage(
+      tester,
+      _buildPage(diverIdNotifier, prefs, initialSerial: '555'),
+    );
+
+    await tester.tap(find.text('Transmitter from gear'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Perdix Tx'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('transmitter_label')), 'M');
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    final db = DatabaseService.instance.database;
+    final row = await (db.select(
+      db.equipment,
+    )..where((t) => t.id.equals('tx'))).getSingle();
+    expect(row.serialNumber, isNull);
+    final saved = await TransmitterRepository().getForDiver('diver-1');
+    expect(saved.single.transmitterEquipmentId, 'tx');
+  });
+
+  testWidgets(
+    'does not offer to copy onto a gear item that already has a serial '
+    '(#3367)',
+    (tester) async {
+      await DatabaseService.instance.database.customStatement(
+        "INSERT INTO equipment (id, diver_id, name, type, serial_number, "
+        "created_at, updated_at) VALUES ('tx', 'diver-1', 'Perdix Tx', "
+        "'transmitter', '999', 1, 1)",
+      );
+      await _pumpPage(
+        tester,
+        _buildPage(diverIdNotifier, prefs, initialSerial: '555'),
+      );
+
+      await tester.tap(find.text('Transmitter from gear'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Perdix Tx'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const Key('transmitter_label')), 'M');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Copy the serial'), findsNothing);
+    },
+  );
+
+  testWidgets('offers the copy onto a gear item whose serial is an all-zero '
+      'placeholder, as the mismatch detector reads it (#3540)', (tester) async {
+    await DatabaseService.instance.database.customStatement(
+      "INSERT INTO equipment (id, diver_id, name, type, serial_number, "
+      "created_at, updated_at) VALUES ('tx', 'diver-1', 'Perdix Tx', "
+      "'transmitter', '000', 1, 1)",
+    );
+    await _pumpPage(
+      tester,
+      _buildPage(diverIdNotifier, prefs, initialSerial: '555'),
+    );
+
+    await tester.tap(find.text('Transmitter from gear'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Perdix Tx'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('transmitter_label')), 'M');
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Copy'));
+    await tester.pumpAndSettle();
+
+    final db = DatabaseService.instance.database;
+    final row = await (db.select(
+      db.equipment,
+    )..where((t) => t.id.equals('tx'))).getSingle();
+    expect(row.serialNumber, '555');
+    expect(find.text('LIST'), findsOneWidget, reason: 'the save completes');
+  });
+
+  testWidgets(
+    'does not copy an all-zero sentinel serial onto the gear item (#3540)',
+    (tester) async {
+      final db = DatabaseService.instance.database;
+      await db.customStatement(
+        "INSERT INTO equipment (id, diver_id, name, type, created_at, "
+        "updated_at) VALUES ('tx', 'diver-1', 'Perdix Tx', 'transmitter', 1, "
+        "1)",
+      );
+      await db.customStatement(
+        "INSERT INTO dive_computers (id, diver_id, name, created_at, "
+        "updated_at) VALUES ('c1', 'diver-1', 'Perdix', 1, 1)",
+      );
+      await _pumpPage(tester, _buildPage(diverIdNotifier, prefs));
+
+      await tester.enterText(find.byKey(const Key('transmitter_label')), 'M');
+      await tester.enterText(
+        find.byKey(const Key('transmitter_serial')),
+        '000',
+      );
+      await tester.tap(find.byType(DropdownButtonFormField<String?>).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Perdix').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const Key('transmitter_channel')), '1');
+      await tester.tap(find.text('Transmitter from gear'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Perdix Tx'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Copy the serial'), findsNothing);
+      final row = await (db.select(
+        db.equipment,
+      )..where((t) => t.id.equals('tx'))).getSingle();
+      expect(row.serialNumber, isNull);
+      final saved = await TransmitterRepository().getForDiver('diver-1');
+      expect(saved.single.transmitterSerial, isNull, reason: 'normalized away');
+    },
+  );
+
+  testWidgets(
+    'does not re-offer the serial copy on a later save of an existing link '
+    '(#3367)',
+    (tester) async {
+      await DatabaseService.instance.database.customStatement(
+        "INSERT INTO equipment (id, diver_id, name, type, created_at, "
+        "updated_at) VALUES ('tx', 'diver-1', 'Perdix Tx', 'transmitter', 1, "
+        "1)",
+      );
+      final now = DateTime.utc(2026, 9, 1);
+      await TransmitterRepository().create(
+        Transmitter(
+          id: 'e1',
+          diverId: 'diver-1',
+          transmitterSerial: '555',
+          label: 'Main',
+          transmitterEquipmentId: 'tx',
+          createdAt: now,
+          updatedAt: now,
+        ),
+      );
+      await _pumpPage(
+        tester,
+        _buildPage(diverIdNotifier, prefs, transmitterId: 'e1'),
+      );
+
+      await tester.enterText(
+        find.byKey(const Key('transmitter_label')),
+        'Main 2',
+      );
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Copy the serial'), findsNothing);
+    },
+  );
+
   testWidgets('shows volume in cubic feet and stores liters', (tester) async {
     final settings = MockSettingsNotifier();
     await settings.setVolumeUnit(VolumeUnit.cubicFeet);

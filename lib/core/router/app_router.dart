@@ -28,6 +28,9 @@ import 'package:submersion/features/setup_wizard/presentation/pages/setup_wizard
 import 'package:submersion/features/buddies/presentation/pages/buddy_detail_page.dart';
 import 'package:submersion/features/buddies/presentation/pages/buddy_edit_page.dart';
 import 'package:submersion/features/buddies/presentation/pages/buddy_merge_page.dart';
+import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
+import 'package:submersion/features/dive_centers/presentation/providers/dive_center_providers.dart';
+import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/documents/domain/entities/document.dart';
 import 'package:submersion/features/documents/presentation/pages/document_detail_page.dart';
 import 'package:submersion/features/documents/presentation/pages/document_edit_page.dart';
@@ -116,14 +119,11 @@ import 'package:submersion/features/shared_library/presentation/pages/shared_lib
 import 'package:submersion/features/shared_library/presentation/pages/shared_library_members_page.dart';
 import 'package:submersion/features/shared_library/presentation/pages/shared_library_page.dart';
 import 'package:submersion/features/shared_library/presentation/pages/suggestion_inbox_page.dart';
-import 'package:submersion/features/media_store/presentation/pages/media_storage_page.dart';
+import 'package:submersion/features/media_store/presentation/pages/photos_videos_page.dart';
 import 'package:submersion/features/media_store/presentation/pages/transfers_page.dart';
 import 'package:submersion/features/settings/presentation/pages/connected_accounts_page.dart';
+import 'package:submersion/features/settings/presentation/pages/account_detail_page.dart';
 import 'package:submersion/features/settings/presentation/pages/lightroom_settings_page.dart';
-import 'package:submersion/features/settings/presentation/pages/photos_media_hub_page.dart';
-import 'package:submersion/features/settings/presentation/pages/photos_media_setup_page.dart';
-import 'package:submersion/features/settings/presentation/pages/s3_config_page.dart';
-import 'package:submersion/features/settings/presentation/pages/webdav_config_page.dart';
 import 'package:submersion/features/settings/presentation/pages/fix_dive_times_page.dart';
 import 'package:submersion/features/settings/presentation/pages/link_buddy_names_page.dart';
 import 'package:submersion/features/settings/presentation/pages/retype_other_gear_page.dart';
@@ -147,11 +147,14 @@ import 'package:submersion/features/safety/presentation/pages/incidents_list_pag
 import 'package:submersion/features/safety/presentation/pages/emergency_card_page.dart';
 import 'package:submersion/features/settings/presentation/pages/equipment_condition_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/decompression_settings_page.dart';
+import 'package:submersion/features/settings/presentation/pages/planner_defaults_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/safety_hub_page.dart';
 import 'package:submersion/features/settings/presentation/pages/safety_review_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/language_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/nav_customization_page.dart';
 import 'package:submersion/features/settings/presentation/pages/theme_gallery_page.dart';
+import 'package:submersion/features/settings/presentation/pages/data_tools_page.dart';
+import 'package:submersion/features/settings/presentation/pages/import_options_page.dart';
 import 'package:submersion/features/settings/presentation/pages/storage_settings_page.dart';
 import 'package:submersion/features/backup/presentation/pages/unrecognized_backups_page.dart';
 import 'package:submersion/features/settings/presentation/pages/storage_usage_page.dart';
@@ -166,11 +169,16 @@ import 'package:submersion/features/settings/presentation/pages/debug_log_viewer
 import 'package:submersion/features/media/presentation/pages/media_sources_page.dart';
 import 'package:submersion/features/media/presentation/pages/network_sources_page.dart';
 import 'package:submersion/features/settings/presentation/pages/section_appearance_page.dart';
+import 'package:submersion/features/settings/presentation/pages/set_up_device_page.dart';
 import 'package:submersion/features/transfer/presentation/pages/transfer_page.dart';
 import 'package:submersion/features/dive_types/presentation/pages/dive_types_page.dart';
 import 'package:submersion/features/site_types/presentation/pages/site_types_page.dart';
 import 'package:submersion/features/dive_roles/presentation/pages/dive_roles_page.dart';
 import 'package:submersion/features/query/presentation/pages/saved_queries_page.dart';
+import 'package:submersion/features/rules/presentation/pages/rule_edit_page.dart';
+import 'package:submersion/features/rules/presentation/pages/rule_history_page.dart';
+import 'package:submersion/features/rules/presentation/pages/rule_run_page.dart';
+import 'package:submersion/features/rules/presentation/pages/rules_page.dart';
 import 'package:submersion/features/tank_presets/presentation/pages/tank_presets_page.dart';
 import 'package:submersion/features/weight_presets/presentation/pages/weight_preset_editor_page.dart';
 import 'package:submersion/features/weight_presets/presentation/pages/weight_presets_page.dart';
@@ -217,13 +225,17 @@ import 'package:submersion/features/import_wizard/data/adapters/garmin_cloud_ada
 import 'package:submersion/features/import_wizard/data/adapters/suunto_cloud_adapter.dart';
 import 'package:submersion/features/import_wizard/data/adapters/suunto_file_adapter.dart';
 import 'package:submersion/core/services/suunto_cloud/suunto_json_file_reader.dart';
+import 'package:submersion/features/import_wizard/data/adapters/suunto_buddy_writer.dart';
+import 'package:submersion/features/import_wizard/data/adapters/suunto_journal_writer.dart';
 import 'package:submersion/features/import_wizard/data/adapters/suunto_route_writer.dart';
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
 import 'package:submersion/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:submersion/features/planner/presentation/pages/plan_canvas_page.dart';
 import 'package:submersion/features/planner/presentation/pages/plan_compare_page.dart';
+import 'package:submersion/features/planning/presentation/pages/planned_dives_page.dart';
 import 'package:submersion/features/surface_interval_tool/presentation/pages/surface_interval_tool_page.dart';
 import 'package:submersion/features/import_wizard/presentation/pages/universal_import_wizard_route.dart';
+import 'package:submersion/features/import_wizard/presentation/widgets/leave_running_import_dialog.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/main_scaffold.dart';
 import 'package:submersion/features/certification_agencies/presentation/pages/certification_agencies_page.dart';
@@ -358,6 +370,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     name: 'editPlan',
                     builder: (context, state) =>
                         PlanCanvasPage(planId: state.pathParameters['planId']),
+                  ),
+                  GoRoute(
+                    path: 'planned-dives',
+                    name: 'plannedDives',
+                    builder: (context, state) => const PlannedDivesPage(),
                   ),
                   GoRoute(
                     path: 'deco-calculator',
@@ -594,8 +611,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'new',
                 name: 'newSite',
-                builder: (context, state) =>
-                    SiteEditPage.fromNewSiteExtra(state.extra),
+                builder: (context, state) => SiteEditPage.fromNewSiteExtra(
+                  state.extra,
+                  duplicateOfId: state.uri.queryParameters['duplicateOf'],
+                ),
               ),
               GoRoute(
                 path: 'merge',
@@ -888,6 +907,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   initialType: DocumentType.values.asNameMap()[q['type']],
                   initialExpiringOnly: q['filter'] == 'expiring',
                   initialPersonalOnly: q['owner'] == 'personal',
+                  initialTagId: q['tag'],
                 ),
               );
             },
@@ -1178,17 +1198,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'import-wizard',
                 name: 'universalImport',
+                onExit: confirmLeaveRunningImport,
                 builder: (context, state) => const UniversalImportWizardRoute(),
               ),
               GoRoute(
                 path: 'import-cloud/suunto',
                 name: 'importFromCloudSuunto',
+                onExit: confirmLeaveRunningImport,
                 builder: (context, state) =>
                     const _SuuntoCloudImportWizardRoute(),
               ),
               GoRoute(
                 path: 'import-file/suunto',
                 name: 'importFromFileSuunto',
+                onExit: confirmLeaveRunningImport,
                 builder: (context, state) => _SuuntoFileImportWizardRoute(
                   initialFiles: state.extra is List<SuuntoJsonFile>
                       ? state.extra! as List<SuuntoJsonFile>
@@ -1198,12 +1221,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'import-cloud/garmin',
                 name: 'importFromCloudGarmin',
+                onExit: confirmLeaveRunningImport,
                 builder: (context, state) =>
                     const _GarminCloudImportWizardRoute(),
               ),
               GoRoute(
                 path: 'import-cloud/divelogs',
                 name: 'importFromCloudDivelogs',
+                onExit: confirmLeaveRunningImport,
                 builder: (context, state) => const _DivelogsImportWizardRoute(),
               ),
             ],
@@ -1357,6 +1382,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => const StorageSettingsPage(),
               ),
               GoRoute(
+                path: 'setup',
+                name: 'setUpDevice',
+                builder: (context, state) => SetUpDevicePage.fromUri(state.uri),
+              ),
+              GoRoute(
+                path: 'import-options',
+                name: 'importOptions',
+                builder: (context, state) => const ImportOptionsPage(),
+              ),
+              GoRoute(
+                path: 'data-tools',
+                name: 'dataTools',
+                builder: (context, state) => const DataToolsPage(),
+              ),
+              GoRoute(
                 path: 'storage-usage',
                 name: 'storageUsage',
                 builder: (context, state) => const StorageUsagePage(),
@@ -1475,6 +1515,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                         const DecompressionSettingsPage(),
                   ),
                   GoRoute(
+                    path: 'planner-defaults',
+                    name: 'plannerDefaultsSettings',
+                    builder: (context, state) =>
+                        const PlannerDefaultsSettingsPage(),
+                  ),
+                  GoRoute(
                     path: 'equipment-condition',
                     name: 'equipmentConditionSettings',
                     builder: (context, state) =>
@@ -1515,6 +1561,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'wearable-import',
                 name: 'wearableImport',
+                onExit: confirmLeaveRunningImport,
                 builder: (context, state) =>
                     const _HealthKitImportWizardRoute(),
               ),
@@ -1540,15 +1587,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 name: 'cloudSync',
                 builder: (context, state) => const CloudSyncPage(),
                 routes: [
+                  // The S3 and WebDAV settings pages became the account
+                  // detail view (#3482); an old link or a restored window
+                  // lands on Connected accounts instead of an error.
                   GoRoute(
                     path: 's3-config',
-                    name: 's3Config',
-                    builder: (context, state) => const S3ConfigPage(),
+                    redirect: (_, _) => '/settings/connected-accounts',
                   ),
                   GoRoute(
                     path: 'webdav-config',
-                    name: 'webdavConfig',
-                    builder: (context, state) => const WebDavConfigPage(),
+                    redirect: (_, _) => '/settings/connected-accounts',
                   ),
                 ],
               ),
@@ -1605,15 +1653,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   ),
                 ],
               ),
+              // Media Storage merged into Photos & videos (issue #3482); old
+              // links and pending setup items land on the new page.
               GoRoute(
                 path: 'media-storage',
                 name: 'mediaStorage',
-                builder: (context, state) => const MediaStoragePage(),
+                redirect: (context, state) =>
+                    state.uri.path.endsWith('/transfers')
+                    ? '/settings/photos-media/uploads'
+                    : '/settings/photos-media',
                 routes: [
                   GoRoute(
                     path: 'transfers',
                     name: 'mediaStorageTransfers',
-                    builder: (context, state) => const TransfersPage(),
+                    redirect: (context, state) =>
+                        '/settings/photos-media/uploads',
                   ),
                 ],
               ),
@@ -1633,12 +1687,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'photos-media',
                 name: 'photosMedia',
-                builder: (context, state) => const PhotosMediaHubPage(),
+                builder: (context, state) => const PhotosVideosPage(),
                 routes: [
                   GoRoute(
-                    path: 'setup',
-                    name: 'photosMediaSetup',
-                    builder: (context, state) => const PhotosMediaSetupPage(),
+                    path: 'uploads',
+                    name: 'photosUploads',
+                    builder: (context, state) => const TransfersPage(),
                   ),
                 ],
               ),
@@ -1646,6 +1700,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'connected-accounts',
                 name: 'connectedAccounts',
                 builder: (context, state) => const ConnectedAccountsPage(),
+                routes: [
+                  GoRoute(
+                    path: ':accountId',
+                    name: 'connectedAccount',
+                    builder: (context, state) => AccountDetailPage(
+                      accountId: state.pathParameters['accountId']!,
+                    ),
+                  ),
+                ],
               ),
               GoRoute(
                 path: 'fix-dive-times',
@@ -1805,6 +1868,41 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/saved-queries',
             name: 'savedQueries',
             builder: (context, state) => const SavedQueriesPage(),
+          ),
+
+          // Logbook rules (#3513)
+          GoRoute(
+            path: '/rules',
+            name: 'rules',
+            builder: (context, state) => const RulesPage(),
+          ),
+          GoRoute(
+            path: '/rules/new',
+            name: 'ruleNew',
+            builder: (context, state) => const RuleEditPage(),
+          ),
+          GoRoute(
+            path: '/rules/history',
+            name: 'ruleHistory',
+            builder: (context, state) {
+              // ?runs= lists just those runs (one import's, any profile).
+              final runs = state.uri.queryParameters['runs'];
+              return RuleHistoryPage(
+                runIds: runs == null || runs.isEmpty ? null : runs.split(','),
+              );
+            },
+          ),
+          GoRoute(
+            path: '/rules/history/:runId',
+            name: 'ruleRun',
+            builder: (context, state) =>
+                RuleRunPage(runId: state.pathParameters['runId']!),
+          ),
+          GoRoute(
+            path: '/rules/:id',
+            name: 'ruleEdit',
+            builder: (context, state) =>
+                RuleEditPage(ruleId: state.pathParameters['id']),
           ),
 
           // Transmitter registry (issue #1365)
@@ -1987,6 +2085,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'discover',
                 name: 'discoverDevice',
+                onExit: confirmLeaveRunningImport,
                 builder: (context, state) =>
                     const _DiveComputerDiscoveryWizardRoute(),
               ),
@@ -2000,6 +2099,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'download',
                     name: 'computerDownload',
+                    onExit: confirmLeaveRunningImport,
                     builder: (context, state) =>
                         _DiveComputerDownloadWizardRoute(
                           computerId: state.pathParameters['computerId']!,
@@ -2261,6 +2361,14 @@ class _SuuntoCloudImportWizardRoute extends ConsumerWidget {
         diverId: diverId,
         routeWriter: SuuntoRouteWriter(
           repository: ref.watch(navTrackRepositoryProvider),
+        ),
+        buddyWriter: SuuntoBuddyWriter(
+          repository: ref.watch(buddyRepositoryProvider),
+        ),
+        journalWriter: SuuntoJournalWriter(
+          centers: ref.watch(diveCenterRepositoryProvider),
+          dives: diveRepo,
+          species: ref.watch(speciesRepositoryProvider),
         ),
         ref: ref,
       ),

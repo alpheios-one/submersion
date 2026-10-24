@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/core/services/accounts/account_display_name.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
@@ -23,6 +24,7 @@ import 'package:submersion/features/media/presentation/providers/media_providers
 import 'package:submersion/features/media/presentation/providers/media_serving_providers.dart';
 import 'package:submersion/features/media/presentation/providers/photo_access_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/limited_access_actions.dart';
+import 'package:submersion/features/media/presentation/widgets/media_info_tags_section.dart';
 import 'package:submersion/features/media/presentation/widgets/set_media_time_dialog.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -65,6 +67,8 @@ class MediaInfoPanel extends ConsumerWidget {
       children: [
         Text(l10n.media_info_title, style: _titleStyle(context)),
         const SizedBox(height: 16),
+        MediaInfoTagsSection(item: live),
+        const SizedBox(height: 12),
         _FileSection(item: live, units: units),
         const SizedBox(height: 12),
         _OriginSection(item: live, origin: provenance.origin, units: units),
@@ -387,7 +391,7 @@ class _BackupSection extends ConsumerWidget {
     final identity = ref.watch(mediaStoreIdentityProvider).value;
 
     return _Section(
-      title: l10n.media_info_backupSection,
+      title: l10n.settings_photos_cloudHeader,
       actions: [
         if (_offerUpload)
           _BackUpButton(item: item, isRetry: backup.queueState == 'failed'),
@@ -395,7 +399,9 @@ class _BackupSection extends ConsumerWidget {
       children: [
         DiveDetailRow(
           label: l10n.media_info_store,
-          value: identity?.displayHint ?? l10n.media_info_storeNotConnected,
+          value: identity == null
+              ? l10n.media_info_storeNotConnected
+              : shortStorageLabel(identity.displayHint),
         ),
         if (_summary(l10n) case final summary?)
           DiveDetailRow(label: '', value: summary),
@@ -633,7 +639,7 @@ class _BackUpButton extends ConsumerWidget {
     child: Text(
       isRetry
           ? context.l10n.media_info_actionRetryUpload
-          : context.l10n.media_info_actionBackUpNow,
+          : context.l10n.media_info_actionCopyNow,
     ),
   );
 }

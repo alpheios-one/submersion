@@ -98,6 +98,10 @@ enum ImportNoticeKind {
   /// were not imported. [ImportNotice.count] is the number of dives.
   photoListingsUnavailable,
 
+  /// Photos a remote source listed without a usable link, so they were not
+  /// imported. [ImportNotice.count] is the number of photos.
+  photosWithoutLink,
+
   /// Photos a remote source listed that could not be downloaded or saved
   /// at import time. [ImportNotice.count] is the number of photos. Appended
   /// by the adapter after the grouped parser notices, like
@@ -142,6 +146,7 @@ enum ImportNoticeKind {
     gearUnavailable ||
     certificationsUnavailable ||
     photoListingsUnavailable ||
+    photosWithoutLink ||
     photosNotDownloaded => false,
   };
 }

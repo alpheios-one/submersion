@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 
 import 'package:collection/collection.dart';
+import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
 
 import 'package:submersion/core/database/database.dart';
@@ -39,11 +40,13 @@ import 'package:submersion/features/documents/domain/entities/document_page.dart
 part 'before_open.dart';
 part 'before_open_backup_note.dart';
 part 'before_open_child_columns.dart';
+part 'before_open_settings_columns.dart';
 part 'before_open_course_links.dart';
 part 'before_open_table_backstops.dart';
 part 'before_open_view_configs.dart';
 part 'helpers/buddy_migrations.dart';
 part 'helpers/certification_currency_migrations.dart';
+part 'helpers/checklist_section_migrations.dart';
 part 'helpers/connection_migrations.dart';
 part 'helpers/course_link_migrations.dart';
 part 'helpers/cylinder_migrations.dart';
@@ -60,10 +63,15 @@ part 'helpers/equipment_condition_migrations.dart';
 part 'helpers/equipment_location_migrations.dart';
 part 'helpers/insight_migrations.dart';
 part 'helpers/media_migrations.dart';
+part 'helpers/planner_defaults_migrations.dart';
+part 'helpers/air_breaks_turn_pressure_migrations.dart';
+part 'helpers/reserve_pressure_gf_migrations.dart';
+part 'helpers/download_owner_migrations.dart';
 part 'helpers/pre_dive_migrations.dart';
 part 'helpers/profile_series_history_migrations.dart';
 part 'helpers/quality_migrations.dart';
 part 'helpers/query_migrations.dart';
+part 'helpers/rule_migrations.dart';
 part 'helpers/safety_migrations.dart';
 part 'helpers/service_migrations.dart';
 part 'helpers/site_migrations.dart';

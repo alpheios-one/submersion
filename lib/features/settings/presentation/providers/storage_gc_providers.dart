@@ -16,6 +16,7 @@ import 'package:submersion/core/services/storage/scratch_sweep.dart';
 import 'package:submersion/core/services/sync/sync_coordinator.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media_store/data/media_stores_repository.dart';
+import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 import 'package:submersion/features/media_store/data/media_verify_service.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_sweep_providers.dart';
@@ -225,6 +226,7 @@ Future<VerifyLibraryReport?> _mediaSweep(
         store: runtime.store,
         mediaRepository: ref.read(mediaRepositoryProvider),
         queue: ref.read(mediaTransferQueueRepositoryProvider),
+        storeId: runtime.storeId,
       ).run(
         policy: ref.read(orphanDeletePolicyFactoryProvider)(),
         dryRun: dryRun,

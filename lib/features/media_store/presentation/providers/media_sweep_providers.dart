@@ -8,6 +8,7 @@ import 'package:submersion/core/services/storage/gc/storage_gc_store.dart';
 import 'package:submersion/core/services/sync/sync_coordinator.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media_store/data/media_store_preflight.dart';
+import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 import 'package:submersion/features/media_store/data/media_verify_service.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -103,6 +104,7 @@ final mediaVerifyRunnerProvider =
           store: runtime.store,
           mediaRepository: ref.read(mediaRepositoryProvider),
           queue: ref.read(mediaTransferQueueRepositoryProvider),
+          storeId: runtime.storeId,
         );
         // The same gates as the scheduled cleanup: no delete while an upload is
         // transferring, nor during or after a merge, a restore or an

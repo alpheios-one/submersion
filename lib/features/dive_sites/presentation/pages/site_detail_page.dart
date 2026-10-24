@@ -32,12 +32,14 @@ import 'package:submersion/features/dive_log/presentation/navigation/open_dive_l
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/environment_enum_display.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/dive_sites/domain/entry_method_list.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/site_delete_usage.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/site_tags_card.dart';
 import 'package:submersion/features/site_types/presentation/site_type_display.dart';
 import 'package:submersion/features/dive_sites/presentation/site_difficulty_display.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/site_detail_header.dart';
+import 'package:submersion/features/dive_sites/presentation/widgets/duplicate_site_action.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/site_detail_properties_menu.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/site_rating_stars.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/site_detail_section_list.dart';
@@ -67,6 +69,7 @@ import 'package:submersion/core/services/shared_library/shared_library_models.da
 import 'package:submersion/features/shared_library/presentation/providers/shared_library_providers.dart';
 import 'package:submersion/features/shared_library/presentation/widgets/library_picker_dialog.dart';
 import 'package:submersion/features/shared_library/presentation/widgets/site_edit_history_sheet.dart';
+import 'package:submersion/shared/widgets/shared_items/item_sharing_row.dart';
 
 class SiteDetailPage extends ConsumerStatefulWidget {
   final String siteId;
@@ -228,7 +231,13 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
             kind: SharedItemKind.site,
             itemId: site.id,
             ownerId: site.diverId,
-            isShared: site.isShared,
+          ),
+          ItemSharingRow(
+            kind: SharedItemKind.site,
+            itemId: site.id,
+            ownerId: site.diverId,
+            itemName: site.name,
+            isLibrarySite: site.isLibrarySite,
           ),
           const SizedBox(height: kSiteDetailCardGap),
           SiteDetailSectionList(
@@ -277,6 +286,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                   _handleMenuAction(context, ref, value, site),
               itemBuilder: (context) => [
                 openInConnectionsMenuItem(context),
+                duplicateSiteMenuItem(context),
                 displayOptionsMenuItem(context, 'displayOptions'),
                 ..._libraryMenuItems(context, ref, site),
               ],
@@ -437,6 +447,13 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
       site.id,
       canDestroy: canDestroy != false,
     );
+    // Remove only while the site reaches this profile (issue #2151).
+    final reachesHere = watchReachesHere(
+      ref,
+      SharedItemKind.site,
+      site.id,
+      libraryId: site.sharedLibraryId,
+    );
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -523,6 +540,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                   _handleMenuAction(context, ref, value, site),
               itemBuilder: (context) => [
                 openInConnectionsMenuItem(context),
+                duplicateSiteMenuItem(context),
                 displayOptionsMenuItem(context, 'displayOptions'),
                 ..._libraryMenuItems(context, ref, site),
                 // Delete for the owner; another profile only removes the
@@ -549,7 +567,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                       contentPadding: EdgeInsets.zero,
                     ),
                   )
-                else if (canDestroy == false)
+                else if (canDestroy == false && reachesHere)
                   PopupMenuItem(
                     value: 'remove',
                     child: ListTile(
@@ -803,6 +821,10 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
       _displayOptionsMenu.open();
       return;
     }
+    if (action == kDuplicateSiteAction) {
+      await openDuplicateSite(context, ref, site.id);
+      return;
+    }
     if (action == 'remove') {
       await _removeFromProfile(context, ref, site);
       return;
@@ -833,7 +855,18 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
       final divers = await ref.read(allDiversProvider.future);
       final usage = await readSiteDeleteUsage(ref, [site.id]);
       final diverCount = divers.length;
-      final isSharedDelete = site.isShared && diverCount >= 2;
+      if (!context.mounted) return;
+      // Shared with everyone or with chosen profiles (issue #2151).
+      final shared = diverCount < 2
+          ? false
+          : await readSharedWithAnyone(
+              ref,
+              context,
+              SharedItemKind.site,
+              site.id,
+            );
+      if (shared == null) return;
+      final isSharedDelete = shared;
       // The other profiles' dives that lose the site (issue #2594).
       final others = isSharedDelete
           ? (await readDiveLinkCounts(ref, SharedItemKind.site, site.id)).others
@@ -1336,8 +1369,8 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
     return (site.accessNotes != null && site.accessNotes!.isNotEmpty) ||
         (site.mooringNumber != null && site.mooringNumber!.isNotEmpty) ||
         (site.parkingInfo != null && site.parkingInfo!.isNotEmpty) ||
-        site.entryMethod != null ||
-        site.exitMethod != null;
+        site.entryMethods.isNotEmpty ||
+        site.exitMethods.isNotEmpty;
   }
 
   /// The site's depth: what it is rated for, and what dives actually found.
@@ -2054,22 +2087,29 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                 site.accessNotes!,
               ),
             ],
-            if (site.entryMethod != null) ...[
+            if (site.entryMethods.isNotEmpty) ...[
               _buildAccessRow(
                 context,
                 Icons.login,
                 context.l10n.diveSites_detail_access_entryMethod,
-                site.entryMethod!.localizedName(context.l10n),
+                joinEntryMethodNames(
+                  site.entryMethods,
+                  (m) => m.localizedName(context.l10n),
+                ),
               ),
             ],
             // Only when it differs: a mirrored exit repeats the entry row.
-            if (site.exitMethod != null &&
-                site.exitMethod != site.entryMethod) ...[
+            // Compared as sets, so the same methods in another order count
+            // as the same (issue #2054).
+            if (exitDiffersFromEntry(site.entryMethods, site.exitMethods)) ...[
               _buildAccessRow(
                 context,
                 Icons.logout,
                 context.l10n.diveSites_detail_access_exitMethod,
-                site.exitMethod!.localizedName(context.l10n),
+                joinEntryMethodNames(
+                  site.exitMethods,
+                  (m) => m.localizedName(context.l10n),
+                ),
               ),
             ],
             if (site.mooringNumber != null &&

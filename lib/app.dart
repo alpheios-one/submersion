@@ -51,6 +51,8 @@ import 'package:submersion/core/services/local_cache_database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/library_epoch.dart';
 import 'package:submersion/features/shared_library/presentation/providers/shared_library_sync_notifier.dart';
+import 'package:submersion/features/import_wizard/presentation/providers/import_job_provider.dart';
+import 'package:submersion/features/import_wizard/presentation/widgets/background_import_notice.dart';
 
 const Locale _defaultFallbackLocale = Locale('en');
 const Set<String> _invalidSystemLocaleLanguageCodes = {'c', 'posix'};
@@ -312,6 +314,22 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
     );
   }
 
+  void _onBackgroundImportEnded(
+    ImportJobOutcome? previous,
+    ImportJobOutcome? outcome,
+  ) {
+    if (outcome == null || identical(outcome, previous)) return;
+    final ctx = _scaffoldMessengerKey.currentContext;
+    if (ctx == null) return;
+    _scaffoldMessengerKey.currentState?.showSnackBar(
+      SnackBar(
+        content: Text(
+          backgroundImportNotice(AppLocalizations.of(ctx), outcome),
+        ),
+      ),
+    );
+  }
+
   void _onSyncStateChanged(SyncState? prev, SyncState next) {
     final ctx = _scaffoldMessengerKey.currentContext;
     final l10n = ctx != null ? AppLocalizations.of(ctx) : null;
@@ -461,6 +479,7 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
       currentPath: location,
       notifier: ref.read(universalImportNotifierProvider.notifier),
       messenger: _scaffoldMessengerKey.currentState,
+      isImportRunning: () => ref.read(importJobProvider).isRunning,
       wizardActiveMessage: l10n?.dropTarget_error_wizardActive,
       unsupportedFileMessage: l10n?.dropTarget_error_unsupportedFile,
     );
@@ -543,6 +562,7 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
       currentPath: location,
       notifier: ref.read(universalImportNotifierProvider.notifier),
       messenger: _scaffoldMessengerKey.currentState,
+      isImportRunning: () => ref.read(importJobProvider).isRunning,
       wizardActiveMessage: l10n?.dropTarget_error_wizardActive,
     );
 
@@ -588,6 +608,13 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
     ref.listen<BackupOperationState>(
       backupOperationProvider,
       _onBackupOperationChanged,
+    );
+
+    // An import that ran on after its wizard closed (#3554) has no summary
+    // page to end on, so its outcome is told here, whatever screen is up.
+    ref.listen<ImportJobOutcome?>(
+      importJobProvider.select((job) => job.backgroundOutcome),
+      _onBackgroundImportEnded,
     );
 
     return MaterialApp.router(

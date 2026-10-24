@@ -11,6 +11,7 @@ import 'package:submersion/core/constants/tank_preset_display.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/dive_log/domain/services/transmitter_serial.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/equipment_picker_sheet.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tank_enum_display.dart';
@@ -80,6 +81,12 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
   /// the cylinder it feeds; the dropout rules read serials through it.
   String? _transmitterEquipmentId;
   String? _transmitterEquipmentName;
+
+  /// Set only by [_pickTransmitterGear] in this editing session (issue
+  /// #3367), never by loading an existing entry. Saving offers to copy the
+  /// serial onto a freshly linked gear item once; it must not re-offer on
+  /// every later save of a link that was already there.
+  bool _transmitterGearJustPicked = false;
   Transmitter? _existing;
   bool _loading = false;
   String? _keyError;
@@ -270,6 +277,7 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
             setState(() {
               _transmitterEquipmentId = item.id;
               _transmitterEquipmentName = item.name;
+              _transmitterGearJustPicked = true;
             });
             Navigator.of(context).pop();
           },
@@ -361,6 +369,13 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
       ).showSnackBar(SnackBar(content: Text('${l10n.common_label_error}: $e')));
       return;
     }
+    // Outside the save's try: the entry is already written, so a failed
+    // offer must not leave the page open for a second Save to collide with it.
+    final copySerial = normalizeTransmitterSerial(serialText);
+    final gearId = _transmitterEquipmentId;
+    if (_transmitterGearJustPicked && gearId != null && copySerial != null) {
+      await _offerCopySerialToGear(gearId, copySerial);
+    }
     if (!mounted) return;
     // A serial assigned straight after a download is the moment the diver
     // most wants the dives just imported fixed too, so offer the retroactive
@@ -394,6 +409,59 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
       context.pop();
     } else {
       context.go('/');
+    }
+  }
+
+  /// A gear item freshly linked this session with no serial of its own
+  /// (issue #3367) gets offered a copy of the matched serial, so the
+  /// equipment record carries it too without a second manual edit. Never
+  /// overwrites a serial that is already there, even a different one; that
+  /// case is left for the data-quality detector to flag. "Already there"
+  /// reads the gear serial the way the detector does, so an all-zero
+  /// placeholder counts as none and is offered the copy.
+  ///
+  /// The entry is saved by the time this runs, so a failure here is reported
+  /// and swallowed rather than undoing the save.
+  Future<void> _offerCopySerialToGear(String equipmentId, String serial) async {
+    try {
+      final gear = await ref.read(equipmentItemProvider(equipmentId).future);
+      if (gear == null) return;
+      if (normalizeTransmitterSerial(gear.serialNumber) != null) return;
+      if (!mounted) return;
+      final l10n = context.l10n;
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(l10n.transmitters_copySerial_title(gear.name)),
+          content: Text(l10n.transmitters_copySerial_content(serial)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.common_action_cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(l10n.common_action_copy),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+      // Through the list notifier, as the equipment editor saves, so the
+      // equipment lists refresh with the new serial.
+      await ref
+          .read(equipmentListNotifierProvider.notifier)
+          .updateEquipment(gear.copyWith(serialNumber: serial));
+    } catch (e, stackTrace) {
+      _log.warning(
+        'Could not copy the serial onto the transmitter gear item',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${context.l10n.common_label_error}: $e')),
+      );
     }
   }
 
@@ -569,6 +637,7 @@ class _TransmitterEditPageState extends ConsumerState<TransmitterEditPage> {
                             onPressed: () => setState(() {
                               _transmitterEquipmentId = null;
                               _transmitterEquipmentName = null;
+                              _transmitterGearJustPicked = false;
                             }),
                           ),
                     onTap: _pickTransmitterGear,

@@ -75,6 +75,10 @@ void main() {
       'preDiveSessions': 'Pre-dive checklist run',
       'checklistTemplates': 'Checklist template',
       'preDiveChecklistTemplates': 'Pre-dive checklist template',
+      'tripChecklistSections': 'Checklist section',
+      'checklistTemplateSections': 'Checklist template section',
+      'preDiveChecklistTemplateSections': 'Pre-dive checklist template section',
+      'preDiveSessionSections': 'Pre-dive checklist section',
     };
 
     test('covers every entity type a foreign key can point at', () {
@@ -129,6 +133,7 @@ void main() {
       for (final (field, target, label) in [
         ('diverRole', 'diveRoles', 'Your role'),
         ('regulatorEquipmentId', 'equipment', 'Regulator'),
+        ('extraRegulatorIds', 'equipment', 'Regulator'),
         ('viaEquipmentId', 'equipment', 'Attached through'),
         ('viaSetId', 'equipmentSets', 'Applied from set'),
         ('parentEquipmentId', 'equipment', 'Installed in'),

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show setEquals;
+import 'package:submersion/core/data/visibility/shared_item_policy.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/utils/currency.dart';
+import 'package:submersion/core/utils/log_failure.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/equipment/presentation/widgets/service_status_indicator.dart';
@@ -27,6 +29,7 @@ import 'package:submersion/features/equipment/presentation/providers/equipment_t
 import 'package:submersion/features/equipment/presentation/widgets/equipment_location_field.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_tags_field.dart';
 import 'package:submersion/features/tags/domain/entities/tag.dart';
+import 'package:submersion/features/transmitters/presentation/providers/transmitter_providers.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_attribute_form_section.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_custom_fields_section.dart';
@@ -257,7 +260,7 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
       final tags = await ref.read(tagsForEquipmentProvider(sourceId).future);
       final own = [
         for (final t in tags)
-          if (diverId == null || t.diverId == null || t.diverId == diverId) t,
+          if (isOwnOrUnowned(ownerId: t.diverId, activeDiverId: diverId)) t,
       ];
       if (mounted && !_tagsTouched && own.isNotEmpty) {
         setState(() => _selectedTags = own);
@@ -1277,6 +1280,18 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
         );
         ref.invalidate(equipmentItemProvider(widget.equipmentId!));
         savedId = widget.equipmentId!;
+        // A transmitter item's serial feeds the gear-serial mismatch finding
+        // (issue #3367) on the dives its registry entries match; those
+        // findings are stored, so they are rescanned now.
+        if (existingEquipment?.serialNumber != equipment.serialNumber) {
+          logFailure(
+            ref
+                .read(transmitterRepositoryProvider)
+                .rescanDivesForTransmitterItem(savedId),
+            EquipmentEditPage,
+            'rescan dives for the transmitter item',
+          );
+        }
       } else {
         final newEquipment = await notifier.addEquipment(
           equipment,

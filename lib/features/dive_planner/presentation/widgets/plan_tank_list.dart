@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/constants/tank_presets.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/export/csv/codec/tank_capacity.dart';
 import 'package:submersion/core/utils/number_input.dart';
@@ -416,7 +417,9 @@ class _TankEditDialogState extends State<_TankEditDialog> {
     _volumeController = TextEditingController(text: _initialVolumeText);
     _pressureController = TextEditingController(
       text: formatRoundedForInput(
-        widget.units.convertPressure(widget.tank?.startPressure ?? 200),
+        widget.units.convertPressure(
+          widget.tank?.startPressure ?? TankPresets.planFillPressureBar,
+        ),
         0,
       ),
     );
@@ -709,6 +712,7 @@ class _TankEditDialogState extends State<_TankEditDialog> {
       transmitterSerial: original?.transmitterSerial,
       sourceTankIndex: original?.sourceTankIndex,
       regulatorEquipmentId: original?.regulatorEquipmentId,
+      extraRegulatorIds: original?.extraRegulatorIds ?? const [],
       equipmentId: original?.equipmentId,
       decoSwitchDepth: original?.decoSwitchDepth,
       gasMix: widget.lockedOxygenSlot

@@ -167,6 +167,8 @@ import 'package:submersion/features/tides/domain/services/site_wall_clock.dart';
 import 'package:submersion/features/certification_agencies/presentation/providers/certification_catalog_providers.dart';
 import 'package:submersion/features/documents/presentation/widgets/documents_section.dart';
 import 'package:submersion/features/documents/domain/entities/document.dart';
+import 'package:submersion/features/rules/presentation/run_rules_flow.dart';
+import 'package:submersion/features/rules/domain/rule_subject.dart';
 
 class DiveDetailPage extends ConsumerStatefulWidget {
   final String diveId;
@@ -1187,6 +1189,8 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             // when the pane is wide enough. Gauge dives hide
             // gas/deco sections (deco status, tissue loading, SAC segments,
             // cylinders). The list layout folds each section to a header row.
+            // They build in the same frame as the header, on a phone as in
+            // the desktop pane, so the visible page appears at once (#3538).
             ..._buildOrderedSections(
               context: context,
               ref: ref,
@@ -1735,6 +1739,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     final container = ProviderScope.containerOf(context, listen: false);
     final messenger = ScaffoldMessenger.of(context);
     final failureMessage = context.l10n.diveLog_planned_markLoggedFailed;
+    final loggedMessage = context.l10n.diveLog_planned_markedLogged;
+    // Read now: a plan marked as logged gets its rules (#3513) even if the
+    // diver leaves the page while it is converted.
+    final rulesAfterCreate = captureRulesAfterCreate(context, ref);
     try {
       await ref.read(diveRepositoryProvider).convertPlanToActualDive(dive.id);
     } catch (_) {
@@ -1750,10 +1758,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     container.invalidate(divesProvider);
     container.invalidate(diveStatisticsProvider);
     container.invalidate(diveNumberingInfoProvider);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.diveLog_planned_markedLogged)),
-    );
+    messenger.showSnackBar(SnackBar(content: Text(loggedMessage)));
+    // A plan marked as logged is a dive logged by hand for the logbook
+    // rules (#3513).
+    await rulesAfterCreate(subject: RuleSubject.dives, ids: [dive.id]);
   }
 
   Widget _buildHeaderSection(
@@ -3230,6 +3238,19 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     String? activeComputerId,
   }) {
     final surfaceIntervalAsync = ref.watch(surfaceIntervalProvider(diveId));
+    // The legacy free-text buddy and dive master columns are only a fallback
+    // while the dive_buddies junction is empty, the same rule as the Buddies
+    // card, the dive list and the exports (#1864). Otherwise an imported
+    // name the diver has since replaced keeps showing here (#3581). Shown
+    // only once the junction has been read as empty, so neither the first
+    // load nor a failed one can bring a stale name back. A refresh keeps the
+    // last answer until the new one arrives, as the Buddies card does, so
+    // the rows do not flicker on every unrelated change to the dive.
+    final showLegacyText = ref.watch(
+      buddiesForDiveProvider(
+        diveId,
+      ).select((a) => a.valueOrNull?.isEmpty ?? false),
+    );
 
     return Card(
       child: Padding(
@@ -3303,17 +3324,19 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 context.l10n.diveLog_detail_label_waterType,
                 dive.effectiveWaterType!.localizedName(context.l10n),
               ),
-            if (dive.buddy != null && dive.buddy!.isNotEmpty)
+            // A placeholder such as "None" is no one, as on the Buddies card.
+            if (showLegacyText && LegacyBuddyTextSection.hasBuddyText(dive))
               _buildDetailRow(
                 context,
                 context.l10n.diveLog_detail_label_buddy,
-                dive.buddy!,
+                dive.buddy!.trim(),
               ),
-            if (dive.diveMaster != null && dive.diveMaster!.isNotEmpty)
+            if (showLegacyText &&
+                LegacyBuddyTextSection.hasDiveMasterText(dive))
               _buildDetailRow(
                 context,
                 context.l10n.diveLog_detail_label_diveMaster,
-                dive.diveMaster!,
+                dive.diveMaster!.trim(),
               ),
             _buildGasConsumptionRows(context, ref, dive, units),
             // Gradient factors (from dive computer)
@@ -4910,17 +4933,19 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const Divider(),
-            Text(
-              dive.notes.isNotEmpty
-                  ? dive.notes
-                  : context.l10n.diveLog_detail_noNotes,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: dive.notes.isEmpty
-                    ? Theme.of(context).colorScheme.onSurfaceVariant
-                    : null,
-                fontStyle: dive.notes.isEmpty ? FontStyle.italic : null,
+            if (dive.notes.isNotEmpty)
+              SelectableText(
+                dive.notes,
+                style: Theme.of(context).textTheme.bodyMedium,
+              )
+            else
+              Text(
+                context.l10n.diveLog_detail_noNotes,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
-            ),
           ],
         ),
       ),

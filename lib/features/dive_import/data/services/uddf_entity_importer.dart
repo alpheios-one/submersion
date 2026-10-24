@@ -105,6 +105,7 @@ import 'package:submersion/features/universal_import/data/services/import_tank_d
 import 'package:uuid/uuid.dart';
 import 'package:submersion/features/certification_agencies/data/repositories/custom_certification_repository.dart';
 import 'package:submersion/features/certification_agencies/data/services/certification_import_resolver.dart';
+import 'package:submersion/features/dive_sites/domain/entry_method_list.dart';
 
 /// Bundles all repositories needed for UDDF import.
 class ImportRepositories {
@@ -298,6 +299,10 @@ class UddfEntityImportResult {
   final int fills;
   final List<String> diveIds;
 
+  /// The sites this import created (not those it matched to existing
+  /// sites), so logbook rules can run on them afterwards (#3513).
+  final List<String> siteIds;
+
   /// The persisted dive id created for each imported source-dive index.
   ///
   /// Keyed by the index into the `dives` list passed to [import] (the same
@@ -324,6 +329,7 @@ class UddfEntityImportResult {
     this.courses = 0,
     this.fills = 0,
     this.diveIds = const [],
+    this.siteIds = const [],
     this.diveIdByIndex = const {},
     this.restoredDataSources = 0,
   });
@@ -413,6 +419,16 @@ class UddfEntityImporter {
 
   /// Parse a value that may be either an enum instance or a string matching
   /// an enum name. Returns null if the value is null or unrecognised.
+  /// A site's entry or exit methods from an import payload value (stored
+  /// comma-joined names), or null when the payload carries none this build
+  /// can read, so an overwrite keeps the site's own list rather than
+  /// emptying it.
+  static List<EntryMethod>? _entryMethodsOrNull(Object? value) {
+    if (value is! String) return null;
+    final methods = decodeEntryMethods(value);
+    return methods.isEmpty ? null : methods;
+  }
+
   static T? _parseEnum<T extends Enum>(Object? value, List<T> values) {
     if (value == null) return null;
     if (value is T) return value;
@@ -774,6 +790,7 @@ class UddfEntityImporter {
             diverId,
           );
 
+    final createdSiteIds = <String>[];
     final sitesCount = stopped()
         ? 0
         : await _importSites(
@@ -784,6 +801,7 @@ class UddfEntityImporter {
             diverId,
             siteIdMapping,
             onProgress,
+            createdSiteIds: createdSiteIds,
             restoreSiteChildren: (siteData, siteId) async {
               // A library site this profile may not edit keeps the
               // library's lists (issue #2567).
@@ -897,6 +915,7 @@ class UddfEntityImporter {
       courses: coursesCount,
       fills: fillsCount,
       diveIds: divesResult.diveIds,
+      siteIds: createdSiteIds,
       diveIdByIndex: divesResult.diveIdByIndex,
       restoredDataSources: divesResult.restoredDataSources,
     );
@@ -1888,6 +1907,7 @@ class UddfEntityImporter {
     Future<void> Function(Map<String, dynamic> siteData, String siteId)?
     restoreSiteChildren,
     ImportCancellationToken? cancelToken,
+    List<String>? createdSiteIds,
   }) async {
     // For deselected sites (duplicates the user chose not to re-import),
     // resolve their UDDF IDs to existing database sites so that dives
@@ -2012,10 +2032,10 @@ class UddfEntityImporter {
         mooringNumber: siteData['mooringNumber'] as String?,
         parkingInfo: siteData['parkingInfo'] as String?,
         altitude: siteData['altitude'] as double?,
-        entryMethod: _parseEnum(siteData['entryMethod'], EntryMethod.values),
-        // A site's typical way out (issue #2201); null means the
-        // same as the entry, so an absent cell stays null.
-        exitMethod: _parseEnum(siteData['exitMethod'], EntryMethod.values),
+        // Null for an absent key, so the site keeps its own methods; a
+        // decoded list (even an empty one) would replace them (#2054).
+        entryMethods: _entryMethodsOrNull(siteData['entryMethod']),
+        exitMethods: _entryMethodsOrNull(siteData['exitMethod']),
       );
 
       // Core fields and the importer-only metadata columns go out as one
@@ -2103,13 +2123,14 @@ class UddfEntityImporter {
         mooringNumber: siteData['mooringNumber'] as String?,
         parkingInfo: siteData['parkingInfo'] as String?,
         altitude: siteData['altitude'] as double?,
-        entryMethod: _parseEnum(siteData['entryMethod'], EntryMethod.values),
+        entryMethods: decodeEntryMethods(siteData['entryMethod'] as String?),
         // A site's typical way out (issue #2201); null means the
         // same as the entry, so an absent cell stays null.
-        exitMethod: _parseEnum(siteData['exitMethod'], EntryMethod.values),
+        exitMethods: decodeEntryMethods(siteData['exitMethod'] as String?),
       );
 
       final createdSite = await repository.createSite(newSite);
+      createdSiteIds?.add(createdSite.id);
 
       // Write MacDive site metadata columns that don't flow through the
       // DiveSite domain entity. Only set columns when source provides a value.

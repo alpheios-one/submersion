@@ -18,6 +18,7 @@ import 'package:submersion/features/trips/domain/entities/trip.dart';
 import 'package:submersion/features/dive_log/domain/entities/computer_tissue_snapshot.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_custom_field.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_weight.dart';
+import 'package:submersion/features/dive_log/domain/entities/tank_extra_regulators.dart';
 import 'package:submersion/features/dive_log/domain/services/bottom_time_calculator.dart';
 import 'package:submersion/features/dive_log/domain/services/multi_cylinder_consumption.dart';
 
@@ -359,7 +360,9 @@ class Dive extends Equatable {
   /// #1427). The entry-method twin of [effectiveWaterType], with the same
   /// reasoning: the site's value is snapped onto a dive when the site is
   /// assigned (issue #1104), so only dives predating that, or whose site was
-  /// filled in later, are left without one.
+  /// filled in later, are left without one. A site listing several entry
+  /// methods gives no fallback (issue #2054): which one the dive used is
+  /// unknown.
   ///
   /// [exitMethod] has no such getter on purpose. Its snap-on-assign rule turns
   /// on whether the diver has unlinked exit from entry, and that flag is dive
@@ -368,7 +371,7 @@ class Dive extends Equatable {
   ///
   /// Requires [site] to be hydrated; a dive loaded without its site reports
   /// only its own value.
-  EntryMethod? get effectiveEntryMethod => entryMethod ?? site?.entryMethod;
+  EntryMethod? get effectiveEntryMethod => entryMethod ?? site?.soleEntryMethod;
 
   /// The stored visibility range, or null when the dive has none.
   VisibilityRange? get visibilityRange =>
@@ -1229,6 +1232,14 @@ class DiveTank extends Equatable {
   /// tank editor sets it and downloads never touch it.
   final String? regulatorEquipmentId;
 
+  /// The regulators on this cylinder after [regulatorEquipmentId] (v312,
+  /// issue #3375): a twin valve or twin set carries more than one, and each
+  /// counts as on the dive. User-authored like [regulatorEquipmentId].
+  /// The repository normalises the pair on write
+  /// (tank_extra_regulators.dart), so a copy here may hold extras with no
+  /// first until it is saved.
+  final List<String> extraRegulatorIds;
+
   /// The trip cylinder slot this tank was breathed from (v232, issue
   /// #2325). User-authored: the tank editor sets it and downloads never
   /// touch it. Meaningless outside the dive's trip, so the repository drops
@@ -1288,6 +1299,7 @@ class DiveTank extends Equatable {
     this.sourceTankIndex,
     this.sharedComputerIds,
     this.regulatorEquipmentId,
+    this.extraRegulatorIds = const [],
     this.tripCylinderId,
     this.passportId,
     this.equipmentId,
@@ -1295,6 +1307,23 @@ class DiveTank extends Equatable {
     this.decoSwitchDepth,
     this.isTravelGas = false,
   });
+
+  /// Every regulator on this cylinder: the first, then the extras.
+  List<String> get regulatorIds => [
+    ?regulatorEquipmentId,
+    ...extraRegulatorIds,
+  ];
+
+  /// A copy carrying [ids] as its regulators, normalised the way the
+  /// repository stores them: the first id is the first regulator.
+  DiveTank withRegulators(List<String> ids) {
+    final regs = normalizeTankRegulators(null, ids);
+    return copyWith(
+      regulatorEquipmentId: regs.first,
+      clearRegulatorEquipmentId: regs.first == null,
+      extraRegulatorIds: regs.extras,
+    );
+  }
 
   /// Whether [computer] breathed this cylinder: it owns it, shares it, or
   /// the tank belongs to the whole dive (unattributed).
@@ -1334,6 +1363,7 @@ class DiveTank extends Equatable {
     bool clearSourceTankIndex = false,
     List<String>? sharedComputerIds,
     String? regulatorEquipmentId,
+    List<String>? extraRegulatorIds,
     String? equipmentId,
     Duration? usageDuration,
     bool clearUsageDuration = false,
@@ -1372,6 +1402,7 @@ class DiveTank extends Equatable {
       regulatorEquipmentId: clearRegulatorEquipmentId
           ? null
           : (regulatorEquipmentId ?? this.regulatorEquipmentId),
+      extraRegulatorIds: extraRegulatorIds ?? this.extraRegulatorIds,
       tripCylinderId: clearTripCylinderId
           ? null
           : (tripCylinderId ?? this.tripCylinderId),
@@ -1407,6 +1438,7 @@ class DiveTank extends Equatable {
     sourceTankIndex,
     sharedComputerIds,
     regulatorEquipmentId,
+    extraRegulatorIds,
     equipmentId,
     tripCylinderId,
     passportId,
