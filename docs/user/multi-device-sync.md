@@ -87,8 +87,9 @@ want when adding a new device to an existing library.
 
 ## Adding More Devices
 
-1. Install Submersion on the new device. In the first-run setup you can choose
-   to bring in your existing data and connect cloud sync straight away.
+1. Install Submersion on the new device. In the first-run setup, choose
+   **I have existing Submersion data**, then **Connect cloud sync**: the same
+   account and sync steps as below run straight away.
 2. Otherwise, open the **Set up this device** card on **Settings > Data** and
    choose the **same account** as your other devices: the same iCloud, Google
    or Dropbox account, or the same server. An account another device added is
@@ -135,7 +136,7 @@ device to the next:
 | Light or dark mode, and service reminder settings | Each device can look and notify its own way |
 | Which diver profile is active | Two people can share a library on different devices |
 | The navigation layout | Phones and computers have different room |
-| A dive computer's Bluetooth address or USB port, and which connection this device last downloaded it over | Each device pairs on its own |
+| A dive computer's Bluetooth address or USB port, and which connection this device last downloaded it over | Each device pairs on its own. The first Bluetooth download on another device searches for the computer by its make and model, so switch the computer's Bluetooth on and keep it close |
 | The cloud provider and its sign-in, sync behaviour, and the encryption passphrase | Credentials never leave the device |
 | Backup settings and location, update channel, debug mode, database location, App Security | Device housekeeping |
 | Photo and video files | Only their links sync; the files themselves travel through [Media Sync](media-sync.md) |

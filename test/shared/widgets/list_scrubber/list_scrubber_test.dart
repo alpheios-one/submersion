@@ -5,7 +5,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/shared/widgets/list_scrubber/list_scrubber.dart';
 import 'package:submersion/shared/widgets/list_scrubber/list_scrubber_geometry.dart';
 import 'package:submersion/shared/widgets/list_scrubber/list_scrubber_panel.dart';
+import 'package:submersion/shared/widgets/list_scrubber/list_scrubber_thumb_style.dart';
 import 'package:submersion/shared/widgets/list_scrubber/scrubber_marker.dart';
+
+import 'scrubber_hover.dart';
+
+const _markers = [
+  ScrubberMarker(slot: 0, label: 'Top'),
+  ScrubberMarker(slot: 150, label: 'Low'),
+];
 
 void main() {
   late ScrollController controller;
@@ -19,6 +27,7 @@ void main() {
     void Function(int)? onEnd,
     String? busy,
     String Function(int)? label,
+    String? Function(int)? detail,
     double? width,
     TextDirection direction = TextDirection.ltr,
     void Function(int)? onRowTap,
@@ -36,10 +45,8 @@ void main() {
               slotCount: slotCount ?? rows,
               loadedSlotCount: loadedSlotCount ?? rows,
               labelFor: label ?? (slot) => 'Slot $slot',
-              markers: const [
-                ScrubberMarker(slot: 0, label: 'Top'),
-                ScrubberMarker(slot: 150, label: 'Low'),
-              ],
+              detailFor: detail,
+              markers: _markers,
               onScrubEnd: onEnd ?? (_) {},
               busyLabel: busy,
               child: ListView.builder(
@@ -60,6 +67,20 @@ void main() {
       ),
     ),
   );
+
+  /// The panel's width for [_markers]: the label column sized to them.
+  double panelWidth(WidgetTester tester) {
+    final context = tester.element(find.byType(ListScrubber));
+    final style = ListScrubberThumbStyle.resolve(
+      context,
+      ListScrubberThumbStyle.statesFor(active: true, dragging: false),
+    );
+    return ListScrubberPanel.labelColumnFor(
+      context,
+      _markers,
+      thumbInset: style.crossAxisMargin + style.thickness,
+    );
+  }
 
   bool insideRect(Rect outer, Rect inner) =>
       inner.left >= outer.left - 0.01 &&
@@ -308,7 +329,7 @@ void main() {
     expect(tester.widget<Text>(value).data, 'Loading');
     final rect = tester.getRect(find.byKey(ListScrubber.panelKey));
     final band = tester.getRect(find.byKey(ListScrubber.currentBandKey));
-    expect(rect.width, ListScrubberPanel.width);
+    expect(rect.width, panelWidth(tester));
     expect(band.left, lessThan(rect.left));
     expect(band.right, rect.right);
     expect(insideRect(band, tester.getRect(value)), isTrue);
@@ -379,9 +400,7 @@ void main() {
     await tester.pump();
 
     final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
-    await mouse.addPointer(
-      location: tester.getCenter(find.byKey(ListScrubber.thumbKey)),
-    );
+    await mouse.addPointer(location: scrubberThumbHoverPoint(tester));
     await tester.pump();
 
     await tester.pumpWidget(host(slotCount: 5));
@@ -394,7 +413,7 @@ void main() {
 
   double expectedThumbTop(WidgetTester tester) {
     final position = controller.position;
-    final slot = slotForScroll(
+    final slot = slotPositionForScroll(
       pixels: position.pixels,
       maxScrollExtent: position.maxScrollExtent,
       loadedSlotCount: 200,
@@ -417,7 +436,7 @@ void main() {
     expect(controller.offset, greaterThan(3000));
     expect(
       tester.getTopLeft(find.byKey(ListScrubber.thumbKey)).dy,
-      closeTo(expectedThumbTop(tester), 1),
+      closeTo(expectedThumbTop(tester), 0.01),
     );
     await tester.pump(ListScrubber.idleHide);
   });
@@ -433,14 +452,23 @@ void main() {
       tester.getCenter(find.byKey(ListScrubber.thumbKey)),
       kind: PointerDeviceKind.mouse,
     );
-    await gesture.moveBy(const Offset(0, 1));
+    // Past the mouse's drag slop, so the drag has started.
+    await gesture.moveBy(const Offset(0, 4));
     await tester.pump();
-    await gesture.moveBy(const Offset(0, 1));
-    await tester.pump();
-    // A jump snaps to a slot; one slot is 9400 / 199 px of scroll and 2 px
-    // of track is under two slots.
     expect(find.byKey(ListScrubber.currentValueKey), findsOneWidget);
-    expect(controller.offset, closeTo(before, 100));
+    // No snap to a slot on the grab: the list sits where the thumb is.
+    final thumb =
+        tester.getTopLeft(find.byKey(ListScrubber.thumbKey)).dy -
+        tester.getTopLeft(find.byType(ListScrubber)).dy;
+    expect(controller.offset, closeTo(thumb / 552 * 9400, 0.01));
+    expect(controller.offset, closeTo(before, 4 * 9400 / 552 + 0.01));
+
+    // The list follows the pointer by the pixel: 10 px of track is
+    // 10 * 9400 / 552 px of scroll.
+    final grabbed = controller.offset;
+    await gesture.moveBy(const Offset(0, 10));
+    await tester.pump();
+    expect(controller.offset, closeTo(grabbed + 10 * 9400 / 552, 0.01));
     await gesture.up();
     await tester.pump(ListScrubber.idleHide);
   });
@@ -486,7 +514,7 @@ void main() {
       final rect = tester.getRect(find.byKey(ListScrubber.panelKey));
       final band = tester.getRect(find.byKey(ListScrubber.currentBandKey));
       final area = tester.getRect(find.byType(ListScrubber));
-      expect(rect.width, ListScrubberPanel.width);
+      expect(rect.width, panelWidth(tester));
       expect(rect.right, area.right);
       expect(band.right, area.right);
       expect(band.left, lessThan(rect.left));
@@ -522,19 +550,19 @@ void main() {
     double width() => tester.getSize(find.byKey(ListScrubber.panelKey)).width;
     double bandWidth() =>
         tester.getSize(find.byKey(ListScrubber.currentBandKey)).width;
-    expect(width(), ListScrubberPanel.width);
+    expect(width(), panelWidth(tester));
     expect(bandWidth(), ListScrubberPanel.maxBandWidth);
     await tester.pump(const Duration(milliseconds: 60));
-    expect(width(), ListScrubberPanel.width);
+    expect(width(), panelWidth(tester));
     await tester.pumpAndSettle();
-    expect(width(), ListScrubberPanel.width);
+    expect(width(), panelWidth(tester));
     expect(bandWidth(), ListScrubberPanel.maxBandWidth);
     await gesture.up();
     await tester.pumpAndSettle();
     await tester.pump(ListScrubber.idleHide);
   });
 
-  testWidgets('a short value keeps the band inside the panel', (tester) async {
+  testWidgets('a short value keeps the band to its own width', (tester) async {
     await tester.pumpWidget(
       host(label: (slot) => slot < 60 ? 'A long dive site name' : 'B'),
     );
@@ -550,11 +578,22 @@ void main() {
     Rect band() => tester.getRect(find.byKey(ListScrubber.currentBandKey));
     expect(band().left, lessThan(rect().left));
 
+    final long = band().width;
     await gesture.moveBy(const Offset(0, 300));
     await tester.pumpAndSettle();
     expect(find.text('B'), findsOneWidget);
-    expect(rect().width, ListScrubberPanel.width);
-    expect(insideRect(rect(), band()), isTrue);
+    expect(rect().width, panelWidth(tester));
+    expect(band().right, rect().right);
+    expect(band().width, lessThan(long));
+    expect(
+      band().width,
+      ListScrubberPanel.bandSize(
+        tester.element(find.byType(ListScrubber)),
+        value: 'B',
+        hostWidth: 800,
+        panelWidth: rect().width,
+      ).width,
+    );
     expect(
       insideRect(
         band(),
@@ -576,10 +615,9 @@ void main() {
     matching: find.byType(DecoratedBox),
   );
 
-  Future<TestGesture> hoverStrip(WidgetTester tester) async {
-    final area = tester.getRect(find.byType(ListScrubber));
+  Future<TestGesture> hoverAt(WidgetTester tester, Offset at) async {
     final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
-    await mouse.addPointer(location: Offset(area.right - 10, area.top + 400));
+    await mouse.addPointer(location: at);
     await tester.pumpAndSettle();
     return mouse;
   }
@@ -596,19 +634,61 @@ void main() {
     final slim = tester.getRect(handle());
     final area = tester.getRect(find.byType(ListScrubber));
     expect(slim.width, 4);
-    expect(slim.height, 48);
+    // The handle is 48 px, but its top falls between whole pixels as the
+    // list scrolls, so the rect's bottom minus top is off in the last bit.
+    expect(slim.height, moreOrLessEquals(48));
     expect(slim.left, greaterThanOrEqualTo(area.right - 8));
     await tester.pump(ListScrubber.idleHide);
   });
 
-  testWidgets('a hover over the strip shows the panel and markers', (
+  testWidgets('a hover beside the edge column leaves it hidden', (
     tester,
   ) async {
     await tester.pumpWidget(host());
     await tester.pump();
-    final mouse = await hoverStrip(tester);
+    final area = tester.getRect(find.byType(ListScrubber));
+    final mouse = await hoverAt(
+      tester,
+      Offset(area.right - ListScrubber.gripWidth - 8, area.top + 10),
+    );
+    expect(opacity(tester), 0);
+    expect(panel(), findsNothing);
+    await mouse.removePointer();
+    await tester.pump(ListScrubber.idleHide);
+  });
+
+  testWidgets('a hover on the edge column shows only the thumb', (
+    tester,
+  ) async {
+    await tester.pumpWidget(host());
+    await tester.pump();
+    final area = tester.getRect(find.byType(ListScrubber));
+    final mouse = await hoverAt(tester, Offset(area.right - 6, area.top + 400));
     expect(opacity(tester), 1);
-    expect(panel(), findsOneWidget);
+    expect(panel(), findsNothing);
+
+    await mouse.moveTo(Offset(area.right - 40, area.top + 400));
+    await tester.pumpAndSettle();
+    expect(opacity(tester), 0);
+    await mouse.removePointer();
+    await tester.pump(ListScrubber.idleHide);
+  });
+
+  testWidgets('a hover on the thumb fades the panel in, then out', (
+    tester,
+  ) async {
+    await tester.pumpWidget(host());
+    await tester.pump();
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: scrubberThumbHoverPoint(tester));
+    await tester.pump();
+    await tester.pump(ListScrubber.reveal ~/ 2);
+    final halfway = tester.widget<ListScrubberPanel>(panel()).reveal;
+    expect(halfway, greaterThan(0));
+    expect(halfway, lessThan(1));
+    await tester.pumpAndSettle();
+    expect(tester.widget<ListScrubberPanel>(panel()).reveal, 1);
+    expect(opacity(tester), 1);
     expect(find.text('Low'), findsOneWidget);
 
     await mouse.moveTo(Offset.zero);
@@ -622,7 +702,7 @@ void main() {
   testWidgets('the hover stays active across the whole panel', (tester) async {
     await tester.pumpWidget(host());
     await tester.pump();
-    final mouse = await hoverStrip(tester);
+    final mouse = await hoverScrubberThumb(tester);
     final rect = tester.getRect(panel());
     await mouse.moveTo(Offset(rect.left + 4, rect.center.dy));
     await tester.pumpAndSettle();
@@ -631,20 +711,21 @@ void main() {
     await tester.pump(ListScrubber.idleHide);
   });
 
-  testWidgets('markers sit inside the panel', (tester) async {
+  testWidgets('markers sit inside a panel sized to them', (tester) async {
     await tester.pumpWidget(host());
     await tester.pump();
-    final mouse = await hoverStrip(tester);
+    final mouse = await hoverScrubberThumb(tester);
     final rect = tester.getRect(panel());
     final area = tester.getRect(find.byType(ListScrubber));
-    expect(rect.width, 64);
+    expect(rect.width, panelWidth(tester));
+    expect(rect.width, lessThan(ListScrubberPanel.width));
     expect(rect.right, area.right);
     expect(rect.height, area.height);
+    final slim = tester.getRect(handle());
     for (final label in ['Low']) {
       final text = tester.getRect(find.text(label));
       expect(text.left, greaterThanOrEqualTo(rect.left));
-      expect(text.right, lessThanOrEqualTo(rect.right));
-      expect(text.center.dx, closeTo(rect.center.dx, 1));
+      expect(text.right, lessThanOrEqualTo(slim.left));
     }
     expect(
       find.ancestor(of: find.text('Low'), matching: panel()),
@@ -657,7 +738,7 @@ void main() {
   testWidgets('a marker under the handle is hidden', (tester) async {
     await tester.pumpWidget(host());
     await tester.pump();
-    final mouse = await hoverStrip(tester);
+    final mouse = await hoverScrubberThumb(tester);
     expect(find.text('Top'), findsNothing);
     expect(find.text('Low'), findsOneWidget);
     await mouse.removePointer();
@@ -686,7 +767,7 @@ void main() {
     final shown = find.text(label);
     expect(shown, findsOneWidget);
     final band = tester.getRect(find.byKey(ListScrubber.currentBandKey));
-    expect(rect.width, ListScrubberPanel.width);
+    expect(rect.width, panelWidth(tester));
     expect(band.left, lessThan(rect.left));
     expect(band.right, rect.right);
     expect(band.center.dy, closeTo(thumb.center.dy, 1));
@@ -741,7 +822,7 @@ void main() {
     int? tapped;
     await tester.pumpWidget(host(onRowTap: (i) => tapped = i));
     await tester.pump();
-    final mouse = await hoverStrip(tester);
+    final mouse = await hoverScrubberThumb(tester);
     final rect = tester.getRect(panel());
     final thumb = tester.getRect(find.byKey(ListScrubber.thumbKey));
     final target = Offset(rect.right - 10, thumb.bottom + 200);
@@ -786,7 +867,7 @@ void main() {
     await tester.pumpAndSettle();
     final rect = tester.getRect(panel());
     expect(rect.left, closeTo(area.left, 0.5));
-    expect(rect.width, ListScrubberPanel.width);
+    expect(rect.width, panelWidth(tester));
     final band = tester.getRect(find.byKey(ListScrubber.currentBandKey));
     expect(band.left, closeTo(area.left, 0.5));
     expect(band.right, greaterThan(rect.right));
@@ -821,5 +902,120 @@ void main() {
     await tester.pump();
     expect(ended, isNotNull);
     await tester.pump(ListScrubber.idleHide);
+  });
+
+  testWidgets('a dragged slot shows its detail under its value', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      host(detail: (slot) => slot.isEven ? 'Trip' : null),
+    );
+    await tester.drag(find.byType(ListView), const Offset(0, -10));
+    await tester.pump();
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byKey(ListScrubber.thumbKey)),
+    );
+    await gesture.moveBy(const Offset(0, 100));
+    await tester.pumpAndSettle();
+    final value = tester.widget<Text>(find.byKey(ListScrubber.currentValueKey));
+    final slot = int.parse(value.data!.substring(5));
+    final detail = find.byKey(ListScrubberPanel.currentDetailKey);
+    expect(detail, slot.isEven ? findsOneWidget : findsNothing);
+    if (slot.isEven) {
+      expect(tester.widget<Text>(detail).data, 'Trip');
+      final band = tester.getRect(find.byKey(ListScrubber.currentBandKey));
+      expect(insideRect(band, tester.getRect(detail)), isTrue);
+    }
+    await gesture.up();
+    await tester.pump(ListScrubber.idleHide);
+  });
+
+  testWidgets('a busy value shows no detail', (tester) async {
+    await tester.pumpWidget(host(busy: 'Loading', detail: (_) => 'Trip'));
+    await tester.drag(find.byType(ListView), const Offset(0, -10));
+    await tester.pump();
+    expect(find.text('Loading'), findsOneWidget);
+    expect(find.byKey(ListScrubberPanel.currentDetailKey), findsNothing);
+    await tester.pump(ListScrubber.idleHide);
+  });
+
+  testWidgets('a mouse drag released over the panel keeps it open', (
+    tester,
+  ) async {
+    await tester.pumpWidget(host());
+    await tester.drag(find.byType(ListView), const Offset(0, -10));
+    await tester.pump();
+    final thumb = tester.getRect(find.byKey(ListScrubber.thumbKey));
+    // In the thumb's hit box but outside the edge column.
+    final gesture = await tester.startGesture(
+      Offset(thumb.right - 30, thumb.center.dy),
+      kind: PointerDeviceKind.mouse,
+    );
+    await gesture.moveBy(const Offset(0, 100));
+    await tester.pumpAndSettle();
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(panel(), findsOneWidget);
+
+    await gesture.moveTo(Offset.zero);
+    await tester.pumpAndSettle();
+    expect(panel(), findsNothing);
+    await gesture.removePointer();
+    await tester.pump(ListScrubber.idleHide);
+  });
+
+  testWidgets('a mouse lost with its unmounted region holds nothing open', (
+    tester,
+  ) async {
+    await tester.pumpWidget(host());
+    await tester.drag(find.byType(ListView), const Offset(0, -10));
+    await tester.pump();
+    final mouse = await hoverScrubberThumb(tester);
+
+    await tester.pumpWidget(host(slotCount: 5));
+    await mouse.removePointer();
+    await tester.pumpWidget(host());
+    await tester.drag(find.byType(ListView), const Offset(0, -10));
+    await tester.pump();
+
+    final touch = await tester.startGesture(
+      tester.getCenter(find.byKey(ListScrubber.thumbKey)),
+    );
+    await touch.moveBy(const Offset(0, 100));
+    await tester.pumpAndSettle();
+    await touch.up();
+    await tester.pumpAndSettle();
+    expect(panel(), findsNothing);
+    await tester.pump(ListScrubber.idleHide);
+  });
+
+  testWidgets('the edge column beside the thumb shows only the thumb', (
+    tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
+    try {
+      await tester.pumpWidget(host());
+      await tester.pump();
+      final area = tester.getRect(find.byType(ListScrubber));
+      final thumb = tester.getRect(find.byKey(ListScrubber.thumbKey));
+      // Desktop: an 8 px thumb 2 px in, so 14 px in is past it but still in
+      // the edge column.
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await mouse.addPointer(
+        location: Offset(area.right - 14, thumb.center.dy),
+      );
+      await tester.pumpAndSettle();
+      expect(opacity(tester), 1);
+      expect(panel(), findsNothing);
+
+      await mouse.moveTo(Offset(area.right - 6, thumb.center.dy));
+      await tester.pumpAndSettle();
+      expect(panel(), findsOneWidget);
+      await mouse.removePointer();
+      await tester.pumpAndSettle();
+      await tester.pump(ListScrubber.idleHide);
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
   });
 }

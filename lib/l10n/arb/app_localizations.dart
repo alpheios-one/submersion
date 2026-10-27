@@ -164,6 +164,84 @@ abstract class AppLocalizations {
   /// **'Show'**
   String get connections_around_show;
 
+  /// No description provided for @connections_caption_circle.
+  ///
+  /// In en, this message translates to:
+  /// **'A line joins two buddies who dived together.'**
+  String get connections_caption_circle;
+
+  /// No description provided for @connections_caption_where.
+  ///
+  /// In en, this message translates to:
+  /// **'A line means you dived at that site with that buddy.'**
+  String get connections_caption_where;
+
+  /// No description provided for @connections_caption_trips.
+  ///
+  /// In en, this message translates to:
+  /// **'A line means that buddy was on that trip.'**
+  String get connections_caption_trips;
+
+  /// No description provided for @connections_caption_life.
+  ///
+  /// In en, this message translates to:
+  /// **'A line means you saw that species at that site.'**
+  String get connections_caption_life;
+
+  /// No description provided for @connections_caption_gear.
+  ///
+  /// In en, this message translates to:
+  /// **'A line joins gear used on the same dive.'**
+  String get connections_caption_gear;
+
+  /// No description provided for @connections_caption_centers.
+  ///
+  /// In en, this message translates to:
+  /// **'A line means you dived with that buddy through that center.'**
+  String get connections_caption_centers;
+
+  /// No description provided for @connections_caption_travel.
+  ///
+  /// In en, this message translates to:
+  /// **'Buddies, trips and sites; a line means they share dives.'**
+  String get connections_caption_travel;
+
+  /// No description provided for @connections_caption_reef.
+  ///
+  /// In en, this message translates to:
+  /// **'Sites, marine life and dive types; a line means they share dives.'**
+  String get connections_caption_reef;
+
+  /// No description provided for @connections_caption_gearRoad.
+  ///
+  /// In en, this message translates to:
+  /// **'Gear, trips and centers; a line means they share dives.'**
+  String get connections_caption_gearRoad;
+
+  /// No description provided for @connections_caption_custom.
+  ///
+  /// In en, this message translates to:
+  /// **'{kinds}; a line means they share a dive.'**
+  String connections_caption_custom(String kinds);
+
+  /// No description provided for @connections_caption_kindSeparator.
+  ///
+  /// In en, this message translates to:
+  /// **', '**
+  String get connections_caption_kindSeparator;
+
+  /// No description provided for @connections_caption_around.
+  ///
+  /// In en, this message translates to:
+  /// **'{hops, plural, =1{Everything that shares a dive with this centre.} other{Everything within {hops} steps of this centre, linked by shared dives.}}'**
+  String connections_caption_around(int hops);
+
+  /// No description provided for @connections_caption_thicker.
+  ///
+  /// In en, this message translates to:
+  /// **'Thicker lines mean more dives.'**
+  String get connections_caption_thicker;
+
   /// No description provided for @connections_editor_kinds.
   ///
   /// In en, this message translates to:
@@ -3115,12 +3193,6 @@ abstract class AppLocalizations {
   /// **'iCloud sync isn\'t available in this build of Submersion. Use S3 sync, or the App Store version.'**
   String get settings_cloudSync_error_icloudUnsupported;
 
-  /// No description provided for @settings_cloudSync_provider_icloud_unsupportedSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Not available in this build — use S3 or the App Store version'**
-  String get settings_cloudSync_provider_icloud_unsupportedSubtitle;
-
   /// No description provided for @settings_cloudSync_encryption_title.
   ///
   /// In en, this message translates to:
@@ -4144,7 +4216,7 @@ abstract class AppLocalizations {
   /// No description provided for @backup_retention_allDevices_on.
   ///
   /// In en, this message translates to:
-  /// **'The cloud folder keeps the last {count} backups from every device. Pinned backups are kept. If other devices use this too, the smallest number wins. Update the app on every device first so their pins are seen.'**
+  /// **'The cloud folder keeps the last {count} backups from every device. Pinned backups are kept. Each device\'s newest backup is kept too, unless it is more than 6 months old. If other devices use this too, the smallest number wins. Update the app on every device first so their pins are seen.'**
   String backup_retention_allDevices_on(int count);
 
   /// No description provided for @backup_retention_cloudFootprint.
@@ -4170,6 +4242,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, one{{count} pinned backup is kept.} other{{count} pinned backups are kept.}}'**
   String backup_retention_confirm_pinnedKept(int count);
+
+  /// No description provided for @backup_retention_confirm_deviceNewestKept.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} backup is kept as its device\'s newest.} other{{count} backups are kept as their device\'s newest.}}'**
+  String backup_retention_confirm_deviceNewestKept(int count);
 
   /// No description provided for @backup_retention_confirm_action.
   ///
@@ -7902,6 +7980,42 @@ abstract class AppLocalizations {
   /// **'--'**
   String get common_placeholder_noValue;
 
+  /// Tooltip for the notes editor button that makes the current line a heading
+  ///
+  /// In en, this message translates to:
+  /// **'Heading'**
+  String get notesEditor_action_heading;
+
+  /// Tooltip for the notes editor button that makes the selected text bold
+  ///
+  /// In en, this message translates to:
+  /// **'Bold'**
+  String get notesEditor_action_bold;
+
+  /// Tooltip for the notes editor button that makes the selected text italic
+  ///
+  /// In en, this message translates to:
+  /// **'Italic'**
+  String get notesEditor_action_italic;
+
+  /// Tooltip for the notes editor button that turns lines into a bulleted list
+  ///
+  /// In en, this message translates to:
+  /// **'Bulleted list'**
+  String get notesEditor_action_bulletList;
+
+  /// Tooltip for the notes editor button that turns lines into a numbered list
+  ///
+  /// In en, this message translates to:
+  /// **'Numbered list'**
+  String get notesEditor_action_numberedList;
+
+  /// Toggle in the notes editor that shows the notes formatted instead of the Markdown being typed
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get notesEditor_action_preview;
+
   /// Generic error snackbar shown when an action fails and the user should retry.
   ///
   /// In en, this message translates to:
@@ -8099,6 +8213,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No dives have a site yet.'**
   String get connections_empty_sites;
+
+  /// No description provided for @connections_empty_whereNoSites.
+  ///
+  /// In en, this message translates to:
+  /// **'None of your dives with a buddy has a site yet. Add sites to those dives to see where you dive together.'**
+  String get connections_empty_whereNoSites;
 
   /// No description provided for @connections_empty_filtered.
   ///
@@ -12949,6 +13069,12 @@ abstract class AppLocalizations {
   /// **'No Buddy'**
   String get diveLog_filterChip_noBuddy;
 
+  /// No description provided for @diveLog_filterChip_noRole.
+  ///
+  /// In en, this message translates to:
+  /// **'No Role'**
+  String get diveLog_filterChip_noRole;
+
   /// No description provided for @diveLog_filterChip_until.
   ///
   /// In en, this message translates to:
@@ -13069,6 +13195,12 @@ abstract class AppLocalizations {
   /// **'No Buddy Assigned'**
   String get diveLog_filter_noBuddyOnly;
 
+  /// No description provided for @diveLog_filter_noRoleOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'No Role Assigned'**
+  String get diveLog_filter_noRoleOnly;
+
   /// No description provided for @diveLog_filter_noTagsYet.
   ///
   /// In en, this message translates to:
@@ -13182,6 +13314,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show only dives without a buddy'**
   String get diveLog_filter_showOnlyNoBuddy;
+
+  /// No description provided for @diveLog_filter_showOnlyNoRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Show only dives where your role is not set'**
+  String get diveLog_filter_showOnlyNoRole;
 
   /// No description provided for @diveLog_filter_startDate.
   ///
@@ -13651,12 +13789,6 @@ abstract class AppLocalizations {
   /// **'Unrated'**
   String get diveLog_scrubber_unrated;
 
-  /// Dive list scrubber value while dragging over a dive on a trip in date sort: the month, then the trip name
-  ///
-  /// In en, this message translates to:
-  /// **'{value} · {trip}'**
-  String diveLog_scrubber_valueWithTrip(String value, String trip);
-
   /// Tooltip: decrease the sighting count
   ///
   /// In en, this message translates to:
@@ -14002,62 +14134,8 @@ abstract class AppLocalizations {
   /// No description provided for @settings_manage_setupAssistant_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Revisit units, appearance, and backup choices'**
+  /// **'Revisit units, backups, sync and photos'**
   String get settings_manage_setupAssistant_subtitle;
-
-  /// No description provided for @setup_backup_cloudCopy.
-  ///
-  /// In en, this message translates to:
-  /// **'Store backups in the cloud'**
-  String get setup_backup_cloudCopy;
-
-  /// No description provided for @setup_backup_frequency.
-  ///
-  /// In en, this message translates to:
-  /// **'Frequency'**
-  String get setup_backup_frequency;
-
-  /// No description provided for @setup_backup_frequency_daily.
-  ///
-  /// In en, this message translates to:
-  /// **'Daily'**
-  String get setup_backup_frequency_daily;
-
-  /// No description provided for @setup_backup_frequency_monthly.
-  ///
-  /// In en, this message translates to:
-  /// **'Monthly'**
-  String get setup_backup_frequency_monthly;
-
-  /// No description provided for @setup_backup_frequency_weekly.
-  ///
-  /// In en, this message translates to:
-  /// **'Weekly'**
-  String get setup_backup_frequency_weekly;
-
-  /// No description provided for @setup_backup_scheduleSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Back up your data on a schedule'**
-  String get setup_backup_scheduleSubtitle;
-
-  /// No description provided for @setup_backup_scheduleToggle.
-  ///
-  /// In en, this message translates to:
-  /// **'Automatic backups'**
-  String get setup_backup_scheduleToggle;
-
-  /// No description provided for @setup_backup_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Protect your data from day one.'**
-  String get setup_backup_subtitle;
-
-  /// No description provided for @setup_backup_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Backups & Sync'**
-  String get setup_backup_title;
 
   /// No description provided for @setup_common_back.
   ///
@@ -14251,12 +14329,6 @@ abstract class AppLocalizations {
   /// **'Restore backup'**
   String get setup_restore_title;
 
-  /// No description provided for @setup_step_backup.
-  ///
-  /// In en, this message translates to:
-  /// **'Backup'**
-  String get setup_step_backup;
-
   /// No description provided for @setup_step_finish.
   ///
   /// In en, this message translates to:
@@ -14274,12 +14346,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Units'**
   String get setup_step_units;
-
-  /// No description provided for @setup_syncPull_continue.
-  ///
-  /// In en, this message translates to:
-  /// **'Continue'**
-  String get setup_syncPull_continue;
 
   /// No description provided for @setup_syncPull_incomplete_message.
   ///
@@ -14322,84 +14388,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No library found'**
   String get setup_syncPull_noLibrary_title;
-
-  /// No description provided for @setup_syncPull_success.
-  ///
-  /// In en, this message translates to:
-  /// **'Library adopted'**
-  String get setup_syncPull_success;
-
-  /// No description provided for @setup_syncPull_syncing.
-  ///
-  /// In en, this message translates to:
-  /// **'Pulling your library...'**
-  String get setup_syncPull_syncing;
-
-  /// No description provided for @setup_sync_changeProvider.
-  ///
-  /// In en, this message translates to:
-  /// **'Change provider'**
-  String get setup_sync_changeProvider;
-
-  /// No description provided for @setup_sync_connectedTo.
-  ///
-  /// In en, this message translates to:
-  /// **'Connected to {provider}'**
-  String setup_sync_connectedTo(String provider);
-
-  /// No description provided for @setup_sync_error.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not connect: {error}'**
-  String setup_sync_error(Object error);
-
-  /// No description provided for @setup_sync_header.
-  ///
-  /// In en, this message translates to:
-  /// **'Cloud sync'**
-  String get setup_sync_header;
-
-  /// No description provided for @setup_sync_libraryFound_adopt.
-  ///
-  /// In en, this message translates to:
-  /// **'Adopt existing library'**
-  String get setup_sync_libraryFound_adopt;
-
-  /// No description provided for @setup_sync_libraryFound_keepFresh.
-  ///
-  /// In en, this message translates to:
-  /// **'Start fresh'**
-  String get setup_sync_libraryFound_keepFresh;
-
-  /// No description provided for @setup_sync_libraryFound_message.
-  ///
-  /// In en, this message translates to:
-  /// **'This account already contains a Submersion library. Adopt it instead of starting fresh?'**
-  String get setup_sync_libraryFound_message;
-
-  /// No description provided for @setup_sync_libraryFound_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Existing library found'**
-  String get setup_sync_libraryFound_title;
-
-  /// No description provided for @setup_sync_manageInSettings.
-  ///
-  /// In en, this message translates to:
-  /// **'Manage in Settings'**
-  String get setup_sync_manageInSettings;
-
-  /// No description provided for @setup_sync_notConnected.
-  ///
-  /// In en, this message translates to:
-  /// **'Not connected'**
-  String get setup_sync_notConnected;
-
-  /// No description provided for @setup_sync_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync your data across devices'**
-  String get setup_sync_subtitle;
 
   /// No description provided for @setup_units_advanced.
   ///
@@ -16099,6 +16087,12 @@ abstract class AppLocalizations {
   /// **'Material'**
   String get diveLog_tank_label_material;
 
+  /// No description provided for @diveLog_tank_label_mnd.
+  ///
+  /// In en, this message translates to:
+  /// **'MND'**
+  String get diveLog_tank_label_mnd;
+
   /// No description provided for @diveLog_tank_label_n2.
   ///
   /// In en, this message translates to:
@@ -16147,17 +16141,65 @@ abstract class AppLocalizations {
   /// **'Set to auto-calculate He%'**
   String get diveLog_tank_mndHelper;
 
-  /// Trailing note on the tank pressure line: how much gas the dive consumed, e.g. "(160 bar / 1920 L used)"
-  ///
-  /// In en, this message translates to:
-  /// **'({amount} used)'**
-  String diveLog_tank_gasUsed(String amount);
-
   /// No description provided for @diveLog_tank_modMndInfo.
   ///
   /// In en, this message translates to:
   /// **'MOD: {mod} (ppO₂ {ppO2}) | MND: {mnd}'**
   String diveLog_tank_modMndInfo(Object mod, String ppO2, Object mnd);
+
+  /// Cylinders card table header over the tank size, name and role
+  ///
+  /// In en, this message translates to:
+  /// **'Tank'**
+  String get diveLog_cylinders_columnTank;
+
+  /// Cylinders card table header over the gas mix
+  ///
+  /// In en, this message translates to:
+  /// **'Gas'**
+  String get diveLog_cylinders_columnGas;
+
+  /// Cylinders card table header over the start pressure; the pressure unit is shown under it
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get diveLog_cylinders_columnStart;
+
+  /// Cylinders card table header over the end pressure; the pressure unit is shown under it
+  ///
+  /// In en, this message translates to:
+  /// **'End'**
+  String get diveLog_cylinders_columnEnd;
+
+  /// Cylinders card table header over the pressure used; the pressure unit is shown under it
+  ///
+  /// In en, this message translates to:
+  /// **'Used'**
+  String get diveLog_cylinders_columnUsed;
+
+  /// Cylinders card detail item: the volume of gas the dive consumed from this cylinder, e.g. "Gas used 1665 L"
+  ///
+  /// In en, this message translates to:
+  /// **'Gas used {amount}'**
+  String diveLog_cylinders_gasUsed(String amount);
+
+  /// Cylinders card detail item: maximum operating depth, e.g. "MOD 33m"
+  ///
+  /// In en, this message translates to:
+  /// **'MOD {depth}'**
+  String diveLog_cylinders_mod(String depth);
+
+  /// Cylinders card detail item: maximum narcotic depth, e.g. "MND 30m"
+  ///
+  /// In en, this message translates to:
+  /// **'MND {depth}'**
+  String diveLog_cylinders_mnd(String depth);
+
+  /// Note under the Cylinders card table: the working ppO2 every MOD on the card was computed at, e.g. "MOD at ppO₂ 1.4"
+  ///
+  /// In en, this message translates to:
+  /// **'MOD at ppO₂ {ppO2}'**
+  String diveLog_cylinders_modNote(String ppO2);
 
   /// No description provided for @diveLog_tank_section_gasMix.
   ///
@@ -23827,6 +23869,24 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to delete this equipment? This action cannot be undone.'**
   String get equipment_deleteDialog_content;
 
+  /// No description provided for @equipment_deleteDialog_content_computer.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this dive computer? Its download history goes with it, so the next download from it reads every dive again. Your dives stay. Connecting the computer again adds it back.'**
+  String get equipment_deleteDialog_content_computer;
+
+  /// No description provided for @equipment_deleteDialog_content_transmitter.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this transmitter? Its cylinder setup goes with it. A later download that carries its serial adds it back. To keep it out of the way instead, mark it Retired.'**
+  String get equipment_deleteDialog_content_transmitter;
+
+  /// No description provided for @equipment_bulkDelete_deviceNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive computers and transmitters in the selection are deleted with their download history and setup. Your dives stay.'**
+  String get equipment_bulkDelete_deviceNote;
+
   /// No description provided for @equipment_deleteDialog_title.
   ///
   /// In en, this message translates to:
@@ -24196,6 +24256,71 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'From preset'**
   String get cylinderConfigs_fromPreset;
+
+  /// Label of a cylinder's maximum operating depth field. MOD is the standard diving abbreviation.
+  ///
+  /// In en, this message translates to:
+  /// **'MOD'**
+  String get tankMod_label;
+
+  /// Under the MOD field when the diver has not set one: the ppO2 limit the default comes from. {limit} is tankMod_limitBottom or tankMod_limitDeco.
+  ///
+  /// In en, this message translates to:
+  /// **'Default at ppO2 {ppO2} ({limit})'**
+  String tankMod_default(String ppO2, String limit);
+
+  /// Name of the bottom (working) ppO2 limit, used inside other MOD strings.
+  ///
+  /// In en, this message translates to:
+  /// **'bottom limit'**
+  String get tankMod_limitBottom;
+
+  /// Name of the decompression ppO2 limit, used inside other MOD strings.
+  ///
+  /// In en, this message translates to:
+  /// **'deco limit'**
+  String get tankMod_limitDeco;
+
+  /// Name of the CCR diluent ppO2 limit, used inside other MOD strings. Matches the "Dil MOD" term on the Settings page.
+  ///
+  /// In en, this message translates to:
+  /// **'Dil MOD'**
+  String get tankMod_limitDiluent;
+
+  /// Under the MOD field when the diver typed a depth: says so and gives the default it replaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Set by you · default {depth}'**
+  String tankMod_overridden(String depth);
+
+  /// The ppO2 the gas reaches at the MOD the diver set.
+  ///
+  /// In en, this message translates to:
+  /// **'ppO2 {ppO2} at {depth}'**
+  String tankMod_ppO2At(String ppO2, String depth);
+
+  /// Warning when the MOD the diver set gives a ppO2 above the limit for the cylinder.
+  ///
+  /// In en, this message translates to:
+  /// **'ppO2 {ppO2} at {depth}, above the {limit} {limitPpO2}'**
+  String tankMod_exceeds(
+    String ppO2,
+    String depth,
+    String limit,
+    String limitPpO2,
+  );
+
+  /// Button that clears a MOD set by hand, back to the default.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get tankMod_reset;
+
+  /// Shown on a dive plan tank chip when the diver set its MOD by hand.
+  ///
+  /// In en, this message translates to:
+  /// **'MOD {depth}'**
+  String tankMod_chip(String depth);
 
   /// No description provided for @cylinderConfigs_applyAction.
   ///
@@ -25006,6 +25131,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Type *'**
   String get equipment_edit_typeLabel;
+
+  /// No description provided for @equipment_edit_typeLockedHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'A connected dive computer or transmitter keeps its type.'**
+  String get equipment_edit_typeLockedHelper;
 
   /// No description provided for @equipment_edit_useCustomReminders.
   ///
@@ -31441,6 +31572,18 @@ abstract class AppLocalizations {
   /// **'Media'**
   String get nav_media;
 
+  /// Subtitle for the Media menu item in the More sheet, naming its two tabs
+  ///
+  /// In en, this message translates to:
+  /// **'Photos, videos and documents'**
+  String get nav_mediaDocumentsSubtitle;
+
+  /// Label of the Media section's tab for photos and videos, beside its Documents tab
+  ///
+  /// In en, this message translates to:
+  /// **'Photos/Videos'**
+  String get nav_photosVideos;
+
   /// Navigation label for the 'more' menu on mobile
   ///
   /// In en, this message translates to:
@@ -33126,6 +33269,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No lead recorded: add weights to this dive, or a dry weight to your weights gear'**
   String get buoyancy_noLeadHint;
+
+  /// No description provided for @buoyancy_tankMaterialAssumedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank material not set, so aluminum was assumed: set the material or pick a tank preset'**
+  String get buoyancy_tankMaterialAssumedHint;
 
   /// No description provided for @buoyancy_chartNet.
   ///
@@ -36160,6 +36309,12 @@ abstract class AppLocalizations {
   /// **'Add downloads to the computer\'s owner'**
   String get settings_conflict_field_downloadsFollowComputerOwner;
 
+  /// Label for the skip-unused-bailout-gases setting in a sync conflict
+  ///
+  /// In en, this message translates to:
+  /// **'Skip unused bailout gases'**
+  String get settings_conflict_field_omitUnusedOcGases;
+
   /// No description provided for @settings_conflict_field_avgSpeed.
   ///
   /// In en, this message translates to:
@@ -36627,12 +36782,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Deco stop increment'**
   String get settings_conflict_field_decoStopIncrement;
-
-  /// No description provided for @settings_conflict_field_decoSwitchDepth.
-  ///
-  /// In en, this message translates to:
-  /// **'Deco gas switch depth'**
-  String get settings_conflict_field_decoSwitchDepth;
 
   /// No description provided for @settings_conflict_field_deepDiveThresholdM.
   ///
@@ -39801,12 +39950,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Documents'**
   String get nav_documents;
-
-  /// No description provided for @documents_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Documents'**
-  String get documents_title;
 
   /// No description provided for @documents_type_insurance.
   ///
@@ -48605,6 +48748,18 @@ abstract class AppLocalizations {
   /// **'When a dive computer belongs to another profile, its dives go to that profile\'s log. You can change it on the review screen.'**
   String get settings_downloadsFollowOwner_subtitle;
 
+  /// Switch title, in Import options on Settings > Data, for leaving out open-circuit gases a rebreather dive computer reports but the diver never carried or breathed
+  ///
+  /// In en, this message translates to:
+  /// **'Skip unused bailout gases'**
+  String get settings_omitUnusedOcGases_title;
+
+  /// Switch subtitle, in Import options on Settings > Data, explaining which gases a rebreather download leaves out
+  ///
+  /// In en, this message translates to:
+  /// **'On rebreather downloads and re-parses, leave out a gas with no transmitter that was never breathed'**
+  String get settings_omitUnusedOcGases_subtitle;
+
   /// No description provided for @tags_manage_searchHint.
   ///
   /// In en, this message translates to:
@@ -53408,18 +53563,6 @@ abstract class AppLocalizations {
   /// **'Cloud import'**
   String get diveComputer_connections_cloudOther;
 
-  /// No description provided for @diveComputer_detail_deleteDialogContent.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to remove \"{name}\"? This will not delete any dives that were imported from this computer.'**
-  String diveComputer_detail_deleteDialogContent(String name);
-
-  /// No description provided for @diveComputer_detail_deleteDialogTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete Computer?'**
-  String get diveComputer_detail_deleteDialogTitle;
-
   /// No description provided for @diveComputer_detail_divesImported.
   ///
   /// In en, this message translates to:
@@ -53432,23 +53575,17 @@ abstract class AppLocalizations {
   /// **'Download Dives'**
   String get diveComputer_detail_downloadDivesButton;
 
-  /// No description provided for @diveComputer_detail_editDialogTitle.
+  /// No description provided for @diveComputer_section_connect.
   ///
   /// In en, this message translates to:
-  /// **'Edit Computer'**
-  String get diveComputer_detail_editDialogTitle;
+  /// **'Connect and download'**
+  String get diveComputer_section_connect;
 
-  /// No description provided for @diveComputer_detail_editNameHint.
+  /// No description provided for @diveComputer_section_notConnected.
   ///
   /// In en, this message translates to:
-  /// **'e.g., My Perdix'**
-  String get diveComputer_detail_editNameHint;
-
-  /// No description provided for @diveComputer_detail_editNotesHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Optional notes'**
-  String get diveComputer_detail_editNotesHint;
+  /// **'This computer has not been connected yet. Connect it to download its dives.'**
+  String get diveComputer_section_notConnected;
 
   /// No description provided for @diveComputer_detail_labelManufacturer.
   ///
@@ -53462,29 +53599,11 @@ abstract class AppLocalizations {
   /// **'Model'**
   String get diveComputer_detail_labelModel;
 
-  /// No description provided for @diveComputer_detail_labelName.
-  ///
-  /// In en, this message translates to:
-  /// **'Name'**
-  String get diveComputer_detail_labelName;
-
   /// No description provided for @diveComputer_detail_lastDownload.
   ///
   /// In en, this message translates to:
   /// **'Last Download'**
   String get diveComputer_detail_lastDownload;
-
-  /// No description provided for @diveComputer_detail_linkedGear.
-  ///
-  /// In en, this message translates to:
-  /// **'Gear item'**
-  String get diveComputer_detail_linkedGear;
-
-  /// No description provided for @diveComputer_detail_notesTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Notes'**
-  String get diveComputer_detail_notesTitle;
 
   /// No description provided for @diveComputer_detail_reimportAllButton.
   ///
@@ -53842,6 +53961,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Find Computers'**
   String get diveComputer_list_findComputers;
+
+  /// No description provided for @diveComputer_list_addByHand.
+  ///
+  /// In en, this message translates to:
+  /// **'Add by hand'**
+  String get diveComputer_list_addByHand;
+
+  /// No description provided for @diveComputer_list_notConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Not connected yet'**
+  String get diveComputer_list_notConnected;
 
   /// No description provided for @diveComputer_list_helpBluetooth.
   ///
@@ -58329,6 +58460,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Temp'**
   String get dive3d_metric_temperature;
+
+  /// No description provided for @navTrack3d_previewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'3D View'**
+  String get navTrack3d_previewTitle;
+
+  /// No description provided for @navTrack3d_metric_speed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get navTrack3d_metric_speed;
+
+  /// No description provided for @navTrack3d_metric_batteryVoltage.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery'**
+  String get navTrack3d_metric_batteryVoltage;
+
+  /// No description provided for @navTrack3d_noProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'This track doesn\'t have enough data for a 3D preview.'**
+  String get navTrack3d_noProfile;
 
   /// No description provided for @dive3d_metric_ascentRate.
   ///
@@ -63239,6 +63394,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Shift all dives from this import'**
   String get dataQuality_repairLabel_shiftImport;
+
+  /// No description provided for @dataQuality_repairLabel_shiftLogbookTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Shift logbook time by {offset}'**
+  String dataQuality_repairLabel_shiftLogbookTime(String offset);
+
+  /// No description provided for @dataQuality_repairLabel_fixSourceClock.
+  ///
+  /// In en, this message translates to:
+  /// **'Fix this computer\'s clock by {offset}'**
+  String dataQuality_repairLabel_fixSourceClock(String offset);
+
+  /// No description provided for @dataQuality_repairLabel_fixSourceClockAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Also fix this computer on other dives with the same offset'**
+  String get dataQuality_repairLabel_fixSourceClockAll;
 
   /// No description provided for @dataQuality_repairLabel_consolidate.
   ///
@@ -75442,12 +75615,6 @@ abstract class AppLocalizations {
   /// **'Search species'**
   String get diveLog_filter_speciesSearchHint;
 
-  /// No description provided for @explore_chip_favorite.
-  ///
-  /// In en, this message translates to:
-  /// **'Favourite'**
-  String get explore_chip_favorite;
-
   /// No description provided for @explore_chip_deco.
   ///
   /// In en, this message translates to:
@@ -75459,12 +75626,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No decompression'**
   String get explore_chip_noDeco;
-
-  /// No description provided for @explore_chip_noBuddy.
-  ///
-  /// In en, this message translates to:
-  /// **'No buddy'**
-  String get explore_chip_noBuddy;
 
   /// No description provided for @explore_chip_rating.
   ///
@@ -75550,95 +75711,17 @@ abstract class AppLocalizations {
   /// **'The on-device model does not understand this language.'**
   String get explore_error_unsupportedLocale;
 
-  /// No description provided for @explore_field_airTemp.
-  ///
-  /// In en, this message translates to:
-  /// **'Air temperature'**
-  String get explore_field_airTemp;
-
-  /// No description provided for @explore_field_avgDepth.
-  ///
-  /// In en, this message translates to:
-  /// **'Average depth'**
-  String get explore_field_avgDepth;
-
   /// No description provided for @explore_field_bottomTime.
   ///
   /// In en, this message translates to:
   /// **'Bottom time'**
   String get explore_field_bottomTime;
 
-  /// No description provided for @explore_field_currentStrength.
-  ///
-  /// In en, this message translates to:
-  /// **'Current'**
-  String get explore_field_currentStrength;
-
-  /// No description provided for @explore_field_depth.
-  ///
-  /// In en, this message translates to:
-  /// **'Depth'**
-  String get explore_field_depth;
-
-  /// No description provided for @explore_field_diveMode.
-  ///
-  /// In en, this message translates to:
-  /// **'Dive mode'**
-  String get explore_field_diveMode;
-
-  /// No description provided for @explore_field_diveNumber.
-  ///
-  /// In en, this message translates to:
-  /// **'Dive number'**
-  String get explore_field_diveNumber;
-
-  /// No description provided for @explore_field_diveType.
-  ///
-  /// In en, this message translates to:
-  /// **'Dive type'**
-  String get explore_field_diveType;
-
-  /// No description provided for @explore_field_entryMethod.
-  ///
-  /// In en, this message translates to:
-  /// **'Entry'**
-  String get explore_field_entryMethod;
-
   /// No description provided for @explore_field_o2.
   ///
   /// In en, this message translates to:
   /// **'Oxygen'**
   String get explore_field_o2;
-
-  /// No description provided for @explore_field_rating.
-  ///
-  /// In en, this message translates to:
-  /// **'Rating'**
-  String get explore_field_rating;
-
-  /// No description provided for @explore_field_visibility.
-  ///
-  /// In en, this message translates to:
-  /// **'Visibility'**
-  String get explore_field_visibility;
-
-  /// No description provided for @explore_field_waterTemp.
-  ///
-  /// In en, this message translates to:
-  /// **'Water temperature'**
-  String get explore_field_waterTemp;
-
-  /// No description provided for @explore_field_waterType.
-  ///
-  /// In en, this message translates to:
-  /// **'Water type'**
-  String get explore_field_waterType;
-
-  /// No description provided for @explore_field_weekday.
-  ///
-  /// In en, this message translates to:
-  /// **'Weekday'**
-  String get explore_field_weekday;
 
   /// No description provided for @explore_handoff_list.
   ///
@@ -77941,6 +78024,53 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Garmin watches store dives as FIT files instead of offering a direct download. Connect the watch by USB, copy the files from its GARMIN/Activity folder, then import them.'**
   String get importWizard_dc_noDirectDownloadGarminBody;
+
+  /// Download step title when a saved Bluetooth computer with no address on this device was not found by a scan for its make and model.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t find {name}'**
+  String importWizard_dc_notFoundNearby(String name);
+
+  /// Download step body when a scan found no device, or several, of a saved Bluetooth computer's make and model.
+  ///
+  /// In en, this message translates to:
+  /// **'Submersion searched over Bluetooth and found no {name} nearby, or found more than one of the same model. Turn on the computer\'s Bluetooth, hold it close to this device and try again.'**
+  String importWizard_dc_notFoundNearbyBody(String name);
+
+  /// Button that searches again for a saved Bluetooth computer that was not found.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get importWizard_dc_tryAgain;
+
+  /// Download step body when the search for a saved Bluetooth computer could not run because Bluetooth is off or missing. Names the Try Again button on the same screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth is off or unavailable on this device. Turn it on, then tap Try Again.'**
+  String get importWizard_dc_bluetoothOffBody;
+
+  /// Download step body when the search for a saved Bluetooth computer could not start for another reason, such as a denied permission. Names the Try Again button on the same screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Submersion could not search over Bluetooth. Check that Bluetooth is on and that Submersion is allowed to use it, then tap Try Again.'**
+  String get importWizard_dc_couldNotScanBody;
+
+  /// Download step title when the one nearby device of a saved computer's make and model turned out to be another unit, such as a buddy's.
+  ///
+  /// In en, this message translates to:
+  /// **'That was not {name}'**
+  String importWizard_dc_anotherUnit(String name);
+
+  /// Download step body when a same-model device reported another serial number than the saved computer, so its dives were not imported.
+  ///
+  /// In en, this message translates to:
+  /// **'The {model} that answered reported serial number {reported}, not {stored}, so it is another computer and its dives were not imported. Turn off that computer\'s Bluetooth, keep {name} close to this device and download again.'**
+  String importWizard_dc_anotherUnitBody(
+    String name,
+    String model,
+    String reported,
+    String stored,
+  );
 
   /// No description provided for @importWizard_dc_noNewDives.
   ///
@@ -81815,6 +81945,12 @@ abstract class AppLocalizations {
   /// **'{count} records will become one. Dives, profiles and download history move to the record you keep. The other records are deleted.'**
   String diveComputer_merge_intro(int count);
 
+  /// No description provided for @diveComputer_merge_gearNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Each other record\'s Equipment item is folded into this one: its service history, documents and photos move here, and the emptied item is deleted.'**
+  String get diveComputer_merge_gearNote;
+
   /// No description provided for @diveComputer_merge_keepLabel.
   ///
   /// In en, this message translates to:
@@ -82090,41 +82226,59 @@ abstract class AppLocalizations {
   /// **'Add transmitter'**
   String get transmitters_add;
 
-  /// No description provided for @transmitters_header_assigned.
+  /// No description provided for @transmitters_emptyItems.
   ///
   /// In en, this message translates to:
-  /// **'Assigned transmitters'**
-  String get transmitters_header_assigned;
+  /// **'No transmitters yet. A download that reads one adds it here, or add one by hand.'**
+  String get transmitters_emptyItems;
 
-  /// No description provided for @transmitters_header_unassigned.
+  /// No description provided for @transmitters_noCylinder.
   ///
   /// In en, this message translates to:
-  /// **'Seen in downloads, not assigned'**
-  String get transmitters_header_unassigned;
+  /// **'No cylinder set up'**
+  String get transmitters_noCylinder;
 
-  /// No description provided for @transmitters_empty.
+  /// No description provided for @transmitters_section_noKey.
   ///
   /// In en, this message translates to:
-  /// **'No transmitters yet. Add one, or assign a serial after your next download.'**
-  String get transmitters_empty;
+  /// **'No serial or channel yet. Add the one your dive computer reports for this transmitter.'**
+  String get transmitters_section_noKey;
 
-  /// No description provided for @transmitters_action_assign.
+  /// No description provided for @transmitters_key_remove.
   ///
   /// In en, this message translates to:
-  /// **'Assign'**
-  String get transmitters_action_assign;
+  /// **'Remove this key'**
+  String get transmitters_key_remove;
 
-  /// No description provided for @transmitters_action_edit.
+  /// No description provided for @transmitters_key_removeTitle.
   ///
   /// In en, this message translates to:
-  /// **'Edit transmitter'**
-  String get transmitters_action_edit;
+  /// **'Remove this key?'**
+  String get transmitters_key_removeTitle;
 
-  /// No description provided for @transmitters_action_delete.
+  /// No description provided for @transmitters_key_removeBody.
   ///
   /// In en, this message translates to:
-  /// **'Delete transmitter'**
-  String get transmitters_action_delete;
+  /// **'The transmitter item and its other keys stay. Use this for a wrong channel or a mistyped serial: a serial your dive computer keeps reporting is added back by the next download, not yet set up.'**
+  String get transmitters_key_removeBody;
+
+  /// No description provided for @transmitters_list_noKey.
+  ///
+  /// In en, this message translates to:
+  /// **'No serial or channel yet'**
+  String get transmitters_list_noKey;
+
+  /// No description provided for @transmitters_section_addKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Add serial or channel'**
+  String get transmitters_section_addKey;
+
+  /// No description provided for @transmitters_section_setUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up'**
+  String get transmitters_section_setUp;
 
   /// No description provided for @transmitters_action_apply.
   ///
@@ -82156,18 +82310,6 @@ abstract class AppLocalizations {
   /// **'No cylinders carry this transmitter'**
   String get transmitters_apply_nothing;
 
-  /// No description provided for @transmitters_delete_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete transmitter?'**
-  String get transmitters_delete_title;
-
-  /// No description provided for @transmitters_delete_content.
-  ///
-  /// In en, this message translates to:
-  /// **'Future downloads from {label} will use the default preset again.'**
-  String transmitters_delete_content(String label);
-
   /// No description provided for @transmitters_channel.
   ///
   /// In en, this message translates to:
@@ -82180,12 +82322,6 @@ abstract class AppLocalizations {
   /// **'Transmitter {serial}'**
   String transmitters_serial(String serial);
 
-  /// No description provided for @transmitters_dives.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 dive} other{{count} dives}}'**
-  String transmitters_dives(int count);
-
   /// No description provided for @transmitters_edit_title.
   ///
   /// In en, this message translates to:
@@ -82197,18 +82333,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New transmitter'**
   String get transmitters_new_title;
-
-  /// No description provided for @transmitters_field_label.
-  ///
-  /// In en, this message translates to:
-  /// **'Label'**
-  String get transmitters_field_label;
-
-  /// No description provided for @transmitters_field_label_helper.
-  ///
-  /// In en, this message translates to:
-  /// **'Becomes the cylinder\'s name on the dive once this transmitter is matched'**
-  String get transmitters_field_label_helper;
 
   /// No description provided for @transmitters_field_serial.
   ///
@@ -82245,18 +82369,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The cylinder this transmitter reports pressure for'**
   String get transmitters_field_gear_subtitle;
-
-  /// No description provided for @transmitters_field_transmitterGear.
-  ///
-  /// In en, this message translates to:
-  /// **'Transmitter from gear'**
-  String get transmitters_field_transmitterGear;
-
-  /// No description provided for @transmitters_field_transmitterGear_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Battery/service tracking, not matching'**
-  String get transmitters_field_transmitterGear_subtitle;
 
   /// No description provided for @transmitters_field_material.
   ///
@@ -82299,18 +82411,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Transmitter saved'**
   String get transmitters_saved;
-
-  /// No description provided for @transmitters_copySerial_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Copy the serial to \"{gearName}\"?'**
-  String transmitters_copySerial_title(String gearName);
-
-  /// No description provided for @transmitters_copySerial_content.
-  ///
-  /// In en, this message translates to:
-  /// **'The serial this entry matches on ({serial}) is not recorded on the transmitter gear item yet.'**
-  String transmitters_copySerial_content(String serial);
 
   /// No description provided for @diveComputer_detail_transmitters.
   ///
@@ -82407,6 +82507,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The dive computer took some oxygen and diluent roles from the names given to its transmitters: a name starting with O reads as oxygen, one starting with D as diluent. Assign the transmitters to confirm or correct those roles.'**
   String get universalImport_summary_noticeTransmitterNameRolesBody;
+
+  /// No description provided for @universalImport_summary_noticeDeviceOtherItemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This computer is already in Equipment'**
+  String get universalImport_summary_noticeDeviceOtherItemTitle;
+
+  /// No description provided for @universalImport_summary_noticeDeviceOtherItemBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The computer you connected is already another Equipment item, so its dives were added there. The item you started from was left as it was.'**
+  String get universalImport_summary_noticeDeviceOtherItemBody;
+
+  /// No description provided for @universalImport_summary_noticeDeviceOtherItemAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Open that item'**
+  String get universalImport_summary_noticeDeviceOtherItemAction;
 
   /// No description provided for @universalImport_summary_noticeDiveNumberConflictTitle.
   ///
@@ -82995,6 +83113,12 @@ abstract class AppLocalizations {
   /// **'Change site'**
   String get navTrack_detail_menuChangeSite;
 
+  /// No description provided for @navTrack_detail_menuChangeDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Change device'**
+  String get navTrack_detail_menuChangeDevice;
+
   /// No description provided for @navTrack_detail_noMapYet.
   ///
   /// In en, this message translates to:
@@ -83024,18 +83148,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'End set from the recording\'s GPS fix.'**
   String get navTrack_detail_correctionStatus_gpsFix;
-
-  /// No description provided for @navTrack_detail_device.
-  ///
-  /// In en, this message translates to:
-  /// **'Device: {name}'**
-  String navTrack_detail_device(String name);
-
-  /// No description provided for @navTrack_detail_equipment.
-  ///
-  /// In en, this message translates to:
-  /// **'Equipment: {name}'**
-  String navTrack_detail_equipment(String name);
 
   /// No description provided for @navTrack_detail_distance.
   ///
@@ -83096,6 +83208,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose site'**
   String get navTrack_detail_chooseSite;
+
+  /// No description provided for @navTrack_detail_noEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'No device'**
+  String get navTrack_detail_noEquipment;
+
+  /// No description provided for @navTrack_detail_chooseDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose device'**
+  String get navTrack_detail_chooseDevice;
 
   /// No description provided for @navTrack_review_importTrackTitle.
   ///
@@ -84342,6 +84466,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Buddy (legacy text)'**
   String get query_dives_legacyBuddy;
+
+  /// Field label in the query builder: whether the diver's own role on the dive is set
+  ///
+  /// In en, this message translates to:
+  /// **'My role'**
+  String get query_dives_role;
 
   /// Field label in the query builder
   ///
@@ -87234,7 +87364,7 @@ abstract class AppLocalizations {
   /// Status: uploads held because the account now holds different copies
   ///
   /// In en, this message translates to:
-  /// **'Uploads paused: choose the account again'**
+  /// **'Uploads paused: the copies need reconnecting'**
   String get settings_photos_status_pausedMismatch;
 
   /// Status: the library keeps copies this device has not joined yet
@@ -87258,8 +87388,116 @@ abstract class AppLocalizations {
   /// Uploads page notice: the account now holds different copies than this device attached to
   ///
   /// In en, this message translates to:
-  /// **'This device and the account no longer agree on which copies are in use. Choosing the account again adopts the copies it holds now.'**
+  /// **'The account no longer holds the copies this device was using. Reconnect to choose what happens next.'**
   String get settings_photos_suspended_mismatch;
+
+  /// Title of the sheet that reconnects photo copies after the account's copies changed
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnect photo copies'**
+  String get settings_photos_reconnect_title;
+
+  /// Reconnect sheet: checking what the account holds now
+  ///
+  /// In en, this message translates to:
+  /// **'Checking {account}…'**
+  String settings_photos_reconnect_checking(String account);
+
+  /// Reconnect sheet: the account holds this device's copies again, nothing to choose
+  ///
+  /// In en, this message translates to:
+  /// **'The copies in {account} match this device again. Uploads resume.'**
+  String settings_photos_reconnect_resolved(String account);
+
+  /// Reconnect sheet: the account holds copies another of the diver's devices set up
+  ///
+  /// In en, this message translates to:
+  /// **'{account} now holds copies set up by another of your devices.'**
+  String settings_photos_reconnect_otherKnown(String account);
+
+  /// Reconnect sheet: the account holds copies the logbook has no record of
+  ///
+  /// In en, this message translates to:
+  /// **'{account} now holds copies this logbook has no record of.'**
+  String settings_photos_reconnect_otherUnknown(String account);
+
+  /// Reconnect sheet: the copies in the account were removed or reset
+  ///
+  /// In en, this message translates to:
+  /// **'The copies in {account} were removed or reset.'**
+  String settings_photos_reconnect_noMarker(String account);
+
+  /// Reconnect sheet: the account could not be checked; the raw error follows
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check {account}.'**
+  String settings_photos_reconnect_unreadable(String account);
+
+  /// Reconnect sheet: this device cannot open the account the copies were in
+  ///
+  /// In en, this message translates to:
+  /// **'This device can no longer open the account the copies were in.'**
+  String get settings_photos_reconnect_needsAccount;
+
+  /// Reconnect choice: use the copies the account holds now
+  ///
+  /// In en, this message translates to:
+  /// **'Use the copies there now'**
+  String get settings_photos_reconnect_adopt;
+
+  /// Reconnect choice explanation: what using the copies there does
+  ///
+  /// In en, this message translates to:
+  /// **'Photos already there stay. Anything missing uploads again from this device.'**
+  String get settings_photos_reconnect_adoptBody;
+
+  /// Reconnect choice explanation: using copies the logbook has no record of
+  ///
+  /// In en, this message translates to:
+  /// **'Choose this only if {account} is meant for this logbook. Photos already there stay, and anything missing uploads again from this device.'**
+  String settings_photos_reconnect_adoptUnknownBody(String account);
+
+  /// Reconnect choice: start a new set of copies in the account
+  ///
+  /// In en, this message translates to:
+  /// **'Start the copies again'**
+  String get settings_photos_reconnect_rebuild;
+
+  /// Reconnect choice explanation: what starting the copies again does
+  ///
+  /// In en, this message translates to:
+  /// **'New copies start in {account}. Photos still there are kept, and everything on this device uploads again.'**
+  String settings_photos_reconnect_rebuildBody(String account);
+
+  /// Reconnect choice: open Photos & videos to choose the account again
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the account again'**
+  String get settings_photos_reconnect_chooseAccount;
+
+  /// Reconnect choice explanation: choosing the account again
+  ///
+  /// In en, this message translates to:
+  /// **'Opens Photos & videos to pick the account or sign in again.'**
+  String get settings_photos_reconnect_chooseAccountBody;
+
+  /// Reconnect sheet warning: items whose only copy is in the cloud
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} photo or video is kept only in the cloud. It opens again only if the account still holds it.} other{{count} photos and videos are kept only in the cloud. They open again only if the account still holds them.}}'**
+  String settings_photos_reconnect_heldOnly(int count);
+
+  /// Snackbar after reconnecting to the copies the account holds
+  ///
+  /// In en, this message translates to:
+  /// **'Now using the copies in {account}'**
+  String settings_photos_reconnect_joined(String account);
+
+  /// Snackbar after starting new copies in the account
+  ///
+  /// In en, this message translates to:
+  /// **'New copies started in {account}'**
+  String settings_photos_reconnect_started(String account);
 
   /// Media info panel: copy this item to the cloud now
   ///
@@ -88059,6 +88297,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'On your other devices, open Submersion, choose {account}, and the same library appears.'**
   String settings_setUpDevice_done_otherDevices(String account);
+
+  /// Step 2 when this device already syncs with the chosen account
+  ///
+  /// In en, this message translates to:
+  /// **'The dives here are in step with your library in {account}.'**
+  String settings_setUpDevice_sync_inStep(String account);
+
+  /// First-run wizard: the account holds no library, so begin a new logbook
+  ///
+  /// In en, this message translates to:
+  /// **'Start a new logbook'**
+  String get setup_syncPull_startFresh;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Explore with sample data'**
+  String get demo_welcome_title;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Look around a complete sample logbook before entering your own'**
+  String get demo_welcome_subtitle;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Explore with sample data'**
+  String get demo_settings_enter_title;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Your logbook is set aside, untouched, until you exit'**
+  String get demo_settings_enter_subtitle;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Exit demo'**
+  String get demo_settings_exit_title;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Discard the sample logbook and return to your own'**
+  String get demo_settings_exit_subtitle;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode: you are exploring sample data'**
+  String get demo_strip_label;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Exit demo'**
+  String get demo_strip_exit;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Exit demo mode?'**
+  String get demo_exit_confirm_title;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Changes you made to the sample logbook will be discarded.'**
+  String get demo_exit_confirm_body;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Exit demo'**
+  String get demo_exit_confirm_action;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading sample logbook'**
+  String get demo_enter_downloading;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing sample logbook'**
+  String get demo_enter_preparing;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Opening sample logbook'**
+  String get demo_enter_opening;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'The sample logbook could not be downloaded. Check your connection and try again.'**
+  String get demo_enter_failed;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Not available in demo mode'**
+  String get demo_sealed_note;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Unavailable in demo mode'**
+  String get demo_unavailable_title;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode keeps the sample logbook separate from your data, so nothing can be imported, exported, backed up or synced.'**
+  String get demo_unavailable_body;
+
+  /// Demo mode (issue #3708)
+  ///
+  /// In en, this message translates to:
+  /// **'Unavailable in demo mode'**
+  String get demo_row_unavailable;
 }
 
 class _AppLocalizationsDelegate

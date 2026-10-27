@@ -245,6 +245,7 @@ extension BeforeOpenBackstops on AppDatabase {
     // database stranded at any lower version by a parallel-branch
     // version collision self-heals here.
     await _assertCylinderConfigSchema();
+    await _assertCylinderConfigItemModColumn(); // v314
 
     // v142 backstop: re-assert trips.return_flight_at.
     await _assertTripReturnFlightColumn();
@@ -787,6 +788,7 @@ extension BeforeOpenBackstops on AppDatabase {
     // #1288 pass, so a computer it just registered gets its file
     // connections too. Local-only, deterministic ids, no HLC bump.
     await _seedDiveComputerConnections();
+    await _healDeviceGear();
 
     // Issue #3343: the v62 view_configs unique index, which a fresh install
     // never got (before_open_view_configs.dart).

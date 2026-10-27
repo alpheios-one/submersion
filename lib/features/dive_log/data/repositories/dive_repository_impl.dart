@@ -750,6 +750,11 @@ class DiveRepository {
     }
   }
 
+  /// Ids bound per [getDivesMissingEntryGps] query: one variable each, well
+  /// under SQLite's 32,766-variable ceiling, since every import passes all
+  /// of its dives (issue #3704).
+  static const _missingEntryGpsIdChunk = 900;
+
   /// Dives lacking an entry GPS position, as (id, start, end) timestamps for
   /// GPS-track matching. Times are wall-clock-as-UTC epoch milliseconds.
   Future<List<({String id, int startMs, int? endMs})>> getDivesMissingEntryGps({
@@ -758,16 +763,31 @@ class DiveRepository {
     // An explicit empty id set means "match nothing" — skip the query.
     if (limitToIds != null && limitToIds.isEmpty) return [];
     try {
-      final query = _db.select(_db.dives)
-        ..where((t) {
-          var cond = t.entryLatitude.isNull() & t.entryLongitude.isNull();
-          if (limitToIds != null) cond = cond & t.id.isIn(limitToIds);
-          return cond;
-        });
-      final rows = await query.get();
-      return [
-        for (final r in rows)
-          (
+      final idChunks = limitToIds == null
+          ? const <List<String>?>[null]
+          : <List<String>?>[
+              for (
+                var i = 0;
+                i < limitToIds.length;
+                i += _missingEntryGpsIdChunk
+              )
+                limitToIds.sublist(
+                  i,
+                  i + _missingEntryGpsIdChunk < limitToIds.length
+                      ? i + _missingEntryGpsIdChunk
+                      : limitToIds.length,
+                ),
+            ];
+      final missing = <({String id, int startMs, int? endMs})>[];
+      for (final ids in idChunks) {
+        final query = _db.select(_db.dives)
+          ..where((t) {
+            var cond = t.entryLatitude.isNull() & t.entryLongitude.isNull();
+            if (ids != null) cond = cond & t.id.isIn(ids);
+            return cond;
+          });
+        for (final r in await query.get()) {
+          missing.add((
             id: r.id,
             startMs: r.entryTime ?? r.diveDateTime,
             endMs:
@@ -775,8 +795,10 @@ class DiveRepository {
                 (r.runtime != null
                     ? (r.entryTime ?? r.diveDateTime) + r.runtime! * 1000
                     : null),
-          ),
-      ];
+          ));
+        }
+      }
+      return missing;
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get dives missing entry GPS',
@@ -1294,7 +1316,9 @@ class DiveRepository {
   /// A row's strand is its computerId when it has one, else its
   /// mergeSourceSlot when a sequential Combine carried it here, else nothing
   /// at all: a manual entry or an edited profile has neither, so there is
-  /// nothing for it to collide on and it always survives.
+  /// nothing for it to collide on and it always survives, unless another
+  /// such row is the same recording of the same computer (issue #3654; see
+  /// [dataSourceStrandKeysById]).
   ///
   /// A sequential merge (DiveMergeService.apply, step 10) carries over every
   /// original dive's data source row as provenance, so a merged dive holds
@@ -1321,19 +1345,25 @@ class DiveRepository {
   List<DiveDataSourcesData> _canonicalDataSourceRows(
     List<DiveDataSourcesData> rows,
   ) {
+    final strandOf = dataSourceStrandKeysById(rows);
     final seenStrands = <String>{};
     final result = <DiveDataSourcesData>[];
     for (final row in rows) {
-      if (seenStrands.add(_strandOf(row))) result.add(row);
+      if (seenStrands.add(strandOf[row.id]!)) result.add(row);
     }
     return result;
   }
 
-  static String _strandOf(DiveDataSourcesData row) => dataSourceStrandKey(
-    rowId: row.id,
-    computerId: row.computerId,
-    mergeSourceSlot: row.mergeSourceSlot,
-  );
+  /// The id of the row each of [rows] (in shown order) shows as: the first
+  /// row of its strand, which is itself for a row that did not collapse.
+  static Map<String, String> _shownIdByRow(List<DiveDataSourcesData> rows) {
+    final strandOf = dataSourceStrandKeysById(rows);
+    final shownIdByStrand = <String, String>{};
+    return {
+      for (final row in rows)
+        row.id: shownIdByStrand.putIfAbsent(strandOf[row.id]!, () => row.id),
+    };
+  }
 
   /// Every source row of [diveId], primary first and then oldest: the order
   /// [_canonicalDataSourceRows] needs to keep the shown row of each strand.
@@ -1343,6 +1373,9 @@ class DiveRepository {
             ..orderBy([
               (t) => OrderingTerm.desc(t.isPrimary),
               (t) => OrderingTerm.asc(t.createdAt),
+              // Combine copies rows with one createdAt; the id keeps the row
+              // that speaks for a strand the same on every read.
+              (t) => OrderingTerm.asc(t.id),
             ]))
           .get();
 
@@ -1363,9 +1396,15 @@ class DiveRepository {
   ) async {
     try {
       final series = await _profileSeries.getSeriesForDive(diveId);
-      final sourceRows = _canonicalDataSourceRows(
-        await _sourceRowsInShownOrder(diveId),
-      );
+      final allRows = await _sourceRowsInShownOrder(diveId);
+      // A series owned by a row that collapsed into another's chip belongs
+      // to the row that speaks for that strand (issue #3654), not to the
+      // primary, which may be a different computer.
+      final shownIdByRow = _shownIdByRow(allRows);
+      final sourceRows = [
+        for (final row in allRows)
+          if (shownIdByRow[row.id] == row.id) row,
+      ];
       if (sourceRows.isEmpty) {
         // Dives with series but no dive_data_sources row (older imports
         // predate that table): synthesize the primary source.
@@ -1390,11 +1429,11 @@ class DiveRepository {
         for (final s in sourceRows)
           if (s.computerId != null) s.computerId!: s.id,
       };
-      final sourceIds = {for (final s in sourceRows) s.id};
       // The FK is authoritative; a series without one follows the pre-v154
       // computer convention (issue #1149).
-      bool isPrimaryFamily(ProfileSeries s) => sourceIds.contains(s.sourceId)
-          ? s.sourceId == primary.id
+      bool isPrimaryFamily(ProfileSeries s) =>
+          shownIdByRow.containsKey(s.sourceId)
+          ? shownIdByRow[s.sourceId] == primary.id
           : s.computerId == null || s.computerId == primary.computerId;
       final family = series.where(isPrimaryFamily);
       final hasEditedProfile =
@@ -1405,8 +1444,8 @@ class DiveRepository {
       };
       var primaryIsEdited = false;
       for (final s in series) {
-        final owner = sourceIds.contains(s.sourceId)
-            ? s.sourceId!
+        final owner = shownIdByRow.containsKey(s.sourceId)
+            ? shownIdByRow[s.sourceId]!
             : s.computerId == null
             ? primary.id
             : (sourceIdByComputer[s.computerId!] ?? primary.id);
@@ -1540,11 +1579,7 @@ class DiveRepository {
   /// shown sources finds the right one (issue #3067).
   Future<List<ProfileSeriesRevision>> getProfileHistory(String diveId) async {
     final revisions = await _profileSeries.getRevisionsForDive(diveId);
-    final shownIdByStrand = <String, String>{};
-    final shownIdByRow = <String, String>{
-      for (final row in await _sourceRowsInShownOrder(diveId))
-        row.id: shownIdByStrand.putIfAbsent(_strandOf(row), () => row.id),
-    };
+    final shownIdByRow = _shownIdByRow(await _sourceRowsInShownOrder(diveId));
     return [
       for (final revision in revisions)
         switch (shownIdByRow[revision.sourceId]) {
@@ -1606,7 +1641,9 @@ class DiveRepository {
     if (owner == null || owner.isPrimary) return null;
     final ownerRow = rows.firstWhere((row) => row.id == owner.id);
     final primaryRow = rows.where((row) => row.isPrimary).firstOrNull;
-    if (primaryRow != null && _strandOf(primaryRow) == _strandOf(ownerRow)) {
+    final strandOf = dataSourceStrandKeysById(rows);
+    if (primaryRow != null &&
+        strandOf[primaryRow.id] == strandOf[ownerRow.id]) {
       return null;
     }
     return ownerRow;
@@ -6137,19 +6174,18 @@ class DiveRepository {
   /// The primary-source answer for one dive's `dive_data_sources` [rows].
   ///
   /// Ordering happens here rather than in SQL so the batched read and the
-  /// single-dive read collapse duplicate computers in the same order, which is
-  /// what keeps the export and the on-screen chart on the same samples.
+  /// single-dive read pick the same row, which is what keeps the export and
+  /// the on-screen chart on the same samples. The first row in shown order
+  /// is always the one the dive's first source shows, so no strand pass is
+  /// needed to find it.
   ({bool hasSources, String? computerId}) _primaryFromRows(
     List<DiveDataSourcesData> rows,
   ) {
-    final ordered = [...rows]
-      ..sort((a, b) {
-        if (a.isPrimary != b.isPrimary) return a.isPrimary ? -1 : 1;
-        return a.createdAt.compareTo(b.createdAt);
-      });
-    final sourceRows = _canonicalDataSourceRows(ordered);
-    if (sourceRows.isEmpty) return (hasSources: false, computerId: null);
-    return (hasSources: true, computerId: sourceRows.first.computerId);
+    if (rows.isEmpty) return (hasSources: false, computerId: null);
+    final first = rows.reduce(
+      (a, b) => compareDataSourcesInShownOrder(a, b) <= 0 ? a : b,
+    );
+    return (hasSources: true, computerId: first.computerId);
   }
 
   /// Lean hydration for decompression/exposure analysis: the dive row's
@@ -6407,8 +6443,10 @@ class DiveRepository {
     }
   }
 
-  /// Append [textToAppend] to the notes of every dive in [diveIds].
-  /// Empty existing notes receive just the text. No transaction/notify.
+  /// Append [textToAppend] to the notes of every dive in [diveIds] as a new
+  /// Markdown paragraph: a blank line after existing notes, so it never
+  /// joins their last paragraph or list item (#3683). Empty existing notes
+  /// receive just the text. No transaction/notify.
   Future<void> bulkAppendNotes(
     List<String> diveIds,
     String textToAppend,
@@ -6417,9 +6455,11 @@ class DiveRepository {
     final now = DateTime.now().millisecondsSinceEpoch;
     final placeholders = List.filled(diveIds.length, '?').join(', ');
     await _db.customUpdate(
-      "UPDATE dives SET notes = COALESCE(notes, '') || ?, updated_at = ? "
+      "UPDATE dives SET notes = CASE WHEN COALESCE(notes, '') = '' THEN ? "
+      'ELSE notes || char(10) || char(10) || ? END, updated_at = ? '
       'WHERE id IN ($placeholders)',
       variables: [
+        Variable.withString(textToAppend),
         Variable.withString(textToAppend),
         Variable.withInt(now),
         ...diveIds.map(Variable.withString),
@@ -6485,25 +6525,28 @@ class DiveRepository {
     if (diveIds.isEmpty || offset == Duration.zero) return;
     final now = DateTime.now().millisecondsSinceEpoch;
     final ms = offset.inMilliseconds;
-    final placeholders = List.filled(diveIds.length, '?').join(', ');
-    await _db.customUpdate(
-      'UPDATE dives SET '
-      'dive_date_time = dive_date_time + ?, '
-      'entry_time = CASE WHEN entry_time IS NULL THEN NULL '
-      'ELSE entry_time + ? END, '
-      'exit_time = CASE WHEN exit_time IS NULL THEN NULL '
-      'ELSE exit_time + ? END, '
-      'updated_at = ? '
-      'WHERE id IN ($placeholders)',
-      variables: [
-        Variable.withInt(ms),
-        Variable.withInt(ms),
-        Variable.withInt(ms),
-        Variable.withInt(now),
-        ...diveIds.map(Variable.withString),
-      ],
-      updates: {_db.dives},
-    );
+    // In chunks: "shift the whole import" binds one variable per dive.
+    for (final chunk in seriesIdChunks(diveIds)) {
+      final placeholders = List.filled(chunk.length, '?').join(', ');
+      await _db.customUpdate(
+        'UPDATE dives SET '
+        'dive_date_time = dive_date_time + ?, '
+        'entry_time = CASE WHEN entry_time IS NULL THEN NULL '
+        'ELSE entry_time + ? END, '
+        'exit_time = CASE WHEN exit_time IS NULL THEN NULL '
+        'ELSE exit_time + ? END, '
+        'updated_at = ? '
+        'WHERE id IN ($placeholders)',
+        variables: [
+          Variable.withInt(ms),
+          Variable.withInt(ms),
+          Variable.withInt(ms),
+          Variable.withInt(now),
+          ...chunk.map(Variable.withString),
+        ],
+        updates: {_db.dives},
+      );
+    }
     for (final diveId in diveIds) {
       await _syncRepository.markRecordPending(
         entityType: 'dives',
@@ -6524,18 +6567,17 @@ class DiveRepository {
   /// Prior time columns for [diveIds]; feed to [restoreDiveTimes] for undo.
   Future<List<({String id, int diveDateTime, int? entryTime, int? exitTime})>>
   getDiveTimesSnapshot(List<String> diveIds) async {
-    if (diveIds.isEmpty) return const [];
-    final rows = await (_db.select(
-      _db.dives,
-    )..where((t) => t.id.isIn(diveIds))).get();
     return [
-      for (final r in rows)
-        (
-          id: r.id,
-          diveDateTime: r.diveDateTime,
-          entryTime: r.entryTime,
-          exitTime: r.exitTime,
-        ),
+      for (final chunk in seriesIdChunks(diveIds))
+        for (final r in await (_db.select(
+          _db.dives,
+        )..where((t) => t.id.isIn(chunk))).get())
+          (
+            id: r.id,
+            diveDateTime: r.diveDateTime,
+            entryTime: r.entryTime,
+            exitTime: r.exitTime,
+          ),
     ];
   }
 
@@ -7279,6 +7321,34 @@ class DiveRepository {
       await _writeGearDiff(diveId, expanded, now);
     }
     await _bumpDives(diveIds, now);
+  }
+
+  /// Swap the gear [fromSetId] put on a dive for [equipmentIds] from
+  /// [toSetId] in one write, as the edit page does when the diver changes
+  /// set: gear both sets hold stays, now tagged with [toSetId], and gear
+  /// added any other way is untouched. No notify/txn.
+  Future<void> replaceSetEquipment(
+    String diveId, {
+    required String fromSetId,
+    required String toSetId,
+    required List<String> equipmentIds,
+  }) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final index = await _loadComponentsIndex();
+    final candidates = {
+      for (final id in equipmentIds) ...[id, ...index.descendantsOf(id)],
+    };
+    final active = await _activeIdsAmong(candidates);
+    final expanded = GearExpander.expand(
+      additions: [
+        for (final id in equipmentIds) (equipmentId: id, viaSetId: toSetId),
+      ],
+      index: index,
+      existing: GearExpander.removeSet(await _provenanceOf(diveId), fromSetId),
+      isActive: active.contains,
+    );
+    await _writeGearDiff(diveId, expanded, now);
+    await _bumpDives([diveId], now);
   }
 
   /// {equipmentId: number of the given dives that reference it}. Junction PK
@@ -8144,12 +8214,14 @@ class DiveRepository {
 
   /// Return true if a dive has readings from 2 or more sources.
   ///
-  /// Counts distinct canonical strands rather than raw rows, mirroring
-  /// [dataSourceStrandKey] in SQL: computer_id when there is one, else
+  /// Counts distinct canonical strands rather than raw rows, per
+  /// [dataSourceStrandKeysById]: computer_id when there is one, else
   /// merge_source_slot for a row a sequential Combine carried here, else the
-  /// row's own id (unique, so such a row is always its own strand). The two
+  /// row's own id unless another such row is the same recording. The two
   /// rows a Combine leaves behind therefore count as one, whether or not the
-  /// segments came from a computer download (issue #1451).
+  /// segments came from a computer download (issue #1451), and so do two
+  /// imports of one download with no computer to tie them (issue #3654).
+  /// Counted in Dart, not SQL, because that last rule compares rows.
   ///
   /// Deliberately the collapse rule alone, without the disjoint-span test the
   /// profile surfaces add on top of it (`usesPerSourceRendering`). That test
@@ -8161,17 +8233,49 @@ class DiveRepository {
   /// included.
   Future<bool> hasMultipleDataSources(String diveId) async {
     try {
-      final result = await _db
-          .customSelect(
-            'SELECT COUNT(DISTINCT COALESCE('
-            "'computer:' || computer_id, "
-            "'mergeSlot:' || merge_source_slot, "
-            "'row:' || id)) as cnt "
-            'FROM dive_data_sources WHERE dive_id = ?',
-            variables: [Variable(diveId)],
-          )
-          .getSingle();
-      return (result.data['cnt'] as int) >= 2;
+      // Only the columns the strand rule reads, so the raw dive bytes each
+      // row carries are not loaded just to be counted.
+      final t = _db.diveDataSources;
+      final query = _db.selectOnly(t)
+        ..addColumns([
+          t.id,
+          t.isPrimary,
+          t.createdAt,
+          t.importedAt,
+          t.sourceFileName,
+          t.computerId,
+          t.mergeSourceSlot,
+          t.computerModel,
+          t.computerSerial,
+          t.entryTime,
+          t.duration,
+          t.maxDepth,
+        ])
+        ..where(t.diveId.equals(diveId))
+        ..orderBy([
+          OrderingTerm.desc(t.isPrimary),
+          OrderingTerm.asc(t.createdAt),
+          OrderingTerm.asc(t.id),
+        ]);
+      final rows = [
+        for (final r in await query.get())
+          DiveDataSourcesData(
+            id: r.read(t.id)!,
+            diveId: diveId,
+            isPrimary: r.read(t.isPrimary)!,
+            importedAt: r.read(t.importedAt)!,
+            createdAt: r.read(t.createdAt)!,
+            sourceFileName: r.read(t.sourceFileName),
+            computerId: r.read(t.computerId),
+            mergeSourceSlot: r.read(t.mergeSourceSlot),
+            computerModel: r.read(t.computerModel),
+            computerSerial: r.read(t.computerSerial),
+            entryTime: r.read(t.entryTime),
+            duration: r.read(t.duration),
+            maxDepth: r.read(t.maxDepth),
+          ),
+      ];
+      return dataSourceStrandKeysById(rows).values.toSet().length >= 2;
     } catch (e, stackTrace) {
       _log.error(
         'Failed to count data source strands for dive: $diveId',
