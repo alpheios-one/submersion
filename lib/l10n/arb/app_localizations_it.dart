@@ -5947,6 +5947,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_homeChips_sync => 'Stato sincronizzazione';
 
   @override
+  String get settings_homeChips_nearby => 'Dispositivi vicini';
+
+  @override
   String get settings_homeChips_dataQuality => 'Qualità dei dati';
 
   @override
@@ -5996,6 +5999,16 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get dashboard_gauges_synced => 'Sincronizzato';
+
+  @override
+  String dashboard_gauges_nearby(String name) {
+    return 'Vicino: $name richiede attenzione';
+  }
+
+  @override
+  String dashboard_gauges_nearbyMore(String name) {
+    return 'Vicini: $name e altri richiedono attenzione';
+  }
 
   @override
   String dashboard_gauges_dataIssues(int count) {
@@ -10195,6 +10208,14 @@ class AppLocalizationsIt extends AppLocalizations {
   String diveLog_cylinders_modNote(String ppO2) {
     return 'MOD a ppO₂ $ppO2';
   }
+
+  @override
+  String diveLog_cylinders_modLimit(String ppO2, String limit) {
+    return '$ppO2 ($limit)';
+  }
+
+  @override
+  String get diveLog_cylinders_modLimitSeparator => ', ';
 
   @override
   String get diveLog_tank_section_gasMix => 'Miscela gas';
@@ -20086,6 +20107,11 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String plannerCanvas_issue_minGas(String pressure) {
     return 'La bombola termina sotto il minimo rock bottom di $pressure';
+  }
+
+  @override
+  String plannerCanvas_issue_noUsableGas(String minGas, String fill) {
+    return 'Il minimo rock bottom di $minGas non lascia gas utilizzabile in una carica di $fill';
   }
 
   @override
@@ -36129,12 +36155,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String settings_shareAllSites_confirm(int count) {
-    return 'Scegli chi vede tutti i tuoi $count siti. Per cambiare un sito in seguito, aprilo e tocca Condiviso con.';
+    return 'Scegli chi vede tutti i tuoi $count siti. Per cambiare un sito in seguito, modificalo e tocca Condiviso con.';
   }
 
   @override
   String settings_shareAllTrips_confirm(int count) {
-    return 'Scegli chi vede tutti i tuoi $count viaggi. Per cambiare un viaggio in seguito, aprilo e tocca Condiviso con.';
+    return 'Scegli chi vede tutti i tuoi $count viaggi. Per cambiare un viaggio in seguito, modificalo e tocca Condiviso con.';
   }
 
   @override
@@ -37487,6 +37513,142 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_sync_keepInStep =>
       'Mantieni i dispositivi allineati automaticamente';
+
+  @override
+  String get settings_nearby_title => 'Dispositivi vicini';
+
+  @override
+  String get settings_nearby_auto_title =>
+      'Sincronizza automaticamente con i dispositivi vicini';
+
+  @override
+  String get settings_nearby_auto_subtitle =>
+      'Quando un dispositivo associato è aperto nelle vicinanze, tramite Bluetooth';
+
+  @override
+  String get settings_nearby_linuxNote =>
+      'Gli altri dispositivi non possono trovare questo computer, quindi si sincronizza con qualsiasi dispositivo vicino tranne un altro computer Linux';
+
+  @override
+  String get settings_nearby_pair => 'Associa un dispositivo';
+
+  @override
+  String settings_nearby_status_synced(String when) {
+    return 'Sincronizzato $when';
+  }
+
+  @override
+  String settings_nearby_status_syncing(String done, String total) {
+    return 'Sincronizzazione: $done di $total';
+  }
+
+  @override
+  String get settings_nearby_status_never => 'Non ancora sincronizzato';
+
+  @override
+  String settings_nearby_status_notSeen(String date) {
+    return 'Non visto dal $date';
+  }
+
+  @override
+  String get settings_nearby_error_newerApp =>
+      'Questo dispositivo ha bisogno di una versione più recente dell\'app';
+
+  @override
+  String get settings_nearby_error_peerOlderApp =>
+      'L\'altro dispositivo ha bisogno di una versione più recente dell\'app';
+
+  @override
+  String get settings_nearby_error_differentLibrary =>
+      'Non è la stessa libreria';
+
+  @override
+  String get settings_nearby_error_notPaired =>
+      'Associazione rimossa sull\'altro dispositivo';
+
+  @override
+  String get settings_nearby_error_applyFailed =>
+      'Impossibile applicare le sue modifiche';
+
+  @override
+  String get settings_nearby_error_bluetoothOff =>
+      'Il Bluetooth è spento o non consentito';
+
+  @override
+  String get settings_nearby_error_unreachable => 'Impossibile connettersi';
+
+  @override
+  String get settings_nearby_sheet_rename => 'Rinomina';
+
+  @override
+  String get settings_nearby_sheet_unpair => 'Rimuovi associazione';
+
+  @override
+  String settings_nearby_unpair_confirm(String name) {
+    return 'Rimuovere l\'associazione di $name? Servirà associarlo di nuovo per sincronizzare da vicino.';
+  }
+
+  @override
+  String get settings_nearby_rename_title => 'Rinomina dispositivo';
+
+  @override
+  String settings_nearby_notInRange(String name) {
+    return '$name non è nelle vicinanze ora';
+  }
+
+  @override
+  String get nearbyPair_looking => 'Ricerca dei dispositivi…';
+
+  @override
+  String get nearbyPair_hint =>
+      'Apri Submersion sull\'altro dispositivo e tocca anche lì Associa un dispositivo.';
+
+  @override
+  String nearbyPair_found(String name) {
+    return 'Trovato $name. Controlla che mostri questo codice, poi conferma su entrambi.';
+  }
+
+  @override
+  String get nearbyPair_sameCode => 'Stesso codice';
+
+  @override
+  String get nearbyPair_notMine => 'Non è mio';
+
+  @override
+  String get nearbyPair_waiting =>
+      'In attesa della conferma dell\'altro dispositivo…';
+
+  @override
+  String get nearbyPair_bothPopulated =>
+      'Entrambi i dispositivi hanno immersioni. L\'associazione le unisce in un solo logbook.';
+
+  @override
+  String get nearbyPair_differentLibrary =>
+      'Quel dispositivo usa un\'altra libreria, quindi non può essere associato a questo.';
+
+  @override
+  String get nearbyPair_permissionDenied =>
+      'Submersion ha bisogno del permesso Bluetooth per trovare i dispositivi vicini.';
+
+  @override
+  String get nearbyPair_bluetoothOff =>
+      'Attiva il Bluetooth per trovare i dispositivi vicini.';
+
+  @override
+  String get nearbyPair_unsupported =>
+      'Questo dispositivo non ha un Bluetooth che Submersion possa usare.';
+
+  @override
+  String get nearbyPair_openSettings => 'Apri impostazioni';
+
+  @override
+  String nearbyPair_done(String name) {
+    return 'Associato a $name';
+  }
+
+  @override
+  String get nearbyPair_failed =>
+      'L\'associazione non si è completata. Riprova su entrambi i dispositivi.';
 
   @override
   String get settings_sync_alsoAtLaunch => 'Sincronizza anche all\'avvio';
@@ -51887,6 +52049,17 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get backup_history_device_anotherDevice => 'Altro dispositivo';
+
+  @override
+  String get backup_history_device_thisDevice => 'Questo dispositivo';
+
+  @override
+  String backup_history_subtitleWithDevice(String summary, String device) {
+    return '$summary · $device';
+  }
+
+  @override
   String backup_history_manualSubtitle(
     int diveCount,
     int siteCount,
@@ -55409,6 +55582,16 @@ class AppLocalizationsIt extends AppLocalizations {
       'Questa azione non può essere annullata.';
 
   @override
+  String tags_manage_rowScopes(String scopes) {
+    return 'Per: $scopes';
+  }
+
+  @override
+  String tags_manage_rowUsage(String counts) {
+    return 'Usato in: $counts';
+  }
+
+  @override
   String get tags_action_edit => 'Modifica tag';
 
   @override
@@ -56000,4 +56183,38 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get demo_row_unavailable => 'Non disponibile in modalità demo';
+
+  @override
+  String get demo_enter_confirm_title => 'Esplorare con dati di esempio?';
+
+  @override
+  String demo_enter_confirm_body(String size) {
+    return 'Verrà scaricato un logbook di esempio ($size) e aperto al posto del tuo. Il tuo logbook resta da parte, intatto, finché non esci dalla modalità demo.';
+  }
+
+  @override
+  String get demo_enter_confirm_action => 'Scarica';
+
+  @override
+  String demo_enter_confirm_body_firstRun(String size) {
+    return 'Verrà scaricato un logbook di esempio ($size) per esplorare l\'app. Esci dalla modalità demo quando vuoi iniziare il tuo.';
+  }
+
+  @override
+  String demo_enter_changed_body(String size) {
+    return 'Il logbook di esempio è stato aggiornato e ora occupa $size. Scaricarlo?';
+  }
+
+  @override
+  String common_byteSize(String value, String unit) {
+    String _temp0 = intl.Intl.selectLogic(unit, {
+      'B': 'B',
+      'KB': 'KB',
+      'MB': 'MB',
+      'GB': 'GB',
+      'TB': 'TB',
+      'other': '$unit',
+    });
+    return '$value $_temp0';
+  }
 }
