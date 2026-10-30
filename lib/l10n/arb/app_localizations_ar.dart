@@ -1434,6 +1434,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get common_action_dismiss => 'تجاهل';
 
   @override
+  String get common_action_dismissAll => 'تجاهل الكل';
+
+  @override
   String get equipment_setEdit_defaultSwitch_title => 'المجموعة الافتراضية';
 
   @override
@@ -2604,6 +2607,15 @@ class AppLocalizationsAr extends AppLocalizations {
       'إرسال عبر AirDrop أو البريد الإلكتروني أو تطبيقات أخرى';
 
   @override
+  String get backup_copySheet_deviceLocked =>
+      'أُخذت هذه النسخة الآمنة من قاعدة بياناتك المحمية. لا يمكن استعادتها إلا على هذا الجهاز.';
+
+  @override
+  String backup_copySheet_title(String dateTime) {
+    return 'نسخة احتياطية من $dateTime';
+  }
+
+  @override
   String get backup_frequency_daily => 'يومي';
 
   @override
@@ -2617,6 +2629,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get backup_history_action_restore => 'استعادة';
+
+  @override
+  String get backup_history_action_saveCopy => 'حفظ نسخة';
+
+  @override
+  String get backup_history_action_share => 'مشاركة';
 
   @override
   String get backup_history_empty => 'لا توجد نسخ احتياطية';
@@ -2897,6 +2915,307 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get buddies_action_addTooltip => 'إضافة رفيق غوص جديد';
+
+  @override
+  String get buddyCard_preview_title => 'بطاقة الرفيق';
+
+  @override
+  String buddyCard_preview_addTitle(String name) {
+    return 'إضافة $name كرفيق';
+  }
+
+  @override
+  String buddyCard_preview_updateTitle(String name) {
+    return 'تحديث $name';
+  }
+
+  @override
+  String buddyCard_preview_possibleTitle(String name) {
+    return 'هل هذا $name من رفاقك؟';
+  }
+
+  @override
+  String get buddyCard_preview_trimmed => 'حُذفت بعض التفاصيل لتتسع في الرمز.';
+
+  @override
+  String get buddyCard_preview_newer =>
+      'هذه البطاقة من إصدار أحدث من Submersion. قد تكون بعض التفاصيل مفقودة.';
+
+  @override
+  String get buddyCard_preview_noChanges => 'لا جديد في هذه البطاقة.';
+
+  @override
+  String get buddyCard_preview_ownCard =>
+      'هذه بطاقتك أنت. تبادل مع رفيق غوص لتحصل على بطاقته.';
+
+  @override
+  String buddyCard_preview_changed(String from, String to) {
+    return '$to (كان $from)';
+  }
+
+  @override
+  String get buddyCard_action_add => 'إضافة رفيق';
+
+  @override
+  String get buddyCard_action_update => 'تحديث الرفيق';
+
+  @override
+  String get buddyCard_action_addAsNew => 'إضافة كرفيق جديد';
+
+  @override
+  String get buddyCard_action_discard => 'تجاهل';
+
+  @override
+  String get buddyCard_field_name => 'الاسم';
+
+  @override
+  String get buddyCard_field_phone => 'الهاتف';
+
+  @override
+  String get buddyCard_field_email => 'البريد الإلكتروني';
+
+  @override
+  String get buddyCard_field_social => 'اسم المستخدم على مواقع التواصل';
+
+  @override
+  String get buddyCard_field_dives => 'الغطسات';
+
+  @override
+  String get buddyCard_field_divingSince => 'يغطس منذ';
+
+  @override
+  String get buddyCard_field_lastDive => 'آخر غطسة';
+
+  @override
+  String get buddyCard_field_certifications => 'الشهادات';
+
+  @override
+  String buddyCard_saved_added(String name) {
+    return 'تمت إضافة $name إلى رفاقك';
+  }
+
+  @override
+  String buddyCard_saved_updated(String name) {
+    return 'تم تحديث $name';
+  }
+
+  @override
+  String get buddyCard_saved_view => 'عرض';
+
+  @override
+  String get buddyCard_error_notACard => 'هذه ليست بطاقة رفيق من Submersion.';
+
+  @override
+  String get buddyCard_error_unreadable => 'تعذّرت قراءة بطاقة الرفيق هذه.';
+
+  @override
+  String get buddySwap_title => 'تبادل مع رفيق';
+
+  @override
+  String get buddySwap_nearby_heading => 'غواصون قريبون يفتحون Submersion';
+
+  @override
+  String get buddySwap_nearby_tapToSwap => 'انقر للتبادل';
+
+  @override
+  String get buddySwap_nearby_looking => 'جارٍ البحث عن المزيد…';
+
+  @override
+  String get buddySwap_nearby_failed =>
+      'تعذّر البحث عن الغواصين القريبين. لا تزال طرق التبادل الأخرى أدناه تعمل.';
+
+  @override
+  String get buddySwap_nearby_hint =>
+      'لا ترى رفيقك؟ يجب أن تفتحا هذه الشاشة كلاكما وأن يكون لديكما Submersion 1.8.4 أو أحدث.';
+
+  @override
+  String buddySwap_sharing(String summary) {
+    return 'المشاركة: $summary';
+  }
+
+  @override
+  String get buddySwap_sharing_change => 'تغيير';
+
+  @override
+  String buddySwap_dives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غطسة',
+      many: '$count غطسة',
+      few: '$count غطسات',
+      two: 'غطستان',
+      one: 'غطسة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get buddySwap_action_showCode => 'عرض رمزي';
+
+  @override
+  String get buddySwap_action_scanCode => 'مسح الرمز';
+
+  @override
+  String get buddySwap_action_sendFile => 'إرسال ملف';
+
+  @override
+  String get buddySwap_action_openFile => 'فتح ملف بطاقة';
+
+  @override
+  String get buddySwap_action_writeSticker => 'كتابة ملصق NFC';
+
+  @override
+  String get buddySwap_action_tapAndroid => 'المس هاتف Android';
+
+  @override
+  String get buddySwap_action_receiveByTap => 'الاستلام باللمس';
+
+  @override
+  String get buddySwap_tap_prompt => 'قرّب هاتفك من الهاتف الآخر أو الملصق';
+
+  @override
+  String get buddySwap_sticker_prompt => 'قرّب هاتفك من ملصق NFC فارغ';
+
+  @override
+  String get buddySwap_sticker_written =>
+      'تمت كتابة الملصق. أعد كتابته عند تغيّر بياناتك.';
+
+  @override
+  String get buddySwap_sticker_tooSmall => 'هذا الملصق صغير جدًا لبطاقتك.';
+
+  @override
+  String get buddySwap_sticker_notWritable => 'لا يمكن الكتابة على هذا الملصق.';
+
+  @override
+  String get buddySwap_nfc_unavailable => 'NFC غير متاح على هذا الجهاز.';
+
+  @override
+  String get buddySwap_qr_title => 'بطاقة الرفيق الخاصة بك';
+
+  @override
+  String get buddySwap_qr_hint =>
+      'اطلب من رفيقك مسح هذا بـ Submersion أو بالكاميرا.';
+
+  @override
+  String buddySwap_request_title(String name) {
+    return 'يريد $name تبادل البطاقات';
+  }
+
+  @override
+  String buddySwap_request_youSend(String summary) {
+    return 'سترسل: $summary';
+  }
+
+  @override
+  String get buddySwap_request_swap => 'تبادل';
+
+  @override
+  String get buddySwap_request_decline => 'رفض';
+
+  @override
+  String buddySwap_waiting(String name) {
+    return 'بانتظار رد $name';
+  }
+
+  @override
+  String buddySwap_failed_declined(String name) {
+    return 'رفض $name التبادل';
+  }
+
+  @override
+  String buddySwap_failed_timedOut(String name) {
+    return 'لم يرد $name';
+  }
+
+  @override
+  String buddySwap_failed_lost(String name) {
+    return 'انقطع الاتصال بـ $name';
+  }
+
+  @override
+  String buddySwap_failed_newerApp(String name) {
+    return 'يحتاج $name إلى إصدار أحدث من Submersion';
+  }
+
+  @override
+  String get buddySwap_cardFailed => 'تعذّر إنشاء بطاقة الرفيق الخاصة بك.';
+
+  @override
+  String get buddySwap_qr_tooLarge =>
+      'بطاقتك أطول من أن تتسع في رمز. جرّب إرسال ملف بدلًا من ذلك.';
+
+  @override
+  String get buddySwap_sendFailed => 'تعذّرت مشاركة ملف البطاقة.';
+
+  @override
+  String get buddyCard_saveFailed => 'تعذّر حفظ الرفيق.';
+
+  @override
+  String get buddyCard_field_photo => 'الصورة';
+
+  @override
+  String get buddyCard_change_newPhoto => 'صورة جديدة';
+
+  @override
+  String get buddyShare_title => 'ما تشاركه';
+
+  @override
+  String get buddyShare_name => 'الاسم';
+
+  @override
+  String get buddyShare_alwaysShared => 'تُشارك دائمًا';
+
+  @override
+  String get buddyShare_neverShared =>
+      'لا تُشارك أبدًا التفاصيل الطبية وتفاصيل التأمين والطوارئ.';
+
+  @override
+  String get buddyShare_photo => 'الصورة';
+
+  @override
+  String get buddyShare_phone => 'الهاتف';
+
+  @override
+  String get buddyShare_email => 'البريد الإلكتروني';
+
+  @override
+  String get buddyShare_certifications => 'الشهادات';
+
+  @override
+  String get buddyShare_cardDetails => 'أرقام البطاقات وتواريخها';
+
+  @override
+  String get buddyShare_diveCount => 'عدد الغطسات';
+
+  @override
+  String get buddyShare_divingSince => 'يغطس منذ';
+
+  @override
+  String get buddyShare_lastDive => 'تاريخ آخر غطسة';
+
+  @override
+  String get buddyShare_social => 'اسم المستخدم على مواقع التواصل';
+
+  @override
+  String buddyCard_detail_heading(String name) {
+    return 'من بطاقة $name';
+  }
+
+  @override
+  String buddyCard_detail_since(String year) {
+    return 'يغطس منذ $year';
+  }
+
+  @override
+  String buddyCard_detail_last(String date) {
+    return 'آخر غطسة $date';
+  }
+
+  @override
+  String buddyCard_detail_received(String date) {
+    return 'استُلمت في $date';
+  }
 
   @override
   String get buddies_action_clearSearch => 'مسح البحث';
@@ -8466,7 +8785,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_filterChip_noBuddy => 'بدون زميل';
 
   @override
+  String get diveLog_filterChip_noEntryMethod => 'بدون طريقة دخول';
+
+  @override
   String get diveLog_filterChip_noRole => 'بدون دور';
+
+  @override
+  String get diveLog_filterChip_noWaterType => 'بدون نوع مياه';
 
   @override
   String diveLog_filterChip_until(Object date) {
@@ -8531,6 +8856,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_filter_noBuddyOnly => 'بدون زميل غوص';
 
   @override
+  String get diveLog_filter_noEntryMethodOnly => 'لم تُسجَّل طريقة دخول';
+
+  @override
   String get diveLog_filter_noRoleOnly => 'بدون دور';
 
   @override
@@ -8589,6 +8917,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_filter_showOnlyNoBuddy => 'عرض الغوصات بدون زميل غوص فقط';
+
+  @override
+  String get diveLog_filter_showOnlyNoEntryMethod =>
+      'عرض الغوصات التي لا تُعرف طريقة دخولها فقط';
 
   @override
   String get diveLog_filter_showOnlyNoRole =>
@@ -10134,6 +10466,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_selection_tooltip_edit => 'تعديل المحدد';
 
   @override
+  String get diveLog_selection_tooltip_newTrip => 'رحلة جديدة من المحدد';
+
+  @override
   String get diveLog_selection_tooltip_export => 'تصدير المحدد';
 
   @override
@@ -10328,19 +10663,24 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get diveLog_cylinders_columnTank => 'أسطوانة';
+  String diveLog_cylinders_figureStart(String pressure) {
+    return 'البداية $pressure';
+  }
 
   @override
-  String get diveLog_cylinders_columnGas => 'غاز';
+  String diveLog_cylinders_figureEnd(String pressure) {
+    return 'النهاية $pressure';
+  }
 
   @override
-  String get diveLog_cylinders_columnStart => 'البداية';
+  String diveLog_cylinders_figureUsed(String pressure) {
+    return 'المستخدم $pressure';
+  }
 
   @override
-  String get diveLog_cylinders_columnEnd => 'النهاية';
-
-  @override
-  String get diveLog_cylinders_columnUsed => 'المستخدم';
+  String diveLog_cylinders_gasSemantics(String mix) {
+    return 'غاز $mix';
+  }
 
   @override
   String diveLog_cylinders_gasUsed(String amount) {
@@ -10859,6 +11199,29 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get divePlanner_gasOptions_ppO2Deco => 'ppO₂ تخفيف الضغط';
+
+  @override
+  String get divePlanner_gasOptions_ppO2DecoBand1 =>
+      'ppO₂ تخفيف الضغط حتى 28% أكسجين';
+
+  @override
+  String get divePlanner_gasOptions_ppO2DecoBand2 =>
+      'ppO₂ تخفيف الضغط 28-45% أكسجين';
+
+  @override
+  String get divePlanner_gasOptions_ppO2DecoBand3 =>
+      'ppO₂ تخفيف الضغط 45-99% أكسجين';
+
+  @override
+  String get divePlanner_gasOptions_maxO2DepthMeters =>
+      'أقصى عمق لـ 100% أكسجين';
+
+  @override
+  String get divePlanner_gasOptions_hypercapniaAmv =>
+      'RMV فرط ثاني أكسيد الكربون';
+
+  @override
+  String get divePlanner_gasOptions_hypercapniaMinutes => 'المدة';
 
   @override
   String get divePlanner_gasOptions_bestMixEnd => 'END لأفضل خليط';
@@ -15261,6 +15624,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String tankMod_default(String ppO2, String limit) {
     return 'الافتراضي عند ppO2 $ppO2 ($limit)';
+  }
+
+  @override
+  String tankMod_defaultDepth(String depth, String limit) {
+    return 'الافتراضي عند $depth ($limit)';
   }
 
   @override
@@ -20517,6 +20885,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get plannerCanvas_chartMode_ccr => 'CCR';
 
   @override
+  String get plannerCanvas_chartMode_scr => 'SCR';
+
+  @override
   String plannerCanvas_scrub_tts(String minutes) {
     return 'TTS $minutes′';
   }
@@ -23244,6 +23615,58 @@ class AppLocalizationsAr extends AppLocalizations {
       'تخطي غازات الطوارئ غير المستخدمة';
 
   @override
+  String get settings_conflict_field_diveListSort => 'الغوصات: الترتيب';
+
+  @override
+  String get settings_conflict_field_divePlanListSort =>
+      'الخطط المحفوظة: الترتيب';
+
+  @override
+  String get settings_conflict_field_tripListSort => 'الرحلات: الترتيب';
+
+  @override
+  String get settings_conflict_field_courseListSort => 'الدورات: الترتيب';
+
+  @override
+  String get settings_conflict_field_buddyListSort => 'زملاء الغوص: الترتيب';
+
+  @override
+  String get settings_conflict_field_diveCenterListSort =>
+      'مراكز الغوص: الترتيب';
+
+  @override
+  String get settings_conflict_field_siteListSort => 'المواقع: الترتيب';
+
+  @override
+  String get settings_conflict_field_certificationListSort =>
+      'الشهادات: الترتيب';
+
+  @override
+  String get settings_conflict_field_equipmentListSort => 'المعدات: الترتيب';
+
+  @override
+  String get settings_conflict_field_siteListGroupBy => 'المواقع: التجميع';
+
+  @override
+  String get settings_conflict_field_certificationListGroupBy =>
+      'الشهادات: التجميع';
+
+  @override
+  String get settings_conflict_field_equipmentArrangement => 'ترتيب المعدات';
+
+  @override
+  String get settings_conflict_field_equipmentGroupByLocation =>
+      'المعدات مجمعة حسب الموقع';
+
+  @override
+  String get settings_conflict_field_listArrangementHlc => 'سجل ترتيب القوائم';
+
+  @override
+  String settings_conflict_sortValue(String field, String direction) {
+    return '$field، $direction';
+  }
+
+  @override
   String get settings_conflict_field_avgSpeed => 'متوسط السرعة';
 
   @override
@@ -24406,6 +24829,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_conflict_field_ppO2Deco => 'ppO2 لتخفيف الضغط';
 
   @override
+  String get settings_conflict_field_ppO2DecoBand1 =>
+      'ppO2 تخفيف الضغط حتى 28% أكسجين';
+
+  @override
+  String get settings_conflict_field_ppO2DecoBand2 =>
+      'ppO2 تخفيف الضغط 28-45% أكسجين';
+
+  @override
+  String get settings_conflict_field_ppO2DecoBand3 =>
+      'ppO2 تخفيف الضغط 45-99% أكسجين';
+
+  @override
+  String get settings_conflict_field_ppO2DecoBandsEnabled =>
+      'حدود ppO2 للديكو حسب نطاق الأكسجين';
+
+  @override
+  String get settings_conflict_field_maxO2DepthEnabled =>
+      'عمق أقصى صريح لـ 100% أكسجين';
+
+  @override
+  String get settings_conflict_field_maxO2DepthMeters =>
+      'العمق الأقصى لـ 100% أكسجين';
+
+  @override
   String get settings_conflict_field_ppO2MaxDeco => 'أقصى ppO2 لتخفيف الضغط';
 
   @override
@@ -24435,6 +24882,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_conflict_field_priorDiveCount => 'الغوصات قبل هذا السجل';
+
+  @override
+  String get settings_conflict_field_buddyCardShare => 'مشاركة بطاقة الرفيق';
+
+  @override
+  String get settings_conflict_field_cardDiveCount => 'الغطسات (من بطاقته)';
+
+  @override
+  String get settings_conflict_field_cardDivingSince => 'يغطس منذ (من بطاقته)';
+
+  @override
+  String get settings_conflict_field_cardId => 'بطاقة الرفيق';
+
+  @override
+  String get settings_conflict_field_cardLastDive => 'آخر غطسة (من بطاقته)';
+
+  @override
+  String get settings_conflict_field_cardReceivedAt => 'تاريخ استلام البطاقة';
+
+  @override
+  String get settings_conflict_field_socialHandle =>
+      'اسم المستخدم على مواقع التواصل';
 
   @override
   String get settings_conflict_field_priorDiveTimeSeconds =>
@@ -25075,6 +25544,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_conflict_field_verifyFactsHlc => 'سجل التحقق';
+
+  @override
+  String get settings_conflict_field_videoPositionMs =>
+      'الوقت في الفيديو (مللي ثانية)';
 
   @override
   String get settings_conflict_field_vesselName => 'السفينة';
@@ -26530,6 +27003,62 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_decompression_ppO2Dialog_title =>
       'حدود الضغط الجزئي للأكسجين OC';
+
+  @override
+  String get settings_decompression_ppO2BandsTitle =>
+      'حدود الديكو حسب نطاق الأكسجين';
+
+  @override
+  String get settings_decompression_ppO2BandsSubtitle =>
+      'حدود ppO2 اختيارية وأدق لمخطط الغوص';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_title =>
+      'ppO2 للديكو: حسب نطاق الأكسجين';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_bandsToggle =>
+      'استخدام حدود الديكو حسب نطاق الأكسجين';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_band1 => 'حتى 28% أكسجين';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_band2 => '28–45% أكسجين';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_band3 => '45–99% أكسجين';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_maxO2DepthToggle =>
+      'استخدام عمق أقصى صريح لـ 100% أكسجين';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_maxO2DepthLabel =>
+      'العمق الأقصى لـ 100% أكسجين';
+
+  @override
+  String get settings_decompression_hypercapniaTitle =>
+      'مرحلة فرط ثاني أكسيد الكربون أثناء الخروج الطارئ';
+
+  @override
+  String get settings_decompression_hypercapniaSubtitle =>
+      'معدل تنفس مرتفع اختياري في بداية الخروج الطارئ OC لأنظمة CCR/SCR';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_title =>
+      'مرحلة فرط ثاني أكسيد الكربون أثناء الخروج الطارئ';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_enabledToggle =>
+      'استخدام مرحلة فرط ثاني أكسيد الكربون للخروج الطارئ OC';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_factorLabel =>
+      'معامل RMV';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_minutesLabel => 'المدة';
 
   @override
   String get settings_decompression_ccrPpO2LimitsTitle =>
@@ -30314,6 +30843,87 @@ class AppLocalizationsAr extends AppLocalizations {
   String get insights_timePatterns_seasonal_title => 'الأنماط الموسمية';
 
   @override
+  String get insights_timePatterns_calendarDays_title => 'أيام التقويم';
+
+  @override
+  String get insights_timePatterns_calendarDays_subtitle =>
+      'الغطسات في كل تاريخ من السنة (كل السنوات)';
+
+  @override
+  String insights_timePatterns_calendarDays_coverage(
+    int covered,
+    int total,
+    String percent,
+  ) {
+    return '$covered من $total يومًا في التقويم ($percent)';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_busiestMonth(String months) {
+    return 'الشهر الأكثر غطسًا: $months';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_busiestDay(String days) {
+    return 'يوم الشهر الأكثر غطسًا: $days';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_cellSemantics(
+    String date,
+    int count,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غطسة',
+      many: '$count غطسة',
+      few: '$count غطسات',
+      two: 'غطستان',
+      one: 'غطسة واحدة',
+      zero: 'لا غطسات',
+    );
+    return '$date، $_temp0';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_totalSemantics(
+    String label,
+    int count,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غطسة',
+      many: '$count غطسة',
+      few: '$count غطسات',
+      two: 'غطستان',
+      one: 'غطسة واحدة',
+      zero: 'لا غطسات',
+    );
+    return '$label، المجموع $_temp0';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_dayLabel(int day) {
+    return 'اليوم $day';
+  }
+
+  @override
+  String get insights_timePatterns_calendarDays_total => 'كل التواريخ';
+
+  @override
+  String get insights_timePatterns_calendarDays_listSeparator => '، ';
+
+  @override
+  String get insights_timePatterns_calendarDays_empty =>
+      'لا توجد غطسات لعرضها في التقويم بعد';
+
+  @override
+  String get insights_timePatterns_calendarDays_error =>
+      'تعذر تحميل أيام التقويم';
+
+  @override
   String get insights_timePatterns_surfaceInterval_average => 'المتوسط';
 
   @override
@@ -31792,6 +32402,43 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String trips_delete_sideTripsStandalone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تصبح رحلاتها الجانبية الـ $count رحلات مستقلة.',
+      many: 'تصبح رحلاتها الجانبية الـ $count رحلات مستقلة.',
+      few: 'تصبح رحلاتها الجانبية الـ $count رحلات مستقلة.',
+      two: 'تصبح رحلتاها الجانبيتان رحلتين مستقلتين.',
+      one: 'تصبح رحلتها الجانبية رحلة مستقلة.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_delete_divesReturnToParent(String name) {
+    return 'تعود غطساتها إلى $name.';
+  }
+
+  @override
+  String trips_bulkDelete_sideTripsStandalone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تصبح $count رحلة جانبية رحلات مستقلة.',
+      many: 'تصبح $count رحلة جانبية رحلات مستقلة.',
+      few: 'تصبح $count رحلات جانبية رحلات مستقلة.',
+      two: 'تصبح رحلتان جانبيتان رحلتين مستقلتين.',
+      one: 'تصبح رحلة جانبية واحدة رحلة مستقلة.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_bulkDelete_divesReturnToParents =>
+      'تعود غطسات الرحلات الجانبية المحذوفة إلى رحلاتها الأكبر.';
+
+  @override
   String get trips_detail_dialog_deleteTitle => 'حذف الرحلة؟';
 
   @override
@@ -32033,6 +32680,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trips_edit_hint_tripName => 'مثال: رحلة البحر الأحمر 2024';
 
   @override
+  String get trips_edit_field_partOf => 'جزء من';
+
+  @override
+  String get trips_edit_partOf_none => 'لا شيء (رحلة مستقلة)';
+
+  @override
+  String get trips_edit_partOf_helper => 'يجعل هذه رحلة جانبية ضمن رحلة أكبر';
+
+  @override
   String get trips_edit_label_endDate => 'تاريخ الانتهاء';
 
   @override
@@ -32224,6 +32880,35 @@ class AppLocalizationsAr extends AppLocalizations {
       one: 'غوصة واحدة',
     );
     return '$_temp0';
+  }
+
+  @override
+  String trips_list_sideTripCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count رحلة جانبية',
+      many: '$count رحلة جانبية',
+      few: '$count رحلات جانبية',
+      two: 'رحلتان جانبيتان',
+      one: 'رحلة جانبية واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_partOf(String name) {
+    return 'جزء من $name';
+  }
+
+  @override
+  String trips_fromSelection_name(String location, String monthYear) {
+    return '$location، $monthYear';
+  }
+
+  @override
+  String trips_fromSelection_nameNoLocation(String monthYear) {
+    return 'رحلة، $monthYear';
   }
 
   @override
@@ -51282,6 +51967,93 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_species_chipsLabel => 'وسوم الأنواع';
 
   @override
+  String get media_people_me => 'أنا';
+
+  @override
+  String get media_people_chipsLabel => 'وسوم الأشخاص';
+
+  @override
+  String media_people_momentChip(String name, String time) {
+    return '$name · $time';
+  }
+
+  @override
+  String get media_people_actionTooltip => 'وسم الأشخاص';
+
+  @override
+  String get media_people_tagModeHint => 'اضغط على شخص لوسمه';
+
+  @override
+  String get media_people_noSpotHint => 'لا يمكن تحديد موضع هنا';
+
+  @override
+  String get media_people_withoutSpot => 'وسم دون موضع';
+
+  @override
+  String get media_people_done => 'تم';
+
+  @override
+  String get media_people_pickerTitle => 'من هذا؟';
+
+  @override
+  String get media_people_searchHint => 'البحث عن رفاق';
+
+  @override
+  String get media_people_onThisDive => 'في هذه الغطسة';
+
+  @override
+  String get media_people_everyoneElse => 'الآخرون';
+
+  @override
+  String get media_people_newBuddy => 'رفيق جديد';
+
+  @override
+  String get media_people_newBuddyName => 'الاسم';
+
+  @override
+  String get media_people_newBuddyAdd => 'إضافة';
+
+  @override
+  String get media_people_changePerson => 'تغيير الشخص';
+
+  @override
+  String get media_people_removeTag => 'إزالة الوسم';
+
+  @override
+  String get media_people_resizeHint => 'اسحب الزوايا للضبط';
+
+  @override
+  String media_people_addToDiveOffer(String name) {
+    return 'هل تريد إضافة $name إلى رفاق هذه الغطسة؟';
+  }
+
+  @override
+  String get media_people_addToDiveAction => 'إضافة';
+
+  @override
+  String get media_people_buddyPhotosTitle => 'الصور ومقاطع الفيديو';
+
+  @override
+  String get media_people_buddyThumbnailLabel => 'صورة أو فيديو مع هذا الرفيق';
+
+  @override
+  String get media_people_filterSection => 'الأشخاص';
+
+  @override
+  String get media_people_removedBuddy => 'رفيق محذوف';
+
+  @override
+  String get media_people_saveFailed => 'تعذر حفظ الوسم. حاول مرة أخرى.';
+
+  @override
+  String get media_people_addToDiveFailed =>
+      'تعذرت إضافة الرفيق إلى هذه الغطسة. حاول مرة أخرى.';
+
+  @override
+  String get media_people_createBuddyFailed =>
+      'تعذر إنشاء الرفيق. حاول مرة أخرى.';
+
+  @override
   String get media_info_fileSection => 'الملف';
 
   @override
@@ -54260,6 +55032,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_dives_year => 'السنة';
 
   @override
+  String get query_dives_month => 'الشهر';
+
+  @override
+  String get query_dives_day => 'يوم الشهر';
+
+  @override
   String get query_entity_buddies => 'رفاق الغوص';
 
   @override
@@ -54534,6 +55312,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get query_trips_dives => 'الغطسات';
+
+  @override
+  String get query_trips_partOf => 'جزء من';
 
   @override
   String get query_trips_endDate => 'تاريخ الانتهاء';
@@ -56928,6 +57709,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get demo_enter_failed =>
       'تعذّر تنزيل السجل التجريبي. تحقّق من اتصالك وحاول مرة أخرى.';
+
+  @override
+  String get demo_enter_importRunning =>
+      'لا يزال الاستيراد قيد التشغيل. استكشف البيانات التجريبية بعد انتهائه.';
 
   @override
   String get demo_sealed_note => 'غير متاح في الوضع التجريبي';

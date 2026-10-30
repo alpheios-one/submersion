@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:path/path.dart' as p;
 import 'package:submersion/features/demo_mode/data/demo_date_columns.dart';
+import 'package:submersion/features/equipment/domain/constants/equipment_attribute_catalog.dart';
 
 /// The `diver_settings` columns that follow the user into demo mode, so the
 /// sample logbook reads in units and formats they already know.
@@ -37,49 +38,101 @@ class DemoUnitSettings {
 /// photo folder, applies the user's units, and drops device-local
 /// notification rows the app rebuilds itself.
 class DemoDatabasePreparer {
+  static const _trackTables = ['gps_tracks', 'nav_tracks'];
+
+  /// [onProgress] hears each step done, out of the total: one per date
+  /// column and per track table, one for the date attributes, then the
+  /// photos, units and notifications.
   Future<void> prepare(
     GeneratedDatabase db, {
     required DateTime now,
     required String photosDir,
     required String? deviceId,
     DemoUnitSettings? units,
+    void Function(int done, int total)? onProgress,
   }) async {
+    final columns = demoDateColumnsOf(db);
+    // The date columns, the track tables and the date attributes, then the
+    // photos, units and notifications.
+    final total = columns.length + _trackTables.length + 4;
+    var done = 0;
+    void step() => onProgress?.call(++done, total);
+
     await db.transaction(() async {
-      await _shiftDates(db, now);
+      await _shiftDates(db, now, columns, step);
       await _relinkPhotos(db, photosDir, deviceId);
+      step();
       if (units != null) await _applyUnits(db, units);
+      step();
       await db.customStatement('DELETE FROM scheduled_notifications');
+      step();
     });
   }
 
-  Future<void> _shiftDates(GeneratedDatabase db, DateTime now) async {
+  /// Steps through every column and track table even when nothing moves, so
+  /// the progress still reaches its total.
+  Future<void> _shiftDates(
+    GeneratedDatabase db,
+    DateTime now,
+    List<DemoDateColumn> columns,
+    void Function() step,
+  ) async {
+    final shift = await _shiftFor(db, now);
+    for (final c in columns) {
+      if (shift != Duration.zero) {
+        final amount = c.unit == DemoDateUnit.epochMillis
+            ? shift.inMilliseconds
+            : shift.inSeconds;
+        await db.customUpdate(
+          'UPDATE "${c.table}" SET "${c.column}" = "${c.column}" + ? '
+          'WHERE "${c.column}" IS NOT NULL',
+          variables: [Variable.withInt(amount)],
+        );
+      }
+      step();
+    }
+    for (final table in _trackTables) {
+      if (shift != Duration.zero) {
+        await _shiftTrackPoints(db, table, shift.inSeconds);
+      }
+      step();
+    }
+    if (shift != Duration.zero) {
+      await _shiftDateAttributes(db, shift.inMilliseconds);
+    }
+    step();
+  }
+
+  /// Equipment attributes of a date kind hold an instant in `value_num`,
+  /// unix milliseconds: a fitted part's install date, a cylinder's last
+  /// inspection. Custom attributes carry no kind and stay as they are.
+  Future<void> _shiftDateAttributes(GeneratedDatabase db, int millis) async {
+    final keys = EquipmentAttributeCatalog.dateKeys.toList()..sort();
+    await db.customUpdate(
+      'UPDATE equipment_attributes SET value_num = value_num + ? '
+      'WHERE is_custom = 0 AND value_num IS NOT NULL '
+      'AND attr_key IN (${List.filled(keys.length, '?').join(', ')})',
+      variables: [
+        Variable.withInt(millis),
+        for (final k in keys) Variable.withString(k),
+      ],
+    );
+  }
+
+  /// How far to move every instant: zero for a logbook without dives.
+  Future<Duration> _shiftFor(GeneratedDatabase db, DateTime now) async {
     final latest = await db
         .customSelect('SELECT MAX(dive_date_time) AS latest FROM dives')
         .getSingle();
     final latestMs = latest.read<int?>('latest');
-    if (latestMs == null) return;
+    if (latestMs == null) return Duration.zero;
 
     // Dive times are wall-clock times stored as UTC, so the date the app
     // shows is the UTC date, whatever the device's time zone.
-    final shift = demoShiftFor(
+    return demoShiftFor(
       latestDive: DateTime.fromMillisecondsSinceEpoch(latestMs, isUtc: true),
       now: now,
     );
-    if (shift == Duration.zero) return;
-
-    for (final c in demoDateColumnsOf(db)) {
-      final amount = c.unit == DemoDateUnit.epochMillis
-          ? shift.inMilliseconds
-          : shift.inSeconds;
-      await db.customUpdate(
-        'UPDATE "${c.table}" SET "${c.column}" = "${c.column}" + ? '
-        'WHERE "${c.column}" IS NOT NULL',
-        variables: [Variable.withInt(amount)],
-      );
-    }
-    for (final table in const ['gps_tracks', 'nav_tracks']) {
-      await _shiftTrackPoints(db, table, shift.inSeconds);
-    }
   }
 
   /// Track points are gzipped JSON arrays whose first element is the fix's

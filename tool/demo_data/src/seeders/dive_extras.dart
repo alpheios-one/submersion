@@ -40,7 +40,7 @@ class DiveExtras {
   ) async {
     final instructors = {
       for (final p in ctx.plan.people)
-        if (p.role == 'instructor') p.id,
+        if (p.role == PersonRole.instructor) p.id,
     };
     for (final person in d.buddyIds) {
       await _buddies.addBuddyToDiveWithRoles(id, ctx.buddyId(person), [
@@ -166,9 +166,11 @@ class DiveExtras {
     if (switches.isNotEmpty) await _dives.insertGasSwitches(switches);
 
     final computer =
-        ctx.computers[d.phase == StoryPhase.recreational && d.number < 130
-            ? 'rec'
-            : 'tech']!;
+        ctx.computers[d.diveMode == 'ccr' || d.tankCount > 1
+            ? 'tech'
+            : ctx.timeline.inUseOn('computer-ai', d.start)
+            ? 'ai'
+            : 'rec']!;
     await _dives.saveComputerReading(
       DiveDataSourcesCompanion.insert(
         id: 'demo-reading-$id',

@@ -18,7 +18,7 @@ import 'package:submersion/features/trips/domain/entities/trip_cylinder.dart';
 import 'package:submersion/features/trips/domain/entities/trip_cylinder_event.dart';
 import 'package:submersion/features/trips/domain/entities/trip_day_weather.dart';
 
-import '../story/story_plan.dart';
+import 'dive_kit.dart';
 import 'seed_context.dart';
 
 /// Every planned trip with its itinerary, daily weather, liveaboard details,
@@ -53,10 +53,8 @@ class TripSeeder implements DemoSeeder {
           startDate: t.start,
           endDate: t.end,
           location: t.destination.label,
-          liveaboardName: t.destination.liveaboard ? 'MV Coral Spirit' : null,
-          resortName: t.destination.liveaboard
-              ? null
-              : '${t.destination.label} Dive Lodge',
+          liveaboardName: t.boatName,
+          resortName: t.resortName,
           tripType: type,
           expectedDives: dives,
           divesPerDayTarget: t.destination.liveaboard ? 3 : 2,
@@ -66,7 +64,9 @@ class TripSeeder implements DemoSeeder {
         ),
       );
       await itinerary.regenerateForTrip(t.id, t.start, t.end, tripType: type);
-      final site = sitesById[t.siteIds.first]!;
+      // The site of the trip's first dive: a picked site may go undived.
+      final site =
+          sitesById[ctx.plan.dives.firstWhere((d) => d.tripId == t.id).siteId]!;
       for (
         var day = t.start;
         !day.isAfter(t.end);
@@ -100,7 +100,7 @@ class TripSeeder implements DemoSeeder {
           LiveaboardDetails(
             id: 'demo-liveaboard-${t.id}',
             tripId: t.id,
-            vesselName: 'MV Coral Spirit',
+            vesselName: t.boatName!,
             operatorName: '${t.destination.label} Liveaboards',
             vesselType: 'Motor yacht',
             cabinType: 'Lower deck twin',
@@ -109,12 +109,17 @@ class TripSeeder implements DemoSeeder {
             updatedAt: t.start,
           ),
         );
-        final cylId = 'demo-trip-cyl-${t.id}';
+      }
+      // A trip away rents its cylinders; near home the diver brings theirs.
+      final cylId = 'demo-trip-cyl-${t.id}';
+      if (!t.destination.nearHome) {
         await cylinders.createCylinder(
           TripCylinder(
             id: cylId,
             tripId: t.id,
-            label: 'Boat 12 L aluminium',
+            label: t.destination.liveaboard
+                ? 'Boat 12 L aluminium'
+                : 'Rental 12 L aluminium',
             volume: 11.1,
             workingPressure: 207,
             material: TankMaterial.aluminum,
@@ -139,12 +144,18 @@ class TripSeeder implements DemoSeeder {
           ),
         );
       }
-      final set =
-          ctx.plan.dives.firstWhere((d) => d.tripId == t.id).phase ==
-              StoryPhase.recreational
-          ? 'warm'
-          : 'tech';
-      await packing.pack(t.id, await _setItems(ctx, set));
+      // Packed: everything the trip's dives were dived with.
+      await packing.pack(t.id, [
+        ...{
+          for (final d in ctx.plan.dives.where((d) => d.tripId == t.id))
+            for (final k in kitFor(
+              d,
+              ctx.timeline,
+              photo: isPhotoDive(d, ctx.timeline),
+            ).gearKeys)
+              ctx.equipment[k]!,
+        },
+      ]);
     }
 
     // The trip being planned now: a liveaboard a few weeks out.

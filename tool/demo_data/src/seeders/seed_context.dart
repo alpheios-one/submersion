@@ -2,9 +2,13 @@ import 'dart:math';
 
 import 'package:submersion/core/database/database.dart';
 
+import '../shape/dive_shape.dart';
 import '../shape/reshaper.dart';
 import '../shape/shape_library.dart';
 import '../story/story_plan.dart';
+import 'gear_catalog.dart';
+import 'gear_faults.dart';
+import 'gear_timeline.dart';
 
 /// What every seeder shares while the demo logbook is written (issue #3708).
 ///
@@ -33,10 +37,20 @@ class DemoSeedContext {
   /// The photo files in [photosDir], with their credit lines.
   final List<DemoPhoto> photoFiles;
 
+  /// The names of the [photoFiles] the media seeder linked to a dive: the
+  /// ones the package carries.
+  final linkedPhotos = <String>{};
+
   static const diverId = 'demo-diver';
   static const partnerId = 'demo-partner';
 
   DateTime get anchor => plan.anchor;
+
+  /// When each piece of kit arrived and left.
+  late final GearTimeline timeline = GearTimeline(plan, demoGear);
+
+  /// What goes wrong with the kit, and on which dives.
+  late final FaultPlan faults = planFaults(plan, timeline);
 
   String diveId(int number) => 'demo-dive-${number.toString().padLeft(4, '0')}';
 
@@ -63,6 +77,12 @@ class DemoSeedContext {
 
   /// Species ids by common name, after the built-in species are seeded.
   final species = <String, String>{};
+
+  /// The kinds of the shape each dive was written from.
+  final pickedKinds = <int, Set<ShapeKind>>{};
+
+  /// The profile each scooter dive was written with, for its route.
+  final scooterProfiles = <int, List<ShapeSample>>{};
 
   /// Planned dive number to the shape and tank ids it was written with.
   final diveTankIds = <int, List<String>>{};

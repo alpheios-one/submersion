@@ -26,14 +26,19 @@ class _ScriptedController extends DemoEnterController {
     starts++;
     lastPackage = package;
     state = const DemoEnterRunning(
-      DemoEnterProgress(DemoEnterStage.downloading, received: 50, total: 100),
+      DemoEnterProgress(DemoEnterStage.downloading, done: 50, total: 100),
     );
   }
 
   @override
   void cancel() => cancels++;
 
+  void progress(DemoEnterProgress progress) =>
+      state = DemoEnterRunning(progress);
+
   void fail() => state = const DemoEnterFailed(DemoDownloadFailure.network);
+
+  void refuseForImport() => state = const DemoEnterImportRunning();
 
   void changeSize(DemoPackage package) =>
       state = DemoEnterPackageChanged(package);
@@ -175,7 +180,31 @@ void main() {
     final bar = tester.widget<LinearProgressIndicator>(
       find.byType(LinearProgressIndicator),
     );
-    expect(bar.value, 0.5);
+    expect(bar.value, DemoEnterStage.downloading.end / 2);
+  });
+
+  testWidgets('the bar shows real progress at every stage, never a sweep', (
+    tester,
+  ) async {
+    await open(tester);
+    double? barValue() => tester
+        .widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator))
+        .value;
+
+    for (final (progress, label) in const [
+      (DemoEnterProgress(DemoEnterStage.downloading), 'Downloading'),
+      (
+        DemoEnterProgress(DemoEnterStage.preparing, done: 1, total: 2),
+        'Preparing',
+      ),
+      (DemoEnterProgress(DemoEnterStage.opening, done: 3, total: 4), 'Opening'),
+    ]) {
+      controller.progress(progress);
+      await tester.pump();
+
+      expect(find.textContaining(label), findsOneWidget);
+      expect(barValue(), progress.fraction);
+    }
   });
 
   testWidgets('a failure shows the message and Retry starts again', (
@@ -197,6 +226,28 @@ void main() {
     await tester.pump();
 
     expect(controller.starts, 2);
+  });
+
+  testWidgets('a running import asks to wait, and Close leaves everything '
+      'as it was', (tester) async {
+    await open(tester);
+    controller.refuseForImport();
+    await tester.pump();
+
+    expect(
+      find.text(
+        'An import is still running. Explore with sample data once it '
+        'has finished.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Retry'), findsNothing);
+
+    await tester.tap(find.text('Close'));
+    await tester.pumpAndSettle();
+
+    expect(controller.cancels, 1);
+    expect(find.byType(DemoEnterDialog), findsNothing);
   });
 
   testWidgets('Cancel stops the download and closes the dialog', (

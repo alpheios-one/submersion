@@ -1,3 +1,4 @@
+import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/dive_roles/data/repositories/dive_role_repository.dart';
@@ -5,7 +6,9 @@ import 'package:submersion/features/divers/data/repositories/diver_repository.da
 import 'package:submersion/features/divers/data/repositories/diver_weight_entry_repository.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/divers/domain/entities/diver_weight_entry.dart';
+import 'package:submersion/features/settings/data/repositories/diver_settings_repository.dart';
 
+import '../story/story_plan.dart';
 import 'seed_context.dart';
 
 /// The demo diver, a second profile (their regular buddy, so the profile
@@ -30,7 +33,9 @@ class DiverSeeder implements DemoSeeder {
         email: 'alex.rivera@example.com',
         phone: '+1 555 0100',
         isDefault: true,
-        notes: 'Started in the lakes, hooked on wrecks, now on a rebreather.',
+        notes:
+            'Learned in the Caribbean, hooked on Jersey wrecks, now on a '
+            'rebreather.',
         emergencyContact: const EmergencyContact(
           name: 'Robin Rivera',
           phone: '+1 555 0199',
@@ -60,6 +65,28 @@ class DiverSeeder implements DemoSeeder {
     await divers.setDefaultDiver(DemoSeedContext.diverId);
     await divers.setActiveDiverIdInSettings(DemoSeedContext.diverId);
 
+    // A New Jersey diver logs in feet, Fahrenheit, psi, pounds and cubic
+    // feet, with 12-hour times and month-first dates.
+    final settings = DiverSettingsRepository();
+    final current = await settings.getOrCreateSettingsForDiver(
+      DemoSeedContext.diverId,
+    );
+    await settings.updateSettingsForDiver(
+      DemoSeedContext.diverId,
+      current.copyWith(
+        depthUnit: DepthUnit.feet,
+        temperatureUnit: TemperatureUnit.fahrenheit,
+        pressureUnit: PressureUnit.psi,
+        volumeUnit: VolumeUnit.cubicFeet,
+        weightUnit: WeightUnit.pounds,
+        altitudeUnit: AltitudeUnit.feet,
+        distanceUnit: DistanceUnit.miles,
+        timeFormat: TimeFormat.twelveHour,
+        dateFormat: DateFormatPreference.mmmDYYYY,
+      ),
+      previous: current,
+    );
+
     final weights = DiverWeightEntryRepository();
     for (var i = 0; i < 6; i++) {
       final at = DateTime(firstDive.year + i, firstDive.month, 3);
@@ -84,20 +111,23 @@ class DiverSeeder implements DemoSeeder {
           diverId: DemoSeedContext.diverId,
           name: person.name,
           email:
-              '${person.firstName.toLowerCase()}.${person.lastName.toLowerCase().replaceAll(RegExp('[^a-z]'), '')}@example.com',
+              '${_local(person.firstName)}.${_local(person.lastName)}@example.com',
           certificationLevel: switch (person.role) {
-            'instructor' => 'Instructor',
-            'guide' => 'Divemaster',
-            _ => 'Advanced Open Water',
+            PersonRole.instructor => 'Instructor',
+            PersonRole.guide => 'Divemaster',
+            PersonRole.techTeam => 'Normoxic Trimix',
+            PersonRole.regular || PersonRole.boatBuddy => 'Advanced Open Water',
           },
           isFavorite: person.id == 'p-mara',
           linkedDiverId: person.id == 'p-mara'
               ? DemoSeedContext.partnerId
               : null,
           notes: switch (person.role) {
-            'instructor' => 'Taught one of the courses.',
-            'guide' => 'Guide on several trips.',
-            _ => '',
+            PersonRole.instructor => 'Taught one of the courses.',
+            PersonRole.guide => 'Guided a trip.',
+            PersonRole.techTeam => 'Technical team.',
+            PersonRole.boatBuddy => 'Met on a trip.',
+            PersonRole.regular => '',
           },
           createdAt: created,
           updatedAt: ctx.anchor,
@@ -110,6 +140,10 @@ class DiverSeeder implements DemoSeeder {
       diverId: DemoSeedContext.diverId,
     );
   }
+
+  /// A name as the local part of an email address: lower case, letters only.
+  static String _local(String name) =>
+      name.toLowerCase().replaceAll(RegExp('[^a-z]'), '');
 
   static DateTime _days(DateTime from, int days) =>
       DateTime(from.year, from.month, from.day + days);

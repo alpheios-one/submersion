@@ -16,6 +16,8 @@ import 'package:submersion/features/demo_mode/data/demo_paths.dart';
 import 'package:submersion/features/demo_mode/data/demo_state_store.dart';
 import 'package:submersion/features/demo_mode/domain/demo_manifest.dart';
 import 'package:submersion/features/demo_mode/presentation/providers/demo_mode_providers.dart';
+import 'package:submersion/features/dive_computer/domain/entities/downloaded_dive.dart';
+import 'package:submersion/features/import_wizard/presentation/providers/import_job_provider.dart';
 import 'package:submersion/features/media/data/services/local_thumbnail_cache.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -118,6 +120,7 @@ void main() {
       DemoDownloader downloader, {
       String? failOpenOf,
       DemoManifestClient? manifest,
+      bool importRunning = false,
     }) async {
       final client = manifest ?? FakeManifestClient(testPackage);
       SharedPreferences.setMockInitialValues({});
@@ -144,6 +147,7 @@ void main() {
         deviceId: () => null,
         cancelDeviceNotifications: () async {},
         restart: () {},
+        importRunning: () => importRunning,
       );
       final container = ProviderContainer(
         overrides: [
@@ -270,6 +274,22 @@ void main() {
       expect(await container.read(demoAvailabilityProvider.future), bigger);
     });
 
+    test('a running import ends on its own message, not failed', () async {
+      final container = await containerWith(
+        FakeDownloader(),
+        importRunning: true,
+      );
+
+      await container
+          .read(demoEnterControllerProvider.notifier)
+          .start(fromFirstRun: false, package: testPackage);
+
+      expect(
+        container.read(demoEnterControllerProvider),
+        isA<DemoEnterImportRunning>(),
+      );
+    });
+
     test('a successful entry ends running, not failed', () async {
       final container = await containerWith(FakeDownloader());
 
@@ -281,6 +301,33 @@ void main() {
         container.read(demoEnterControllerProvider),
         isA<DemoEnterRunning>(),
       );
+    });
+  });
+
+  group('dives being written', () {
+    test('an import job running counts', () {
+      expect(divesBeingWritten(importJobRunning: true), isTrue);
+    });
+
+    test('a dive computer download counts until its dives are saved', () {
+      for (final phase in DownloadPhase.values) {
+        expect(
+          divesBeingWritten(importJobRunning: false, diveComputerPhase: phase),
+          switch (phase) {
+            DownloadPhase.connecting ||
+            DownloadPhase.pinRequired ||
+            DownloadPhase.enumerating ||
+            DownloadPhase.downloading ||
+            DownloadPhase.processing => isTrue,
+            _ => isFalse,
+          },
+          reason: phase.name,
+        );
+      }
+    });
+
+    test('nothing running, or no download ever started, does not', () {
+      expect(divesBeingWritten(importJobRunning: false), isFalse);
     });
   });
 
@@ -319,6 +366,22 @@ void main() {
 
       expect(service.paths.root, p.join(support.path, 'demo_mode'));
       expect(removed, [photo]);
+    });
+
+    test('the service sees an import the import job is running', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final container = ProviderContainer(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          importJobProvider.overrideWith(_RunningImportJob.new),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final service = await container.read(demoModeServiceProvider.future);
+
+      expect(service.importRunning!(), isTrue);
     });
 
     test('the exit action leaves demo mode through the service', () async {
@@ -391,4 +454,9 @@ class _RecordingThumbnails extends LocalThumbnailCache {
 
   @override
   Future<void> removePath(String path) async => removed.add(path);
+}
+
+class _RunningImportJob extends ImportJobNotifier {
+  @override
+  ImportJobState build() => const ImportJobState(isRunning: true);
 }

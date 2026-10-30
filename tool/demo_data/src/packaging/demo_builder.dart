@@ -22,6 +22,7 @@ import '../checks/public_vocabulary.dart';
 import '../seeders/demo_seeding.dart';
 import '../seeders/seed_context.dart';
 import '../shape/dive_shape.dart';
+import '../shape/shape_budget.dart';
 import '../shape/shape_library.dart';
 import '../story/catalog.dart';
 import '../story/story_planner.dart';
@@ -47,8 +48,8 @@ class DemoBuildOutput {
 /// real dive, and packages the database with its photos for the `demo-data`
 /// release.
 class DemoBuilder {
-  static const maxDatabaseZipBytes = 5 * 1024 * 1024;
-  static const maxPackageBytes = 15 * 1024 * 1024;
+  static const maxDatabaseZipBytes = 12 * 1024 * 1024;
+  static const maxPackageBytes = 28 * 1024 * 1024;
   static const releaseBase =
       'https://github.com/submersion-app/submersion/releases/download/demo-data';
 
@@ -63,6 +64,7 @@ class DemoBuilder {
     Set<String>? sourceStringHashes,
     String? salt,
     List<DemoSeeder>? seeders,
+    Set<String> refusedNames = const {},
   }) async {
     final work = Directory.systemTemp.createTempSync('demo_pack');
     try {
@@ -72,10 +74,22 @@ class DemoBuilder {
       );
       DatabaseService.instance.setTestDatabase(db);
       final catalog = Catalog.load(catalogDir);
+      final plan = StoryPlanner(
+        Random(seed),
+        catalog,
+        refusedNames: refusedNames,
+      ).plan(anchor: anchor);
+      final library = ShapeLibrary(shapes, Random(seed));
+      final short = shapeShortfalls(plan, library.shapes);
+      if (short.isNotEmpty) {
+        await db.close();
+        DatabaseService.instance.resetForTesting();
+        throw DemoBuildRefused('not enough dive shapes: ${short.join('; ')}');
+      }
       final ctx = DemoSeedContext(
         db: db,
-        plan: StoryPlanner(Random(seed), catalog).plan(anchor: anchor),
-        library: ShapeLibrary(shapes, Random(seed)),
+        plan: plan,
+        library: library,
         random: Random(seed),
         photosDir: photosDir,
         photoFiles: photos,
@@ -136,6 +150,7 @@ class DemoBuilder {
       final archive = Archive()
         ..addFile(ArchiveFile.bytes('submersion_demo.db', dbBytes));
       for (final photo in photos) {
+        if (!ctx.linkedPhotos.contains(photo.fileName)) continue;
         archive.addFile(
           ArchiveFile.bytes(
             'photos/${photo.fileName}',

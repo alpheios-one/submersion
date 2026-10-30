@@ -634,10 +634,72 @@ extension RungsFromV231 on AppDatabase {
     if (from < 318) await _moveComputerTissueScalars();
     if (from < 318) await reportProgress();
 
+    // v319: per-O2-band deco ppO2 limits and the explicit MOD for 100% O2
+    // (issue #3580), Dive Planner only. diver_settings gains the toggles
+    // and band/depth values; dive_plans gains the matching per-plan
+    // overrides. Column only, both off by default; re-asserted in
+    // beforeOpen, which also covers a database already at 320.
+    if (from < 319) await _assertPpO2DecoBandColumns();
+    if (from < 319) await reportProgress();
+
     // v320: the device-local nearby_peers table and the publish state's
     // relay floor (issue #3731). 319 is held
     // by PR #3726.
     if (from < 320) await _assertNearbySchema();
     if (from < 320) await reportProgress();
+
+    // v321: per-plan "explicitly off" flags for the bands and the
+    // explicit-depth override (issue #3580), so a plan can force either off
+    // regardless of the diver's Settings toggle. Column only, both off by
+    // default; re-asserted in beforeOpen, which also covers a database
+    // already at 323 (v321 and v322 sit below main's v323).
+    if (from < 321) await _assertPpO2DecoBandsExplicitlyOffColumns();
+    if (from < 321) await reportProgress();
+
+    // v322: hypercapnia-bailout phase for OC bailout during a CCR/SCR dive
+    // (issue #3743). diver_settings gains the toggle/factor/duration;
+    // dive_plans gains the matching per-plan overrides and "explicitly
+    // off" flag. Column only, both off by default; re-asserted in
+    // beforeOpen.
+    if (from < 322) await _assertHypercapniaBailoutColumns();
+    if (from < 322) await reportProgress();
+
+    // v323: diver_settings list arrangement columns and their sync clock
+    // (issue #3748); re-asserted in beforeOpen. 321 and 322 are held by
+    // PR #3726.
+    if (from < 323) await _assertListArrangementColumns();
+    if (from < 323) await reportProgress();
+
+    // v324: buddy card swap columns on buddies, certifications and divers
+    // (issue #3728).
+    if (from < 324) await _assertBuddyCardColumns();
+    if (from < 324) await reportProgress();
+
+    // v325: trips.parent_trip_id, the larger trip a side trip is part of
+    // (issue #3658). Column and index only, no backfill; re-asserted in
+    // beforeOpen. Renumbered from 323, which #3748 shipped first; #3728
+    // then shipped 324.
+    if (from < 325) await _assertTripParentColumn();
+    if (from < 325) await reportProgress();
+
+    // v326: people tagged on photos and videos (issue #1745). Table-only
+    // rung, no backfill; re-asserted in beforeOpen. Renumbered from 323 and
+    // 324, which #3748 and #3728 took; 325 is #3786's; 319, 321 and 322 are
+    // held by PR #3726.
+    if (from < 326) await _assertMediaPeopleSchema();
+    if (from < 326) await reportProgress();
+
+    // v327: adds the `pp_o2_*` deco band columns Drift reads and drops the
+    // ones the v319 and v321 rungs first added spelled `ppo2_*` (issue
+    // #3809). Every database that carries the misspelling is at v326 or
+    // below, so the drop runs once. The adds are also re-asserted in
+    // beforeOpen, but the rung does not lean on that: anything that reads
+    // these tables through Drift between here and the backstop would fail.
+    if (from < 327) {
+      await _assertPpO2DecoBandColumns();
+      await _assertPpO2DecoBandsExplicitlyOffColumns();
+      await _dropMisspelledPpO2DecoBandColumns();
+    }
+    if (from < 327) await reportProgress();
   }
 }

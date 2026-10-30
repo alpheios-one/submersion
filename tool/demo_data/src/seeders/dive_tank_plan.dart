@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:submersion/core/constants/enums.dart';
 
 import '../shape/dive_shape.dart';
+import '../story/course_plan.dart';
 import '../story/story_plan.dart';
 
 /// One cylinder a demo dive is breathed from.
@@ -33,25 +34,27 @@ class PlannedTank {
 
 /// Chooses a dive's cylinders: the gases follow the diver's certifications
 /// (air until the nitrox card, then nitrox on shallower dives), the sizes
-/// follow the place (rental aluminium on trips, the diver's own steel at
-/// home), and technical and rebreather dives keep the gas plan of the real
+/// follow the place (rental aluminium 80s on trips, the diver's own steel
+/// HP100 at home), and technical and rebreather dives keep the gas plan of the real
 /// dive their shape came from.
 List<PlannedTank> planTanks(PlannedDive d, DiveShape shape, Random random) {
-  final home = d.destination.key == 'home';
+  final home = d.destination.key == 'home' || d.destination.nearHome;
   if (d.phase == StoryPhase.recreational ||
       shape.tanks.length <= 1 && d.diveMode == 'oc') {
     final nitrox =
-        d.number >= 30 && d.targetMaxDepth <= 30 && random.nextDouble() < 0.6;
+        d.number >= nitroxDive &&
+        d.targetMaxDepth <= 30 &&
+        random.nextDouble() < 0.6;
     return [
       PlannedTank(
         o2: nitrox ? 32 : 21,
         he: 0,
         role: TankRole.backGas,
-        volumeL: home ? 12 : 11.1,
-        workingBar: home ? 232 : 207,
-        startBar: home ? 220 : 200,
+        volumeL: home ? 12.9 : 11.1,
+        workingBar: home ? 237.3 : 207,
+        startBar: home ? 227.5 : 200,
         material: home ? TankMaterial.steel : TankMaterial.aluminum,
-        presetName: home ? null : 'al80',
+        presetName: home ? 'hp100' : 'al80',
       ),
     ];
   }
@@ -85,20 +88,28 @@ List<PlannedTank> planTanks(PlannedDive d, DiveShape shape, Random random) {
     ];
   }
   final bottomO2 = shape.tanks.first.o2;
+  // A trimix dive breathes trimix whatever the source shape carried: real
+  // open-circuit trimix shapes are scarce, so deep deco shapes stand in.
+  final trimix =
+      d.targetMaxDepth > 45 &&
+      (d.requiresCert == CertLevel.trimix || d.courseId == 'course-trimix');
+  final (o2, he) = trimix
+      ? (d.targetMaxDepth > 60 ? (18.0, 45.0) : (21.0, 35.0))
+      : (shape.tanks.first.o2, shape.tanks.first.he);
   return [
     for (var i = 0; i < shape.tanks.length; i++)
       PlannedTank(
-        o2: shape.tanks[i].o2,
-        he: shape.tanks[i].he,
+        o2: i == 0 ? o2 : shape.tanks[i].o2,
+        he: i == 0 ? he : shape.tanks[i].he,
         role: i == 0
             ? TankRole.backGas
             : _specificRole(shape.tanks[i].role) ??
                   (shape.tanks[i].o2 > bottomO2
                       ? TankRole.deco
                       : TankRole.stage),
-        volumeL: i == 0 ? 24 : 7,
-        workingBar: i == 0 ? 232 : 207,
-        startBar: i == 0 ? 220 : 200,
+        volumeL: i == 0 ? 25.8 : 5.7,
+        workingBar: i == 0 ? 237.3 : 207,
+        startBar: i == 0 ? 227.5 : 200,
         material: i == 0 ? TankMaterial.steel : TankMaterial.aluminum,
       ),
   ];

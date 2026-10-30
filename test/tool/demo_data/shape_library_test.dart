@@ -130,4 +130,82 @@ void main() {
     expect(shape.durationSec, lessThanOrEqualTo(2400 + 120));
     expect(shape.tanks.single.pressures.last.$1, lessThanOrEqualTo(2400 + 120));
   });
+
+  test('a dive wanting one kind takes a shape without extra kinds first', () {
+    final library = ShapeLibrary(syntheticShapes(), Random(3));
+
+    for (var i = 0; i < 30; i++) {
+      final s = library.pick(
+        kinds: const {ShapeKind.multiGasDeco},
+        diveMode: 'oc',
+        targetMaxDepth: 45,
+      );
+      expect(s.kinds, isNot(contains(ShapeKind.deepOpenCircuit)));
+    }
+  });
+
+  test('a shape that reaches the planned depth comes before fewer extra '
+      'kinds', () {
+    DiveShape deco(String id, Set<ShapeKind> kinds, double depth) => DiveShape(
+      id: id,
+      kinds: kinds,
+      diveMode: 'oc',
+      sampleIntervalSec: 60,
+      samples: [
+        const ShapeSample(t: 0, depth: 0),
+        ShapeSample(t: 600, depth: depth),
+        ShapeSample(t: 2400, depth: depth),
+        const ShapeSample(t: 2700, depth: 0),
+      ],
+      tanks: const [],
+    );
+    final library = ShapeLibrary([
+      deco('shallow', {ShapeKind.multiGasDeco}, 20),
+      deco('deep', {ShapeKind.multiGasDeco, ShapeKind.deepOpenCircuit}, 42),
+    ], Random(1));
+
+    final s = library.pick(
+      kinds: const {ShapeKind.multiGasDeco},
+      diveMode: 'oc',
+      targetMaxDepth: 42,
+    );
+
+    expect(s.id, 'deep');
+  });
+
+  test('a rebreather shape reaches 0.7 of its depth, open circuit 0.85', () {
+    DiveShape at(String mode, double depth) => DiveShape(
+      id: mode,
+      kinds: const {},
+      diveMode: mode,
+      sampleIntervalSec: 60,
+      samples: [
+        const ShapeSample(t: 0, depth: 0),
+        ShapeSample(t: 600, depth: depth),
+        const ShapeSample(t: 1200, depth: 0),
+      ],
+      tanks: const [],
+    );
+
+    expect(ShapeLibrary.reaches(at('ccr', 47.2), 33.1), isTrue);
+    expect(ShapeLibrary.reaches(at('ccr', 47.2), 32.9), isFalse);
+    expect(ShapeLibrary.reaches(at('oc', 47.2), 33.1), isFalse);
+    expect(ShapeLibrary.reaches(at('oc', 47.2), 40.2), isTrue);
+  });
+
+  test('no shape of the wanted kinds for a technical dive is an error', () {
+    final library = ShapeLibrary([
+      for (final s in syntheticShapes())
+        if (s.kinds.contains(ShapeKind.recreational)) s,
+    ], Random(4));
+
+    expect(
+      () => library.pick(
+        kinds: const {ShapeKind.multiGasDeco},
+        diveMode: 'oc',
+        targetMaxDepth: 45,
+      ),
+      throwsStateError,
+    );
+  });
 }

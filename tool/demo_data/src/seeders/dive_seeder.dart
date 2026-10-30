@@ -2,21 +2,33 @@ import 'dart:math';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/util/wall_clock_utc.dart';
+import 'package:submersion/features/cylinder_passports/data/repositories/cylinder_fill_repository.dart';
+import 'package:submersion/features/cylinder_passports/data/repositories/cylinder_passport_repository.dart';
+import 'package:submersion/features/cylinder_passports/domain/entities/cylinder_fill.dart';
+import 'package:submersion/features/dive_centers/domain/entities/dive_center.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_repository.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_custom_field.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_weight.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
-import 'package:submersion/features/equipment/domain/entities/gear_provenance.dart';
+import 'package:submersion/features/equipment/data/repositories/equipment_component_repository.dart';
+import 'package:submersion/features/equipment/domain/services/components_index.dart';
+import 'package:submersion/features/equipment/domain/services/gear_expander.dart';
 import 'package:submersion/features/tags/domain/entities/tag.dart';
+import 'package:submersion/features/transmitters/data/repositories/transmitter_repository.dart';
 
 import '../shape/dive_shape.dart';
 import '../story/destination_life.dart';
 import '../story/story_plan.dart';
 import 'dive_extras.dart';
+import 'dive_kit.dart';
 import 'dive_tank_plan.dart';
+import 'fault_signals.dart';
+import 'gear_cylinder_seeder.dart';
+import 'gear_seeder.dart';
 import 'seed_context.dart';
+import 'water_column.dart';
 
 /// Every planned dive, written through the app's own repository: a real
 /// dive's shape, reshaped onto this dive's tanks and place.
@@ -31,6 +43,12 @@ class DiveSeeder implements DemoSeeder {
     final extras = DiveExtras(ctx);
     final sites = {for (final s in ctx.plan.sites) s.id: s};
     final trips = {for (final t in ctx.plan.trips) t.id: t};
+    final centers = {for (final c in ctx.plan.centers) c.id: c};
+    final index = ComponentsIndex.fromRows(
+      await EquipmentComponentRepository().getAllComponents(),
+    );
+    final keyOf = {for (final e in ctx.equipment.entries) e.value: e.key};
+    final faults = ctx.faults;
 
     for (final d in ctx.plan.dives) {
       final source = ctx.library.pick(
@@ -39,6 +57,7 @@ class DiveSeeder implements DemoSeeder {
         targetMaxDepth: d.targetMaxDepth,
         tripId: d.tripId,
       );
+      ctx.pickedKinds[d.number] = source.kinds;
       final tanks = planTanks(d, source, ctx.random);
       final trimmed = DiveShape(
         id: source.id,
@@ -55,8 +74,21 @@ class DiveSeeder implements DemoSeeder {
         startBar: [for (final t in tanks) t.startBar],
         volumesL: [for (final t in tanks) t.volumeL],
       );
-      final shift = _temperatureShift(shape, d, ctx.random);
+      final water = WaterColumn.forDive(
+        d.destination,
+        d.waterTempC,
+        ctx.random,
+      );
+      final temps = water.trace(shape.samples, ctx.random);
+      if (d.scooter) ctx.scooterProfiles[d.number] = shape.samples;
       final id = ctx.diveId(d.number);
+      final kit = kitFor(d, ctx.timeline, photo: isPhotoDive(d, ctx.timeline));
+      // Each cell's output per bar; the swapped-in cell 2 is new and strong.
+      final gains = [
+        50.0,
+        ctx.timeline.inUseOn('o2-cell-2b', d.start) ? 53.0 : 47.0,
+        49.0,
+      ];
       final tankIds = [
         for (var i = 0; i < tanks.length; i++) 'demo-tank-${d.number}-$i',
       ];
@@ -97,30 +129,47 @@ class DiveSeeder implements DemoSeeder {
               material: tanks[i].material,
               presetName: tanks[i].presetName,
               order: i,
+              regulatorEquipmentId: _regulatorFor(ctx, kit.gearKeys, tanks, i),
+              extraRegulatorIds: [
+                if (i == 0 && kit.gearKeys.contains('reg-left'))
+                  ctx.equipment['reg-left']!,
+              ],
+              transmitterSerial: _transmitterFor(ctx, kit.gearKeys, d, i),
             ),
         ],
         profile: [
-          for (final s in shape.samples)
-            DiveProfilePoint(
-              timestamp: s.t,
-              depth: s.depth,
-              temperature: s.temp == null ? null : s.temp! + shift,
-              heartRate: s.heartRate,
-              ppO2: s.ppO2,
-              setpoint: s.setpoint,
-              o2Sensor1: s.cells != null && s.cells!.isNotEmpty
-                  ? s.cells![0]
-                  : null,
-              o2Sensor2: s.cells != null && s.cells!.length > 1
-                  ? s.cells![1]
-                  : null,
-              o2Sensor3: s.cells != null && s.cells!.length > 2
-                  ? s.cells![2]
-                  : null,
+          for (final (i, s) in shape.samples.indexed)
+            _point(
+              s,
+              temps[i],
+              cellReadings(
+                s.cells,
+                s.t / max(1, shape.durationSec),
+                drifting2: faults.cellDriftDives.contains(d.number),
+                divergent3: faults.divergentCellDives.contains(d.number),
+              ),
+              gains,
             ),
         ],
-        weights: _weights(d, id),
-        tags: _tags(ctx, d),
+        weights: [
+          for (var i = 0; i < kit.weights.length; i++)
+            DiveWeight(
+              id: 'demo-weight-$id-$i',
+              diveId: id,
+              weightType: kit.weights[i].weightType,
+              amountKg: kit.weights[i].amountKg,
+              label: kit.weights[i].label,
+            ),
+        ],
+        diveCenter: d.centerId == null
+            ? null
+            : DiveCenter(
+                id: ctx.centerId(d.centerId!),
+                name: centers[d.centerId]!.name,
+                createdAt: d.start,
+                updatedAt: d.start,
+              ),
+        tags: _tags(ctx, d, photo: isPhotoDive(d, ctx.timeline)),
         diveTypeIds: _types(d, trip),
         diverRoleIds: [d.courseId != null ? 'student' : 'buddy'],
         courseIds: [if (d.courseId != null) d.courseId!],
@@ -129,12 +178,15 @@ class DiveSeeder implements DemoSeeder {
             DiveCustomField(
               id: 'demo-field-$id',
               key: 'Boat',
-              value: 'MV Coral Spirit',
+              value: trip.boatName ?? '',
               sortOrder: 0,
             ),
         ],
-        waterTemp: _minTemp(shape) == null ? null : _minTemp(shape)! + shift,
-        airTemp: (d.destination.waterTempC.$2 + ctx.between(0, 6))
+        waterTemp: temps.reduce(min),
+        // Air follows the surface water through the seasons, not the cold
+        // bottom water a stratified sea is quoted for; in the tropics it is
+        // a little warmer than the sea.
+        airTemp: (water.surfaceC + ctx.between(_seasonal(d) ? -3 : 0, 5))
             .roundToDouble(),
         visibilityMeters:
             (d.destination.freshwater
@@ -150,9 +202,7 @@ class DiveSeeder implements DemoSeeder {
             ? CurrentDirection.values[ctx.random.nextInt(8)]
             : null,
         waterType: salt ? WaterType.salt : WaterType.fresh,
-        entryMethod: d.destination.key == 'home'
-            ? EntryMethod.shore
-            : EntryMethod.backRoll,
+        entryMethod: d.boat ? EntryMethod.backRoll : EntryMethod.shore,
         diveMode: d.diveMode == 'ccr' ? DiveMode.ccr : DiveMode.oc,
         setpointLow: d.diveMode == 'ccr' ? 0.7 : null,
         setpointHigh: d.diveMode == 'ccr' ? 1.3 : null,
@@ -179,24 +229,49 @@ class DiveSeeder implements DemoSeeder {
           bottomTime: dive.calculateBottomTimeFromProfile() ?? runtime,
         ),
       );
-      await dives.replaceGearRows(id, [
-        for (final e in await _gear(ctx, d))
-          GearProvenance(
-            equipmentId: e,
-            viaSetId: ctx.equipmentSets[_setFor(d)],
-          ),
-      ]);
+      final setItems = demoSets[kit.setKey]?.$2 ?? const <String>[];
+      await dives.replaceGearRows(
+        id,
+        GearExpander.expand(
+          additions: [
+            for (final k in kit.gearKeys)
+              (
+                equipmentId: ctx.equipment[k]!,
+                viaSetId: setItems.contains(k)
+                    ? ctx.equipmentSets[kit.setKey]
+                    : null,
+              ),
+          ],
+          index: index,
+          existing: const [],
+          isActive: (e) => ctx.timeline.inUseOn(keyOf[e]!, d.start),
+        ),
+      );
       await pressures.insertTankPressures(id, {
         for (var i = 0; i < tanks.length; i++)
           if (shape.tanks[i].pressures.isNotEmpty)
             tankIds[i]: [
-              for (final (t, bar) in shape.tanks[i].pressures)
+              for (final (t, bar)
+                  in i == 0 && faults.dropoutDives.contains(d.number)
+                      ? withDropouts(
+                          shape.tanks[i].pressures,
+                          gapFraction: 0.15,
+                          random: ctx.random,
+                        )
+                      : shape.tanks[i].pressures)
                 (timestamp: t, pressure: bar),
             ],
       });
+      await _fills(ctx, d, kit.gearKeys, tanks);
       await extras.write(d, id, shape, tanks, tankIds);
     }
     await extras.finish();
+    // The registry links every tank a configured transmitter read to that
+    // transmitter's cylinder, as it does after an import.
+    final transmitters = TransmitterRepository();
+    for (final t in await transmitters.getForDiver(DemoSeedContext.diverId)) {
+      await transmitters.applyToExistingDives(t);
+    }
   }
 
   /// The source's tanks lined up with the planned ones: one per planned tank,
@@ -215,23 +290,6 @@ class DiveSeeder implements DemoSeeder {
             ),
   ];
 
-  static double? _minTemp(DiveShape s) {
-    final temps = [
-      for (final x in s.samples)
-        if (x.temp != null) x.temp!,
-    ];
-    return temps.isEmpty ? null : temps.reduce(min);
-  }
-
-  /// Moves the shape's temperatures to the destination's water.
-  static double _temperatureShift(DiveShape s, PlannedDive d, Random random) {
-    final coldest = _minTemp(s);
-    if (coldest == null) return 0;
-    final (lo, hi) = d.destination.waterTempC;
-    final target = lo + random.nextDouble() * (hi - lo);
-    return ((target - coldest) * 10).roundToDouble() / 10;
-  }
-
   static double _avg(DiveShape s) {
     final under = [
       for (final x in s.samples)
@@ -242,29 +300,11 @@ class DiveSeeder implements DemoSeeder {
         10;
   }
 
-  static List<DiveWeight> _weights(PlannedDive d, String id) {
-    if (d.phase != StoryPhase.recreational) return const [];
-    final home = d.destination.key == 'home';
-    return [
-      DiveWeight(
-        id: 'demo-weight-$id',
-        diveId: id,
-        weightType: WeightType.belt,
-        amountKg: home ? 6 : 4,
-        label: 'Belt',
-      ),
-      if (home)
-        DiveWeight(
-          id: 'demo-weight-$id-trim',
-          diveId: id,
-          weightType: WeightType.trimWeights,
-          amountKg: 2,
-          label: 'Trim',
-        ),
-    ];
-  }
-
-  static List<Tag> _tags(DemoSeedContext ctx, PlannedDive d) {
+  static List<Tag> _tags(
+    DemoSeedContext ctx,
+    PlannedDive d, {
+    required bool photo,
+  }) {
     Tag tag(String name) => Tag(
       id: ctx.tags[name]!,
       name: name,
@@ -273,7 +313,7 @@ class DiveSeeder implements DemoSeeder {
     );
     return [
       if (d.courseId != null) tag('Training'),
-      if (d.number % 11 == 0) tag('Photo'),
+      if (photo) tag('Photo'),
       if (d.number % 37 == 0) tag('Favourite'),
       if (destinationSiteTypes[d.destination.key]!.contains('wreck') &&
           d.number % 3 == 0)
@@ -286,22 +326,132 @@ class DiveSeeder implements DemoSeeder {
     if (d.targetMaxDepth >= 30) 'deep',
     if (d.courseId != null) 'training',
     if (d.night) 'night',
-    if (d.destination.key == 'home') 'shore' else 'boat',
+    if (d.boat) 'boat' else 'shore',
     if (trip != null && trip.destination.liveaboard) 'liveaboard',
   ];
 
-  static String _setFor(PlannedDive d) => switch (d.phase) {
-    StoryPhase.rebreather => 'ccr',
-    StoryPhase.technicalOc when d.tankCount > 1 => 'tech',
-    _ => d.destination.key == 'home' ? 'lake' : 'warm',
-  };
+  /// The regulator on tank [i]: the single's own, the doubles' right post on
+  /// the back gas, a stage regulator on each stage, the bailout regulator.
+  static String? _regulatorFor(
+    DemoSeedContext ctx,
+    List<String> kit,
+    List<PlannedTank> tanks,
+    int i,
+  ) {
+    final role = tanks[i].role;
+    if (role == TankRole.diluent || role == TankRole.oxygenSupply) return null;
+    final String? key;
+    if (role == TankRole.bailout) {
+      key = 'reg-stage-bailout';
+    } else if (kit.contains('reg-right')) {
+      key = i == 0 ? 'reg-right' : (i == 1 ? 'reg-stage-1' : 'reg-stage-2');
+    } else {
+      key = ['reg-cold', 'reg-warm'].where(kit.contains).firstOrNull;
+    }
+    return key != null && kit.contains(key) ? ctx.equipment[key] : null;
+  }
 
-  static Future<List<String>> _gear(DemoSeedContext ctx, PlannedDive d) async {
-    final rows = await ctx.db
-        .customSelect(
-          "SELECT equipment_id FROM equipment_set_items WHERE set_id = '${ctx.equipmentSets[_setFor(d)]}'",
-        )
-        .get();
-    return [for (final r in rows) r.read<String>('equipment_id')];
+  /// The serial of the transmitter on the back gas regulator, when it has
+  /// one in use that day.
+  static String? _transmitterFor(
+    DemoSeedContext ctx,
+    List<String> kit,
+    PlannedDive d,
+    int i,
+  ) {
+    if (i != 0) return null;
+    for (final (reg, transmitter) in [
+      ('reg-right', 'transmitter-right'),
+      ('reg-cold', 'transmitter-cold'),
+    ]) {
+      if (kit.contains(reg) && ctx.timeline.inUseOn(transmitter, d.start)) {
+        return transmitterSerials[transmitter];
+      }
+    }
+    return null;
+  }
+
+  /// One profile sample, with the water's [temperature] as the computer read
+  /// it, the cells as the loop read them and each cell's millivolts.
+  static DiveProfilePoint _point(
+    ShapeSample s,
+    double temperature,
+    List<double>? cells,
+    List<double> gains,
+  ) {
+    double? cell(int i) => cells != null && cells.length > i ? cells[i] : null;
+    int? mv(int i) => cell(i) == null ? null : cellMv(cell(i)!, gains[i]);
+    return DiveProfilePoint(
+      timestamp: s.t,
+      depth: s.depth,
+      temperature: temperature,
+      heartRate: s.heartRate,
+      ppO2: s.ppO2,
+      setpoint: s.setpoint,
+      o2Sensor1: cell(0),
+      o2Sensor2: cell(1),
+      o2Sensor3: cell(2),
+      o2SensorMv1: mv(0),
+      o2SensorMv2: mv(1),
+      o2SensorMv3: mv(2),
+    );
+  }
+
+  /// Whether [d]'s destination has seasons (a wide temperature range).
+  static bool _seasonal(PlannedDive d) =>
+      d.destination.waterTempC.$2 - d.destination.waterTempC.$1 >= 6;
+
+  final _passports = <String, String>{};
+  final _fillCount = <String, int>{};
+
+  /// A fill on the day before every fourth home dive an owned cylinder was
+  /// taken on, of the gas that dive breathed from it.
+  Future<void> _fills(
+    DemoSeedContext ctx,
+    PlannedDive d,
+    List<String> kit,
+    List<PlannedTank> tanks,
+  ) async {
+    for (var i = 0; i < tanks.length; i++) {
+      final key = _cylinderKey(kit, tanks[i].role, i);
+      if (key == null) continue;
+      final n = _fillCount[key] = (_fillCount[key] ?? 0) + 1;
+      if (n % 4 != 1) continue;
+      final passport = _passports[key] ??= await CylinderPassportRepository()
+          .ensurePassportId(
+            ctx.equipment[key]!,
+            diverId: DemoSeedContext.diverId,
+          );
+      final at = ctx.timeline.homeDayOnOrBefore(
+        d.start.subtract(const Duration(days: 1)),
+      );
+      await CylinderFillRepository().create(
+        CylinderFill(
+          id: 'demo-fill-$key-$n',
+          passportId: passport,
+          equipmentId: ctx.equipment[key],
+          filledAt: at,
+          o2Percent: tanks[i].o2,
+          hePercent: tanks[i].he,
+          pressureBar: tanks[i].startBar,
+          stationName: 'Club fill station',
+          source: FillSource.manual,
+          createdAt: at,
+          updatedAt: at,
+        ),
+      );
+    }
+  }
+
+  /// The diver's own cylinder for tank [i], when the kit took one.
+  static String? _cylinderKey(List<String> kit, TankRole role, int i) {
+    final key = switch (role) {
+      TankRole.diluent => 'ccr-dil',
+      TankRole.oxygenSupply => 'ccr-o2',
+      TankRole.bailout => 'stage-1',
+      _ when kit.contains('twin') => ['twin', 'stage-1', 'stage-2'][min(i, 2)],
+      _ => 'tank-12',
+    };
+    return kit.contains(key) ? key : null;
   }
 }

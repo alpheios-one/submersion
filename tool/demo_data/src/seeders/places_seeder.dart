@@ -37,6 +37,26 @@ class PlacesSeeder implements DemoSeeder {
     'Needs service': ('#FB8C00', {TagScope.equipment}),
   };
 
+  static const _tankNotes = [
+    'Valve was stiff; ask for another.',
+    'Fine.',
+    'Filled to 200 bar every morning.',
+    'O-ring needed changing on the second day.',
+    'Nitrox on request, analysed on the dock.',
+    'Tanks a little low; check before kitting up.',
+  ];
+  static const _leadNotes = [
+    'Two kilos less than at home with the aluminium.',
+    'Soft weights, plenty of them.',
+    'Only block weights; bring a pocket belt.',
+    'One kilo less in the 3 mm.',
+  ];
+  static const _regulatorNotes = [
+    'Breathed well.',
+    'Octopus breathed wet; bring my own next time.',
+    'Old but serviced; fine for the shallow reef.',
+  ];
+
   /// The demo's tag names, for the privacy check's allow list.
   static Iterable<String> get tagNames => _tags.keys;
 
@@ -196,21 +216,60 @@ class PlacesSeeder implements DemoSeeder {
           updatedAt: created,
         ),
       );
-      await notes.create(
+      // What was rented here: cylinders and lead every time, the
+      // regulator too before the diver owned one.
+      final here = [
+        for (final d in ctx.plan.dives)
+          if (d.centerId == center.id) d,
+      ];
+      final first = here.isEmpty ? created : here.first.start;
+      final ownReg = ctx.plan.milestones[StoryMilestone.ownRegulator]!;
+      final rentedRegulator = here.any((d) => d.number < ownReg);
+      var k = 0;
+      Future<void> note(
+        EquipmentType type,
+        String label,
+        RentalVerdict verdict,
+        String text, {
+        double? lead,
+        double? litres,
+      }) => notes.create(
         DiveCenterGearNote(
-          id: 'demo-gear-note-$c',
+          id: 'demo-gear-note-$c-${k++}',
           diveCenterId: id,
-          gearType: c.isEven ? EquipmentType.tank : EquipmentType.weights,
-          label: c.isEven ? 'Rental 12 L steel' : 'Lead',
-          verdict: c % 3 == 0 ? RentalVerdict.avoid : RentalVerdict.worked,
-          leadAdjustmentKg: c.isEven ? null : -1.0,
-          volumeLiters: c.isEven ? 12 : null,
-          note: c % 3 == 0 ? 'Valve was stiff; ask for another.' : 'Fine.',
-          notedAt: created,
-          createdAt: created,
-          updatedAt: created,
+          gearType: type,
+          label: label,
+          verdict: verdict,
+          leadAdjustmentKg: lead,
+          volumeLiters: litres,
+          note: text,
+          notedAt: first,
+          createdAt: first,
+          updatedAt: first,
         ),
       );
+      await note(
+        EquipmentType.tank,
+        'Rental 12 L aluminium',
+        c % 3 == 0 ? RentalVerdict.avoid : RentalVerdict.worked,
+        _tankNotes[c % _tankNotes.length],
+        litres: 11.1,
+      );
+      await note(
+        EquipmentType.weights,
+        'Lead',
+        RentalVerdict.worked,
+        _leadNotes[c % _leadNotes.length],
+        lead: -2,
+      );
+      if (rentedRegulator) {
+        await note(
+          EquipmentType.regulator,
+          'Rental regulator',
+          c.isEven ? RentalVerdict.worked : RentalVerdict.avoid,
+          _regulatorNotes[c % _regulatorNotes.length],
+        );
+      }
       c++;
     }
   }

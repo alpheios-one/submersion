@@ -6,6 +6,7 @@ import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/deco/ascent/ascent_gas_plan.dart';
 import 'package:submersion/core/deco/ascent/ccr_loop_ascent_gas.dart';
 import 'package:submersion/core/deco/deco_model.dart';
+import 'package:submersion/core/deco/deco_ppo2_limits.dart';
 import 'package:submersion/core/deco/entities/breathing_config.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/deco/entities/dive_environment.dart';
@@ -37,6 +38,32 @@ import 'package:submersion/features/planner/domain/entities/plan_outcome.dart';
 class PlanEngineConfig extends Equatable {
   final double ppO2Working;
   final double ppO2Deco;
+
+  /// Per-O2-band deco ppO2 limits and the explicit MOD for 100% O2 (issue
+  /// #3580), the diver's Settings defaults layered with this plan's own
+  /// overrides (see [resolvedFor]). Off by default: [ppO2Deco] alone keeps
+  /// governing every deco gas until the diver turns one on. Use
+  /// [decoLimits] to resolve a specific gas's limit; these raw fields exist
+  /// so [copyWith]/[resolvedFor] can merge them the same way as every
+  /// other field here.
+  final bool ppO2DecoBandsEnabled;
+  final double ppO2DecoBand1;
+  final double ppO2DecoBand2;
+  final double ppO2DecoBand3;
+  final bool maxO2DepthEnabled;
+  final double maxO2DepthMeters;
+
+  /// Hypercapnia-bailout phase (issue #3743): an elevated RMV for
+  /// [hypercapniaMinutes] at the start of an OC bailout, a multiplier on
+  /// [sacBottom] (issue #3552's "a plan's own value always wins" diver
+  /// default). Off by default. Resolved per plan through
+  /// [hypercapniaEnabledFor]/[hypercapniaAmvFor]/[hypercapniaSecondsFor],
+  /// not a plain `?? this.x` merge - matches [airBreaksFor]'s
+  /// "explicit off wins" shape, since the per-plan override
+  /// ([domain.DivePlan.hypercapniaAmv]) is an absolute rate, not a factor.
+  final bool hypercapniaEnabled;
+  final double hypercapniaFactor;
+  final int hypercapniaMinutes;
 
   /// Diluent MOD limit: the ppO2 a CCR plan's diluent may reach on a flush,
   /// from the diver's "ppO2 limits CCR" Settings. Unlike [ppO2Working] and
@@ -156,6 +183,15 @@ class PlanEngineConfig extends Equatable {
   const PlanEngineConfig({
     this.ppO2Working = 1.4,
     this.ppO2Deco = 1.6,
+    this.ppO2DecoBandsEnabled = false,
+    this.ppO2DecoBand1 = 1.6,
+    this.ppO2DecoBand2 = 1.6,
+    this.ppO2DecoBand3 = 1.6,
+    this.maxO2DepthEnabled = false,
+    this.maxO2DepthMeters = 6.0,
+    this.hypercapniaEnabled = false,
+    this.hypercapniaFactor = 4.0,
+    this.hypercapniaMinutes = 5,
     this.ccrDiluentModPpO2 = 1.6,
     this.ccrSetpointLow = domain.DivePlan.specSetpointLow,
     this.ccrSetpointHigh = domain.DivePlan.specSetpointHigh,
@@ -200,6 +236,15 @@ class PlanEngineConfig extends Equatable {
   List<Object?> get props => [
     ppO2Working,
     ppO2Deco,
+    ppO2DecoBandsEnabled,
+    ppO2DecoBand1,
+    ppO2DecoBand2,
+    ppO2DecoBand3,
+    maxO2DepthEnabled,
+    maxO2DepthMeters,
+    hypercapniaEnabled,
+    hypercapniaFactor,
+    hypercapniaMinutes,
     ccrDiluentModPpO2,
     ccrSetpointLow,
     ccrSetpointHigh,
@@ -243,6 +288,15 @@ class PlanEngineConfig extends Equatable {
   PlanEngineConfig copyWith({
     double? ppO2Working,
     double? ppO2Deco,
+    bool? ppO2DecoBandsEnabled,
+    double? ppO2DecoBand1,
+    double? ppO2DecoBand2,
+    double? ppO2DecoBand3,
+    bool? maxO2DepthEnabled,
+    double? maxO2DepthMeters,
+    bool? hypercapniaEnabled,
+    double? hypercapniaFactor,
+    int? hypercapniaMinutes,
     double? ccrDiluentModPpO2,
     double? ccrSetpointLow,
     double? ccrSetpointHigh,
@@ -288,6 +342,15 @@ class PlanEngineConfig extends Equatable {
     return PlanEngineConfig(
       ppO2Working: ppO2Working ?? this.ppO2Working,
       ppO2Deco: ppO2Deco ?? this.ppO2Deco,
+      ppO2DecoBandsEnabled: ppO2DecoBandsEnabled ?? this.ppO2DecoBandsEnabled,
+      ppO2DecoBand1: ppO2DecoBand1 ?? this.ppO2DecoBand1,
+      ppO2DecoBand2: ppO2DecoBand2 ?? this.ppO2DecoBand2,
+      ppO2DecoBand3: ppO2DecoBand3 ?? this.ppO2DecoBand3,
+      maxO2DepthEnabled: maxO2DepthEnabled ?? this.maxO2DepthEnabled,
+      maxO2DepthMeters: maxO2DepthMeters ?? this.maxO2DepthMeters,
+      hypercapniaEnabled: hypercapniaEnabled ?? this.hypercapniaEnabled,
+      hypercapniaFactor: hypercapniaFactor ?? this.hypercapniaFactor,
+      hypercapniaMinutes: hypercapniaMinutes ?? this.hypercapniaMinutes,
       ccrDiluentModPpO2: ccrDiluentModPpO2 ?? this.ccrDiluentModPpO2,
       ccrSetpointLow: ccrSetpointLow ?? this.ccrSetpointLow,
       ccrSetpointHigh: ccrSetpointHigh ?? this.ccrSetpointHigh,
@@ -353,6 +416,24 @@ class PlanEngineConfig extends Equatable {
     return copyWith(
       ppO2Working: plan.ppO2Bottom,
       ppO2Deco: plan.ppO2Deco,
+      ppO2DecoBand1: plan.ppO2DecoBand1,
+      ppO2DecoBand2: plan.ppO2DecoBand2,
+      ppO2DecoBand3: plan.ppO2DecoBand3,
+      ppO2DecoBandsEnabled: resolveDecoLayerEnabled(
+        settingsEnabled: ppO2DecoBandsEnabled,
+        explicitlyOff: plan.ppO2DecoBandsExplicitlyOff,
+        hasCustomValue: hasCustomDecoBands(
+          plan.ppO2DecoBand1,
+          plan.ppO2DecoBand2,
+          plan.ppO2DecoBand3,
+        ),
+      ),
+      maxO2DepthMeters: plan.maxO2DepthMeters,
+      maxO2DepthEnabled: resolveDecoLayerEnabled(
+        settingsEnabled: maxO2DepthEnabled,
+        explicitlyOff: plan.maxO2DepthExplicitlyOff,
+        hasCustomValue: plan.maxO2DepthMeters != null,
+      ),
       o2Narcotic: plan.o2Narcotic,
       bestMixEndMeters: plan.bestMixEndMeters,
       buddyFactor: plan.sacFactor,
@@ -374,6 +455,20 @@ class PlanEngineConfig extends Equatable {
     );
   }
 
+  /// This config's deco ppO2 limits as a [DecoPpO2Limits] (issue #3580),
+  /// for [tank_mod.dart]'s MOD/switch-depth resolution. Call on a
+  /// [resolvedFor] config so a plan's per-band overrides are already
+  /// merged in.
+  DecoPpO2Limits get decoLimits => DecoPpO2Limits(
+    flat: ppO2Deco,
+    bandsEnabled: ppO2DecoBandsEnabled,
+    band1: ppO2DecoBand1,
+    band2: ppO2DecoBand2,
+    band3: ppO2DecoBand3,
+    explicitO2DepthEnabled: maxO2DepthEnabled,
+    explicitO2DepthMeters: maxO2DepthMeters,
+  );
+
   /// [plan]'s low (shallow) setpoint: its own value when set, else the
   /// diver's [ccrSetpointLow] (issue #2801).
   double setpointLowFor(domain.DivePlan plan) =>
@@ -386,6 +481,39 @@ class PlanEngineConfig extends Equatable {
   /// raw `sacBottom`, see [domain.DivePlan.sacStressedEffective]).
   double sacStressedFor(domain.DivePlan plan) =>
       plan.sacStressed ?? sacBottom * sacStressedFactor;
+
+  /// Whether [plan]'s OC bailout uses a hypercapnia phase at all (issue
+  /// #3743): true when either per-plan override
+  /// ([domain.DivePlan.hypercapniaAmv]/[domain.DivePlan.hypercapniaMinutes])
+  /// is set (an explicit "Custom" choice), else the diver's Settings
+  /// [hypercapniaEnabled] toggle, unless
+  /// [domain.DivePlan.hypercapniaExplicitlyOff] forces it off regardless -
+  /// same "explicit off wins" shape as [airBreaksFor].
+  bool hypercapniaEnabledFor(domain.DivePlan plan) {
+    if (plan.hypercapniaExplicitlyOff) return false;
+    if (plan.hypercapniaAmv != null || plan.hypercapniaMinutes != null) {
+      return true;
+    }
+    return hypercapniaEnabled;
+  }
+
+  /// [plan]'s hypercapnia-bailout AMV in L/min, or null when
+  /// [hypercapniaEnabledFor] is false: its own [domain.DivePlan.hypercapniaAmv]
+  /// override when set, else [sacBottom] (already resolved against this
+  /// plan - call this on a [resolvedFor] config) times the diver's
+  /// [hypercapniaFactor] - same "absolute override, else a factor of
+  /// bottom SAC" shape as [sacStressedFor].
+  double? hypercapniaAmvFor(domain.DivePlan plan) {
+    if (!hypercapniaEnabledFor(plan)) return null;
+    return plan.hypercapniaAmv ?? sacBottom * hypercapniaFactor;
+  }
+
+  /// [plan]'s hypercapnia-bailout phase duration in seconds from the
+  /// bailout instant, or null when [hypercapniaEnabledFor] is false.
+  int? hypercapniaSecondsFor(domain.DivePlan plan) {
+    if (!hypercapniaEnabledFor(plan)) return null;
+    return (plan.hypercapniaMinutes ?? hypercapniaMinutes) * 60;
+  }
 
   /// [plan]'s high (deep) setpoint: its own value when set, else the
   /// diver's [ccrSetpointHigh] (issue #2801).
@@ -566,6 +694,11 @@ class PlanEngine {
       environment: environment,
       policy: policy,
     );
+    // Deliberately flat (issue #3580 scope cut, see PlanCalculatorService's
+    // matching comment): O2ToxicityCalculator is a general-purpose, widely
+    // shared utility, used here only for CNS/OTU accumulation, not for the
+    // deco ppO2 critical/warning PlanIssue check below, which IS band-aware
+    // (config.decoLimits.ppO2For).
     final o2Calc = O2ToxicityCalculator(
       ppO2WarningThreshold: config.ppO2Working,
       ppO2CriticalThreshold: config.ppO2Deco,
@@ -1451,6 +1584,8 @@ class PlanEngine {
       );
     }
 
+    // Built once per call, not per leg: the getter constructs a new object.
+    final decoLimits = config.decoLimits;
     for (var i = 0; i < legs.length; i++) {
       final leg = legs[i];
       final segment = leg.segment;
@@ -1461,8 +1596,37 @@ class PlanEngine {
           : leg.endDepth;
       final fO2 = segment.gasMix.o2 / 100.0;
       final fHe = segment.gasMix.he / 100.0;
+      // The deco ceiling for THIS segment's own gas (issue #3580): its
+      // band when bands are on, the ppO2 at the explicit depth for a gas
+      // under that setting, otherwise the flat ppO2Deco, same as before.
+      // Only used for display here - the breach check itself goes through
+      // decoCeilingBreachedFor, which compares depth directly for an
+      // explicit-depth gas instead of this (environment-aware) ppO2 against
+      // outcome.maxPpO2 (the flat-model one), a mismatch a Copilot review
+      // caught disagreeing in salt water/at altitude.
+      //
+      // A loop segment's ppO2 follows the setpoint, not its diluent's O2
+      // fraction, so those per-gas layers (OC deco gas limits) do not apply
+      // there: it keeps the flat ppO2Deco, as before.
+      final segmentIsLoop = _modeFor(plan, segment) != domain.PlanMode.oc;
+      final segmentDecoPpO2 = segmentIsLoop
+          ? config.ppO2Deco
+          : decoCeilingPpO2For(
+              segment.gasMix,
+              decoLimits,
+              environment: environment,
+            );
+      final decoCeilingBreached = segmentIsLoop
+          ? outcome.maxPpO2 > config.ppO2Deco
+          : decoCeilingBreachedFor(
+              segment.gasMix,
+              decoLimits,
+              depthMeters: deeperEnd,
+              actualPpO2: outcome.maxPpO2,
+              environment: environment,
+            );
 
-      if (outcome.maxPpO2 > config.ppO2Deco) {
+      if (decoCeilingBreached) {
         issues.add(
           PlanIssue(
             type: PlanIssueType.ppO2Critical,
@@ -1473,7 +1637,7 @@ class PlanEngine {
             atDepth: deeperEnd,
             segmentId: segment.id,
             value: outcome.maxPpO2,
-            threshold: config.ppO2Deco,
+            threshold: segmentDecoPpO2,
           ),
         );
       } else if (outcome.maxPpO2 > config.ppO2Working) {
@@ -1776,7 +1940,7 @@ class PlanEngine {
       gases: ascentGasesFor(
         tanks,
         bottomPpO2: config.ppO2Working,
-        decoPpO2: config.ppO2Deco,
+        decoPpO2: config.decoLimits,
         environment: environment,
         diluentPpO2: config.ccrDiluentModPpO2,
       ),
@@ -1791,31 +1955,49 @@ class PlanEngine {
   List<PlanIssue> _modOverrideIssues(
     List<DiveTank> tanks,
     DiveEnvironment environment,
-  ) => [
-    for (final tank in tanks)
-      if (modOverrideCheck(
-            tank,
-            bottomPpO2: config.ppO2Working,
-            decoPpO2: config.ppO2Deco,
-            diluentPpO2: config.ccrDiluentModPpO2,
-            environment: environment,
-          )
-          case (:final ppO2, :final limitPpO2, exceedsLimit: true))
+  ) {
+    final issues = <PlanIssue>[];
+    final decoLimits = config.decoLimits;
+    for (final tank in tanks) {
+      final check = modOverrideCheck(
+        tank,
+        bottomPpO2: config.ppO2Working,
+        decoPpO2: decoLimits,
+        diluentPpO2: config.ccrDiluentModPpO2,
+        environment: environment,
+      );
+      if (check == null || !check.exceedsLimit) continue;
+      // Critical when the override's ppO2 breaches the deco ceiling for a
+      // gas of this O2% (issue #3580: per-band, or the ppO2 at the
+      // explicit depth for a gas under that setting, not always the flat
+      // ppO2Deco) -- even for a bottom-role tank, which can still breach
+      // it on a sufficiently deep hand-set MOD. A bottom-role tank under
+      // that ceiling is a warning (it already exceeded its own, lower,
+      // bottom limit to get here at all). decoCeilingPpO2For, not
+      // check.limitPpO2: that is whatever limit THIS tank's own role
+      // calls for (bottom or deco), not necessarily the deco ceiling.
+      final isCritical =
+          check.ppO2 >
+          decoCeilingPpO2For(tank.gasMix, decoLimits, environment: environment);
+      issues.add(
         PlanIssue(
-          type: ppO2 > config.ppO2Deco
+          type: isCritical
               ? PlanIssueType.ppO2Critical
               : PlanIssueType.ppO2High,
-          severity: ppO2 > config.ppO2Deco
+          severity: isCritical
               ? PlanIssueSeverity.critical
               : PlanIssueSeverity.warning,
           message:
-              'ppO2 ${ppO2.toStringAsFixed(2)} bar at the MOD set on '
+              'ppO2 ${check.ppO2.toStringAsFixed(2)} bar at the MOD set on '
               '${tank.name ?? tank.gasMix.name} exceeds its limit',
           atDepth: tank.decoSwitchDepth,
-          value: ppO2,
-          threshold: limitPpO2,
+          value: check.ppO2,
+          threshold: check.limitPpO2,
         ),
-  ];
+      );
+    }
+    return issues;
+  }
 
   List<PlanStop> _mapStops(
     DecoSchedule schedule,

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../helpers/test_database.dart';
 import '../../../tool/demo_data/src/seeders/diver_seeder.dart';
 import '../../../tool/demo_data/src/seeders/gear_catalog.dart';
+import '../../../tool/demo_data/src/seeders/gear_cylinder_seeder.dart';
 import '../../../tool/demo_data/src/seeders/gear_seeder.dart';
 import '../../../tool/demo_data/src/seeders/places_seeder.dart';
 import '../../../tool/demo_data/src/seeders/seed_context.dart';
@@ -19,6 +20,7 @@ void main() {
     await DiverSeeder().seed(ctx);
     await PlacesSeeder().seed(ctx);
     await GearSeeder().seed(ctx);
+    await GearCylinderSeeder().seed(ctx);
     await TripSeeder().seed(ctx);
   });
 
@@ -38,22 +40,14 @@ void main() {
     }
   });
 
-  test('storage, service, sharing and a transfer are recorded', () async {
-    for (final t in [
-      'equipment_locations',
-      'equipment_location_moves',
-      'equipment_observations',
-      'equipment_shares',
-      'equipment_ownership_events',
-      'service_records',
-      'service_schedules',
-    ]) {
-      expect(await countRows(ctx, t), greaterThan(0), reason: t);
-    }
+  // Storage, loans, checks and service history follow the dives; their
+  // tests are gear_life_test.dart and gear_service_test.dart.
+  test('every item gets its service clocks', () async {
+    expect(await countRows(ctx, 'service_schedules'), greaterThan(0));
   });
 
   test('computers, transmitters, presets and cylinders are set up', () async {
-    expect(await countRows(ctx, 'dive_computers'), 2);
+    expect(await countRows(ctx, 'dive_computers'), 3);
     expect(await countRows(ctx, 'transmitters'), 2);
     for (final t in [
       'dive_computer_connections',
@@ -62,7 +56,6 @@ void main() {
       'weight_preset_entries',
       'cylinder_configs',
       'cylinder_config_items',
-      'cylinder_fills',
     ]) {
       expect(await countRows(ctx, t), greaterThan(0), reason: t);
     }
