@@ -315,7 +315,7 @@ void main() {
     },
   );
 
-  test('applies a pre-v364 diver_settings payload missing '
+  test('applies a pre-v365 diver_settings payload missing '
       'defaultShowCounterdiffusion', () async {
     await db.customStatement('PRAGMA foreign_keys = OFF');
 

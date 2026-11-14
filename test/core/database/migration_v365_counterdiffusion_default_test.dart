@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/database/database.dart';
 
-/// Schema v364: diver_settings.default_show_counterdiffusion, the default
+/// Schema v365: diver_settings.default_show_counterdiffusion, the default
 /// visibility of the isobaric counterdiffusion overlay on the dive profile
 /// (issue #4530). Defaulted off, no backfill, so the sync floor holds.
 void main() {
@@ -34,23 +34,23 @@ void main() {
               .getSingle())
           .read<int>('v');
 
-  test('v364 is in the ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(364));
-    expect(AppDatabase.migrationVersions, contains(364));
+  test('v365 is in the ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(365));
+    expect(AppDatabase.migrationVersions, contains(365));
   });
 
   test('the new column is defaulted and kept the floor', () {
-    expect(AppDatabase.minimumCompatibleSchemaVersion, lessThan(364));
+    expect(AppDatabase.minimumCompatibleSchemaVersion, lessThan(365));
   });
 
-  test('upgrading from v363 adds the column switched off', () async {
-    final db = AppDatabase(dbAt(363));
+  test('upgrading from v364 adds the column switched off', () async {
+    final db = AppDatabase(dbAt(364));
     addTearDown(db.close);
     expect(await storedValue(db), 0);
   });
 
   test('the upgraded column is a boolean, as on a fresh install', () async {
-    final db = AppDatabase(dbAt(363));
+    final db = AppDatabase(dbAt(364));
     addTearDown(db.close);
     await storedValue(db);
     await expectLater(
@@ -62,7 +62,7 @@ void main() {
   });
 
   test('a database already carrying the column keeps its value', () async {
-    final db = AppDatabase(dbAt(363, stored: true));
+    final db = AppDatabase(dbAt(364, stored: true));
     addTearDown(db.close);
     expect(await storedValue(db), 1);
   });
