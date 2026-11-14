@@ -1500,6 +1500,14 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_color_white => 'לבן';
 
   @override
+  String equipment_color_customName(String name, String code) {
+    return '$name ($code)';
+  }
+
+  @override
+  String get equipment_color_recent => 'אחרונים';
+
+  @override
   String get equipment_color_none => 'ללא';
 
   @override
@@ -24626,6 +24634,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'קבוצות ציוד מקופלות';
 
   @override
+  String get settings_conflict_field_recentEquipmentColors =>
+      'צבעי ציוד אחרונים';
+
+  @override
   String get settings_conflict_field_listArrangementHlc => 'יומן סידור הרשימות';
 
   @override
@@ -32833,23 +32845,23 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get tags_color_custom => 'צבע מותאם אישית';
+  String get common_color_custom => 'צבע מותאם אישית';
 
   @override
-  String get tags_color_hexLabel => 'קוד הקסדצימלי';
+  String get common_color_hexLabel => 'קוד הקסדצימלי';
 
   @override
-  String get tags_color_hexError =>
+  String get common_color_hexError =>
       'יש להזין שישה תווים 0-9 או A-F, למשל #2E8B57';
 
   @override
-  String get tags_color_use => 'שימוש';
+  String get common_color_use => 'שימוש';
 
   @override
-  String get tags_color_hueLabel => 'גוון';
+  String get common_color_hueLabel => 'גוון';
 
   @override
-  String get tags_color_squareLabel => 'רוויה ובהירות';
+  String get common_color_squareLabel => 'רוויה ובהירות';
 
   @override
   String get tags_manage_narrowDialog_confirm => 'הסר';

@@ -1508,6 +1508,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equipment_color_white => 'White';
 
   @override
+  String equipment_color_customName(String name, String code) {
+    return '$name ($code)';
+  }
+
+  @override
+  String get equipment_color_recent => 'Recent';
+
+  @override
   String get equipment_color_none => 'None';
 
   @override
@@ -24815,6 +24823,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Equipment folded groups';
 
   @override
+  String get settings_conflict_field_recentEquipmentColors =>
+      'Recent equipment colors';
+
+  @override
   String get settings_conflict_field_listArrangementHlc =>
       'List arrangement record';
 
@@ -33099,22 +33111,23 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get tags_color_custom => 'Custom color';
+  String get common_color_custom => 'Custom color';
 
   @override
-  String get tags_color_hexLabel => 'Hex code';
+  String get common_color_hexLabel => 'Hex code';
 
   @override
-  String get tags_color_hexError => 'Enter six digits 0-9 or A-F, like #2E8B57';
+  String get common_color_hexError =>
+      'Enter six digits 0-9 or A-F, like #2E8B57';
 
   @override
-  String get tags_color_use => 'Use';
+  String get common_color_use => 'Use';
 
   @override
-  String get tags_color_hueLabel => 'Hue';
+  String get common_color_hueLabel => 'Hue';
 
   @override
-  String get tags_color_squareLabel => 'Saturation and brightness';
+  String get common_color_squareLabel => 'Saturation and brightness';
 
   @override
   String get tags_manage_narrowDialog_confirm => 'Remove';

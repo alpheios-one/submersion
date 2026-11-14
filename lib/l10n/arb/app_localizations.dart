@@ -2360,6 +2360,18 @@ abstract class AppLocalizations {
   /// **'White'**
   String get equipment_color_white;
 
+  /// A custom item colour: its nearest named colour, then its code
+  ///
+  /// In en, this message translates to:
+  /// **'{name} ({code})'**
+  String equipment_color_customName(String name, String code);
+
+  /// Heading for the custom item colours the diver used recently, in the colour sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Recent'**
+  String get equipment_color_recent;
+
   /// No description provided for @equipment_color_none.
   ///
   /// In en, this message translates to:
@@ -39704,6 +39716,12 @@ abstract class AppLocalizations {
   /// **'Equipment folded groups'**
   String get settings_conflict_field_equipmentCollapsedGroups;
 
+  /// Label for the custom equipment colours the diver picked recently, in a sync conflict
+  ///
+  /// In en, this message translates to:
+  /// **'Recent equipment colors'**
+  String get settings_conflict_field_recentEquipmentColors;
+
   /// Label for a saved list arrangement in a sync conflict
   ///
   /// In en, this message translates to:
@@ -53370,41 +53388,41 @@ abstract class AppLocalizations {
   /// **'Current color, {code}'**
   String tags_color_current(String code);
 
-  /// No description provided for @tags_color_custom.
+  /// No description provided for @common_color_custom.
   ///
   /// In en, this message translates to:
   /// **'Custom color'**
-  String get tags_color_custom;
+  String get common_color_custom;
 
-  /// No description provided for @tags_color_hexLabel.
+  /// No description provided for @common_color_hexLabel.
   ///
   /// In en, this message translates to:
   /// **'Hex code'**
-  String get tags_color_hexLabel;
+  String get common_color_hexLabel;
 
-  /// No description provided for @tags_color_hexError.
+  /// No description provided for @common_color_hexError.
   ///
   /// In en, this message translates to:
   /// **'Enter six digits 0-9 or A-F, like #2E8B57'**
-  String get tags_color_hexError;
+  String get common_color_hexError;
 
-  /// No description provided for @tags_color_use.
+  /// No description provided for @common_color_use.
   ///
   /// In en, this message translates to:
   /// **'Use'**
-  String get tags_color_use;
+  String get common_color_use;
 
-  /// No description provided for @tags_color_hueLabel.
+  /// No description provided for @common_color_hueLabel.
   ///
   /// In en, this message translates to:
   /// **'Hue'**
-  String get tags_color_hueLabel;
+  String get common_color_hueLabel;
 
-  /// No description provided for @tags_color_squareLabel.
+  /// No description provided for @common_color_squareLabel.
   ///
   /// In en, this message translates to:
   /// **'Saturation and brightness'**
-  String get tags_color_squareLabel;
+  String get common_color_squareLabel;
 
   /// No description provided for @tags_manage_narrowDialog_confirm.
   ///

@@ -1520,6 +1520,14 @@ class AppLocalizationsEs extends AppLocalizations {
   String get equipment_color_white => 'Blanco';
 
   @override
+  String equipment_color_customName(String name, String code) {
+    return '$name ($code)';
+  }
+
+  @override
+  String get equipment_color_recent => 'Recientes';
+
+  @override
   String get equipment_color_none => 'Ninguno';
 
   @override
@@ -25197,6 +25205,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Grupos de equipo plegados';
 
   @override
+  String get settings_conflict_field_recentEquipmentColors =>
+      'Colores de equipo recientes';
+
+  @override
   String get settings_conflict_field_listArrangementHlc =>
       'Registro de organización de listas';
 
@@ -33690,23 +33702,23 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get tags_color_custom => 'Color personalizado';
+  String get common_color_custom => 'Color personalizado';
 
   @override
-  String get tags_color_hexLabel => 'Código hexadecimal';
+  String get common_color_hexLabel => 'Código hexadecimal';
 
   @override
-  String get tags_color_hexError =>
+  String get common_color_hexError =>
       'Introduce seis caracteres 0-9 o A-F, como #2E8B57';
 
   @override
-  String get tags_color_use => 'Usar';
+  String get common_color_use => 'Usar';
 
   @override
-  String get tags_color_hueLabel => 'Tono';
+  String get common_color_hueLabel => 'Tono';
 
   @override
-  String get tags_color_squareLabel => 'Saturación y brillo';
+  String get common_color_squareLabel => 'Saturación y brillo';
 
   @override
   String get tags_manage_narrowDialog_confirm => 'Quitar';
