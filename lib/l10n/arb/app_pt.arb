@@ -3109,6 +3109,11 @@
   "diveLog_counterdiffusion_segment_all": "Tudo",
   "diveLog_tooltip_counterdiffusion_icd": "Contradifusão (ICD)",
   "diveLog_tooltip_counterdiffusion_opposing": "Troca oposta",
+  "diveLog_tooltip_counterdiffusion_exchange": "Troca gasosa",
+  "diveLog_tooltip_counterdiffusion_directions": "N₂ {n2}, He {he}, líquido {net}",
+  "diveLog_tooltip_counterdiffusion_in": "entra",
+  "diveLog_tooltip_counterdiffusion_out": "sai",
+  "diveLog_tooltip_counterdiffusion_mixed": "misto",
   "diveLog_tooltip_counterdiffusion_compartments": "#{list}",
   "@diveLog_tooltip_counterdiffusion_compartments": {
     "placeholders": {

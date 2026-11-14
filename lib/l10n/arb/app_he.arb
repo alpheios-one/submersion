@@ -2986,6 +2986,11 @@
   "diveLog_counterdiffusion_segment_all": "הכול",
   "diveLog_tooltip_counterdiffusion_icd": "דיפוזיה נגדית (ICD)",
   "diveLog_tooltip_counterdiffusion_opposing": "חילוף מנוגד",
+  "diveLog_tooltip_counterdiffusion_exchange": "חילוף גזים",
+  "diveLog_tooltip_counterdiffusion_directions": "N₂ {n2}, He {he}, נטו {net}",
+  "diveLog_tooltip_counterdiffusion_in": "נכנס",
+  "diveLog_tooltip_counterdiffusion_out": "יוצא",
+  "diveLog_tooltip_counterdiffusion_mixed": "מעורב",
   "diveLog_tooltip_counterdiffusion_compartments": "#{list}",
   "@diveLog_tooltip_counterdiffusion_compartments": {
     "placeholders": {

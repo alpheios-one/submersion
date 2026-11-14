@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/deco/entities/deco_status.dart';
+import 'package:submersion/core/deco/entities/gas_exchange.dart';
 import 'package:submersion/core/deco/entities/tissue_compartment.dart';
 import 'package:submersion/features/dive_log/domain/entities/counterdiffusion_analysis.dart';
 import 'package:submersion/features/dive_log/domain/services/counterdiffusion_ranges.dart';
@@ -79,6 +80,9 @@ void main() {
           endSeconds: 50,
           kind: CounterdiffusionKind.netOngassing,
           compartmentNumbers: [1],
+          n2Exchange: GasExchange.offgassing,
+          heExchange: GasExchange.ongassing,
+          netExchange: GasExchange.ongassing,
         ),
       ]);
       expect(result.opposingRanges.single.startSeconds, 10);
@@ -98,6 +102,9 @@ void main() {
           endSeconds: 30,
           kind: CounterdiffusionKind.opposing,
           compartmentNumbers: [1],
+          n2Exchange: GasExchange.ongassing,
+          heExchange: GasExchange.offgassing,
+          netExchange: GasExchange.ongassing,
         ),
       ]);
     });
@@ -109,7 +116,49 @@ void main() {
 
       expect(result.icdRanges, isEmpty);
       expect(result.opposingRanges, hasLength(1));
+      expect(result.opposingRanges.single.netExchange, GasExchange.offgassing);
     });
+
+    test('a span whose samples disagree on a direction reports it mixed', () {
+      // Nitrogen enters and helium leaves throughout, but the net direction
+      // turns from out to in halfway.
+      final statuses = [offgassing(), offgassing(), uptake(), uptake()];
+
+      final range = counterdiffusionAnalysisOf(
+        statuses,
+        every10s(4),
+      ).opposingRanges.single;
+
+      expect(range.n2Exchange, GasExchange.ongassing);
+      expect(range.heExchange, GasExchange.offgassing);
+      expect(range.netExchange, isNull);
+    });
+
+    test(
+      'merging runs across a short gap keeps only the shared directions',
+      () {
+        final statuses = [
+          offgassing(),
+          offgassing(),
+          offgassing(),
+          still(),
+          uptake(),
+          uptake(),
+          uptake(),
+        ];
+
+        final range = counterdiffusionAnalysisOf(
+          statuses,
+          every10s(7),
+        ).opposingRanges.single;
+
+        expect(range.startSeconds, 0);
+        expect(range.endSeconds, 60);
+        expect(range.n2Exchange, GasExchange.ongassing);
+        expect(range.heExchange, GasExchange.offgassing);
+        expect(range.netExchange, isNull);
+      },
+    );
 
     test('a net on-gassing rate below the minimum is not ICD', () {
       // Both gases move (each beyond the 0.01 bar tolerance) and the tissue

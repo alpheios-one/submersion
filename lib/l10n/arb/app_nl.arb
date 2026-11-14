@@ -3109,6 +3109,11 @@
   "diveLog_counterdiffusion_segment_all": "Alles",
   "diveLog_tooltip_counterdiffusion_icd": "Tegendiffusie (ICD)",
   "diveLog_tooltip_counterdiffusion_opposing": "Tegengestelde uitwisseling",
+  "diveLog_tooltip_counterdiffusion_exchange": "Gasuitwisseling",
+  "diveLog_tooltip_counterdiffusion_directions": "N₂ {n2}, He {he}, netto {net}",
+  "diveLog_tooltip_counterdiffusion_in": "in",
+  "diveLog_tooltip_counterdiffusion_out": "uit",
+  "diveLog_tooltip_counterdiffusion_mixed": "gemengd",
   "diveLog_tooltip_counterdiffusion_compartments": "#{list}",
   "@diveLog_tooltip_counterdiffusion_compartments": {
     "placeholders": {

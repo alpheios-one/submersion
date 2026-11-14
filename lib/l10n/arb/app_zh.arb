@@ -3222,6 +3222,11 @@
   "diveLog_counterdiffusion_segment_all": "全部",
   "diveLog_tooltip_counterdiffusion_icd": "逆向扩散 (ICD)",
   "diveLog_tooltip_counterdiffusion_opposing": "反向交换",
+  "diveLog_tooltip_counterdiffusion_exchange": "气体交换",
+  "diveLog_tooltip_counterdiffusion_directions": "N₂ {n2}，He {he}，净 {net}",
+  "diveLog_tooltip_counterdiffusion_in": "进",
+  "diveLog_tooltip_counterdiffusion_out": "出",
+  "diveLog_tooltip_counterdiffusion_mixed": "不一",
   "diveLog_tooltip_counterdiffusion_compartments": "#{list}",
   "@diveLog_tooltip_counterdiffusion_compartments": {
     "placeholders": {

@@ -9413,6 +9413,27 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_tooltip_counterdiffusion_opposing => 'Ellentétes csere';
 
   @override
+  String get diveLog_tooltip_counterdiffusion_exchange => 'Gázcsere';
+
+  @override
+  String diveLog_tooltip_counterdiffusion_directions(
+    String n2,
+    String he,
+    String net,
+  ) {
+    return 'N₂ $n2, He $he, nettó $net';
+  }
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_in => 'be';
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_out => 'ki';
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_mixed => 'vegyes';
+
+  @override
   String diveLog_tooltip_counterdiffusion_compartments(String list) {
     return '#$list';
   }

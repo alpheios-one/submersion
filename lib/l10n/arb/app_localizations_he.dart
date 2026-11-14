@@ -9227,6 +9227,27 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_tooltip_counterdiffusion_opposing => 'חילוף מנוגד';
 
   @override
+  String get diveLog_tooltip_counterdiffusion_exchange => 'חילוף גזים';
+
+  @override
+  String diveLog_tooltip_counterdiffusion_directions(
+    String n2,
+    String he,
+    String net,
+  ) {
+    return 'N₂ $n2, He $he, נטו $net';
+  }
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_in => 'נכנס';
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_out => 'יוצא';
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_mixed => 'מעורב';
+
+  @override
   String diveLog_tooltip_counterdiffusion_compartments(String list) {
     return '#$list';
   }

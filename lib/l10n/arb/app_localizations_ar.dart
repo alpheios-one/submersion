@@ -9564,6 +9564,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_tooltip_counterdiffusion_opposing => 'تبادل متعاكس';
 
   @override
+  String get diveLog_tooltip_counterdiffusion_exchange => 'تبادل الغازات';
+
+  @override
+  String diveLog_tooltip_counterdiffusion_directions(
+    String n2,
+    String he,
+    String net,
+  ) {
+    return 'N₂ $n2، He $he، الصافي $net';
+  }
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_in => 'داخل';
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_out => 'خارج';
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_mixed => 'مختلط';
+
+  @override
   String diveLog_tooltip_counterdiffusion_compartments(String list) {
     return '#$list';
   }

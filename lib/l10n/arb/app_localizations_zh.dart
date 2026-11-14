@@ -8949,6 +8949,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_tooltip_counterdiffusion_opposing => '反向交换';
 
   @override
+  String get diveLog_tooltip_counterdiffusion_exchange => '气体交换';
+
+  @override
+  String diveLog_tooltip_counterdiffusion_directions(
+    String n2,
+    String he,
+    String net,
+  ) {
+    return 'N₂ $n2，He $he，净 $net';
+  }
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_in => '进';
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_out => '出';
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_mixed => '不一';
+
+  @override
   String diveLog_tooltip_counterdiffusion_compartments(String list) {
     return '#$list';
   }

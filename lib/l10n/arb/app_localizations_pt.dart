@@ -9436,6 +9436,27 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_tooltip_counterdiffusion_opposing => 'Troca oposta';
 
   @override
+  String get diveLog_tooltip_counterdiffusion_exchange => 'Troca gasosa';
+
+  @override
+  String diveLog_tooltip_counterdiffusion_directions(
+    String n2,
+    String he,
+    String net,
+  ) {
+    return 'N₂ $n2, He $he, líquido $net';
+  }
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_in => 'entra';
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_out => 'sai';
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_mixed => 'misto';
+
+  @override
   String diveLog_tooltip_counterdiffusion_compartments(String list) {
     return '#$list';
   }

@@ -3109,6 +3109,11 @@
   "diveLog_counterdiffusion_segment_all": "Todo",
   "diveLog_tooltip_counterdiffusion_icd": "Contradifusión (ICD)",
   "diveLog_tooltip_counterdiffusion_opposing": "Intercambio opuesto",
+  "diveLog_tooltip_counterdiffusion_exchange": "Intercambio de gases",
+  "diveLog_tooltip_counterdiffusion_directions": "N₂ {n2}, He {he}, neto {net}",
+  "diveLog_tooltip_counterdiffusion_in": "entra",
+  "diveLog_tooltip_counterdiffusion_out": "sale",
+  "diveLog_tooltip_counterdiffusion_mixed": "mixto",
   "diveLog_tooltip_counterdiffusion_compartments": "#{list}",
   "@diveLog_tooltip_counterdiffusion_compartments": {
     "placeholders": {

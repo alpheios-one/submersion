@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import 'package:submersion/core/deco/entities/gas_exchange.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_tank.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/domain/icd_calculator.dart'
@@ -28,11 +29,26 @@ class CounterdiffusionRange extends Equatable {
   /// span.
   final List<int> compartmentNumbers;
 
+  /// Which way nitrogen moved in every compartment that met [kind] across
+  /// the span, or null when they did not all agree.
+  final GasExchange? n2Exchange;
+
+  /// Which way helium moved, as [n2Exchange].
+  final GasExchange? heExchange;
+
+  /// Which way both gases together moved (the net that
+  /// `DecoStatus.gasExchanges` reads), as [n2Exchange]. Always on-gassing on
+  /// a [CounterdiffusionKind.netOngassing] span.
+  final GasExchange? netExchange;
+
   const CounterdiffusionRange({
     required this.startSeconds,
     required this.endSeconds,
     required this.kind,
     required this.compartmentNumbers,
+    this.n2Exchange,
+    this.heExchange,
+    this.netExchange,
   });
 
   /// Whether [timestamp] lies inside the span, edges included.
@@ -44,11 +60,17 @@ class CounterdiffusionRange extends Equatable {
     int? endSeconds,
     CounterdiffusionKind? kind,
     List<int>? compartmentNumbers,
+    GasExchange? n2Exchange,
+    GasExchange? heExchange,
+    GasExchange? netExchange,
   }) => CounterdiffusionRange(
     startSeconds: startSeconds ?? this.startSeconds,
     endSeconds: endSeconds ?? this.endSeconds,
     kind: kind ?? this.kind,
     compartmentNumbers: compartmentNumbers ?? this.compartmentNumbers,
+    n2Exchange: n2Exchange ?? this.n2Exchange,
+    heExchange: heExchange ?? this.heExchange,
+    netExchange: netExchange ?? this.netExchange,
   );
 
   @override
@@ -57,6 +79,9 @@ class CounterdiffusionRange extends Equatable {
     endSeconds,
     kind,
     compartmentNumbers,
+    n2Exchange,
+    heExchange,
+    netExchange,
   ];
 }
 

@@ -2815,23 +2815,21 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     }
 
     // Counterdiffusion span under the cursor (#4530).
-    final counterdiffusion = _showCounterdiffusion
-        ? counterdiffusionTooltip(
-            widget.counterdiffusion,
-            point.timestamp,
-            showAll: _counterdiffusionShowAll,
-            l10n: l10n,
-            scheme: Theme.of(context).colorScheme,
-          )
-        : null;
-    if (counterdiffusion != null) {
-      rows.add(
-        TooltipRow(
-          label: counterdiffusion.label,
-          value: counterdiffusion.value,
-          bulletColor: counterdiffusion.bulletColor,
-        ),
-      );
+    if (_showCounterdiffusion) {
+      rows.addAll([
+        for (final row in counterdiffusionTooltip(
+          widget.counterdiffusion,
+          point.timestamp,
+          showAll: _counterdiffusionShowAll,
+          l10n: l10n,
+          scheme: Theme.of(context).colorScheme,
+        ))
+          TooltipRow(
+            label: row.label,
+            value: row.value,
+            bulletColor: row.bulletColor,
+          ),
+      ]);
     }
 
     // Marker info (if touching near a marker)

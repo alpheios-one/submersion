@@ -3109,6 +3109,11 @@
   "diveLog_counterdiffusion_segment_all": "الكل",
   "diveLog_tooltip_counterdiffusion_icd": "انتشار عكسي (ICD)",
   "diveLog_tooltip_counterdiffusion_opposing": "تبادل متعاكس",
+  "diveLog_tooltip_counterdiffusion_exchange": "تبادل الغازات",
+  "diveLog_tooltip_counterdiffusion_directions": "N₂ {n2}، He {he}، الصافي {net}",
+  "diveLog_tooltip_counterdiffusion_in": "داخل",
+  "diveLog_tooltip_counterdiffusion_out": "خارج",
+  "diveLog_tooltip_counterdiffusion_mixed": "مختلط",
   "diveLog_tooltip_counterdiffusion_compartments": "#{list}",
   "@diveLog_tooltip_counterdiffusion_compartments": {
     "placeholders": {

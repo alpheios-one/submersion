@@ -9376,6 +9376,27 @@ class AppLocalizationsNl extends AppLocalizations {
       'Tegengestelde uitwisseling';
 
   @override
+  String get diveLog_tooltip_counterdiffusion_exchange => 'Gasuitwisseling';
+
+  @override
+  String diveLog_tooltip_counterdiffusion_directions(
+    String n2,
+    String he,
+    String net,
+  ) {
+    return 'N₂ $n2, He $he, netto $net';
+  }
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_in => 'in';
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_out => 'uit';
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_mixed => 'gemengd';
+
+  @override
   String diveLog_tooltip_counterdiffusion_compartments(String list) {
     return '#$list';
   }

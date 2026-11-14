@@ -2986,6 +2986,11 @@
   "diveLog_counterdiffusion_segment_all": "Tout",
   "diveLog_tooltip_counterdiffusion_icd": "Contre-diffusion (ICD)",
   "diveLog_tooltip_counterdiffusion_opposing": "Échange opposé",
+  "diveLog_tooltip_counterdiffusion_exchange": "Échange gazeux",
+  "diveLog_tooltip_counterdiffusion_directions": "N₂ {n2}, He {he}, au total {net}",
+  "diveLog_tooltip_counterdiffusion_in": "entre",
+  "diveLog_tooltip_counterdiffusion_out": "sort",
+  "diveLog_tooltip_counterdiffusion_mixed": "mixte",
   "diveLog_tooltip_counterdiffusion_compartments": "#{list}",
   "@diveLog_tooltip_counterdiffusion_compartments": {
     "placeholders": {

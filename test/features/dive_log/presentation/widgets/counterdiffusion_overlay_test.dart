@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/deco/entities/gas_exchange.dart';
 import 'package:submersion/features/dive_log/domain/entities/counterdiffusion_analysis.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_tank.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/counterdiffusion_overlay.dart';
@@ -16,12 +17,17 @@ void main() {
     endSeconds: 780,
     kind: CounterdiffusionKind.netOngassing,
     compartmentNumbers: [4, 5],
+    n2Exchange: GasExchange.offgassing,
+    heExchange: GasExchange.ongassing,
+    netExchange: GasExchange.ongassing,
   );
   const opposing = CounterdiffusionRange(
     startSeconds: 1900,
     endSeconds: 3000,
     kind: CounterdiffusionKind.opposing,
     compartmentNumbers: [1, 2, 3, 9],
+    n2Exchange: GasExchange.ongassing,
+    heExchange: GasExchange.offgassing,
   );
   IcdSwitchMarker marker(int time, IcdSeverity severity) => IcdSwitchMarker(
     timestamp: time,
@@ -142,8 +148,8 @@ void main() {
   group('counterdiffusionTooltip', () {
     final l10n = lookupAppLocalizations(const Locale('en'));
 
-    test('an ICD span names its compartments with the warning bullet', () {
-      final row = counterdiffusionTooltip(
+    test('an ICD span names its compartments and how each gas moves', () {
+      final rows = counterdiffusionTooltip(
         analysis,
         700,
         showAll: false,
@@ -151,13 +157,14 @@ void main() {
         scheme: scheme,
       );
 
-      expect(row, isNotNull);
-      expect(row!.label, l10n.diveLog_tooltip_counterdiffusion_icd);
-      expect(
-        row.value,
-        l10n.diveLog_tooltip_counterdiffusion_compartments('4-5'),
-      );
-      expect(row.bulletColor, counterdiffusionIcdColor);
+      expect(rows, hasLength(2));
+      expect(rows[0].label, 'Counterdiffusion (ICD)');
+      expect(rows[0].value, '#4-5');
+      expect(rows[1].label, 'Gas exchange');
+      expect(rows[1].value, 'N₂ out, He in, net in');
+      for (final row in rows) {
+        expect(row.bulletColor, counterdiffusionIcdColor);
+      }
     });
 
     test('an opposing span shows only with All, in the neutral tone', () {
@@ -176,13 +183,29 @@ void main() {
         scheme: scheme,
       );
 
-      expect(hidden, isNull);
-      expect(shown!.label, l10n.diveLog_tooltip_counterdiffusion_opposing);
-      expect(
-        shown.value,
-        l10n.diveLog_tooltip_counterdiffusion_compartments('1-3, 9'),
-      );
-      expect(shown.bulletColor, counterdiffusionOpposingColor(scheme));
+      expect(hidden, isEmpty);
+      expect(shown[0].label, 'Opposing exchange');
+      expect(shown[0].value, '#1-3, 9');
+      // The compartments disagree on the net direction across the span.
+      expect(shown[1].value, 'N₂ in, He out, net mixed');
+      for (final row in shown) {
+        expect(row.bulletColor, counterdiffusionOpposingColor(scheme));
+      }
+    });
+
+    test('every locale renders the directions with its own words', () {
+      for (final locale in AppLocalizations.supportedLocales) {
+        final rows = counterdiffusionTooltip(
+          analysis,
+          700,
+          showAll: false,
+          l10n: lookupAppLocalizations(locale),
+          scheme: scheme,
+        );
+
+        expect(rows[1].value, contains('N₂'), reason: '$locale');
+        expect(rows[1].value, isNot(contains('{')), reason: '$locale');
+      }
     });
   });
 

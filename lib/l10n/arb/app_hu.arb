@@ -2986,6 +2986,11 @@
   "diveLog_counterdiffusion_segment_all": "Mind",
   "diveLog_tooltip_counterdiffusion_icd": "Ellendiffúzió (ICD)",
   "diveLog_tooltip_counterdiffusion_opposing": "Ellentétes csere",
+  "diveLog_tooltip_counterdiffusion_exchange": "Gázcsere",
+  "diveLog_tooltip_counterdiffusion_directions": "N₂ {n2}, He {he}, nettó {net}",
+  "diveLog_tooltip_counterdiffusion_in": "be",
+  "diveLog_tooltip_counterdiffusion_out": "ki",
+  "diveLog_tooltip_counterdiffusion_mixed": "vegyes",
   "diveLog_tooltip_counterdiffusion_compartments": "#{list}",
   "@diveLog_tooltip_counterdiffusion_compartments": {
     "placeholders": {

@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import 'package:submersion/core/deco/entities/gas_exchange.dart';
 import 'package:submersion/features/dive_log/domain/entities/counterdiffusion_analysis.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_highlight_range.dart';
 import 'package:submersion/features/gas_calculators/domain/icd_calculator.dart'
@@ -98,10 +99,11 @@ CounterdiffusionRange? counterdiffusionRangeAt(
   return null;
 }
 
-/// The cursor tooltip row for the span under [timestamp] (see
-/// [counterdiffusionRangeAt]): its label, the affected compartments, and the
-/// bullet colour of its band. Null outside every shown span.
-({String label, String value, Color bulletColor})? counterdiffusionTooltip(
+/// The cursor tooltip rows for the span under [timestamp] (see
+/// [counterdiffusionRangeAt]): its kind with the affected compartments, then
+/// which way nitrogen, helium and both together move in them, each in the
+/// bullet colour of its band. Empty outside every shown span.
+List<({String label, String value, Color bulletColor})> counterdiffusionTooltip(
   CounterdiffusionAnalysis? analysis,
   int timestamp, {
   required bool showAll,
@@ -109,20 +111,44 @@ CounterdiffusionRange? counterdiffusionRangeAt(
   required ColorScheme scheme,
 }) {
   final range = counterdiffusionRangeAt(analysis, timestamp, showAll: showAll);
-  if (range == null) return null;
+  if (range == null) return const [];
   final icd = range.kind == CounterdiffusionKind.netOngassing;
-  return (
-    label: icd
-        ? l10n.diveLog_tooltip_counterdiffusion_icd
-        : l10n.diveLog_tooltip_counterdiffusion_opposing,
-    value: l10n.diveLog_tooltip_counterdiffusion_compartments(
-      formatCompartmentRuns(range.compartmentNumbers),
+  final bulletColor = icd
+      ? counterdiffusionIcdColor
+      : counterdiffusionOpposingColor(scheme);
+  return [
+    (
+      label: icd
+          ? l10n.diveLog_tooltip_counterdiffusion_icd
+          : l10n.diveLog_tooltip_counterdiffusion_opposing,
+      value: l10n.diveLog_tooltip_counterdiffusion_compartments(
+        formatCompartmentRuns(range.compartmentNumbers),
+      ),
+      bulletColor: bulletColor,
     ),
-    bulletColor: icd
-        ? counterdiffusionIcdColor
-        : counterdiffusionOpposingColor(scheme),
-  );
+    (
+      label: l10n.diveLog_tooltip_counterdiffusion_exchange,
+      value: l10n.diveLog_tooltip_counterdiffusion_directions(
+        _directionWord(range.n2Exchange, l10n),
+        _directionWord(range.heExchange, l10n),
+        _directionWord(range.netExchange, l10n),
+      ),
+      bulletColor: bulletColor,
+    ),
+  ];
 }
+
+/// "in" for gas the tissue takes up, "out" for gas it releases, and
+/// "mixed" when the span's compartments disagree (null). Equilibrium cannot
+/// reach here: a span holds only compartments whose gases move in opposite
+/// directions, so their net moves too.
+String _directionWord(GasExchange? exchange, AppLocalizations l10n) =>
+    switch (exchange) {
+      GasExchange.ongassing => l10n.diveLog_tooltip_counterdiffusion_in,
+      GasExchange.offgassing => l10n.diveLog_tooltip_counterdiffusion_out,
+      GasExchange.equilibrium ||
+      null => l10n.diveLog_tooltip_counterdiffusion_mixed,
+    };
 
 /// Compartment numbers as compact runs, e.g. `[3, 4, 5, 7]` as "3-5, 7".
 String formatCompartmentRuns(List<int> numbers) {

@@ -9467,6 +9467,27 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_tooltip_counterdiffusion_opposing => 'Échange opposé';
 
   @override
+  String get diveLog_tooltip_counterdiffusion_exchange => 'Échange gazeux';
+
+  @override
+  String diveLog_tooltip_counterdiffusion_directions(
+    String n2,
+    String he,
+    String net,
+  ) {
+    return 'N₂ $n2, He $he, au total $net';
+  }
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_in => 'entre';
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_out => 'sort';
+
+  @override
+  String get diveLog_tooltip_counterdiffusion_mixed => 'mixte';
+
+  @override
   String diveLog_tooltip_counterdiffusion_compartments(String list) {
     return '#$list';
   }

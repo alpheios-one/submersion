@@ -1,6 +1,5 @@
 import 'package:submersion/core/deco/entities/deco_status.dart';
 import 'package:submersion/core/deco/entities/gas_exchange.dart';
-import 'package:submersion/core/deco/entities/tissue_compartment.dart';
 import 'package:submersion/features/dive_log/domain/entities/counterdiffusion_analysis.dart';
 
 /// Smallest net on-gassing rate, in bar/min, that counts as isobaric
@@ -58,20 +57,21 @@ CounterdiffusionAnalysis counterdiffusionAnalysisOf(
     final start = timestamps[i];
     final end = i + 1 < timestamps.length ? timestamps[i + 1] : start;
 
-    final icdHere = <int>{};
-    final opposingHere = <int>{};
+    final icdHere = _SampleBuilder();
+    final opposingHere = _SampleBuilder();
     final inspiredN2 = status.inspiredN2Bar;
     final inspiredHe = status.inspiredHeBar;
     if (inspiredN2 != null && inspiredHe != null) {
       for (final compartment in status.compartments) {
-        if (!_opposite(status, compartment)) continue;
-        opposingHere.add(compartment.compartmentNumber);
+        final exchanges = status.gasExchanges(compartment);
+        if (!_opposite(exchanges.n2, exchanges.he)) continue;
+        opposingHere.add(compartment.compartmentNumber, exchanges);
         final tissueTotal = compartment.currentPN2 + compartment.currentPHe;
         // Non-null: the inspired gas is known on this branch.
         final rate = status.netHaldaneRateBarPerMin(compartment)!;
         if (tissueTotal > inspiredN2 + inspiredHe + tolerance &&
             rate > minNetRateBarPerMin) {
-          icdHere.add(compartment.compartmentNumber);
+          icdHere.add(compartment.compartmentNumber, exchanges);
         }
       }
     }
@@ -86,12 +86,9 @@ CounterdiffusionAnalysis counterdiffusionAnalysisOf(
   );
 }
 
-bool _opposite(DecoStatus status, TissueCompartment compartment) {
-  final n2 = status.n2Exchange(compartment);
-  final he = status.heExchange(compartment);
-  return (n2 == GasExchange.ongassing && he == GasExchange.offgassing) ||
-      (n2 == GasExchange.offgassing && he == GasExchange.ongassing);
-}
+bool _opposite(GasExchange? n2, GasExchange? he) =>
+    (n2 == GasExchange.ongassing && he == GasExchange.offgassing) ||
+    (n2 == GasExchange.offgassing && he == GasExchange.ongassing);
 
 bool _holdsHelium(DecoStatus status) {
   const tolerance = DecoStatus.gasEquilibriumToleranceBar;
@@ -107,6 +104,34 @@ bool _holdsHelium(DecoStatus status) {
 List<int> _sortedNumbers(Iterable<int> numbers) =>
     List.unmodifiable(numbers.toList()..sort());
 
+/// The one direction every entry of [seen] agrees on, or null when they
+/// differ (or there are none).
+GasExchange? _agreed(Set<GasExchange?> seen) =>
+    seen.length == 1 ? seen.single : null;
+
+/// [a] when [b] agrees with it, else null: two spans merged into one keep
+/// only the directions both report.
+GasExchange? _shared(GasExchange? a, GasExchange? b) => a == b ? a : null;
+
+/// The compartments of one sample that meet a kind, with the directions
+/// they move in.
+class _SampleBuilder {
+  final Set<int> compartments = {};
+  final Set<GasExchange?> n2 = {};
+  final Set<GasExchange?> he = {};
+  final Set<GasExchange?> net = {};
+
+  void add(
+    int compartmentNumber,
+    ({GasExchange? n2, GasExchange? he, GasExchange? net}) exchanges,
+  ) {
+    compartments.add(compartmentNumber);
+    n2.add(exchanges.n2);
+    he.add(exchanges.he);
+    net.add(exchanges.net);
+  }
+}
+
 /// Collects consecutive samples that meet one kind into spans.
 class _RunBuilder {
   final CounterdiffusionKind kind;
@@ -114,18 +139,24 @@ class _RunBuilder {
   int? _start;
   int? _end;
   final Set<int> _compartments = {};
+  final Set<GasExchange?> _n2 = {};
+  final Set<GasExchange?> _he = {};
+  final Set<GasExchange?> _net = {};
 
   _RunBuilder(this.kind);
 
   /// Adds the sample at [start], whose state holds until [end].
-  void add(int start, int end, Set<int> compartments) {
-    if (compartments.isEmpty) {
+  void add(int start, int end, _SampleBuilder sample) {
+    if (sample.compartments.isEmpty) {
       _close();
       return;
     }
     _start ??= start;
     _end = end;
-    _compartments.addAll(compartments);
+    _compartments.addAll(sample.compartments);
+    _n2.addAll(sample.n2);
+    _he.addAll(sample.he);
+    _net.addAll(sample.net);
   }
 
   void _close() {
@@ -138,12 +169,18 @@ class _RunBuilder {
           endSeconds: end,
           kind: kind,
           compartmentNumbers: _sortedNumbers(_compartments),
+          n2Exchange: _agreed(_n2),
+          heExchange: _agreed(_he),
+          netExchange: _agreed(_net),
         ),
       );
     }
     _start = null;
     _end = null;
     _compartments.clear();
+    _n2.clear();
+    _he.clear();
+    _net.clear();
   }
 
   List<CounterdiffusionRange> build(int minDuration, int mergeGap) {
@@ -152,12 +189,19 @@ class _RunBuilder {
     for (final run in _runs) {
       final last = merged.isEmpty ? null : merged.last;
       if (last != null && run.startSeconds - last.endSeconds <= mergeGap) {
-        merged[merged.length - 1] = last.copyWith(
+        // Built whole rather than by copyWith, which cannot clear a
+        // direction the two spans disagree on.
+        merged[merged.length - 1] = CounterdiffusionRange(
+          startSeconds: last.startSeconds,
           endSeconds: run.endSeconds,
+          kind: kind,
           compartmentNumbers: _sortedNumbers({
             ...last.compartmentNumbers,
             ...run.compartmentNumbers,
           }),
+          n2Exchange: _shared(last.n2Exchange, run.n2Exchange),
+          heExchange: _shared(last.heExchange, run.heExchange),
+          netExchange: _shared(last.netExchange, run.netExchange),
         );
       } else {
         merged.add(run);

@@ -14853,6 +14853,40 @@ abstract class AppLocalizations {
   /// **'Opposing exchange'**
   String get diveLog_tooltip_counterdiffusion_opposing;
 
+  /// No description provided for @diveLog_tooltip_counterdiffusion_exchange.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas exchange'**
+  String get diveLog_tooltip_counterdiffusion_exchange;
+
+  /// Counterdiffusion tooltip: how nitrogen, helium and both together move in the span's compartments. Each value is the in, out or mixed word.
+  ///
+  /// In en, this message translates to:
+  /// **'N₂ {n2}, He {he}, net {net}'**
+  String diveLog_tooltip_counterdiffusion_directions(
+    String n2,
+    String he,
+    String net,
+  );
+
+  /// No description provided for @diveLog_tooltip_counterdiffusion_in.
+  ///
+  /// In en, this message translates to:
+  /// **'in'**
+  String get diveLog_tooltip_counterdiffusion_in;
+
+  /// No description provided for @diveLog_tooltip_counterdiffusion_out.
+  ///
+  /// In en, this message translates to:
+  /// **'out'**
+  String get diveLog_tooltip_counterdiffusion_out;
+
+  /// No description provided for @diveLog_tooltip_counterdiffusion_mixed.
+  ///
+  /// In en, this message translates to:
+  /// **'mixed'**
+  String get diveLog_tooltip_counterdiffusion_mixed;
+
   /// No description provided for @diveLog_tooltip_counterdiffusion_compartments.
   ///
   /// In en, this message translates to:
