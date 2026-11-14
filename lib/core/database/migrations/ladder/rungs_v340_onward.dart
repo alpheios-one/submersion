@@ -192,11 +192,18 @@ extension RungsFromV340 on AppDatabase {
     if (from < 364) await _assertBodyCompositionColumns();
     if (from < 364) await reportProgress();
 
-    // v365: diver_settings.default_show_counterdiffusion, the default
+    // v365: diver_settings.recent_equipment_colors, the custom colours the
+    // diver picked for their gear (issue #4537). Nullable, no backfill.
+    // Re-asserted in beforeOpen. Renumbered from 364, which main took for
+    // #4525.
+    if (from < 365) await _assertRecentEquipmentColorsColumn();
+    if (from < 365) await reportProgress();
+
+    // v366: diver_settings.default_show_counterdiffusion, the default
     // visibility of the isobaric counterdiffusion overlay on the dive profile
     // (issue #4530). Column only, defaulted off; re-asserted in beforeOpen.
-    // Renumbered from 364, which main took for #4525.
-    if (from < 365) await _assertDefaultShowCounterdiffusionColumn();
-    if (from < 365) await reportProgress();
+    // Renumbered from 365, which main took for #4537.
+    if (from < 366) await _assertDefaultShowCounterdiffusionColumn();
+    if (from < 366) await reportProgress();
   }
 }
