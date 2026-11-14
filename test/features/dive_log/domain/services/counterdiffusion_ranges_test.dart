@@ -90,6 +90,23 @@ void main() {
       expect(result.heliumPresent, isTrue);
     });
 
+    test('nitrogen entering while helium leaves is never ICD, even with the '
+        'tissue above the breathed total', () {
+      // Tissue 2.0 bar against 1.95 breathed, N2 in by 0.1, He out by 0.15.
+      // Holding more than is breathed means He leaves by more than N2
+      // enters, and He's half-time (1.51 min) is shorter than N2's (4.0), so
+      // the net rate ln2 * (0.1 / 4.0 - 0.15 / 1.51) is negative: only He in
+      // with N2 out can take gas up net here, in every ZH-L16 compartment.
+      DecoStatus heLeaving() =>
+          status([comp(pN2: 0.4, pHe: 1.6)], inspiredN2: 0.5, inspiredHe: 1.45);
+      final statuses = [heLeaving(), heLeaving(), heLeaving(), heLeaving()];
+
+      final result = counterdiffusionAnalysisOf(statuses, every10s(4));
+
+      expect(result.icdRanges, isEmpty);
+      expect(result.opposingRanges.single.netExchange, GasExchange.offgassing);
+    });
+
     test('ordinary uptake with helium leaving is opposing, never ICD', () {
       final statuses = [uptake(), uptake(), uptake(), uptake()];
 

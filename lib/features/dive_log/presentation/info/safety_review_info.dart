@@ -14,7 +14,10 @@ List<DiveTerm> _termsFor(SafetyRuleId rule) => switch (rule) {
   SafetyRuleId.lateGasSwitch => const [DiveTerm.lateGasSwitch],
   // The rule fires on a switch that breaks the rule of fifths and on a
   // tissue-model span where helium enters faster than nitrogen leaves; the
-  // first term explains only the switch, the second the span (#4530).
+  // first term explains only the switch, the second the span (#4530). The
+  // analysis checks either opposing direction, but only this one can take
+  // gas up net while the tissue holds more than is breathed: helium's
+  // half-time is the shorter in every ZH-L16 compartment.
   SafetyRuleId.isobaricCounterdiffusion => const [
     DiveTerm.isobaricCounterdiffusion,
     DiveTerm.counterdiffusionProfile,
